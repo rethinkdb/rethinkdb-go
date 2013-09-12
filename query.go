@@ -20,12 +20,7 @@ type List []interface{}
 type termsList []RqlTerm
 type termsObj map[string]RqlTerm
 
-type RqlTerm interface {
-	String() string
-	build() *p.Term
-}
-
-type RqlVal struct {
+type RqlTerm struct {
 	name     string
 	termType p.Term_TermType
 	data     interface{}
@@ -34,7 +29,7 @@ type RqlVal struct {
 }
 
 // build takes the query tree and turns it into a protobuf term tree.
-func (t RqlVal) build() *p.Term {
+func (t RqlTerm) build() *p.Term {
 	switch t.termType {
 	case p.Term_DATUM:
 		if t.data == nil {
@@ -100,26 +95,41 @@ func (t RqlVal) build() *p.Term {
 }
 
 // compose returns a string representation of the query tree
-func (t RqlVal) String() string {
+func (t RqlTerm) String() string {
 	switch t.termType {
 	case p.Term_MAKE_ARRAY:
 		return fmt.Sprintf("[%s]", strings.Join(argsToStringSlice(t.args), ", "))
 	case p.Term_MAKE_OBJ:
 		return fmt.Sprintf("{%s}", strings.Join(optArgsToStringSlice(t.optArgs), ", "))
+	case p.Term_FUNC:
+		// Get string representation of each argument
+		args := []string{}
+		for _, v := range t.args[0].data.([]interface{}) {
+			args = append(args, fmt.Sprintf("var_%d", v))
+		}
+
+		return fmt.Sprintf("func(%s r.RqlTerm) r.RqlTerm { return %s }",
+			strings.Join(args, ", "),
+			t.args[1].String(),
+		)
+	case p.Term_VAR:
+		return fmt.Sprintf("var_%s", t.args[0])
+	case p.Term_IMPLICIT_VAR:
+		return "r.Row"
 	case p.Term_DATUM:
 		return fmt.Sprintf("%v", t.data)
 	default:
 		if t.name != "" {
 			return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 		} else {
-			return fmt.Sprintf("(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
+			return fmt.Sprintf("(%s)", strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 		}
 	}
 }
 
-// newRqlVal is an alias for creating a new RqlValue.
-func newRqlVal(name string, termType p.Term_TermType, args List, optArgs Obj) RqlVal {
-	return RqlVal{
+// newRqlTerm is an alias for creating a new RqlTermue.
+func newRqlTerm(name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
+	return RqlTerm{
 		name:     name,
 		termType: termType,
 		args:     listToTermsList(args),
@@ -127,15 +137,15 @@ func newRqlVal(name string, termType p.Term_TermType, args List, optArgs Obj) Rq
 	}
 }
 
-// newRqlValFromPrevVal is an alias for creating a new RqlValue. Unlike newRqlVal
+// newRqlTermFromPrevVal is an alias for creating a new RqlTermue. Unlike newRqlTerm
 // this function adds the previous expression in the tree to the argument list.
 // It is used when evalutating an expression like
 //
 // `r.Expr(1).Add(2).Mul(3)`
-func newRqlValFromPrevVal(prevVal RqlVal, name string, termType p.Term_TermType, args List, optArgs Obj) RqlVal {
+func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
 	args = append(List{prevVal}, args...)
 
-	return RqlVal{
+	return RqlTerm{
 		name:     name,
 		termType: termType,
 		args:     listToTermsList(args),

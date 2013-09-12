@@ -27,21 +27,21 @@ func (s *RethinkSuite) TestControlExecList(c *test.C) {
 // }
 
 func (s *RethinkSuite) TestControlDo(c *test.C) {
-	query := Do(Obj{"a": 1}, Obj{"a": 2}, Obj{"a": 3}, func(row RqlTerm) RqlTerm {
+	query := Do(List{Obj{"a": 1}, Obj{"a": 2}, Obj{"a": 3}}, func(row RqlTerm) RqlTerm {
 		// return row.Field("a")
 		return row
 	})
 	fmt.Println(query.String())
 }
 
-func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
-	query := Expr(List{
-		Obj{"a": 1},
-		Obj{"a": 2},
-		Obj{"a": 3},
-	}).Do(func(row RqlTerm) RqlTerm {
-		// return row.Field("a")
-		return row
-	})
-	fmt.Println(query.String())
-}
+// func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
+// 	query := Expr(List{
+// 		Obj{"a": 1},
+// 		Obj{"a": 2},
+// 		Obj{"a": 3},
+// 	}).Do(func(row RqlTerm) RqlTerm {
+// 		// return row.Field("a")
+// 		return row
+// 	})
+// 	fmt.Println(query.String())
+// }

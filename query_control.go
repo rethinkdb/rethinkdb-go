@@ -2,6 +2,7 @@ package rethinkgo
 
 import (
 	p "github.com/christopherhesse/rethinkgo/ql2"
+	"reflect"
 )
 
 // Expr converts any value to an expression.  Internally it uses the `json`
@@ -20,20 +21,18 @@ import (
 // Example response:
 //
 //  {"go": "awesome", "rethinkdb": "awesomer"}
-func Expr(value interface{}) RqlVal {
+func Expr(value interface{}) RqlTerm {
 	return expr(value, 20)
 }
 
-func expr(value interface{}, depth int) RqlVal {
+func expr(value interface{}, depth int) RqlTerm {
 	if depth <= 0 {
 		panic("Maximum nesting depth limit exceeded")
 	}
 
 	switch val := value.(type) {
-	case RqlVal:
+	case RqlTerm:
 		return val
-	// case func(...interface{}) RqlQueryBase:
-	// 	return makeFunc(val, map[string]interface{}{})
 	// case time.Time:
 	// 	return EpochTime(val.Unix())
 	case List:
@@ -51,7 +50,13 @@ func expr(value interface{}, depth int) RqlVal {
 
 		return makeObject(vals)
 	default:
-		return RqlVal{
+		// Use reflection to check for other types
+		if reflect.TypeOf(val).Kind() == reflect.Func {
+			return makeFunc(val)
+		}
+
+		// If no other match was found then return a datum value
+		return RqlTerm{
 			termType: p.Term_DATUM,
 			data:     val,
 		}
@@ -72,14 +77,16 @@ func expr(value interface{}, depth int) RqlVal {
 // Example response:
 //
 // [1,2,3]
-func (t RqlVal) Do(args ...interface{}) RqlVal {
+func (t RqlTerm) Do(args ...interface{}) RqlTerm {
 	enforceArgLength(1, 1, args)
+	args[len(args)-1] = funcWrap(args[len(args)-1])
 
-	return newRqlValFromPrevVal(t, "do", p.Term_FUNCALL, args, Obj{})
+	return newRqlTermFromPrevVal(t, "do", p.Term_FUNCALL, args, Obj{})
 }
 
-func Do(args ...interface{}) RqlVal {
+func Do(args ...interface{}) RqlTerm {
 	enforceArgLength(2, 0, args)
+	args[len(args)-1] = funcWrap(args[len(args)-1])
 
-	return newRqlVal("do", p.Term_FUNCALL, args, Obj{})
+	return newRqlTerm("do", p.Term_FUNCALL, args, Obj{})
 }
