@@ -28,18 +28,18 @@ type RqlTerm interface {
 type RqlOp interface {
 	RqlTerm
 	Add(args ...interface{}) RqlOp
-	// Sub(args ...interface{}) RqlOp
-	// Mul(args ...interface{}) RqlOp
-	// Div(args ...interface{}) RqlOp
-	// Mod(args ...interface{}) RqlOp
-	// And(args ...interface{}) RqlOp
-	// Or(args ...interface{}) RqlOp
-	// Eq(args ...interface{}) RqlOp
-	// Ne(args ...interface{}) RqlOp
-	// Gt(args ...interface{}) RqlOp
-	// Ge(args ...interface{}) RqlOp
-	// Lt(args ...interface{}) RqlOp
-	// Not(args ...interface{}) RqlOp
+	Sub(args ...interface{}) RqlOp
+	Mul(args ...interface{}) RqlOp
+	Div(args ...interface{}) RqlOp
+	Mod(args ...interface{}) RqlOp
+	And(args ...interface{}) RqlOp
+	Or(args ...interface{}) RqlOp
+	Eq(args ...interface{}) RqlOp
+	Ne(args ...interface{}) RqlOp
+	Gt(args ...interface{}) RqlOp
+	Ge(args ...interface{}) RqlOp
+	Lt(args ...interface{}) RqlOp
+	Not() RqlOp
 }
 
 type RqlVal struct {
