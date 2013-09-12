@@ -57,3 +57,29 @@ func expr(value interface{}, depth int) RqlVal {
 		}
 	}
 }
+
+// Do evalutes the last argument (a function) using all previous arguments as the arguments to the function.
+//
+// For instance, Do(a, b, c, f) will be run as f(a, b, c).
+//
+// Example usage:
+//
+//  var response interface{}
+//  err := r.Do(1, 2, 3, func(a, b, c r.Exp) interface{} {
+//      return r.List{a, b, c}
+//  }).Run(session).One(&response)
+//
+// Example response:
+//
+// [1,2,3]
+func (t RqlVal) Do(args ...interface{}) RqlVal {
+	enforceArgLength(1, 1, args)
+
+	return newRqlValFromPrevVal(t, "do", p.Term_FUNCALL, args, Obj{})
+}
+
+func Do(args ...interface{}) RqlVal {
+	enforceArgLength(2, 0, args)
+
+	return newRqlVal("do", p.Term_FUNCALL, args, Obj{})
+}
