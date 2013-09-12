@@ -1,0 +1,11 @@
+how to compile ql2.go:
+    brew install mercurial
+    go get code.google.com/p/goprotobuf/{proto,protoc-gen-go}
+    brew install protobuf
+    protoc --go_out=. ql2.proto
+
+testing:
+    go get launchpad.net/gocheck
+    go test
+    for specific test function:
+        go test -gocheck.f TestGroups
