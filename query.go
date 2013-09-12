@@ -33,6 +33,7 @@ type RqlVal struct {
 	optArgs  map[string]RqlTerm
 }
 
+// build takes the query tree and turns it into a protobuf term tree.
 func (t RqlVal) build() *p.Term {
 	switch t.termType {
 	case p.Term_DATUM:
@@ -98,6 +99,7 @@ func (t RqlVal) build() *p.Term {
 	}
 }
 
+// compose returns a string representation of the query tree
 func (t RqlVal) compose() string {
 	switch t.termType {
 	case p.Term_MAKE_ARRAY:
@@ -115,6 +117,7 @@ func (t RqlVal) compose() string {
 	}
 }
 
+// newRqlVal is an alias for creating a new RqlValue.
 func newRqlVal(name string, termType p.Term_TermType, args List, optArgs Obj) RqlVal {
 	return RqlVal{
 		name:     name,
@@ -124,6 +127,11 @@ func newRqlVal(name string, termType p.Term_TermType, args List, optArgs Obj) Rq
 	}
 }
 
+// newRqlValFromPrevVal is an alias for creating a new RqlValue. Unlike newRqlVal
+// this function adds the previous expression in the tree to the argument list.
+// It is used when evalutating an expression like
+//
+// `r.Expr(1).Add(2).Mul(3)`
 func newRqlValFromPrevVal(prevVal RqlVal, name string, termType p.Term_TermType, args List, optArgs Obj) RqlVal {
 	args = append(List{prevVal}, args...)
 
