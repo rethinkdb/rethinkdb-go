@@ -28,10 +28,10 @@ func allArgsToStringSlice(args termsList, optArgs termsObj) []string {
 	allArgs := []string{}
 
 	for _, v := range args {
-		allArgs = append(allArgs, v.compose())
+		allArgs = append(allArgs, v.String())
 	}
 	for k, v := range optArgs {
-		allArgs = append(allArgs, k+"="+v.compose())
+		allArgs = append(allArgs, k+"="+v.String())
 	}
 
 	return allArgs
@@ -41,7 +41,7 @@ func argsToStringSlice(args termsList) []string {
 	allArgs := []string{}
 
 	for _, v := range args {
-		allArgs = append(allArgs, v.compose())
+		allArgs = append(allArgs, v.String())
 	}
 
 	return allArgs
@@ -51,7 +51,7 @@ func optArgsToStringSlice(optArgs termsObj) []string {
 	allArgs := []string{}
 
 	for k, v := range optArgs {
-		allArgs = append(allArgs, k+"="+v.compose())
+		allArgs = append(allArgs, k+"="+v.String())
 	}
 
 	return allArgs

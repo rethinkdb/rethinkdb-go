@@ -21,7 +21,7 @@ type termsList []RqlTerm
 type termsObj map[string]RqlTerm
 
 type RqlTerm interface {
-	compose() string
+	String() string
 	build() *p.Term
 }
 
@@ -100,7 +100,7 @@ func (t RqlVal) build() *p.Term {
 }
 
 // compose returns a string representation of the query tree
-func (t RqlVal) compose() string {
+func (t RqlVal) String() string {
 	switch t.termType {
 	case p.Term_MAKE_ARRAY:
 		return fmt.Sprintf("[%s]", strings.Join(argsToStringSlice(t.args), ", "))
