@@ -33,7 +33,7 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 		db = "test"
 	}
 
-	SetDebug(*debug)
+	// SetDebug(*debug)
 	var err error
 	session, err = Connect(map[string]interface{}{
 		"address": url,

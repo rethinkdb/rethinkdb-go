@@ -25,7 +25,7 @@ type Session struct {
 
 	debug bool
 
-	conn   *connection
+	// conn   *connection
 	closed bool
 }
 
@@ -68,7 +68,7 @@ func Connect(args map[string]interface{}) (*Session, error) {
 	var err error
 
 	s := NewSession(args)
-	s.conn, err = serverConnect(s.address, s.authkey)
+	// s.conn, err = serverConnect(s.address, s.authkey)
 	return s, err
 }
 
@@ -84,7 +84,7 @@ func (s *Session) Reconnect() error {
 	}
 
 	s.closed = false
-	s.conn, err = serverConnect(s.address, s.authkey)
+	// s.conn, err = serverConnect(s.address, s.authkey)
 	return err
 }
 
@@ -98,7 +98,8 @@ func (s *Session) Close() error {
 		return nil
 	}
 
-	err := s.conn.Close()
+	// err := s.conn.Close()
+	var err error = nil
 	s.closed = true
 
 	return err
