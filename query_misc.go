@@ -7,7 +7,7 @@ import (
 // Helper functions for creating internal RQL types
 
 // makeArray takes a slice of terms and produces a single MAKE_ARRAY term
-func makeArray(args termsList) RqlOp {
+func makeArray(args termsList) RqlVal {
 
 	return RqlVal{
 		name:     "[...]",
@@ -17,7 +17,7 @@ func makeArray(args termsList) RqlOp {
 }
 
 // makeObject takes a map of terms and produces a single MAKE_OBJECT term
-func makeObject(args termsObj) RqlOp {
+func makeObject(args termsObj) RqlVal {
 	// First all evaluate all fields in the map
 	temp := termsObj{}
 	for k, v := range args {

@@ -1,5 +1,9 @@
 package rethinkgo
 
+import (
+	p "github.com/christopherhesse/rethinkgo/ql2"
+)
+
 // Expr converts any value to an expression.  Internally it uses the `json`
 // module to convert any literals, so any type annotations or methods understood
 // by that module can be used. If the value cannot be converted, an error is
@@ -16,17 +20,17 @@ package rethinkgo
 // Example response:
 //
 //  {"go": "awesome", "rethinkdb": "awesomer"}
-func Expr(value interface{}) RqlOp {
+func Expr(value interface{}) RqlVal {
 	return expr(value, 20)
 }
 
-func expr(value interface{}, depth int) RqlOp {
+func expr(value interface{}, depth int) RqlVal {
 	if depth <= 0 {
 		panic("Maximum nesting depth limit exceeded")
 	}
 
 	switch val := value.(type) {
-	case RqlOp:
+	case RqlVal:
 		return val
 	// case func(...interface{}) RqlQueryBase:
 	// 	return makeFunc(val, map[string]interface{}{})
@@ -47,8 +51,9 @@ func expr(value interface{}, depth int) RqlOp {
 
 		return makeObject(vals)
 	default:
-		return RqlDatum{
-			data: val,
+		return RqlVal{
+			termType: p.Term_DATUM,
+			data:     val,
 		}
 	}
 }
