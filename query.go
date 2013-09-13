@@ -115,7 +115,9 @@ func (t RqlTerm) String() string {
 	case p.Term_VAR:
 		return fmt.Sprintf("var_%s", t.args[0])
 	case p.Term_IMPLICIT_VAR:
-		return "r.Row"
+		return "r.Row()"
+	case p.Term_GET_FIELD:
+		return fmt.Sprintf("%s(%s)", t.args[0], t.args[1])
 	case p.Term_DATUM:
 		return fmt.Sprintf("%v", t.data)
 	default:

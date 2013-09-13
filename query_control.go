@@ -85,7 +85,7 @@ func (t RqlTerm) Do(args ...interface{}) RqlTerm {
 }
 
 func Do(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 	args[len(args)-1] = funcWrap(args[len(args)-1])
 
 	return newRqlTerm("do", p.Term_FUNCALL, args, Obj{})

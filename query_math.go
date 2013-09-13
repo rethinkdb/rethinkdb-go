@@ -11,15 +11,15 @@ import (
 //  r.Expr(1,2,3).Add(r.Expr(4,5,6)) => [1,2,3,4,5,6]
 //  r.Expr(2).Add(2) => 4
 func (t RqlTerm) Add(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "add", p.Term_ADD, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Add", p.Term_ADD, args, Obj{})
 }
 
 func Add(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("add", p.Term_ADD, args, Obj{})
+	return newRqlTerm("Add", p.Term_ADD, args, Obj{})
 }
 
 // Sub subtracts two numbers.
@@ -28,15 +28,15 @@ func Add(args ...interface{}) RqlTerm {
 //
 //  r.Expr(2).Sub(2) => 0
 func (t RqlTerm) Sub(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "sub", p.Term_SUB, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Sub", p.Term_SUB, args, Obj{})
 }
 
 func Sub(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("sub", p.Term_SUB, args, Obj{})
+	return newRqlTerm("Sub", p.Term_SUB, args, Obj{})
 }
 
 // Mul multiplies two numbers.
@@ -45,15 +45,15 @@ func Sub(args ...interface{}) RqlTerm {
 //
 //  r.Expr(2).Mul(3) => 6
 func (t RqlTerm) Mul(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "mul", p.Term_MUL, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Mul", p.Term_MUL, args, Obj{})
 }
 
 func Mul(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("mul", p.Term_MUL, args, Obj{})
+	return newRqlTerm("Mul", p.Term_MUL, args, Obj{})
 }
 
 // Div divides two numbers.
@@ -62,15 +62,15 @@ func Mul(args ...interface{}) RqlTerm {
 //
 //  r.Expr(3).Div(2) => 1.5
 func (t RqlTerm) Div(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "div", p.Term_DIV, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Div", p.Term_DIV, args, Obj{})
 }
 
 func Div(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("div", p.Term_DIV, args, Obj{})
+	return newRqlTerm("Div", p.Term_DIV, args, Obj{})
 }
 
 // Mod divides two numbers and returns the remainder.
@@ -81,13 +81,13 @@ func Div(args ...interface{}) RqlTerm {
 func (t RqlTerm) Mod(args ...interface{}) RqlTerm {
 	enforceArgLength(1, 1, args)
 
-	return newRqlTermFromPrevVal(t, "mod", p.Term_MOD, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Mod", p.Term_MOD, args, Obj{})
 }
 
 func Mod(args ...interface{}) RqlTerm {
 	enforceArgLength(2, 2, args)
 
-	return newRqlTerm("mod", p.Term_MOD, args, Obj{})
+	return newRqlTerm("Mod", p.Term_MOD, args, Obj{})
 }
 
 // And performs a logical and on two values.
@@ -96,15 +96,15 @@ func Mod(args ...interface{}) RqlTerm {
 //
 //  r.Expr(true).And(true) => true
 func (t RqlTerm) And(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "and", p.Term_ALL, args, Obj{})
+	return newRqlTermFromPrevVal(t, "And", p.Term_ALL, args, Obj{})
 }
 
 func And(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("and", p.Term_ALL, args, Obj{})
+	return newRqlTerm("And", p.Term_ALL, args, Obj{})
 }
 
 // Or performs a logical or on two values.
@@ -113,15 +113,15 @@ func And(args ...interface{}) RqlTerm {
 //
 //  r.Expr(true).Or(false) => true
 func (t RqlTerm) Or(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "or", p.Term_ANY, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Or", p.Term_ANY, args, Obj{})
 }
 
 func Or(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("or", p.Term_ANY, args, Obj{})
+	return newRqlTerm("Or", p.Term_ANY, args, Obj{})
 }
 
 // Eq returns true if two values are equal.
@@ -130,15 +130,15 @@ func Or(args ...interface{}) RqlTerm {
 //
 //  r.Expr(1).Eq(1) => true
 func (t RqlTerm) Eq(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "eq", p.Term_EQ, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Eq", p.Term_EQ, args, Obj{})
 }
 
 func Eq(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("eq", p.Term_EQ, args, Obj{})
+	return newRqlTerm("Eq", p.Term_EQ, args, Obj{})
 }
 
 // Ne returns true if two values are not equal.
@@ -147,15 +147,15 @@ func Eq(args ...interface{}) RqlTerm {
 //
 //  r.Expr(1).Ne(-1) => true
 func (t RqlTerm) Ne(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "ne", p.Term_NE, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Ne", p.Term_NE, args, Obj{})
 }
 
 func Ne(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("ne", p.Term_NE, args, Obj{})
+	return newRqlTerm("Ne", p.Term_NE, args, Obj{})
 }
 
 // Gt returns true if the first value is greater than the second.
@@ -164,15 +164,15 @@ func Ne(args ...interface{}) RqlTerm {
 //
 //  r.Expr(2).Gt(1) => true
 func (t RqlTerm) Gt(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "gt", p.Term_GT, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Gt", p.Term_GT, args, Obj{})
 }
 
 func Gt(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("gt", p.Term_GT, args, Obj{})
+	return newRqlTerm("Gt", p.Term_GT, args, Obj{})
 }
 
 // Gt returns true if the first value is greater than or equal to the second.
@@ -181,15 +181,15 @@ func Gt(args ...interface{}) RqlTerm {
 //
 //  r.Expr(2).Gt(2) => true
 func (t RqlTerm) Ge(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "ge", p.Term_GE, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Ge", p.Term_GE, args, Obj{})
 }
 
 func Ge(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("ge", p.Term_GE, args, Obj{})
+	return newRqlTerm("Ge", p.Term_GE, args, Obj{})
 }
 
 // Lt returns true if the first value is less than the second.
@@ -198,15 +198,15 @@ func Ge(args ...interface{}) RqlTerm {
 //
 //  r.Expr(1).Lt(2) => true
 func (t RqlTerm) Lt(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "lt", p.Term_LT, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Lt", p.Term_LT, args, Obj{})
 }
 
 func Lt(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("lt", p.Term_LT, args, Obj{})
+	return newRqlTerm("Lt", p.Term_LT, args, Obj{})
 }
 
 // Le returns true if the first value is less than or equal to the second.
@@ -215,15 +215,15 @@ func Lt(args ...interface{}) RqlTerm {
 //
 //  r.Expr(2).Lt(2) => true
 func (t RqlTerm) Le(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTermFromPrevVal(t, "le", p.Term_LE, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Le", p.Term_LE, args, Obj{})
 }
 
 func Le(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 0, args)
+	enforceArgLength(2, -1, args)
 
-	return newRqlTerm("le", p.Term_LE, args, Obj{})
+	return newRqlTerm("Le", p.Term_LE, args, Obj{})
 }
 
 // Not performs a logical not on a value.
@@ -232,11 +232,11 @@ func Le(args ...interface{}) RqlTerm {
 //
 //  r.Expr(true).Not() => false
 func (t RqlTerm) Not() RqlTerm {
-	return newRqlTermFromPrevVal(t, "not", p.Term_NOT, List{}, Obj{})
+	return newRqlTermFromPrevVal(t, "Not", p.Term_NOT, List{}, Obj{})
 }
 
 func Not(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 0, args)
+	enforceArgLength(1, -1, args)
 
-	return newRqlTerm("not", p.Term_NOT, args, Obj{})
+	return newRqlTerm("Not", p.Term_NOT, args, Obj{})
 }
