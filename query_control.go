@@ -1,7 +1,7 @@
 package rethinkgo
 
 import (
-	p "github.com/christopherhesse/rethinkgo/ql2"
+	p "github.com/dancannon/rethinkgo/ql2"
 	"reflect"
 )
 
@@ -63,6 +63,18 @@ func expr(value interface{}, depth int) RqlTerm {
 	}
 }
 
+func Js(js string) RqlTerm {
+	return newRqlTerm("Js", p.Term_JAVASCRIPT, List{js}, Obj{})
+}
+
+func Json(json string) RqlTerm {
+	return newRqlTerm("Json", p.Term_JSON, List{json}, Obj{})
+}
+
+func Error(message string) RqlTerm {
+	return newRqlTerm("Error", p.Term_ERROR, List{message}, Obj{})
+}
+
 // Do evalutes the last argument (a function) using all previous arguments as the arguments to the function.
 //
 // For instance, Do(a, b, c, f) will be run as f(a, b, c).
@@ -81,12 +93,36 @@ func (t RqlTerm) Do(args ...interface{}) RqlTerm {
 	enforceArgLength(1, 1, args)
 	args[len(args)-1] = funcWrap(args[len(args)-1])
 
-	return newRqlTermFromPrevVal(t, "do", p.Term_FUNCALL, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Do", p.Term_FUNCALL, args, Obj{})
 }
 
 func Do(args ...interface{}) RqlTerm {
 	enforceArgLength(2, -1, args)
 	args[len(args)-1] = funcWrap(args[len(args)-1])
 
-	return newRqlTerm("do", p.Term_FUNCALL, args, Obj{})
+	return newRqlTerm("Do", p.Term_FUNCALL, args, Obj{})
+}
+
+func Branch(test, trueBranch, falseBranch interface{}) RqlTerm {
+	return newRqlTerm("Branch", p.Term_BRANCH, List{test, trueBranch, falseBranch}, Obj{})
+}
+
+func (t RqlTerm) ForEach(f interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Foreach", p.Term_FOREACH, List{funcWrap(f)}, Obj{})
+}
+
+func (t RqlTerm) Default(value interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, List{value}, Obj{})
+}
+
+func (t RqlTerm) CoerceTo(typeName string) RqlTerm {
+	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, List{typeName}, Obj{})
+}
+
+func (t RqlTerm) TypeOf() RqlTerm {
+	return newRqlTermFromPrevVal(t, "TypeOf", p.Term_TYPEOF, List{}, Obj{})
+}
+
+func (t RqlTerm) Info() RqlTerm {
+	return newRqlTermFromPrevVal(t, "Info", p.Term_INFO, List{}, Obj{})
 }

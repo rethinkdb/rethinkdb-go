@@ -1,7 +1,7 @@
 package rethinkgo
 
 import (
-	p "github.com/christopherhesse/rethinkgo/ql2"
+	p "github.com/dancannon/rethinkgo/ql2"
 )
 
 // Add sums two numbers or concatenates two arrays.

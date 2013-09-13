@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var session *Session
+var conn *Connection
 var debug = flag.Bool("test.debug", false, "debug: print query trees")
 
 func init() {
@@ -35,12 +35,12 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 
 	// SetDebug(*debug)
 	var err error
-	session, err = Connect(map[string]interface{}{
+	conn, err = Connect(map[string]interface{}{
 		"address": url,
 	})
 	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TearDownSuite(c *test.C) {
-	session.Close()
+	conn.Close()
 }

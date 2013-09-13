@@ -2,7 +2,7 @@ package rethinkgo
 
 import (
 	"fmt"
-	p "github.com/christopherhesse/rethinkgo/ql2"
+	p "github.com/dancannon/rethinkgo/ql2"
 	"strings"
 )
 
@@ -32,43 +32,7 @@ type RqlTerm struct {
 func (t RqlTerm) build() *p.Term {
 	switch t.termType {
 	case p.Term_DATUM:
-		if t.data == nil {
-			return &p.Term{
-				Type: p.Term_DATUM.Enum(),
-				Datum: &p.Datum{
-					Type: p.Datum_R_NULL.Enum(),
-				},
-			}
-		} else {
-			switch val := t.data.(type) {
-			case bool:
-				return &p.Term{
-					Type: p.Term_DATUM.Enum(),
-					Datum: &p.Datum{
-						Type:  p.Datum_R_BOOL.Enum(),
-						RBool: &val,
-					},
-				}
-			case float64:
-				return &p.Term{
-					Type: p.Term_DATUM.Enum(),
-					Datum: &p.Datum{
-						Type: p.Datum_R_NUM.Enum(),
-						RNum: &val,
-					},
-				}
-			case string:
-				return &p.Term{
-					Type: p.Term_DATUM.Enum(),
-					Datum: &p.Datum{
-						Type: p.Datum_R_STR.Enum(),
-						RStr: &val,
-					},
-				}
-			default:
-				panic(fmt.Sprintf("Cannot convert type '%T' to Datum", val))
-			}
-		}
+		return constructDatum(t)
 	default:
 		args := []*p.Term{}
 		optArgs := []*p.Term_AssocPair{}
@@ -127,6 +91,10 @@ func (t RqlTerm) String() string {
 			return fmt.Sprintf("(%s)", strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 		}
 	}
+}
+
+func (t RqlTerm) Run(c *Connection) Result {
+	result, err := c.startQuery(t)
 }
 
 // newRqlTerm is an alias for creating a new RqlTermue.

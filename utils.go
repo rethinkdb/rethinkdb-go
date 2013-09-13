@@ -2,7 +2,9 @@ package rethinkgo
 
 import (
 	"code.google.com/p/goprotobuf/proto"
+	"strconv"
 	"strings"
+	"time"
 )
 
 func enforceArgLength(min, max int, args []interface{}) {
@@ -53,4 +55,28 @@ func prefixLines(s string, prefix string) (result string) {
 
 func protobufToString(p proto.Message, indentLevel int) string {
 	return prefixLines(proto.MarshalTextString(p), strings.Repeat("    ", indentLevel))
+}
+
+func reqlTimeToNativeTime(timestamp int64, timezone string) (time.Time, error) {
+	t := time.Unix(timestamp, 0)
+
+	// Caclulate the timezone
+	if timezone != "" {
+		hours, err := strconv.Atoi(timezone[1:3])
+		if err != nil {
+			return time.Time{}, err
+		}
+		minutes, err := strconv.Atoi(timezone[4:6])
+		if err != nil {
+			return time.Time{}, err
+		}
+		tzOffset := ((hours * 60) + minutes) * 60
+		if timezone[:1] == "-" {
+			tzOffset = 0 - tzOffset
+		}
+
+		t = t.In(time.FixedZone(timezone, tzOffset))
+	}
+
+	return t, nil
 }
