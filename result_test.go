@@ -5,14 +5,25 @@ import (
 	"testing"
 )
 
-func (s *RethinkSuite) TestAtomResult(c *test.C) {
+func (s *RethinkSuite) TestResultAtomString(c *test.C) {
+	query := Expr("a")
+	rows, err := query.Run(conn)
+	c.Assert(err, test.IsNil)
+	row, err := rows.Row()
+	c.Assert(err, test.IsNil)
+	c.Assert(row, test.Equals, "a")
+}
+
+func (s *RethinkSuite) TestResultAtomArray(c *test.C) {
 	query := Expr(List{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
 	result, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
 
 	num := 0
 	for result.Next() {
-		c.Assert(len(result.Row().([]interface{})), test.Equals, 10)
+		row, err := result.Row()
+		c.Assert(err, test.IsNil)
+		c.Assert(len(row.([]interface{})), test.Equals, 10)
 		num++
 	}
 

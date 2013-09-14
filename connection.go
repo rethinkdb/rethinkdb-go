@@ -229,8 +229,8 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (R
 			responseType: r.GetType(),
 		}, nil
 	default:
-		data, _ := deconstructDatum(r.GetResponse()[0])
-		return Rows{}, fmt.Errorf("%v", data)
+		data, err := deconstructDatum(r.GetResponse()[0])
+		return Rows{}, fmt.Errorf("%v, %v", data, err)
 	}
 
 	return Rows{}, nil

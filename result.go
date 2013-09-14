@@ -1,7 +1,6 @@
 package rethinkgo
 
 import (
-	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -17,22 +16,23 @@ type Rows struct {
 	term         RqlTerm
 	opts         map[string]interface{}
 	buffer       []*p.Datum
-	current      *p.Datum
 	start        int
 	end          int
 	token        int64
 	err          error
+	closed       bool
 	responseType p.Response_ResponseType
 }
 
-func (r *Rows) Close() (err error) {
-	_, err = r.conn.stopQuery(r.query, r.term)
-	if err != nil {
-		return
-	}
-	err = r.conn.Close()
+func (r *Rows) Close() error {
+	var err error
 
-	return
+	if !r.closed {
+		_, err = r.conn.stopQuery(r.query, r.term)
+		r.closed = true
+	}
+
+	return err
 }
 
 func (r *Rows) Err() error {
@@ -49,7 +49,6 @@ func (r *Rows) Next() bool {
 				return false
 			}
 
-			r.current = row
 			if row != nil {
 				return true
 			}
@@ -57,6 +56,7 @@ func (r *Rows) Next() bool {
 
 		// Check if all rows have been loaded
 		if r.responseType == p.Response_SUCCESS_SEQUENCE {
+			r.closed = true
 			r.start = 0
 			r.end = 0
 			return false
@@ -72,20 +72,7 @@ func (r *Rows) Next() bool {
 			r.start = 0
 		}
 
-		// Resize buffer if needed
-		// Is the buffer full? If so, resize.
-		if r.end == len(r.buffer) {
-			newSize := len(r.buffer) * 2
-			newBuf := make([]*p.Datum, newSize)
-			copy(newBuf, r.buffer[r.start:r.end])
-			r.buffer = newBuf
-			r.end -= r.start
-			r.start = 0
-			continue
-		}
-
 		// Continue the query
-		fmt.Println("Cont")
 		newResult, err := r.conn.continueQuery(r.query, r.term)
 		if err != nil {
 			r.err = err
@@ -98,7 +85,7 @@ func (r *Rows) Next() bool {
 }
 
 func (r *Rows) advance() bool {
-	if 1 > r.end-r.start {
+	if r.end <= r.start {
 		return false
 	}
 
@@ -106,20 +93,25 @@ func (r *Rows) advance() bool {
 	return true
 }
 
-func (r *Rows) Row() interface{} {
-	data, err := deconstructDatum(r.current)
+func (r *Rows) Row() (interface{}, error) {
+	data, err := deconstructDatum(r.buffer[r.start])
 	if err != nil {
-		return nil
+		return nil, err
 	}
 
-	return data
+	return data, nil
 }
 
-func (r *Rows) All() []interface{} {
+func (r *Rows) All() ([]interface{}, error) {
 	rows := []interface{}{}
 	for r.Next() {
-		rows = append(rows, r.Row())
+		row, err := r.Row()
+		if err != nil {
+			return []interface{}{}, err
+		}
+
+		rows = append(rows, row)
 	}
 
-	return rows
+	return rows, nil
 }

@@ -137,5 +137,5 @@ func deconstructDatum(datum *p.Datum) (interface{}, error) {
 		return obj, nil
 	}
 
-	return nil, fmt.Errorf("Unknown Datum type %d encountered in response.", datum.Type.String())
+	return nil, fmt.Errorf("Unknown Datum type %s encountered in response.", datum.GetType().String())
 }
