@@ -1,6 +1,7 @@
 package rethinkgo
 
 import (
+	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -84,6 +85,7 @@ func (r *Rows) Next() bool {
 		}
 
 		// Continue the query
+		fmt.Println("Cont")
 		newResult, err := r.conn.continueQuery(r.query, r.term)
 		if err != nil {
 			r.err = err

@@ -57,8 +57,9 @@ func makeFunc(f interface{}) RqlTerm {
 	}
 
 	body := value.Call(args)[0].Interface()
+	argsArr := makeArray(listToTermsList(argNums))
 
-	return newRqlTerm("func", p.Term_FUNC, List{argNums, body}, Obj{})
+	return newRqlTerm("func", p.Term_FUNC, List{argsArr, body}, Obj{})
 }
 
 func funcWrap(value interface{}) RqlTerm {
