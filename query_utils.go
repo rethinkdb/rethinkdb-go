@@ -1,58 +1,95 @@
 package rethinkgo
 
-// Helper functions for constructing terms
+import (
+	p "github.com/dancannon/gorethink/ql2"
+	"reflect"
+)
 
-// Convert a list into a slice of terms
-func listToTermsList(l List) termsList {
-	terms := termsList{}
-	for _, v := range l {
-		terms = append(terms, Expr(v))
+// Helper functions for creating internal RQL types
+
+// makeArray takes a slice of terms and produces a single MAKE_ARRAY term
+func makeArray(args termsList) RqlTerm {
+
+	return RqlTerm{
+		name:     "[...]",
+		termType: p.Term_MAKE_ARRAY,
+		args:     args,
 	}
-
-	return terms
 }
 
-// Convert a map into a map of terms
-func objToTermsObj(o Obj) termsObj {
-	terms := termsObj{}
-	for k, v := range o {
-		terms[k] = Expr(v)
+// makeObject takes a map of terms and produces a single MAKE_OBJECT term
+func makeObject(args termsObj) RqlTerm {
+	// First all evaluate all fields in the map
+	temp := termsObj{}
+	for k, v := range args {
+		temp[k] = Expr(v)
 	}
 
-	return terms
+	return RqlTerm{
+		name:     "{...}",
+		termType: p.Term_MAKE_OBJ,
+		optArgs:  temp,
+	}
 }
 
-// Helper functions for turning an expression tree into a string
+var nextVarId int64 = 0
 
-func allArgsToStringSlice(args termsList, optArgs termsObj) []string {
-	allArgs := []string{}
+func makeFunc(f interface{}) RqlTerm {
+	value := reflect.ValueOf(f)
+	valueType := value.Type()
 
-	for _, v := range args {
-		allArgs = append(allArgs, v.String())
+	var argNums []interface{}
+	var args []reflect.Value
+	for i := 0; i < valueType.NumIn(); i++ {
+		// Get a slice of the VARs to use as the function arguments
+		args = append(args, reflect.ValueOf(newRqlTerm("var", p.Term_VAR, List{nextVarId}, Obj{})))
+		argNums = append(argNums, nextVarId)
+		nextVarId++
+
+		// make sure all input arguments are of type Exp
+		if valueType.In(i).String() != "rethinkgo.RqlTerm" {
+			panic("Function argument is not of type Exp")
+		}
 	}
-	for k, v := range optArgs {
-		allArgs = append(allArgs, k+"="+v.String())
+
+	if valueType.NumOut() != 1 {
+		panic("Function does not have a single return value")
 	}
 
-	return allArgs
+	body := value.Call(args)[0].Interface()
+	argsArr := makeArray(listToTermsList(argNums))
+
+	return newRqlTerm("func", p.Term_FUNC, List{argsArr, body}, Obj{})
 }
 
-func argsToStringSlice(args termsList) []string {
-	allArgs := []string{}
+func funcWrap(value interface{}) RqlTerm {
+	val := Expr(value)
 
-	for _, v := range args {
-		allArgs = append(allArgs, v.String())
+	if implVarScan(val) {
+		return makeFunc(val)
+	} else {
+		return val
 	}
-
-	return allArgs
 }
 
-func optArgsToStringSlice(optArgs termsObj) []string {
-	allArgs := []string{}
+// implVarScan recursivly checks a value to see if it contains an
+// IMPLICIT_VAR term. If it does it returns true
+func implVarScan(value RqlTerm) bool {
+	if value.termType == p.Term_IMPLICIT_VAR {
+		return true
+	} else {
+		for _, v := range value.args {
+			if implVarScan(v) {
+				return true
+			}
+		}
 
-	for k, v := range optArgs {
-		allArgs = append(allArgs, k+"="+v.String())
+		for _, v := range value.optArgs {
+			if implVarScan(v) {
+				return true
+			}
+		}
+
+		return false
 	}
-
-	return allArgs
 }
