@@ -5,7 +5,7 @@ import (
 	"code.google.com/p/goprotobuf/proto"
 	"encoding/binary"
 	"fmt"
-	p "github.com/dancannon/rethinkgo/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 	"io"
 	"net"
 	"sync/atomic"
@@ -118,7 +118,7 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
 }
 
-func (c *Connection) startQuery(t RqlTerm) (interface{}, error) {
+func (c *Connection) startQuery(t RqlTerm) (Rows, error) {
 	token := c.nextToken()
 
 	// Build query tree
@@ -137,7 +137,7 @@ func (c *Connection) startQuery(t RqlTerm) (interface{}, error) {
 	return c.send(query, t, map[string]interface{}{})
 }
 
-func (c *Connection) continueQuery(q *p.Query, t *p.Term) (interface{}, error) {
+func (c *Connection) continueQuery(q *p.Query, t RqlTerm) (Rows, error) {
 	nq := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
 		Token: q.Token,
@@ -146,7 +146,7 @@ func (c *Connection) continueQuery(q *p.Query, t *p.Term) (interface{}, error) {
 	return c.send(nq, t, map[string]interface{}{})
 }
 
-func (c *Connection) stopQuery(q *p.Query, t *p.Term) (interface{}, error) {
+func (c *Connection) stopQuery(q *p.Query, t RqlTerm) (Rows, error) {
 	nq := &p.Query{
 		Type:  p.Query_STOP.Enum(),
 		Token: q.Token,
@@ -155,105 +155,82 @@ func (c *Connection) stopQuery(q *p.Query, t *p.Term) (interface{}, error) {
 	return c.send(nq, t, map[string]interface{}{})
 }
 
-func (c *Connection) send(q *p.Query, t *p.Term, opts map[string]interface{}) (interface{}, error) {
+func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (Rows, error) {
 	var data []byte
 	var err error
 
 	// Ensure that the connection is not closed
 	if c.closed {
-		return nil, fmt.Errorf("Connection is closed.")
+		return Rows{}, fmt.Errorf("Connection is closed.")
 	}
 
 	// Send query
 	if data, err = proto.Marshal(q); err != nil {
-		return nil, err
+		return Rows{}, err
 	}
 	if err = binary.Write(c.conn, binary.LittleEndian, uint32(len(data))); err != nil {
-		return nil, err
+		return Rows{}, err
 	}
 
 	if err = binary.Write(c.conn, binary.BigEndian, data); err != nil {
-		return nil, err
+		return Rows{}, err
 	}
 
 	// Read response
 	var messageLength uint32
 	if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
-		return nil, err
+		return Rows{}, err
 	}
 
 	buffer := make([]byte, messageLength)
 	_, err = io.ReadFull(c.conn, buffer)
 	if err != nil {
-		return nil, err
+		return Rows{}, err
 	}
 
 	r := &p.Response{}
 	err = proto.Unmarshal(buffer, r)
 	if err != nil {
-		return nil, err
+		return Rows{}, err
 	}
 
 	// Ensure that this is the response we were expecting
 	if q.GetToken() != r.GetToken() {
-		return nil, fmt.Errorf("Unexpected response received.")
+		return Rows{}, fmt.Errorf("Unexpected response received.")
 	}
 
 	// Deconstruct datum and return the result
 	switch r.GetType() {
 	case p.Response_SUCCESS_ATOM:
 		if len(r.GetResponse()) < 1 {
-			return nil, nil
+			return Rows{}, nil
 		} else {
-			return deconstructDatum(r.GetResponse()[0])
+			return Rows{
+				conn:         c,
+				query:        q,
+				term:         t,
+				buffer:       r.GetResponse(),
+				end:          len(r.GetResponse()),
+				token:        q.GetToken(),
+				responseType: r.GetType(),
+			}, nil
 		}
-	case p.Response_SUCCESS_PARTIAL:
+	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
 		// beginning of stream of rows, there are more results available from the
 		// server than the ones we just received, so save the session we used in
 		// case the user wants more
-		return &map[string]interface{}{
-			"token":        q.GetToken(),
-			"buffer":       r.GetResponse(),
-			"responseType": r.GetType(),
-		}, nil
-	case p.Response_SUCCESS_SEQUENCE:
-		// end of a stream of rows, since we got this on the initial query this means
-		// that we got a stream response, but the number of results was less than the
-		// number required to break the response into chunks. we can just return all
-		// the results in one go, as this is the only response
-		return &map[string]interface{}{
-			"complete":     true,
-			"token":        q.GetToken(),
-			"buffer":       r.GetResponse(),
-			"responseType": r.GetType(),
+		return Rows{
+			conn:         c,
+			query:        q,
+			term:         t,
+			buffer:       r.GetResponse(),
+			end:          len(r.GetResponse()),
+			token:        q.GetToken(),
+			responseType: r.GetType(),
 		}, nil
 	default:
-		return nil, fmt.Errorf("Error")
+		return Rows{}, fmt.Errorf("Error")
 	}
 
-	return nil, nil
+	return Rows{}, nil
 }
-
-// func (c *Connection) writeMessage(data []byte) error {
-// 	messageLength := uint32(len(data))
-// 	if err := binary.Write(c, binary.LittleEndian, messageLength); err != nil {
-// 		return err
-// 	}
-
-// 	_, err := c.Write(data)
-// 	return err
-// }
-
-// func (c *connection) readMessage() ([]byte, error) {
-// 	var messageLength uint32
-// 	if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
-// 		return nil, err
-// 	}
-
-// 	buffer := make([]byte, messageLength)
-// 	_, err := io.ReadFull(c, buffer)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return buffer, nil
-// }

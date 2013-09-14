@@ -1,7 +1,7 @@
 package rethinkgo
 
 import (
-	p "github.com/dancannon/rethinkgo/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 // ErrBadQuery indicates that the server has told us we have constructed an

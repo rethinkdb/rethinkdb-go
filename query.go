@@ -2,7 +2,7 @@ package rethinkgo
 
 import (
 	"fmt"
-	p "github.com/dancannon/rethinkgo/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 	"strings"
 )
 
@@ -93,8 +93,8 @@ func (t RqlTerm) String() string {
 	}
 }
 
-func (t RqlTerm) Run(c *Connection) Result {
-	result, err := c.startQuery(t)
+func (t RqlTerm) Run(c *Connection) (Rows, error) {
+	return c.startQuery(t)
 }
 
 // newRqlTerm is an alias for creating a new RqlTermue.

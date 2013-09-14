@@ -1,57 +1,123 @@
 package rethinkgo
 
 import (
-	p "github.com/dancannon/rethinkgo/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
-type Row struct {
-	*p.Datum
+// Used when query is to be executed and no results returned
+type Result struct {
 }
 
-type Result struct {
-	conn         Connection
+// Rows contains the result of a query. Its cursor starts before the first row
+// of the result set. Use Next to advance through the rows.
+type Rows struct {
+	conn         *Connection
 	query        *p.Query
-	term         *p.Term
+	term         RqlTerm
 	opts         map[string]interface{}
-	buffer       []*Row
-	current      *Row
+	buffer       []*p.Datum
+	current      *p.Datum
+	start        int
+	end          int
 	token        int64
 	err          error
 	responseType p.Response_ResponseType
 }
 
-func (r Result) fetchMore() bool {
-	if r.Complete() {
-		return false
-	}
-
-	// Load more results
-	results, err := conn.continueQuery(r.query, r.term, opts)
+func (r *Rows) Close() (err error) {
+	_, err = r.conn.stopQuery(r.query, r.term)
 	if err != nil {
-		return false
-	} else {
-		r.buffer = results
-		r.current = 0
-		return true
+		return
 	}
+	err = r.conn.Close()
+
+	return
 }
 
-func (r Result) Complete() bool {
-	return r.responseType == p.Response_SUCCESS_SEQUENCE
+func (r *Rows) Err() error {
+	return r.err
 }
 
-func (r Result) HasNext() Row {
-	return !r.Complete() && len(r.buffer)-1 >= r.current+1
-}
+func (r *Rows) Next() bool {
+	for {
+		// Attempt to get a result in the buffer
+		if r.end > r.start {
+			row := r.buffer[r.start]
 
-func (r Result) Scan() bool {
-	if len(r.buffer)-1 >= r.current+1 {
-		if current, ok := r.buffer[r.current+1]; ok {
-			return current
+			if !r.advance() {
+				return false
+			}
+
+			r.current = row
+			if row != nil {
+				return true
+			}
 		}
+
+		// Check if all rows have been loaded
+		if r.responseType == p.Response_SUCCESS_SEQUENCE {
+			r.start = 0
+			r.end = 0
+			return false
+		}
+
+		// Load more data from the database
+
+		// First, shift data to beginning of buffer if there's lots of empty space
+		// or space is neded.
+		if r.start > 0 && (r.end == len(r.buffer) || r.start > len(r.buffer)/2) {
+			copy(r.buffer, r.buffer[r.start:r.end])
+			r.end -= r.start
+			r.start = 0
+		}
+
+		// Resize buffer if needed
+		// Is the buffer full? If so, resize.
+		if r.end == len(r.buffer) {
+			newSize := len(r.buffer) * 2
+			newBuf := make([]*p.Datum, newSize)
+			copy(newBuf, r.buffer[r.start:r.end])
+			r.buffer = newBuf
+			r.end -= r.start
+			r.start = 0
+			continue
+		}
+
+		// Continue the query
+		newResult, err := r.conn.continueQuery(r.query, r.term)
+		if err != nil {
+			r.err = err
+			return false
+		}
+
+		r.buffer = append(r.buffer, newResult.buffer...)
+		r.end += len(newResult.buffer)
 	}
 }
 
-func (r Result) Row() Row {
-	return r.current
+func (r *Rows) advance() bool {
+	if 1 > r.end-r.start {
+		return false
+	}
+
+	r.start++
+	return true
+}
+
+func (r *Rows) Row() interface{} {
+	data, err := deconstructDatum(r.current)
+	if err != nil {
+		return nil
+	}
+
+	return data
+}
+
+func (r *Rows) All() []interface{} {
+	rows := []interface{}{}
+	for r.Next() {
+		rows = append(rows, r.Row())
+	}
+
+	return rows
 }

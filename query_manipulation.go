@@ -1,10 +1,12 @@
 package rethinkgo
 
 import (
-	p "github.com/dancannon/rethinkgo/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
-var Row RqlTerm = newRqlTerm("Row", p.Term_IMPLICIT_VAR, List{}, Obj{})
+func Row() RqlTerm {
+	return newRqlTerm("Row", p.Term_IMPLICIT_VAR, List{}, Obj{})
+}
 
 func Literal(args ...interface{}) RqlTerm {
 	enforceArgLength(0, 1, args)

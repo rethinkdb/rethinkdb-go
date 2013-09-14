@@ -1,7 +1,7 @@
 package rethinkgo
 
 import (
-	p "github.com/dancannon/rethinkgo/ql2"
+	p "github.com/dancannon/gorethink/ql2"
 	"reflect"
 )
 

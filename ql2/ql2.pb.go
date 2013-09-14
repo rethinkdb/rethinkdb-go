@@ -13,6 +13,7 @@ var _ = proto.Marshal
 var _ = &json.SyntaxError{}
 var _ = math.Inf
 
+// non-conforming protobuf libraries
 type VersionDummy_Version int32
 
 const (
@@ -54,7 +55,8 @@ type Query_QueryType int32
 const (
 	Query_START    Query_QueryType = 1
 	Query_CONTINUE Query_QueryType = 2
-	Query_STOP     Query_QueryType = 3
+	// (see [Response]).
+	Query_STOP Query_QueryType = 3
 )
 
 var Query_QueryType_name = map[int32]string{
@@ -127,12 +129,18 @@ func (x *Frame_FrameType) UnmarshalJSON(data []byte) error {
 type Response_ResponseType int32
 
 const (
+	// These response types indicate success.
 	Response_SUCCESS_ATOM     Response_ResponseType = 1
 	Response_SUCCESS_SEQUENCE Response_ResponseType = 2
 	Response_SUCCESS_PARTIAL  Response_ResponseType = 3
-	Response_CLIENT_ERROR     Response_ResponseType = 16
-	Response_COMPILE_ERROR    Response_ResponseType = 17
-	Response_RUNTIME_ERROR    Response_ResponseType = 18
+	// These response types indicate failure.
+	Response_CLIENT_ERROR Response_ResponseType = 16
+	// client sends a malformed protobuf, or tries to
+	// send [CONTINUE] for an unknown token.
+	Response_COMPILE_ERROR Response_ResponseType = 17
+	// checking.  For example, if you pass too many
+	// arguments to a function.
+	Response_RUNTIME_ERROR Response_ResponseType = 18
 )
 
 var Response_ResponseType_name = map[int32]string{
@@ -223,136 +231,331 @@ func (x *Datum_DatumType) UnmarshalJSON(data []byte) error {
 type Term_TermType int32
 
 const (
-	Term_DATUM              Term_TermType = 1
-	Term_MAKE_ARRAY         Term_TermType = 2
-	Term_MAKE_OBJ           Term_TermType = 3
-	Term_VAR                Term_TermType = 10
-	Term_JAVASCRIPT         Term_TermType = 11
-	Term_ERROR              Term_TermType = 12
-	Term_IMPLICIT_VAR       Term_TermType = 13
-	Term_DB                 Term_TermType = 14
-	Term_TABLE              Term_TermType = 15
-	Term_GET                Term_TermType = 16
-	Term_GET_ALL            Term_TermType = 78
-	Term_EQ                 Term_TermType = 17
-	Term_NE                 Term_TermType = 18
-	Term_LT                 Term_TermType = 19
-	Term_LE                 Term_TermType = 20
-	Term_GT                 Term_TermType = 21
-	Term_GE                 Term_TermType = 22
-	Term_NOT                Term_TermType = 23
-	Term_ADD                Term_TermType = 24
-	Term_SUB                Term_TermType = 25
-	Term_MUL                Term_TermType = 26
-	Term_DIV                Term_TermType = 27
-	Term_MOD                Term_TermType = 28
-	Term_APPEND             Term_TermType = 29
-	Term_PREPEND            Term_TermType = 80
-	Term_DIFFERENCE         Term_TermType = 95
-	Term_SET_INSERT         Term_TermType = 88
-	Term_SET_INTERSECTION   Term_TermType = 89
-	Term_SET_UNION          Term_TermType = 90
-	Term_SET_DIFFERENCE     Term_TermType = 91
-	Term_SLICE              Term_TermType = 30
-	Term_SKIP               Term_TermType = 70
-	Term_LIMIT              Term_TermType = 71
-	Term_INDEXES_OF         Term_TermType = 87
-	Term_CONTAINS           Term_TermType = 93
-	Term_GET_FIELD          Term_TermType = 31
-	Term_KEYS               Term_TermType = 94
-	Term_HAS_FIELDS         Term_TermType = 32
-	Term_WITH_FIELDS        Term_TermType = 96
-	Term_PLUCK              Term_TermType = 33
-	Term_WITHOUT            Term_TermType = 34
-	Term_MERGE              Term_TermType = 35
-	Term_BETWEEN            Term_TermType = 36
-	Term_REDUCE             Term_TermType = 37
-	Term_MAP                Term_TermType = 38
-	Term_FILTER             Term_TermType = 39
-	Term_CONCATMAP          Term_TermType = 40
-	Term_ORDERBY            Term_TermType = 41
-	Term_DISTINCT           Term_TermType = 42
-	Term_COUNT              Term_TermType = 43
-	Term_IS_EMPTY           Term_TermType = 86
-	Term_UNION              Term_TermType = 44
-	Term_NTH                Term_TermType = 45
+	// A RQL datum, stored in `datum` below.
+	Term_DATUM      Term_TermType = 1
+	Term_MAKE_ARRAY Term_TermType = 2
+	// Evaluate the terms in [optargs] and make an object
+	Term_MAKE_OBJ Term_TermType = 3
+	// * Compound types
+	// Takes an integer representing a variable and returns the value stored
+	// in that variable.  It's the responsibility of the client to translate
+	// from their local representation of a variable to a unique integer for
+	// that variable.  (We do it this way instead of letting clients provide
+	// variable names as strings to discourage variable-capturing client
+	// libraries, and because it's more efficient on the wire.)
+	Term_VAR Term_TermType = 10
+	// Takes some javascript code and executes it.
+	Term_JAVASCRIPT Term_TermType = 11
+	// Takes a string and throws an error with that message.
+	// Inside of a `default` block, you can omit the first
+	// argument to rethrow whatever error you catch (this is most
+	// useful as an argument to the `default` filter optarg).
+	Term_ERROR Term_TermType = 12
+	// Takes nothing and returns a reference to the implicit variable.
+	Term_IMPLICIT_VAR Term_TermType = 13
+	// * Data Operators
+	// Returns a reference to a database.
+	Term_DB Term_TermType = 14
+	// Returns a reference to a table.
+	Term_TABLE Term_TermType = 15
+	// Gets a single element from a table by its primary or a secondary key.
+	Term_GET Term_TermType = 16
+	// Table, STRING -> NULL            | Table, NUMBER -> NULL |
+	Term_GET_ALL Term_TermType = 78
+	// Simple DATUM Ops
+	Term_EQ  Term_TermType = 17
+	Term_NE  Term_TermType = 18
+	Term_LT  Term_TermType = 19
+	Term_LE  Term_TermType = 20
+	Term_GT  Term_TermType = 21
+	Term_GE  Term_TermType = 22
+	Term_NOT Term_TermType = 23
+	// ADD can either add two numbers or concatenate two arrays.
+	Term_ADD Term_TermType = 24
+	Term_SUB Term_TermType = 25
+	Term_MUL Term_TermType = 26
+	Term_DIV Term_TermType = 27
+	Term_MOD Term_TermType = 28
+	// DATUM Array Ops
+	// Append a single element to the end of an array (like `snoc`).
+	Term_APPEND Term_TermType = 29
+	// Prepend a single element to the end of an array (like `cons`).
+	Term_PREPEND Term_TermType = 80
+	// Remove the elements of one array from another array.
+	Term_DIFFERENCE Term_TermType = 95
+	// DATUM Set Ops
+	// Set ops work on arrays. They don't use actual sets and thus have
+	// performance characteristics you would expect from arrays rather than
+	// from sets. All set operations have the post condition that they
+	// array they return contains no duplicate values.
+	Term_SET_INSERT       Term_TermType = 88
+	Term_SET_INTERSECTION Term_TermType = 89
+	Term_SET_UNION        Term_TermType = 90
+	Term_SET_DIFFERENCE   Term_TermType = 91
+	Term_SLICE            Term_TermType = 30
+	Term_SKIP             Term_TermType = 70
+	Term_LIMIT            Term_TermType = 71
+	Term_INDEXES_OF       Term_TermType = 87
+	Term_CONTAINS         Term_TermType = 93
+	// Stream/Object Ops
+	// Get a particular field from an object, or map that over a
+	// sequence.
+	Term_GET_FIELD Term_TermType = 31
+	// | Sequence, STRING -> Sequence
+	// Return an array containing the keys of the object.
+	Term_KEYS Term_TermType = 94
+	// Check whether an object contains all the specified fields,
+	// or filters a sequence so that all objects inside of it
+	// contain all the specified fields.
+	Term_HAS_FIELDS Term_TermType = 32
+	// x.with_fields(...) <=> x.has_fields(...).pluck(...)
+	Term_WITH_FIELDS Term_TermType = 96
+	// Get a subset of an object by selecting some attributes to preserve,
+	// or map that over a sequence.  (Both pick and pluck, polymorphic.)
+	Term_PLUCK Term_TermType = 33
+	// Get a subset of an object by selecting some attributes to discard, or
+	// map that over a sequence.  (Both unpick and without, polymorphic.)
+	Term_WITHOUT Term_TermType = 34
+	// Merge objects (right-preferential)
+	Term_MERGE Term_TermType = 35
+	// Sequence Ops
+	// Get all elements of a sequence between two values.
+	Term_BETWEEN Term_TermType = 36
+	Term_REDUCE  Term_TermType = 37
+	Term_MAP     Term_TermType = 38
+	// Filter a sequence with either a function or a shortcut
+	// object (see API docs for details).  The body of FILTER is
+	// wrapped in an implicit `.default(false)`, and you can
+	// change the default value by specifying the `default`
+	// optarg.  If you make the default `r.error`, all errors
+	// caught by `default` will be rethrown as if the `default`
+	// did not exist.
+	Term_FILTER Term_TermType = 39
+	// Sequence, OBJECT, {default:DATUM} -> Sequence
+	// Map a function over a sequence and then concatenate the results together.
+	Term_CONCATMAP Term_TermType = 40
+	// Order a sequence based on one or more attributes.
+	Term_ORDERBY Term_TermType = 41
+	// Get all distinct elements of a sequence (like `uniq`).
+	Term_DISTINCT Term_TermType = 42
+	// Count the number of elements in a sequence, or only the elements that match
+	// a given filter.
+	Term_COUNT    Term_TermType = 43
+	Term_IS_EMPTY Term_TermType = 86
+	// Take the union of multiple sequences (preserves duplicate elements! (use distinct)).
+	Term_UNION Term_TermType = 44
+	// Get the Nth element of a sequence.
+	Term_NTH Term_TermType = 45
+	// Takes a sequence, and three functions:
+	// - A function to group the sequence by.
+	// - A function to map over the groups.
+	// - A reduction to apply to each of the groups.
 	Term_GROUPED_MAP_REDUCE Term_TermType = 46
-	Term_GROUPBY            Term_TermType = 47
-	Term_INNER_JOIN         Term_TermType = 48
-	Term_OUTER_JOIN         Term_TermType = 49
-	Term_EQ_JOIN            Term_TermType = 50
-	Term_ZIP                Term_TermType = 72
-	Term_INSERT_AT          Term_TermType = 82
-	Term_DELETE_AT          Term_TermType = 83
-	Term_CHANGE_AT          Term_TermType = 84
-	Term_SPLICE_AT          Term_TermType = 85
-	Term_COERCE_TO          Term_TermType = 51
-	Term_TYPEOF             Term_TermType = 52
-	Term_UPDATE             Term_TermType = 53
-	Term_DELETE             Term_TermType = 54
-	Term_REPLACE            Term_TermType = 55
-	Term_INSERT             Term_TermType = 56
-	Term_DB_CREATE          Term_TermType = 57
-	Term_DB_DROP            Term_TermType = 58
-	Term_DB_LIST            Term_TermType = 59
-	Term_TABLE_CREATE       Term_TermType = 60
-	Term_TABLE_DROP         Term_TermType = 61
-	Term_TABLE_LIST         Term_TermType = 62
-	Term_INDEX_CREATE       Term_TermType = 75
-	Term_INDEX_DROP         Term_TermType = 76
-	Term_INDEX_LIST         Term_TermType = 77
-	Term_FUNCALL            Term_TermType = 64
-	Term_BRANCH             Term_TermType = 65
-	Term_ANY                Term_TermType = 66
-	Term_ALL                Term_TermType = 67
-	Term_FOREACH            Term_TermType = 68
-	Term_FUNC               Term_TermType = 69
-	Term_ASC                Term_TermType = 73
-	Term_DESC               Term_TermType = 74
-	Term_INFO               Term_TermType = 79
-	Term_MATCH              Term_TermType = 97
-	Term_SAMPLE             Term_TermType = 81
-	Term_DEFAULT            Term_TermType = 92
-	Term_JSON               Term_TermType = 98
-	Term_ISO8601            Term_TermType = 99
-	Term_TO_ISO8601         Term_TermType = 100
-	Term_EPOCH_TIME         Term_TermType = 101
-	Term_TO_EPOCH_TIME      Term_TermType = 102
-	Term_NOW                Term_TermType = 103
-	Term_IN_TIMEZONE        Term_TermType = 104
-	Term_DURING             Term_TermType = 105
-	Term_DATE               Term_TermType = 106
-	Term_TIME_OF_DAY        Term_TermType = 126
-	Term_TIMEZONE           Term_TermType = 127
-	Term_YEAR               Term_TermType = 128
-	Term_MONTH              Term_TermType = 129
-	Term_DAY                Term_TermType = 130
-	Term_DAY_OF_WEEK        Term_TermType = 131
-	Term_DAY_OF_YEAR        Term_TermType = 132
-	Term_HOURS              Term_TermType = 133
-	Term_MINUTES            Term_TermType = 134
-	Term_SECONDS            Term_TermType = 135
-	Term_TIME               Term_TermType = 136
-	Term_MONDAY             Term_TermType = 107
-	Term_TUESDAY            Term_TermType = 108
-	Term_WEDNESDAY          Term_TermType = 109
-	Term_THURSDAY           Term_TermType = 110
-	Term_FRIDAY             Term_TermType = 111
-	Term_SATURDAY           Term_TermType = 112
-	Term_SUNDAY             Term_TermType = 113
-	Term_JANUARY            Term_TermType = 114
-	Term_FEBRUARY           Term_TermType = 115
-	Term_MARCH              Term_TermType = 116
-	Term_APRIL              Term_TermType = 117
-	Term_MAY                Term_TermType = 118
-	Term_JUNE               Term_TermType = 119
-	Term_JULY               Term_TermType = 120
-	Term_AUGUST             Term_TermType = 121
-	Term_SEPTEMBER          Term_TermType = 122
-	Term_OCTOBER            Term_TermType = 123
-	Term_NOVEMBER           Term_TermType = 124
-	Term_DECEMBER           Term_TermType = 125
-	Term_LITERAL            Term_TermType = 137
+	// Groups a sequence by one or more attributes, and then applies a reduction.
+	// The third argument is a special object literal giving the kind of operation to be
+	// performed and any necessary arguments.
+	// At present, GROUPBY suports the following operations
+	// * {'COUNT': <ignored>} - count the size of the group
+	// * {'SUM': attr} - sum the values of the given attribute across the group
+	// * {'AVG': attr} - average the values of the given attribute across the group
+	Term_GROUPBY    Term_TermType = 47
+	Term_INNER_JOIN Term_TermType = 48
+	Term_OUTER_JOIN Term_TermType = 49
+	// An inner-join that does an equality comparison on two attributes.
+	Term_EQ_JOIN Term_TermType = 50
+	Term_ZIP     Term_TermType = 72
+	// Array Ops
+	// Insert an element in to an array at a given index.
+	Term_INSERT_AT Term_TermType = 82
+	// Remove an element at a given index from an array.
+	Term_DELETE_AT Term_TermType = 83
+	// ARRAY, NUMBER, NUMBER -> ARRAY
+	// Change the element at a given index of an array.
+	Term_CHANGE_AT Term_TermType = 84
+	// Splice one array in to another array.
+	Term_SPLICE_AT Term_TermType = 85
+	// * Type Ops
+	// Coerces a datum to a named type (e.g. "bool").
+	// If you previously used `stream_to_array`, you should use this instead
+	// with the type "array".
+	Term_COERCE_TO Term_TermType = 51
+	// Returns the named type of a datum (e.g. TYPEOF(true) = "BOOL")
+	Term_TYPEOF Term_TermType = 52
+	// * Write Ops (the OBJECTs contain data about number of errors etc.)
+	// Updates all the rows in a selection.  Calls its Function with the row
+	// to be updated, and then merges the result of that call.
+	Term_UPDATE Term_TermType = 53
+	// SingleSelection, Function(1), {non_atomic:BOOL, durability:STRING, return_vals:BOOL} -> OBJECT |
+	// StreamSelection, OBJECT,      {non_atomic:BOOL, durability:STRING, return_vals:BOOL} -> OBJECT |
+	// SingleSelection, OBJECT,      {non_atomic:BOOL, durability:STRING, return_vals:BOOL} -> OBJECT
+	// Deletes all the rows in a selection.
+	Term_DELETE Term_TermType = 54
+	// Replaces all the rows in a selection.  Calls its Function with the row
+	// to be replaced, and then discards it and stores the result of that
+	// call.
+	Term_REPLACE Term_TermType = 55
+	// Inserts into a table.  If `upsert` is true, overwrites entries with
+	// the same primary key (otherwise errors).
+	Term_INSERT Term_TermType = 56
+	// * Administrative OPs
+	// Creates a database with a particular name.
+	Term_DB_CREATE Term_TermType = 57
+	// Drops a database with a particular name.
+	Term_DB_DROP Term_TermType = 58
+	// Lists all the databases by name.  (Takes no arguments)
+	Term_DB_LIST Term_TermType = 59
+	// Creates a table with a particular name in a particular
+	// database.  (You may omit the first argument to use the
+	// default database.)
+	Term_TABLE_CREATE Term_TermType = 60
+	// STRING, {datacenter:STRING, primary_key:STRING, cache_size:NUMBER, durability:STRING} -> OBJECT
+	// Drops a table with a particular name from a particular
+	// database.  (You may omit the first argument to use the
+	// default database.)
+	Term_TABLE_DROP Term_TermType = 61
+	// STRING -> OBJECT
+	// Lists all the tables in a particular database.  (You may
+	// omit the first argument to use the default database.)
+	Term_TABLE_LIST Term_TermType = 62
+	// * Secondary indexes OPs
+	// Creates a new secondary index with a particular name and definition.
+	Term_INDEX_CREATE Term_TermType = 75
+	// Drops a secondary index with a particular name from the specified table.
+	Term_INDEX_DROP Term_TermType = 76
+	// Lists all secondary indexes on a particular table.
+	Term_INDEX_LIST Term_TermType = 77
+	// * Control Operators
+	// Calls a function on data
+	Term_FUNCALL Term_TermType = 64
+	// Executes its first argument, and returns its second argument if it
+	// got [true] or its third argument if it got [false] (like an `if`
+	// statement).
+	Term_BRANCH Term_TermType = 65
+	// Returns true if any of its arguments returns true (short-circuits).
+	// (Like `or` in most languages.)
+	Term_ANY Term_TermType = 66
+	// Returns true if all of its arguments return true (short-circuits).
+	// (Like `and` in most languages.)
+	Term_ALL Term_TermType = 67
+	// Calls its Function with each entry in the sequence
+	// and executes the array of terms that Function returns.
+	Term_FOREACH Term_TermType = 68
+	// An anonymous function.  Takes an array of numbers representing
+	// variables (see [VAR] above), and a [Term] to execute with those in
+	// scope.  Returns a function that may be passed an array of arguments,
+	// then executes the Term with those bound to the variable names.  The
+	// user will never construct this directly.  We use it internally for
+	// things like `map` which take a function.  The "arity" of a [Function] is
+	// the number of arguments it takes.
+	// For example, here's what `_X_.map{|x| x+2}` turns into:
+	// Term {
+	//   type = MAP;
+	//   args = [_X_,
+	//           Term {
+	//             type = Function;
+	//             args = [Term {
+	//                       type = DATUM;
+	//                       datum = Datum {
+	//                         type = R_ARRAY;
+	//                         r_array = [Datum { type = R_NUM; r_num = 1; }];
+	//                       };
+	//                     },
+	//                     Term {
+	//                       type = ADD;
+	//                       args = [Term {
+	//                                 type = VAR;
+	//                                 args = [Term {
+	//                                           type = DATUM;
+	//                                           datum = Datum { type = R_NUM;
+	//                                                           r_num = 1};
+	//                                         }];
+	//                               },
+	//                               Term {
+	//                                 type = DATUM;
+	//                                 datum = Datum { type = R_NUM; r_num = 2; };
+	//                               }];
+	//                     }];
+	//           }];
+	Term_FUNC Term_TermType = 69
+	// Indicates to ORDER_BY that this attribute is to be sorted in ascending order.
+	Term_ASC Term_TermType = 73
+	// Indicates to ORDER_BY that this attribute is to be sorted in descending order.
+	Term_DESC Term_TermType = 74
+	// Gets info about anything.  INFO is most commonly called on tables.
+	Term_INFO Term_TermType = 79
+	// `a.match(b)` returns a match object if the string `a`
+	// matches the regular expression `b`.
+	Term_MATCH Term_TermType = 97
+	// Select a number of elements from sequence with uniform distribution.
+	Term_SAMPLE Term_TermType = 81
+	// Evaluates its first argument.  If that argument returns
+	// NULL or throws an error related to the absence of an
+	// expected value (for instance, accessing a non-existent
+	// field or adding NULL to an integer), DEFAULT will either
+	// return its second argument or execute it if it's a
+	// function.  If the second argument is a function, it will be
+	// passed either the text of the error or NULL as its
+	// argument.
+	Term_DEFAULT Term_TermType = 92
+	// Parses its first argument as a json string and returns it as a
+	// datum.
+	Term_JSON Term_TermType = 98
+	// Parses its first arguments as an ISO 8601 time and returns it as a
+	// datum.
+	Term_ISO8601 Term_TermType = 99
+	// Prints a time as an ISO 8601 time.
+	Term_TO_ISO8601 Term_TermType = 100
+	// Returns a time given seconds since epoch in UTC.
+	Term_EPOCH_TIME Term_TermType = 101
+	// Returns seconds since epoch in UTC given a time.
+	Term_TO_EPOCH_TIME Term_TermType = 102
+	// The time the query was received by the server.
+	Term_NOW Term_TermType = 103
+	// Puts a time into an ISO 8601 timezone.
+	Term_IN_TIMEZONE Term_TermType = 104
+	// a.during(b, c) returns whether a is in the range [b, c)
+	Term_DURING Term_TermType = 105
+	// Retrieves the date portion of a time.
+	Term_DATE Term_TermType = 106
+	// x.time_of_day == x.date - x
+	Term_TIME_OF_DAY Term_TermType = 126
+	// Returns the timezone of a time.
+	Term_TIMEZONE Term_TermType = 127
+	// These access the various components of a time.
+	Term_YEAR        Term_TermType = 128
+	Term_MONTH       Term_TermType = 129
+	Term_DAY         Term_TermType = 130
+	Term_DAY_OF_WEEK Term_TermType = 131
+	Term_DAY_OF_YEAR Term_TermType = 132
+	Term_HOURS       Term_TermType = 133
+	Term_MINUTES     Term_TermType = 134
+	Term_SECONDS     Term_TermType = 135
+	// Construct a time from a date and optional timezone or a
+	// date+time and optional timezone.
+	Term_TIME Term_TermType = 136
+	// Constants for ISO 8601 days of the week.
+	Term_MONDAY    Term_TermType = 107
+	Term_TUESDAY   Term_TermType = 108
+	Term_WEDNESDAY Term_TermType = 109
+	Term_THURSDAY  Term_TermType = 110
+	Term_FRIDAY    Term_TermType = 111
+	Term_SATURDAY  Term_TermType = 112
+	Term_SUNDAY    Term_TermType = 113
+	// Constants for ISO 8601 months.
+	Term_JANUARY   Term_TermType = 114
+	Term_FEBRUARY  Term_TermType = 115
+	Term_MARCH     Term_TermType = 116
+	Term_APRIL     Term_TermType = 117
+	Term_MAY       Term_TermType = 118
+	Term_JUNE      Term_TermType = 119
+	Term_JULY      Term_TermType = 120
+	Term_AUGUST    Term_TermType = 121
+	Term_SEPTEMBER Term_TermType = 122
+	Term_OCTOBER   Term_TermType = 123
+	Term_NOVEMBER  Term_TermType = 124
+	Term_DECEMBER  Term_TermType = 125
+	// Indicates to MERGE to replace the other object rather than merge it.
+	Term_LITERAL Term_TermType = 137
 )
 
 var Term_TermType_name = map[int32]string{
@@ -640,6 +843,8 @@ func (x *Term_TermType) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// This enum contains the magic numbers for your version.  See **THE HIGH-LEVEL
+// VIEW** for what to do with it.
 type VersionDummy struct {
 	XXX_unrecognized []byte `json:"-"`
 }
@@ -648,10 +853,19 @@ func (m *VersionDummy) Reset()         { *m = VersionDummy{} }
 func (m *VersionDummy) String() string { return proto.CompactTextString(m) }
 func (*VersionDummy) ProtoMessage()    {}
 
+// You send one of:
+// * A [START] query with a [Term] to evaluate and a unique-per-connection token.
+// * A [CONTINUE] query with the same token as a [START] query that returned
+//   [SUCCESS_PARTIAL] in its [Response].
+// * A [STOP] query with the same token as a [START] query that you want to stop.
 type Query struct {
-	Type             *Query_QueryType   `protobuf:"varint,1,opt,name=type,enum=Query_QueryType" json:"type,omitempty"`
-	Query            *Term              `protobuf:"bytes,2,opt,name=query" json:"query,omitempty"`
-	Token            *int64             `protobuf:"varint,3,opt,name=token" json:"token,omitempty"`
+	Type *Query_QueryType `protobuf:"varint,1,opt,name=type,enum=Query_QueryType" json:"type,omitempty"`
+	// A [Term] is how we represent the operations we want a query to perform.
+	Query *Term  `protobuf:"bytes,2,opt,name=query" json:"query,omitempty"`
+	Token *int64 `protobuf:"varint,3,opt,name=token" json:"token,omitempty"`
+	// This flag is ignored on the server.  `noreply` should be added
+	// to `global_optargs` instead (the key "noreply" should map to
+	// either true or false).
 	OBSOLETENoreply  *bool              `protobuf:"varint,4,opt,name=OBSOLETE_noreply,def=0" json:"OBSOLETE_noreply,omitempty"`
 	GlobalOptargs    []*Query_AssocPair `protobuf:"bytes,6,rep,name=global_optargs" json:"global_optargs,omitempty"`
 	XXX_unrecognized []byte             `json:"-"`
@@ -722,6 +936,7 @@ func (m *Query_AssocPair) GetVal() *Term {
 	return nil
 }
 
+// A backtrace frame (see `backtrace` in Response below)
 type Frame struct {
 	Type             *Frame_FrameType `protobuf:"varint,1,opt,name=type,enum=Frame_FrameType" json:"type,omitempty"`
 	Pos              *int64           `protobuf:"varint,2,opt,name=pos" json:"pos,omitempty"`
@@ -770,12 +985,16 @@ func (m *Backtrace) GetFrames() []*Frame {
 	return nil
 }
 
+// You get back a response with the same [token] as your query.
 type Response struct {
-	Type             *Response_ResponseType `protobuf:"varint,1,opt,name=type,enum=Response_ResponseType" json:"type,omitempty"`
-	Token            *int64                 `protobuf:"varint,2,opt,name=token" json:"token,omitempty"`
-	Response         []*Datum               `protobuf:"bytes,3,rep,name=response" json:"response,omitempty"`
-	Backtrace        *Backtrace             `protobuf:"bytes,4,opt,name=backtrace" json:"backtrace,omitempty"`
-	XXX_unrecognized []byte                 `json:"-"`
+	Type  *Response_ResponseType `protobuf:"varint,1,opt,name=type,enum=Response_ResponseType" json:"type,omitempty"`
+	Token *int64                 `protobuf:"varint,2,opt,name=token" json:"token,omitempty"`
+	// [response] contains 1 RQL datum if [type] is [SUCCESS_ATOM], or many RQL
+	// data if [type] is [SUCCESS_SEQUENCE] or [SUCCESS_PARTIAL].  It contains 1
+	// error message (of type [R_STR]) in all other cases.
+	Response         []*Datum   `protobuf:"bytes,3,rep,name=response" json:"response,omitempty"`
+	Backtrace        *Backtrace `protobuf:"bytes,4,opt,name=backtrace" json:"backtrace,omitempty"`
+	XXX_unrecognized []byte     `json:"-"`
 }
 
 func (m *Response) Reset()         { *m = Response{} }
@@ -810,6 +1029,9 @@ func (m *Response) GetBacktrace() *Backtrace {
 	return nil
 }
 
+// A [Datum] is a chunk of data that can be serialized to disk or returned to
+// the user in a Response.  Currently we only support JSON types, but we may
+// support other types in the future (e.g., a date type or an integer type).
 type Datum struct {
 	Type             *Datum_DatumType          `protobuf:"varint,1,opt,name=type,enum=Datum_DatumType" json:"type,omitempty"`
 	RBool            *bool                     `protobuf:"varint,2,opt,name=r_bool" json:"r_bool,omitempty"`
@@ -905,8 +1127,52 @@ func (m *Datum_AssocPair) GetVal() *Datum {
 	return nil
 }
 
+// A [Term] is either a piece of data (see **Datum** above), or an operator and
+// its operands.  If you have a [Datum], it's stored in the member [datum].  If
+// you have an operator, its positional arguments are stored in [args] and its
+// optional arguments are stored in [optargs].
+//
+// A note about type signatures:
+// We use the following notation to denote types:
+//   arg1_type, arg2_type, argrest_type... -> result_type
+// So, for example, if we have a function `avg` that takes any number of
+// arguments and averages them, we might write:
+//   NUMBER... -> NUMBER
+// Or if we had a function that took one number modulo another:
+//   NUMBER, NUMBER -> NUMBER
+// Or a function that takes a table and a primary key of any Datum type, then
+// retrieves the entry with that primary key:
+//   Table, DATUM -> OBJECT
+// Some arguments must be provided as literal values (and not the results of sub
+// terms).  These are marked with a `!`.
+// Optional arguments are specified within curly braces as argname `:` value
+// type (e.x `{use_outdated:BOOL}`)
+// Many RQL operations are polymorphic. For these, alterantive type signatures
+// are separated by `|`.
+//
+// The RQL type hierarchy is as follows:
+//   Top
+//     DATUM
+//       NULL
+//       BOOL
+//       NUMBER
+//       STRING
+//       OBJECT
+//         SingleSelection
+//       ARRAY
+//     Sequence
+//       ARRAY
+//       Stream
+//         StreamSelection
+//           Table
+//     Database
+//     Function
+//     Ordering - used only by ORDER_BY
+//     Pathspec -- an object, string, or array that specifies a path
+//   Error
 type Term struct {
-	Type             *Term_TermType            `protobuf:"varint,1,opt,name=type,enum=Term_TermType" json:"type,omitempty"`
+	Type *Term_TermType `protobuf:"varint,1,opt,name=type,enum=Term_TermType" json:"type,omitempty"`
+	// This is only used when type is DATUM.
 	Datum            *Datum                    `protobuf:"bytes,2,opt,name=datum" json:"datum,omitempty"`
 	Args             []*Term                   `protobuf:"bytes,3,rep,name=args" json:"args,omitempty"`
 	Optargs          []*Term_AssocPair         `protobuf:"bytes,4,rep,name=optargs" json:"optargs,omitempty"`
