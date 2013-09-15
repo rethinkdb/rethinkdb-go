@@ -1,8 +1,10 @@
 package rethinkgo
 
 import (
+	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 	"reflect"
+	"time"
 )
 
 // Expr converts any value to an expression.  Internally it uses the `json`
@@ -33,8 +35,8 @@ func expr(value interface{}, depth int) RqlTerm {
 	switch val := value.(type) {
 	case RqlTerm:
 		return val
-	// case time.Time:
-	// 	return EpochTime(val.Unix())
+	case time.Time:
+		return EpochTime(val.Unix())
 	case List:
 		vals := []RqlTerm{}
 		for _, v := range val {
@@ -51,8 +53,13 @@ func expr(value interface{}, depth int) RqlTerm {
 		return makeObject(vals)
 	default:
 		// Use reflection to check for other types
-		if reflect.TypeOf(val).Kind() == reflect.Func {
+		typ := reflect.TypeOf(val)
+
+		if typ.Kind() == reflect.Func {
 			return makeFunc(val)
+		}
+		if typ.Kind() == reflect.Struct {
+			return expr(encoding.Encode(val), depth-1)
 		}
 
 		// If no other match was found then return a datum value

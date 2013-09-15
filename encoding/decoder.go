@@ -9,21 +9,6 @@ import (
 	"strings"
 )
 
-// NewDecoder returns a new Decoder.
-func NewDecoder() *Decoder {
-	return &Decoder{cache: newCache()}
-}
-
-// Decoder decodes values from a map[string][]string to a struct.
-type Decoder struct {
-	cache *fieldCache
-}
-
-// RegisterConverter registers a converter function for a custom type.
-func (d *Decoder) RegisterConverter(value interface{}, converterFunc Converter) {
-	d.cache.conv[reflect.TypeOf(value).Kind()] = converterFunc
-}
-
 // Decode decodes a map[string][]string to a struct.
 //
 // The first parameter must be a pointer to a struct.
@@ -32,7 +17,7 @@ func (d *Decoder) RegisterConverter(value interface{}, converterFunc Converter) 
 // Keys are "paths" in dotted notation to the struct fields and nested structs.
 //
 // See the package documentation for a full explanation of the mechanics.
-func (d *Decoder) Decode(dst interface{}, src interface{}) error {
+func Decode(dst interface{}, src interface{}) error {
 	dv := reflect.ValueOf(dst)
 	sv := reflect.ValueOf(src)
 
@@ -42,10 +27,10 @@ func (d *Decoder) Decode(dst interface{}, src interface{}) error {
 	}
 	dv = dv.Elem()
 
-	return d.decode(dv, sv)
+	return decode(dv, sv)
 }
 
-func (d *Decoder) decode(dv, sv reflect.Value) error {
+func decode(dv, sv reflect.Value) error {
 	if dv.IsValid() && sv.IsValid() {
 		// Ensure that the source value has the correct type of parsing
 		if sv.Kind() == reflect.Interface {
@@ -54,29 +39,29 @@ func (d *Decoder) decode(dv, sv reflect.Value) error {
 
 		switch sv.Kind() {
 		case reflect.Slice:
-			return d.decodeArray(dv, sv)
+			return decodeArray(dv, sv)
 		case reflect.Map:
-			return d.decodeObject(dv, sv)
+			return decodeObject(dv, sv)
 		case reflect.Struct:
 			dv.Set(sv)
 		default:
-			return d.decodeLiteral(dv, sv)
+			return decodeLiteral(dv, sv)
 		}
 	}
 
 	return nil
 }
 
-func (d *Decoder) decodeLiteral(dv reflect.Value, sv reflect.Value) error {
-	dv = d.indirect(dv)
+func decodeLiteral(dv reflect.Value, sv reflect.Value) error {
+	dv = indirect(dv)
 	dt := dv.Type()
 
 	if dv.Kind() == reflect.Interface {
-		dv.Set(reflect.ValueOf(d.decodeLiteralInterface(sv)))
+		dv.Set(reflect.ValueOf(decodeLiteralInterface(sv)))
 		return nil
 	}
 
-	if conv := d.cache.conv[dt.Kind()]; conv != nil {
+	if conv := converters[dt.Kind()]; conv != nil {
 		if value := conv(sv.Interface()); value.IsValid() {
 			dv.Set(value)
 		} else {
@@ -89,14 +74,14 @@ func (d *Decoder) decodeLiteral(dv reflect.Value, sv reflect.Value) error {
 	return nil
 }
 
-func (d *Decoder) decodeArray(dv reflect.Value, sv reflect.Value) error {
-	dv = d.indirect(dv)
+func decodeArray(dv reflect.Value, sv reflect.Value) error {
+	dv = indirect(dv)
 	dt := dv.Type()
 
 	if dt.Kind() == reflect.Interface {
 		if dv.NumMethod() == 0 {
 			// Decoding into nil interface?  Switch to non-reflect code.
-			dv.Set(reflect.ValueOf(d.decodeArrayInterface(sv)))
+			dv.Set(reflect.ValueOf(decodeArrayInterface(sv)))
 
 			return nil
 		} else {
@@ -128,13 +113,13 @@ func (d *Decoder) decodeArray(dv reflect.Value, sv reflect.Value) error {
 
 		if i < dv.Len() {
 			// Decode into element.
-			err := d.decode(dv.Index(i), sv.Index(i))
+			err := decode(dv.Index(i), sv.Index(i))
 			if err != nil {
 				return err
 			}
 		} else {
 			// Ran out of fixed array: skip.
-			err := d.decode(reflect.Value{}, sv.Index(i))
+			err := decode(reflect.Value{}, sv.Index(i))
 			if err != nil {
 				return err
 			}
@@ -161,20 +146,20 @@ func (d *Decoder) decodeArray(dv reflect.Value, sv reflect.Value) error {
 }
 
 // decode fills a struct field using a parsed path.
-func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
-	dv = d.indirect(dv)
+func decodeObject(dv reflect.Value, sv reflect.Value) error {
+	dv = indirect(dv)
 	dt := dv.Type()
 
 	// Decoding into nil interface?  Switch to non-reflect code.
 	if dv.Kind() == reflect.Interface && dv.NumMethod() == 0 {
-		dv.Set(reflect.ValueOf(d.decodeObjectInterface(sv)))
+		dv.Set(reflect.ValueOf(decodeObjectInterface(sv)))
 		return nil
 	}
 
 	if dv.Kind() == reflect.Map {
 		// map must have string kind
 		if dt.Key().Kind() != reflect.String {
-			// d.saveError(&UnmarshalTypeError{"object", dv.Type()})
+			// saveError(&UnmarshalTypeError{"object", dv.Type()})
 			return fmt.Errorf("Map key not string...")
 		}
 
@@ -201,7 +186,7 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 			subdv = mapElem
 		} else {
 			var f *field
-			fields := d.cache.typeFields(dv.Type())
+			fields := cachedTypeFields(dv.Type())
 			for i := range fields {
 				ff := &fields[i]
 				if ff.name == skey {
@@ -226,7 +211,7 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 			}
 		}
 
-		err := d.decode(subdv, subsv)
+		err := decode(subdv, subsv)
 		if err != nil {
 			return err
 		}
@@ -245,46 +230,46 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 // but they avoid the weight of reflection in this common case.
 
 // valueInterface is like value but returns interface{}
-func (d *Decoder) decodeInterface(sv reflect.Value) interface{} {
+func decodeInterface(sv reflect.Value) interface{} {
 	switch sv.Kind() {
 	case reflect.Array, reflect.Slice:
-		return d.decodeArrayInterface(sv)
+		return decodeArrayInterface(sv)
 	case reflect.Struct, reflect.Map:
-		return d.decodeObjectInterface(sv)
+		return decodeObjectInterface(sv)
 	default:
-		return d.decodeLiteralInterface(sv)
+		return decodeLiteralInterface(sv)
 	}
 }
 
 // arrayInterface is like array but returns []interface{}.
-func (d *Decoder) decodeArrayInterface(sv reflect.Value) []interface{} {
+func decodeArrayInterface(sv reflect.Value) []interface{} {
 	var arr = make([]interface{}, 0)
 	for _, v := range sv.Interface().([]interface{}) {
-		arr = append(arr, d.decodeInterface(reflect.ValueOf(v)))
+		arr = append(arr, decodeInterface(reflect.ValueOf(v)))
 	}
 	return arr
 }
 
 // objectInterface is like object but returns map[string]interface{}.
-func (d *Decoder) decodeObjectInterface(sv reflect.Value) map[string]interface{} {
+func decodeObjectInterface(sv reflect.Value) map[string]interface{} {
 	m := make(map[string]interface{})
 	for k, v := range sv.Interface().(map[interface{}]interface{}) {
 		// Ensure that key is of type string
 		if key, ok := k.(string); ok {
-			m[key] = d.decodeInterface(reflect.ValueOf(v))
+			m[key] = decodeInterface(reflect.ValueOf(v))
 		}
 	}
 	return m
 }
 
 // literalInterface is like literal but returns an interface value.
-func (d *Decoder) decodeLiteralInterface(sv reflect.Value) interface{} {
+func decodeLiteralInterface(sv reflect.Value) interface{} {
 	return sv.Interface()
 }
 
 // indirect walks down v allocating pointers as needed,
 // until it gets to a non-pointer.
-func (d *Decoder) indirect(v reflect.Value) reflect.Value {
+func indirect(v reflect.Value) reflect.Value {
 	// If v is a named type and is addressable,
 	// start with its address, so that if the type has pointer methods,
 	// we find them.

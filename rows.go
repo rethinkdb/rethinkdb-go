@@ -162,8 +162,7 @@ func (r *Rows) Scan(dest interface{}) error {
 		return err
 	}
 
-	decoder := encoding.NewDecoder()
-	err = decoder.Decode(dest, data)
+	err = encoding.Decode(dest, data)
 	if err != nil {
 		return err
 	}

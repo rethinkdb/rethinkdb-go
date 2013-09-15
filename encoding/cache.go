@@ -9,28 +9,20 @@ import (
 )
 
 // newCache returns a new cache.
-func newCache() *fieldCache {
-	c := fieldCache{
-		m:    make(map[reflect.Type][]field),
-		conv: make(map[reflect.Kind]Converter),
-	}
-	for k, v := range converters {
-		c.conv[k] = v
-	}
-	return &c
+func init() {
+	fieldCache.m = make(map[reflect.Type][]field)
 }
 
 // fieldCache caches meta-data about a struct.
-type fieldCache struct {
-	l    sync.RWMutex
-	m    map[reflect.Type][]field
-	conv map[reflect.Kind]Converter
+var fieldCache struct {
+	l sync.RWMutex
+	m map[reflect.Type][]field
 }
 
-func (c *fieldCache) typeFields(t reflect.Type) []field {
-	c.l.RLock()
-	f := c.m[t]
-	c.l.RUnlock()
+func cachedTypeFields(t reflect.Type) []field {
+	fieldCache.l.RLock()
+	f := fieldCache.m[t]
+	fieldCache.l.RUnlock()
 	if f != nil {
 		return f
 	}
@@ -42,12 +34,12 @@ func (c *fieldCache) typeFields(t reflect.Type) []field {
 		f = []field{}
 	}
 
-	c.l.Lock()
-	if c.m == nil {
-		c.m = map[reflect.Type][]field{}
+	fieldCache.l.Lock()
+	if fieldCache.m == nil {
+		fieldCache.m = map[reflect.Type][]field{}
 	}
-	c.m[t] = f
-	c.l.Unlock()
+	fieldCache.m[t] = f
+	fieldCache.l.Unlock()
 	return f
 }
 
