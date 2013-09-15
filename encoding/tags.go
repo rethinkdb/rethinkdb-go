@@ -1,6 +1,6 @@
 // This code is based on encoding/json and gorilla/schema
 
-package mapping
+package encoding
 
 import (
 	"reflect"
@@ -14,7 +14,7 @@ const TagName = "rethink"
 // tag, or the empty string. It does not include the leading comma.
 type tagOptions string
 
-func getTag(sf reflect.StructField) reflect.StructTag {
+func getTag(sf reflect.StructField) string {
 	return sf.Tag.Get(TagName)
 }
 

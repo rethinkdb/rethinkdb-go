@@ -1,7 +1,7 @@
 package rethinkgo
 
 import (
-	"github.com/dancannon/gorethink/mapping"
+	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -162,7 +162,7 @@ func (r *Rows) Scan(dest interface{}) error {
 		return err
 	}
 
-	decoder := mapping.NewDecoder()
+	decoder := encoding.NewDecoder()
 	err = decoder.Decode(dest, data)
 	if err != nil {
 		return err

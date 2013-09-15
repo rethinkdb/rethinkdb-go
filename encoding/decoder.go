@@ -1,6 +1,6 @@
 // This code is based on encoding/json and gorilla/schema
 
-package mapping
+package encoding
 
 import (
 	"errors"
