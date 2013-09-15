@@ -66,7 +66,9 @@ func funcWrap(value interface{}) RqlTerm {
 	val := Expr(value)
 
 	if implVarScan(val) {
-		return makeFunc(val)
+		return makeFunc(func(x RqlTerm) RqlTerm {
+			return val
+		})
 	} else {
 		return val
 	}

@@ -5,7 +5,7 @@ import (
 )
 
 func (s *RethinkSuite) TestManipulationDocField(c *test.C) {
-	query := Expr(Obj{"a": 1}).Map(Doc().Field("a"))
+	query := Expr(Obj{"a": 1}).Do(Doc().Field("a"))
 
 	var response int
 	err := query.RunRow(conn).Scan(&response)
