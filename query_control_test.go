@@ -2,7 +2,6 @@ package rethinkgo
 
 import (
 	"errors"
-	"fmt"
 	test "launchpad.net/gocheck"
 )
 
@@ -109,7 +108,6 @@ func (s *RethinkSuite) TestControlDo(c *test.C) {
 	}, func(row RqlTerm) RqlTerm {
 		return row.Field("a")
 	})
-	fmt.Println(query)
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
