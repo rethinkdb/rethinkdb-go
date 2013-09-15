@@ -1,6 +1,7 @@
 package rethinkgo
 
 import (
+	"errors"
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -20,7 +21,7 @@ func (r *Row) Scan(dest interface{}) error {
 
 	defer r.rows.Close()
 	if !r.rows.Next() {
-		return ErrNoRows
+		return errors.New("rethinkdb: no rows in the result set")
 	}
 	err := r.rows.Scan(dest)
 	if err != nil {
@@ -147,13 +148,13 @@ func (r *Rows) advance() bool {
 // key).
 func (r *Rows) Scan(dest interface{}) error {
 	if r.closed {
-		return ErrRowsClosed
+		return errors.New("rethinkdb: no rows in the result set")
 	}
 	if r.err != nil {
 		return r.err
 	}
 	if r.current == nil {
-		return ErrNoCurrRow
+		return errors.New("rethinkdb: Scan called without calling Next")
 	}
 
 	data, err := deconstructDatum(r.current)
