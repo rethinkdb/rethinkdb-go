@@ -5,7 +5,7 @@ import (
 )
 
 func (t RqlTerm) Insert(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Insert", p.Term_INSERT, List{arg}, Obj{})
+	return newRqlTermFromPrevVal(t, "Insert", p.Term_INSERT, List{funcWrap(arg)}, Obj{})
 }
 
 func (t RqlTerm) Update(arg interface{}) RqlTerm {

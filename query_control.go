@@ -37,6 +37,13 @@ func expr(value interface{}, depth int) RqlTerm {
 		return val
 	case time.Time:
 		return EpochTime(val.Unix())
+	case []interface{}:
+		vals := []RqlTerm{}
+		for _, v := range val {
+			vals = append(vals, expr(v, depth))
+		}
+
+		return makeArray(vals)
 	case List:
 		vals := []RqlTerm{}
 		for _, v := range val {
@@ -44,6 +51,13 @@ func expr(value interface{}, depth int) RqlTerm {
 		}
 
 		return makeArray(vals)
+	case map[string]interface{}:
+		vals := map[string]RqlTerm{}
+		for k, v := range val {
+			vals[k] = expr(v, depth)
+		}
+
+		return makeObject(vals)
 	case Obj:
 		vals := map[string]RqlTerm{}
 		for k, v := range val {

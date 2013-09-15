@@ -62,7 +62,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 			m.SetMapIndex(k, ev)
 		}
 
-		return v, nil
+		return m, nil
 	case reflect.Slice:
 		s := reflect.MakeSlice(reflect.TypeOf([]interface{}{}), v.Len(), v.Len())
 
@@ -79,7 +79,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 			s.Index(i).Set(ev)
 		}
 
-		return v, nil
+		return s, nil
 	case reflect.Interface, reflect.Ptr:
 		if v.IsNil() {
 			return reflect.Value{}, nil

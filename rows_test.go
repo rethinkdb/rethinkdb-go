@@ -5,7 +5,7 @@ import (
 )
 
 type object struct {
-	Id    int64  `rethinkdb:"id"`
+	Id    int64  `rethinkdb:"id,omitempty"`
 	Name  string `rethinkdb:"name"`
 	Attrs []attr
 }

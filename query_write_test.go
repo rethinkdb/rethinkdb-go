@@ -11,9 +11,8 @@ func (s *RethinkSuite) TestWriteInsert(c *test.C) {
 }
 
 func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
-	var response interface{}
+	var response map[string]interface{}
 	o := object{
-		Id:   5,
 		Name: "Object 3",
 		Attrs: []attr{
 			attr{
@@ -27,7 +26,7 @@ func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"inserted": 1})
+	c.Assert(response["inserted"], test.Equals, float64(1))
 }
 
 func (s *RethinkSuite) TestWriteUpdate(c *test.C) {
