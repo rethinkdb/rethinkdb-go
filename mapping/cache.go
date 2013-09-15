@@ -1,8 +1,4 @@
-// This file is based on the github.com/gorilla/schema package
-
-// Copyright 2012 The Gorilla Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// This code is based on encoding/json and gorilla/schema
 
 package mapping
 
@@ -89,10 +85,8 @@ func typeFields(t reflect.Type) []field {
 				if sf.PkgPath != "" { // unexported
 					continue
 				}
-				tag := sf.Tag.Get("rethinkdb")
-				if tag == "-" {
-					continue
-				}
+
+				tag := getTag(sf)
 				name, opts := parseTag(tag)
 				if !isValidTag(name) {
 					name = ""

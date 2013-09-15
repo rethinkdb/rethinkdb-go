@@ -1,19 +1,24 @@
-// Copyright 2011 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// This code is based on encoding/json and gorilla/schema
 
 package mapping
 
 import (
+	"reflect"
 	"strings"
 	"unicode"
 )
 
-// tagOptions is the string following a comma in a struct field's "json"
+const TagName = "rethink"
+
+// tagOptions is the string following a comma in a struct field's
 // tag, or the empty string. It does not include the leading comma.
 type tagOptions string
 
-// parseTag splits a struct field's json tag into its name and
+func getTag(sf reflect.StructField) reflect.StructTag {
+	return sf.Tag.Get(TagName)
+}
+
+// parseTag splits a struct field's tag into its name and
 // comma-separated options.
 func parseTag(tag string) (string, tagOptions) {
 	if idx := strings.Index(tag, ","); idx != -1 {
