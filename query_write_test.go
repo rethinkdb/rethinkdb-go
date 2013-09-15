@@ -1,7 +1,6 @@
 package rethinkgo
 
 import (
-	"fmt"
 	test "launchpad.net/gocheck"
 )
 
@@ -12,6 +11,7 @@ func (s *RethinkSuite) TestWriteInsert(c *test.C) {
 }
 
 func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
+	var response interface{}
 	o := object{
 		Id:   5,
 		Name: "Object 3",
