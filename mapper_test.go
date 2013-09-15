@@ -56,10 +56,50 @@ func (s *RethinkSuite) TestMapperScanMap(c *test.C) {
 	rows, err := Expr(Obj{
 		"id":   2,
 		"name": "Object 1",
-		// "attr": List{Obj{
-		// 	"name":  "attr 1",
-		// 	"value": "value 1",
-		// }},
+		"attr": List{Obj{
+			"name":  "attr 1",
+			"value": "value 1",
+		}},
+	}).Run(conn)
+	c.Assert(err, test.IsNil)
+
+	for rows.Next() {
+		var response map[string]interface{}
+		err = rows.Scan(&response)
+		c.Assert(err, test.IsNil)
+
+		fmt.Printf("%#v\n", response)
+	}
+}
+
+func (s *RethinkSuite) TestMapperScanMapIntoInterface(c *test.C) {
+	rows, err := Expr(Obj{
+		"id":   2,
+		"name": "Object 1",
+		"attr": List{Obj{
+			"name":  "attr 1",
+			"value": "value 1",
+		}},
+	}).Run(conn)
+	c.Assert(err, test.IsNil)
+
+	for rows.Next() {
+		var response interface{}
+		err = rows.Scan(&response)
+		c.Assert(err, test.IsNil)
+
+		fmt.Printf("%#v\n", response)
+	}
+}
+
+func (s *RethinkSuite) TestMapperScanMapNested(c *test.C) {
+	rows, err := Expr(Obj{
+		"id":   2,
+		"name": "Object 1",
+		"attr": List{Obj{
+			"name":  "attr 1",
+			"value": "value 1",
+		}},
 	}).Run(conn)
 	c.Assert(err, test.IsNil)
 

@@ -48,25 +48,33 @@ func (d *Decoder) Decode(dst interface{}, src interface{}) error {
 }
 
 func (d *Decoder) decode(dv, sv reflect.Value) error {
-	if !dv.IsValid() || !sv.IsValid() {
-		return fmt.Errorf("Value is invalid")
+	if dv.IsValid() && sv.IsValid() {
+		// Ensure that the source value has the correct type of parsing
+		if sv.Kind() == reflect.Interface {
+			sv = reflect.ValueOf(sv.Interface())
+		}
+
+		switch dv.Kind() {
+		case reflect.Slice, reflect.Array:
+			return d.decodeArray(dv, sv)
+		case reflect.Struct, reflect.Map:
+			return d.decodeObject(dv, sv)
+		default:
+			return d.decodeLiteral(dv, sv)
+		}
 	}
 
-	switch sv.Kind() {
-	case reflect.Interface:
-		return d.decode(dv, reflect.ValueOf(sv.Interface()))
-	case reflect.Slice, reflect.Array:
-		return d.decodeArray(dv, sv)
-	case reflect.Struct, reflect.Map:
-		return d.decodeObject(dv, sv)
-	default:
-		return d.decodeLiteral(dv, sv)
-	}
+	return nil
 }
 
 func (d *Decoder) decodeLiteral(dv reflect.Value, sv reflect.Value) error {
 	dv = d.indirect(dv)
 	dt := dv.Type()
+
+	if dv.Kind() == reflect.Interface {
+		dv.Set(reflect.ValueOf(d.decodeLiteralInterface(sv)))
+		return nil
+	}
 
 	if conv := d.cache.conv[dt.Kind()]; conv != nil {
 		if value := conv(sv.Interface()); value.IsValid() {
@@ -85,11 +93,23 @@ func (d *Decoder) decodeArray(dv reflect.Value, sv reflect.Value) error {
 	dv = d.indirect(dv)
 	dt := dv.Type()
 
+	if dt.Kind() == reflect.Interface {
+		if dv.NumMethod() == 0 {
+			// Decoding into nil interface?  Switch to non-reflect code.
+			dv.Set(reflect.ValueOf(d.decodeArrayInterface(sv)))
+
+			return nil
+		} else {
+			return nil
+		}
+	}
+
 	if dv.Kind() == reflect.Slice {
 		dv.Set(reflect.MakeSlice(dt, 0, 0))
 	}
 
-	for i := 0; i < sv.Len(); i++ {
+	i := 0
+	for i < sv.Len() {
 		if dv.Kind() == reflect.Slice {
 			// Get element of array, growing if necessary.
 			if i >= dv.Cap() {
@@ -106,10 +126,35 @@ func (d *Decoder) decodeArray(dv reflect.Value, sv reflect.Value) error {
 			}
 		}
 
-		err := d.decode(dv.Index(i), sv.Index(i))
-		if err != nil {
-			return err
+		if i < dv.Len() {
+			// Decode into element.
+			err := d.decode(dv.Index(i), sv.Index(i))
+			if err != nil {
+				return err
+			}
+		} else {
+			// Ran out of fixed array: skip.
+			err := d.decode(reflect.Value{}, sv.Index(i))
+			if err != nil {
+				return err
+			}
 		}
+
+		i++
+	}
+	if i < dv.Len() {
+		if dv.Kind() == reflect.Array {
+			// Array.  Zero the rest.
+			z := reflect.Zero(dv.Type().Elem())
+			for ; i < dv.Len(); i++ {
+				dv.Index(i).Set(z)
+			}
+		} else {
+			dv.SetLen(i)
+		}
+	}
+	if i == 0 && dv.Kind() == reflect.Slice {
+		dv.Set(reflect.MakeSlice(dv.Type(), 0, 0))
 	}
 
 	return nil
@@ -119,6 +164,12 @@ func (d *Decoder) decodeArray(dv reflect.Value, sv reflect.Value) error {
 func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 	dv = d.indirect(dv)
 	dt := dv.Type()
+
+	// Decoding into nil interface?  Switch to non-reflect code.
+	if dv.Kind() == reflect.Interface && dv.NumMethod() == 0 {
+		dv.Set(reflect.ValueOf(d.decodeObjectInterface(sv)))
+		return nil
+	}
 
 	if dv.Kind() == reflect.Map {
 		// map must have string kind
@@ -176,12 +227,51 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 		}
 
 		if dv.Kind() == reflect.Map {
-			kv := reflect.ValueOf(key).Convert(dv.Type().Key())
+			kv := reflect.ValueOf(key.Interface().(string))
 			dv.SetMapIndex(kv, subdv)
 		}
 	}
 
 	return nil
+}
+
+// The xxxInterface routines build up a value to be stored
+// in an empty interface.  They are not strictly necessary,
+// but they avoid the weight of reflection in this common case.
+
+// valueInterface is like value but returns interface{}
+func (d *Decoder) decodeInterface(sv reflect.Value) interface{} {
+	switch sv.Kind() {
+	case reflect.Array, reflect.Slice:
+		return d.decodeArrayInterface(sv)
+	case reflect.Struct, reflect.Map:
+		return d.decodeObjectInterface(sv)
+	default:
+		return d.decodeLiteralInterface(sv)
+	}
+}
+
+// arrayInterface is like array but returns []interface{}.
+func (d *Decoder) decodeArrayInterface(sv reflect.Value) []interface{} {
+	var arr = make([]interface{}, 0)
+	for _, v := range sv.Interface().([]interface{}) {
+		arr = append(arr, d.decodeInterface(reflect.ValueOf(v)))
+	}
+	return arr
+}
+
+// objectInterface is like object but returns map[string]interface{}.
+func (d *Decoder) decodeObjectInterface(sv reflect.Value) map[string]interface{} {
+	m := make(map[string]interface{})
+	for k, v := range sv.Interface().(map[string]interface{}) {
+		m[k] = d.decodeInterface(reflect.ValueOf(v))
+	}
+	return m
+}
+
+// literalInterface is like literal but returns an interface value.
+func (d *Decoder) decodeLiteralInterface(sv reflect.Value) interface{} {
+	return sv.Interface()
 }
 
 // indirect walks down v allocating pointers as needed,
