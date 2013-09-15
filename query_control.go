@@ -59,7 +59,16 @@ func expr(value interface{}, depth int) RqlTerm {
 			return makeFunc(val)
 		}
 		if typ.Kind() == reflect.Struct {
-			return expr(encoding.Encode(val), depth-1)
+			data, err := encoding.Encode(val)
+
+			if err != nil || data == nil {
+				return RqlTerm{
+					termType: p.Term_DATUM,
+					data:     nil,
+				}
+			}
+
+			return expr(data, depth-1)
 		}
 
 		// If no other match was found then return a datum value

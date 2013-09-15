@@ -138,9 +138,6 @@ func decodeArray(dv reflect.Value, sv reflect.Value) error {
 			dv.SetLen(i)
 		}
 	}
-	if i == 0 && dv.Kind() == reflect.Slice {
-		dv.Set(reflect.MakeSlice(dv.Type(), 0, 0))
-	}
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package rethinkgo
 
 import (
+	"fmt"
 	test "launchpad.net/gocheck"
 )
 
@@ -8,6 +9,23 @@ func (s *RethinkSuite) TestWriteInsert(c *test.C) {
 	query := Db("test").Table("test").Insert(Obj{"num": 1})
 	_, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
+}
+
+func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
+	o := object{
+		Id:   5,
+		Name: "Object 3",
+		Attrs: []attr{
+			attr{
+				Name:  "Attr 2",
+				Value: "Value",
+			},
+		},
+	}
+
+	query := Db("test").Table("test").Insert(o)
+	// query.Exec(conn)
+	fmt.Println(query)
 }
 
 func (s *RethinkSuite) TestWriteUpdate(c *test.C) {
