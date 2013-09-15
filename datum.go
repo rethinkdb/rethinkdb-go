@@ -114,7 +114,10 @@ func deconstructDatum(datum *p.Datum) (interface{}, error) {
 				// TODO: Add optional arguments and pass time format here
 				timeformat := "native"
 				if timeformat == "native" {
-					return reqlTimeToNativeTime(obj["epoch_time"].(int64), obj["timezone"].(string))
+					// Convert timestamp from float to int
+					seconds := int64(obj["epoch_time"].(float64))
+
+					return reqlTimeToNativeTime(seconds, obj["timezone"].(string))
 				} else if timeformat == "raw" {
 					return obj, nil
 				} else {

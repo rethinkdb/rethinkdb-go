@@ -6,7 +6,7 @@ import (
 
 // Returns the currently visited document.
 func Doc() RqlTerm {
-	return newRqlTerm("Row", p.Term_IMPLICIT_VAR, List{}, Obj{})
+	return newRqlTerm("Doc", p.Term_IMPLICIT_VAR, List{}, Obj{})
 }
 
 func Literal(args ...interface{}) RqlTerm {

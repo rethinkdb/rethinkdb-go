@@ -53,10 +53,12 @@ func (d *Decoder) decode(dv, sv reflect.Value) error {
 		}
 
 		switch sv.Kind() {
-		case reflect.Slice, reflect.Array:
+		case reflect.Slice:
 			return d.decodeArray(dv, sv)
-		case reflect.Struct, reflect.Map:
+		case reflect.Map:
 			return d.decodeObject(dv, sv)
+		case reflect.Struct:
+			dv.Set(sv)
 		default:
 			return d.decodeLiteral(dv, sv)
 		}
@@ -182,6 +184,8 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 	}
 
 	var mapElem reflect.Value
+
+	fmt.Println(sv, sv.Interface())
 
 	for _, key := range sv.MapKeys() {
 		var subdv reflect.Value
