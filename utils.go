@@ -2,6 +2,7 @@ package rethinkgo
 
 import (
 	"code.google.com/p/goprotobuf/proto"
+	p "github.com/dancannon/gorethink/ql2"
 	"strconv"
 	"strings"
 	"time"
@@ -33,6 +34,32 @@ func mergeArgs(args ...interface{}) []interface{} {
 }
 
 // Helper functions for constructing terms
+
+// newRqlTerm is an alias for creating a new RqlTermue.
+func newRqlTerm(name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
+	return RqlTerm{
+		name:     name,
+		termType: termType,
+		args:     listToTermsList(args),
+		optArgs:  objToTermsObj(optArgs),
+	}
+}
+
+// newRqlTermFromPrevVal is an alias for creating a new RqlTermue. Unlike newRqlTerm
+// this function adds the previous expression in the tree to the argument list.
+// It is used when evalutating an expression like
+//
+// `r.Expr(1).Add(2).Mul(3)`
+func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
+	args = append(List{prevVal}, args...)
+
+	return RqlTerm{
+		name:     name,
+		termType: termType,
+		args:     listToTermsList(args),
+		optArgs:  objToTermsObj(optArgs),
+	}
+}
 
 // Convert a list into a slice of terms
 func listToTermsList(l List) termsList {

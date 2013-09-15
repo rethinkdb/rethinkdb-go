@@ -1,9 +1,9 @@
 package rethinkgo
 
 import (
+	"code.google.com/p/goprotobuf/proto"
 	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
-	"math"
 	"reflect"
 )
 
@@ -22,7 +22,7 @@ func constructDatum(t RqlTerm) *p.Term {
 				Type: p.Term_DATUM.Enum(),
 				Datum: &p.Datum{
 					Type:  p.Datum_R_BOOL.Enum(),
-					RBool: &val,
+					RBool: proto.Bool(val),
 				},
 			}
 		case uint, uint8, uint16, uint32, uint64:
@@ -34,7 +34,7 @@ func constructDatum(t RqlTerm) *p.Term {
 				Type: p.Term_DATUM.Enum(),
 				Datum: &p.Datum{
 					Type: p.Datum_R_NUM.Enum(),
-					RNum: &fv,
+					RNum: proto.Float64(fv),
 				},
 			}
 		case int, int8, int16, int32, int64:
@@ -46,7 +46,7 @@ func constructDatum(t RqlTerm) *p.Term {
 				Type: p.Term_DATUM.Enum(),
 				Datum: &p.Datum{
 					Type: p.Datum_R_NUM.Enum(),
-					RNum: &fv,
+					RNum: proto.Float64(fv),
 				},
 			}
 		case float32, float64:
@@ -58,7 +58,7 @@ func constructDatum(t RqlTerm) *p.Term {
 				Type: p.Term_DATUM.Enum(),
 				Datum: &p.Datum{
 					Type: p.Datum_R_NUM.Enum(),
-					RNum: &fv,
+					RNum: proto.Float64(fv),
 				},
 			}
 		case string:
@@ -66,7 +66,7 @@ func constructDatum(t RqlTerm) *p.Term {
 				Type: p.Term_DATUM.Enum(),
 				Datum: &p.Datum{
 					Type: p.Datum_R_STR.Enum(),
-					RStr: &val,
+					RStr: proto.String(val),
 				},
 			}
 		default:
@@ -82,16 +82,7 @@ func deconstructDatum(datum *p.Datum) (interface{}, error) {
 	case p.Datum_R_BOOL:
 		return datum.GetRBool(), nil
 	case p.Datum_R_NUM:
-		num := datum.GetRNum()
-		// Convert to an integer if we think maybe the user might think of this
-		// number as an integer. I have been assured that this is a "temporary"
-		// behavior change until RQL supports native integers.
-		if math.Mod(num, 1) == 0 {
-			// Then we assume that in the user's data model this floating point
-			// number is meant be an integer and "helpfully" convert types for them.
-			return int(num), nil
-		}
-		return num, nil
+		return datum.GetRNum(), nil
 	case p.Datum_R_STR:
 		return datum.GetRStr(), nil
 	case p.Datum_R_ARRAY:

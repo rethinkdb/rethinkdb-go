@@ -1,6 +1,7 @@
 package rethinkgo
 
 import (
+	"code.google.com/p/goprotobuf/proto"
 	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
 	"strings"
@@ -46,7 +47,7 @@ func (t RqlTerm) build() *p.Term {
 
 		for k, v := range t.optArgs {
 			optArgs = append(optArgs, &p.Term_AssocPair{
-				Key: &k,
+				Key: proto.String(k),
 				Val: v.build(),
 			})
 		}
@@ -93,32 +94,22 @@ func (t RqlTerm) String() string {
 	}
 }
 
-func (t RqlTerm) Run(c *Connection) (Rows, error) {
+func (t RqlTerm) Run(c *Connection) (*Rows, error) {
 	return c.startQuery(t)
 }
 
-// newRqlTerm is an alias for creating a new RqlTermue.
-func newRqlTerm(name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
-	return RqlTerm{
-		name:     name,
-		termType: termType,
-		args:     listToTermsList(args),
-		optArgs:  objToTermsObj(optArgs),
-	}
+func (t RqlTerm) RunRow(c *Connection) *Row {
+	rows, err := t.Run(c)
+	return &Row{rows: rows, err: err}
 }
 
-// newRqlTermFromPrevVal is an alias for creating a new RqlTermue. Unlike newRqlTerm
-// this function adds the previous expression in the tree to the argument list.
-// It is used when evalutating an expression like
-//
-// `r.Expr(1).Add(2).Mul(3)`
-func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
-	args = append(List{prevVal}, args...)
+// Run a write query
+func (t RqlTerm) RunWrite(c *Connection) (*Rows, error) {
+	rows, err := t.Run(c)
+	return rows, err
+}
 
-	return RqlTerm{
-		name:     name,
-		termType: termType,
-		args:     listToTermsList(args),
-		optArgs:  objToTermsObj(optArgs),
-	}
+func (t RqlTerm) Exec(c *Connection) error {
+	_, err := t.Run(c)
+	return err
 }

@@ -4,7 +4,8 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-func Row() RqlTerm {
+// Returns the currently visited document.
+func Doc() RqlTerm {
 	return newRqlTerm("Row", p.Term_IMPLICIT_VAR, List{}, Obj{})
 }
 
