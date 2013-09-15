@@ -4,7 +4,6 @@ import (
 	"code.google.com/p/goprotobuf/proto"
 	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
-	"math"
 	"reflect"
 )
 
@@ -83,16 +82,7 @@ func deconstructDatum(datum *p.Datum) (interface{}, error) {
 	case p.Datum_R_BOOL:
 		return datum.GetRBool(), nil
 	case p.Datum_R_NUM:
-		num := datum.GetRNum()
-		// Convert to an integer if we think maybe the user might think of this
-		// number as an integer. I have been assured that this is a "temporary"
-		// behavior change until RQL supports native integers.
-		if math.Mod(num, 1) == 0 {
-			// Then we assume that in the user's data model this floating point
-			// number is meant be an integer and "helpfully" convert types for them.
-			return int(num), nil
-		}
-		return num, nil
+		return datum.GetRNum(), nil
 	case p.Datum_R_STR:
 		return datum.GetRStr(), nil
 	case p.Datum_R_ARRAY:
