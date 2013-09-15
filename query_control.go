@@ -89,18 +89,22 @@ func Error(message string) RqlTerm {
 // Example response:
 //
 // [1,2,3]
-func (t RqlTerm) Do(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 1, args)
-	args[len(args)-1] = funcWrap(args[len(args)-1])
+func (t RqlTerm) Do(f interface{}) RqlTerm {
+	newArgs := List{}
+	newArgs = append(newArgs, funcWrap(f))
+	newArgs = append(newArgs, t)
 
-	return newRqlTermFromPrevVal(t, "Do", p.Term_FUNCALL, args, Obj{})
+	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, Obj{})
 }
 
 func Do(args ...interface{}) RqlTerm {
-	enforceArgLength(2, -1, args)
-	args[len(args)-1] = funcWrap(args[len(args)-1])
+	enforceArgLength(1, -1, args)
 
-	return newRqlTerm("Do", p.Term_FUNCALL, args, Obj{})
+	newArgs := List{}
+	newArgs = append(newArgs, funcWrap(args[len(args)-1]))
+	newArgs = append(newArgs, args[:len(args)-1]...)
+
+	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, Obj{})
 }
 
 func Branch(test, trueBranch, falseBranch interface{}) RqlTerm {

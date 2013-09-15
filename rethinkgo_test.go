@@ -1,6 +1,7 @@
 package rethinkgo
 
 import (
+	"encoding/json"
 	"flag"
 	test "launchpad.net/gocheck"
 	"os"
@@ -43,4 +44,30 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 
 func (s *RethinkSuite) TearDownSuite(c *test.C) {
 	conn.Close()
+}
+
+type jsonChecker struct {
+	info *test.CheckerInfo
+}
+
+func (j jsonChecker) Info() *test.CheckerInfo {
+	return j.info
+}
+
+func (j jsonChecker) Check(params []interface{}, names []string) (result bool, error string) {
+	var jsonParams []interface{}
+	for _, param := range params {
+		jsonParam, err := json.Marshal(param)
+		if err != nil {
+			return false, err.Error()
+		}
+		jsonParams = append(jsonParams, jsonParam)
+	}
+	return test.DeepEquals.Check(jsonParams, names)
+}
+
+// JsonEquals compares two interface{} objects by converting them to JSON and
+// seeing if the strings match
+var JsonEquals = &jsonChecker{
+	&test.CheckerInfo{Name: "JsonEquals", Params: []string{"obtained", "expected"}},
 }

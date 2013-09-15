@@ -185,8 +185,6 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 
 	var mapElem reflect.Value
 
-	fmt.Println(sv, sv.Interface())
-
 	for _, key := range sv.MapKeys() {
 		var subdv reflect.Value
 		var subsv reflect.Value = sv.MapIndex(key)
