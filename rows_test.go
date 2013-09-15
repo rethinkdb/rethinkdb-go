@@ -121,8 +121,8 @@ func (s *RethinkSuite) TestResultAtomString(c *test.C) {
 func (s *RethinkSuite) TestResultAtomArray(c *test.C) {
 	row := Expr(List{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).RunRow(conn)
 
-	var response List
+	var response []int
 	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, List{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
+	c.Assert(response, test.DeepEquals, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
 }
