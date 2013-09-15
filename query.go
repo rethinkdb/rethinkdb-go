@@ -69,8 +69,8 @@ func (t RqlTerm) String() string {
 	case p.Term_FUNC:
 		// Get string representation of each argument
 		args := []string{}
-		for _, v := range t.args[0].data.([]interface{}) {
-			args = append(args, fmt.Sprintf("var_%d", v))
+		for _, v := range t.args[0].args {
+			args = append(args, fmt.Sprintf("var_%d", v.data))
 		}
 
 		return fmt.Sprintf("func(%s r.RqlTerm) r.RqlTerm { return %s }",

@@ -9,11 +9,11 @@ func (t RqlTerm) Insert(arg interface{}) RqlTerm {
 }
 
 func (t RqlTerm) Update(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Update", p.Term_UPDATE, List{arg}, Obj{})
+	return newRqlTermFromPrevVal(t, "Update", p.Term_UPDATE, List{funcWrap(arg)}, Obj{})
 }
 
 func (t RqlTerm) Replace(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Replace", p.Term_REPLACE, List{arg}, Obj{})
+	return newRqlTermFromPrevVal(t, "Replace", p.Term_REPLACE, List{funcWrap(arg)}, Obj{})
 }
 
 func (t RqlTerm) Delete() RqlTerm {

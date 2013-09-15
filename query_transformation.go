@@ -5,7 +5,7 @@ import (
 )
 
 func (t RqlTerm) Map(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Map", p.Term_MAP, List{f}, Obj{})
+	return newRqlTermFromPrevVal(t, "Map", p.Term_MAP, List{funcWrap(f)}, Obj{})
 }
 
 func (t RqlTerm) WithFields(fields ...interface{}) RqlTerm {
@@ -13,19 +13,25 @@ func (t RqlTerm) WithFields(fields ...interface{}) RqlTerm {
 }
 
 func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "ConcatMap", p.Term_CONCATMAP, List{f}, Obj{})
+	return newRqlTermFromPrevVal(t, "ConcatMap", p.Term_CONCATMAP, List{funcWrap(f)}, Obj{})
 }
 
 func (t RqlTerm) OrderBy(args ...interface{}) RqlTerm {
+	for k, arg := range args {
+		if t, ok := arg.(RqlTerm); !(ok && (t.termType == p.Term_DESC || t.termType == p.Term_ASC)) {
+			args[k] = funcWrap(arg)
+		}
+	}
+
 	return newRqlTermFromPrevVal(t, "OrderBy", p.Term_ORDERBY, args, Obj{})
 }
 
 func Desc(arg interface{}) RqlTerm {
-	return newRqlTerm("Desc", p.Term_DESC, List{arg}, Obj{})
+	return newRqlTerm("Desc", p.Term_DESC, List{funcWrap(arg)}, Obj{})
 }
 
 func Asc(arg interface{}) RqlTerm {
-	return newRqlTerm("Asc", p.Term_ASC, List{arg}, Obj{})
+	return newRqlTerm("Asc", p.Term_ASC, List{funcWrap(arg)}, Obj{})
 }
 
 func (t RqlTerm) Skip(n interface{}) RqlTerm {
@@ -45,7 +51,7 @@ func (t RqlTerm) Nth(n interface{}) RqlTerm {
 }
 
 func (t RqlTerm) IndexesOf(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexesOf", p.Term_INDEXES_OF, List{arg}, Obj{})
+	return newRqlTermFromPrevVal(t, "IndexesOf", p.Term_INDEXES_OF, List{funcWrap(arg)}, Obj{})
 }
 
 func (t RqlTerm) IsEmpty() RqlTerm {

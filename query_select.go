@@ -21,9 +21,9 @@ func (t RqlTerm) GetAll(keys ...interface{}) RqlTerm {
 }
 
 func (t RqlTerm) Between(lowerKey, upperKey interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, List{lowerKey, upperKey}, Obj{})
+	return newRqlTermFromPrevVal(t, "Between", p.Term_BETWEEN, List{lowerKey, upperKey}, Obj{})
 }
 
-func (t RqlTerm) Filter(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, List{arg}, Obj{})
+func (t RqlTerm) Filter(f interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Filter", p.Term_FILTER, List{funcWrap(f)}, Obj{})
 }

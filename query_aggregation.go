@@ -7,13 +7,15 @@ import (
 // Aggregation
 // These commands are used to compute smaller values from large sequences.
 
-func (t RqlTerm) Reduce(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 2, args)
-	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, args, Obj{})
+func (t RqlTerm) Reduce(f, base interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, List{funcWrap(f), base}, Obj{})
 }
 
 func (t RqlTerm) Count(args ...interface{}) RqlTerm {
 	enforceArgLength(0, 1, args)
+	for k, v := range args {
+		args[k] = funcWrap(v)
+	}
 	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, args, Obj{})
 }
 
@@ -26,7 +28,7 @@ func (t RqlTerm) GroupedMapReduce(grouping, mapping, reduction, base interface{}
 		t,
 		"GroupedMapReduce",
 		p.Term_GROUPED_MAP_REDUCE,
-		List{grouping, mapping, reduction, base},
+		List{funcWrap(grouping), funcWrap(mapping), funcWrap(reduction), base},
 		Obj{},
 	)
 }
@@ -36,6 +38,10 @@ func (t RqlTerm) GroupBy(args ...interface{}) RqlTerm {
 }
 
 func (t RqlTerm) Contains(args ...interface{}) RqlTerm {
+	for k, v := range args {
+		args[k] = funcWrap(v)
+	}
+
 	return newRqlTermFromPrevVal(t, "Contains", p.Term_CONTAINS, args, Obj{})
 }
 
