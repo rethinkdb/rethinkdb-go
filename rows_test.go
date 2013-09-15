@@ -1,9 +1,7 @@
 package rethinkgo
 
 import (
-	"fmt"
 	test "launchpad.net/gocheck"
-	"testing"
 )
 
 type object struct {
@@ -18,138 +16,113 @@ type attr struct {
 }
 
 func (s *RethinkSuite) TestResultScanLiteral(c *test.C) {
-	rows, err := Expr(5).Run(conn)
+	row := Expr(5).RunRow(conn)
+
+	var response interface{}
+	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-
-	for rows.Next() {
-		var response interface{}
-		rows.Scan(&response)
-
-		fmt.Printf("%#v\n", response)
-	}
+	c.Assert(response, JsonEquals, 5)
 }
 
 func (s *RethinkSuite) TestResultScanSlice(c *test.C) {
-	rows, err := Expr(List{1, 2, 3, 4, 5}).Run(conn)
+	row := Expr(List{1, 2, 3, 4, 5}).RunRow(conn)
+
+	var response interface{}
+	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-
-	for rows.Next() {
-		var response interface{}
-		rows.Scan(&response)
-
-		fmt.Printf("%#v\n", response)
-	}
-}
-
-func (s *RethinkSuite) TestResultScanIntSlice(c *test.C) {
-	rows, err := Expr(List{1, 2, 3, 4, 5}).Run(conn)
-	c.Assert(err, test.IsNil)
-
-	for rows.Next() {
-		var response []int
-		rows.Scan(&response)
-
-		fmt.Printf("%#v\n", response)
-	}
+	c.Assert(response, JsonEquals, List{1, 2, 3, 4, 5})
 }
 
 func (s *RethinkSuite) TestResultScanMap(c *test.C) {
-	rows, err := Expr(Obj{
+	row := Expr(Obj{
 		"id":   2,
 		"name": "Object 1",
-		"attr": List{Obj{
-			"name":  "attr 1",
-			"value": "value 1",
-		}},
-	}).Run(conn)
+	}).RunRow(conn)
+
+	var response map[string]interface{}
+	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-
-	for rows.Next() {
-		var response map[string]interface{}
-		err = rows.Scan(&response)
-		c.Assert(err, test.IsNil)
-
-		fmt.Printf("%#v\n", response)
-	}
+	c.Assert(response, JsonEquals, Obj{
+		"id":   2,
+		"name": "Object 1",
+	})
 }
 
 func (s *RethinkSuite) TestResultScanMapIntoInterface(c *test.C) {
-	rows, err := Expr(Obj{
+	row := Expr(Obj{
 		"id":   2,
 		"name": "Object 1",
-		"attr": List{Obj{
-			"name":  "attr 1",
-			"value": "value 1",
-		}},
-	}).Run(conn)
+	}).RunRow(conn)
+
+	var response interface{}
+	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-
-	for rows.Next() {
-		var response interface{}
-		err = rows.Scan(&response)
-		c.Assert(err, test.IsNil)
-
-		fmt.Printf("%#v\n", response)
-	}
+	c.Assert(response, JsonEquals, Obj{
+		"id":   2,
+		"name": "Object 1",
+	})
 }
 
 func (s *RethinkSuite) TestResultScanMapNested(c *test.C) {
-	rows, err := Expr(Obj{
+	row := Expr(Obj{
 		"id":   2,
 		"name": "Object 1",
 		"attr": List{Obj{
 			"name":  "attr 1",
 			"value": "value 1",
 		}},
-	}).Run(conn)
+	}).RunRow(conn)
+
+	var response interface{}
+	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-
-	for rows.Next() {
-		var response map[string]interface{}
-		err = rows.Scan(&response)
-		c.Assert(err, test.IsNil)
-
-		fmt.Printf("%#v\n", response)
-	}
+	c.Assert(response, JsonEquals, Obj{
+		"id":   2,
+		"name": "Object 1",
+		"attr": List{Obj{
+			"name":  "attr 1",
+			"value": "value 1",
+		}},
+	})
 }
 
 func (s *RethinkSuite) TestResultScanStruct(c *test.C) {
-	rows, err := Expr(Obj{
+	row := Expr(Obj{
 		"id":   2,
 		"name": "Object 1",
 		"Attrs": List{Obj{
 			"Name":  "attr 1",
 			"Value": "value 1",
 		}},
-	}).Run(conn)
+	}).RunRow(conn)
+
+	var response object
+	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-
-	for rows.Next() {
-		var response object
-		err = rows.Scan(&response)
-		c.Assert(err, test.IsNil)
-
-		fmt.Printf("%#v\n", response)
-	}
+	c.Assert(response, test.DeepEquals, object{
+		Id:   2,
+		Name: "Object 1",
+		Attrs: []attr{attr{
+			Name:  "attr 1",
+			Value: "value 1",
+		}},
+	})
 }
 
 func (s *RethinkSuite) TestResultAtomString(c *test.C) {
-	// row := Expr("a").RunRow(conn)
-	// c.Assert(row, test.Equals, "a")
+	row := Expr("a").RunRow(conn)
+
+	var response string
+	err := row.Scan(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "a")
 }
 
 func (s *RethinkSuite) TestResultAtomArray(c *test.C) {
-	// query := Expr(List{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
-	// result, err := query.Run(conn)
-	// c.Assert(err, test.IsNil)
+	row := Expr(List{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).RunRow(conn)
 
-	// num := 0
-	// for result.Next() {
-	// 	row, err := result.Row()
-	// 	c.Assert(err, test.IsNil)
-	// 	c.Assert(len(row.([]interface{})), test.Equals, 10)
-	// 	num++
-	// }
-
-	// c.Assert(num, test.Equals, 1)
+	var response List
+	err := row.Scan(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.DeepEquals, List{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
 }

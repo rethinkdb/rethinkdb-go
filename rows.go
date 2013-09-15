@@ -178,7 +178,7 @@ func (r *Rows) All() ([]interface{}, error) {
 	for r.Next() {
 		var row interface{}
 
-		err := r.Scan(row)
+		err := r.Scan(&row)
 		if err != nil {
 			return rows, err
 		}
