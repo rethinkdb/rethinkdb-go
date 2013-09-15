@@ -186,6 +186,8 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 		var subdv reflect.Value
 		var subsv reflect.Value = sv.MapIndex(key)
 
+		skey := key.Interface().(string)
+
 		if dv.Kind() == reflect.Map {
 			elemType := dv.Type().Elem()
 			if !mapElem.IsValid() {
@@ -199,9 +201,12 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 			fields := d.cache.typeFields(dv.Type())
 			for i := range fields {
 				ff := &fields[i]
-				if ff.name == key.Interface().(string) {
+				if ff.name == skey {
 					f = ff
 					break
+				}
+				if f == nil && strings.EqualFold(ff.name, skey) {
+					f = ff
 				}
 			}
 			if f != nil {
@@ -224,7 +229,7 @@ func (d *Decoder) decodeObject(dv reflect.Value, sv reflect.Value) error {
 		}
 
 		if dv.Kind() == reflect.Map {
-			kv := reflect.ValueOf(key.Interface().(string))
+			kv := reflect.ValueOf(skey)
 			dv.SetMapIndex(kv, subdv)
 		}
 	}

@@ -1,6 +1,7 @@
 package rethinkgo
 
 import (
+	"errors"
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -10,49 +11,25 @@ type Row struct {
 	rows *Rows
 }
 
-// func (r *Row) Scan(dest interface{}) error {
-// var v reflect.Value
-// v = reflect.ValueOf(dest)
-// if v.Kind() != reflect.Ptr {
-// 	return errors.New("Must pass a pointer, not a value, to Scan destination.")
-// }
+// Scan copies the result from the matched row into the value pointed at by dest.
+// If more than one row is returned by the query then Scan returns the first and
+// ignores the rest. If no row is found then Scan returns an error.
+func (r *Row) Scan(dest interface{}) error {
+	if r.err != nil {
+		return r.err
+	}
 
-// direct := reflect.Indirect(v)
-// base, err := BaseStructType(direct.Type())
-// if err != nil {
-// 	return err
-// }
+	defer r.rows.Close()
+	if !r.rows.Next() {
+		return errors.New("gorethink: no rows in the result set")
+	}
+	err := r.rows.Scan(dest)
+	if err != nil {
+		return err
+	}
 
-// fm, err := getFieldmap(base)
-// if err != nil {
-// 	return err
-// }
-
-// columns, err := r.Columns()
-// if err != nil {
-// 	return err
-// }
-
-// fields, err := getFields(fm, columns)
-// if err != nil {
-// 	return err
-// }
-
-// values := make([]interface{}, len(columns))
-// // create a new struct type (which returns PtrTo) and indirect it
-// setValues(fields, reflect.Indirect(v), values)
-// // scan into the struct field pointers and append to our results
-
-// if r.err != nil {
-// 	return err
-// }
-
-// defer r.rows.Close()
-// if !r.rows.Next() {
-// 	panic("No rows")
-// }
-// return r.rows.Scan(values...)
-// }
+	return nil
+}
 
 // Rows contains the result of a query. Its cursor starts before the first row
 // of the result set. Use Next to advance through the rows.
@@ -71,6 +48,8 @@ type Rows struct {
 	responseType p.Response_ResponseType
 }
 
+// Close closes the Rows, preventing further enumeration. If the end is
+// encountered, the Rows are closed automatically. Close is idempotent.
 func (r *Rows) Close() error {
 	var err error
 
@@ -82,10 +61,15 @@ func (r *Rows) Close() error {
 	return err
 }
 
+// Err returns the error, if any, that was encountered during iteration.
 func (r *Rows) Err() error {
 	return r.err
 }
 
+// Next prepares the next row for reading. It returns true on success or false
+// if there are no more rows. Every call to scan must be preceeded by a call
+// to next. If all rows in the buffer have been read and a partial sequence was
+// returned then Next will load more from the database
 func (r *Rows) Next() bool {
 	if r.closed {
 		return false
@@ -143,6 +127,7 @@ func (r *Rows) Next() bool {
 	return true
 }
 
+// advance moves the interal buffer pointer ahead to point to the next row
 func (r *Rows) advance() bool {
 	if r.end <= r.start {
 		return false
@@ -152,9 +137,24 @@ func (r *Rows) advance() bool {
 	return true
 }
 
+// Scan copies the result in the current row into the value pointed at by dest.
+//
+// If an argument as type *interface{}, Scan copies the value provided by the
+// database wihtout conversion.
+//
+// If the value is a struct then Scan traverses
+// the result recursivly and attempts to match the keys returned by the database
+// to the name used by the structs field (either the struct field name or its
+// key).
 func (r *Rows) Scan(dest interface{}) error {
+	if r.closed {
+		return errors.New("gorethink: Rows closed")
+	}
+	if r.err != nil {
+		return r.err
+	}
 	if r.current == nil {
-		return nil
+		return errors.New("gorethink: Scan called without calling Next")
 	}
 
 	data, err := deconstructDatum(r.current)
@@ -171,16 +171,20 @@ func (r *Rows) Scan(dest interface{}) error {
 	return nil
 }
 
-// func (r *Rows) All() ([]interface{}, error) {
-// 	rows := []interface{}{}
-// 	for r.Next() {
-// 		row, err := r.Row()
-// 		if err != nil {
-// 			return []interface{}{}, err
-// 		}
+//
+func (r *Rows) All() ([]interface{}, error) {
+	rows := []interface{}{}
 
-// 		rows = append(rows, row)
-// 	}
+	for r.Next() {
+		var row interface{}
 
-// 	return rows, nil
-// }
+		err := r.Scan(row)
+		if err != nil {
+			return rows, err
+		}
+
+		rows = append(rows, row)
+	}
+
+	return rows, nil
+}
