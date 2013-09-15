@@ -54,4 +54,7 @@ func (s *RethinkSuite) TestDbDelete(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, Obj{"dropped": 1})
+
+	// Ensure that there is still a test DB after the test has finished
+	DbCreate("test").Exec(conn)
 }
