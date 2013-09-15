@@ -24,8 +24,10 @@ func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 	}
 
 	query := Db("test").Table("test").Insert(o)
-	// query.Exec(conn)
-	fmt.Println(query)
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, Obj{"inserted": 1})
 }
 
 func (s *RethinkSuite) TestWriteUpdate(c *test.C) {
