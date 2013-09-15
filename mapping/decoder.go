@@ -44,6 +44,7 @@ func (d *Decoder) Decode(dst interface{}, src interface{}) error {
 		return errors.New("schema: destination must be a pointer")
 	}
 	dv = dv.Elem()
+
 	return d.decode(dv, sv)
 }
 
@@ -54,7 +55,7 @@ func (d *Decoder) decode(dv, sv reflect.Value) error {
 			sv = reflect.ValueOf(sv.Interface())
 		}
 
-		switch dv.Kind() {
+		switch sv.Kind() {
 		case reflect.Slice, reflect.Array:
 			return d.decodeArray(dv, sv)
 		case reflect.Struct, reflect.Map:
@@ -263,8 +264,11 @@ func (d *Decoder) decodeArrayInterface(sv reflect.Value) []interface{} {
 // objectInterface is like object but returns map[string]interface{}.
 func (d *Decoder) decodeObjectInterface(sv reflect.Value) map[string]interface{} {
 	m := make(map[string]interface{})
-	for k, v := range sv.Interface().(map[string]interface{}) {
-		m[k] = d.decodeInterface(reflect.ValueOf(v))
+	for k, v := range sv.Interface().(map[interface{}]interface{}) {
+		// Ensure that key is of type string
+		if key, ok := k.(string); ok {
+			m[key] = d.decodeInterface(reflect.ValueOf(v))
+		}
 	}
 	return m
 }
