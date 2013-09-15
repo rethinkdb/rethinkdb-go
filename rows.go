@@ -1,7 +1,6 @@
 package rethinkgo
 
 import (
-	"errors"
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -21,7 +20,7 @@ func (r *Row) Scan(dest interface{}) error {
 
 	defer r.rows.Close()
 	if !r.rows.Next() {
-		return errors.New("gorethink: no rows in the result set")
+		return ErrNoRows
 	}
 	err := r.rows.Scan(dest)
 	if err != nil {
@@ -148,13 +147,13 @@ func (r *Rows) advance() bool {
 // key).
 func (r *Rows) Scan(dest interface{}) error {
 	if r.closed {
-		return errors.New("gorethink: Rows closed")
+		return ErrRowsClosed
 	}
 	if r.err != nil {
 		return r.err
 	}
 	if r.current == nil {
-		return errors.New("gorethink: Scan called without calling Next")
+		return ErrNoCurrRow
 	}
 
 	data, err := deconstructDatum(r.current)
@@ -171,7 +170,8 @@ func (r *Rows) Scan(dest interface{}) error {
 	return nil
 }
 
-//
+// All is a helper method for returning a slice containing all rows. The slice
+// is of type []interface{}.
 func (r *Rows) All() ([]interface{}, error) {
 	rows := []interface{}{}
 

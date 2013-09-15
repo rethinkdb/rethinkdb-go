@@ -58,3 +58,31 @@ type ErrWrongResponseType struct {
 func (e ErrWrongResponseType) Error() string {
 	return "rethinkdb: Wrong response type, you may have used the wrong one of: .Exec(), .One(), .All()"
 }
+
+// ----------------------------------------------------------------------------
+// Result/Rows errors
+
+// ErrNoRow indicates that rows.Scan has been called before rows.Next
+type ErrRowsClosed struct {
+}
+
+func (e ErrRowsClosed) Error() string {
+	return "rethinkdb: Rows closed"
+}
+
+// ErrNoRows indicates that the server has not returned any results but row.Scan
+// has been called.
+type ErrNoRows struct {
+}
+
+func (e ErrBadQuery) Error() string {
+	return "rethinkdb: no rows in the result set"
+}
+
+// ErrNoRow indicates that rows.Scan has been called before rows.Next
+type ErrNoCurrRow struct {
+}
+
+func (e ErrNoCurrRow) Error() string {
+	return "rethinkdb: Scan called without calling Next"
+}
