@@ -4,6 +4,7 @@ import (
 	"code.google.com/p/goprotobuf/proto"
 	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
+	"strconv"
 	"strings"
 )
 
@@ -84,7 +85,13 @@ func (t RqlTerm) String() string {
 	case p.Term_GET_FIELD:
 		return fmt.Sprintf("%s(%s)", t.args[0], t.args[1])
 	case p.Term_DATUM:
-		return fmt.Sprintf("%v", t.data)
+		switch v := t.data.(type) {
+		case string:
+			return strconv.Quote(v)
+		default:
+			return fmt.Sprintf("%v", v)
+		}
+
 	default:
 		if t.name != "" {
 			return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
