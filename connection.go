@@ -112,6 +112,10 @@ func (c *Connection) Close() error {
 	return err
 }
 
+func (c *Connection) Use(database string) {
+	c.database = database
+}
+
 // getToken generates the next query token, used to number requests and match
 // responses with requests.
 func (c *Connection) nextToken() int64 {
