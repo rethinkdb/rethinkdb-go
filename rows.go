@@ -54,7 +54,7 @@ func (r *Rows) Close() error {
 	var err error
 
 	if !r.closed {
-		_, err = r.conn.stopQuery(r.query, r.term)
+		_, err = r.conn.stopQuery(r.query, r.term, r.opts)
 		r.closed = true
 	}
 
@@ -112,7 +112,7 @@ func (r *Rows) Next() bool {
 	}
 
 	// Continue the query
-	newResult, err := r.conn.continueQuery(r.query, r.term)
+	newResult, err := r.conn.continueQuery(r.query, r.term, r.opts)
 	if err != nil {
 		r.err = err
 		return false
@@ -157,7 +157,7 @@ func (r *Rows) Scan(dest interface{}) error {
 		return errors.New("rethinkdb: Scan called without calling Next")
 	}
 
-	data, err := deconstructDatum(r.current)
+	data, err := deconstructDatum(r.current, r.opts)
 	if err != nil {
 		return err
 	}

@@ -122,7 +122,7 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
 }
 
-func (c *Connection) startQuery(t RqlTerm) (*Rows, error) {
+func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*Rows, error) {
 	token := c.nextToken()
 
 	// Build query tree
@@ -138,25 +138,25 @@ func (c *Connection) startQuery(t RqlTerm) (*Rows, error) {
 	// Set global defaults
 	// TODO:
 
-	return c.send(query, t, map[string]interface{}{})
+	return c.send(query, t, opts)
 }
 
-func (c *Connection) continueQuery(q *p.Query, t RqlTerm) (*Rows, error) {
+func (c *Connection) continueQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*Rows, error) {
 	nq := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
 		Token: q.Token,
 	}
 
-	return c.send(nq, t, map[string]interface{}{})
+	return c.send(nq, t, opts)
 }
 
-func (c *Connection) stopQuery(q *p.Query, t RqlTerm) (*Rows, error) {
+func (c *Connection) stopQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*Rows, error) {
 	nq := &p.Query{
 		Type:  p.Query_STOP.Enum(),
 		Token: q.Token,
 	}
 
-	return c.send(nq, t, map[string]interface{}{})
+	return c.send(nq, t, opts)
 }
 
 func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*Rows, error) {
@@ -213,6 +213,7 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 				conn:         c,
 				query:        q,
 				term:         t,
+				opts:         opts,
 				buffer:       r.GetResponse(),
 				end:          len(r.GetResponse()),
 				closed:       r.GetType() == p.Response_SUCCESS_SEQUENCE,
@@ -228,6 +229,7 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 			conn:         c,
 			query:        q,
 			term:         t,
+			opts:         opts,
 			buffer:       r.GetResponse(),
 			end:          len(r.GetResponse()),
 			closed:       r.GetType() == p.Response_SUCCESS_SEQUENCE,
@@ -235,7 +237,7 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 			responseType: r.GetType(),
 		}, nil
 	default:
-		data, err := deconstructDatum(r.GetResponse()[0])
+		data, err := deconstructDatum(r.GetResponse()[0], opts)
 		return nil, fmt.Errorf("%v, %v", data, err)
 	}
 

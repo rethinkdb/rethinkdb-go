@@ -99,22 +99,27 @@ func (t RqlTerm) String() string {
 	}
 }
 
-func (t RqlTerm) Run(c *Connection) (*Rows, error) {
-	return c.startQuery(t)
+func (t RqlTerm) Run(c *Connection, args ...interface{}) (*Rows, error) {
+	argm := optArgsToMap([]string{"use_outdated", "noreply", "time_format"}, args)
+	return c.startQuery(t, argm)
 }
 
-func (t RqlTerm) RunRow(c *Connection) *Row {
-	rows, err := t.Run(c)
+func (t RqlTerm) RunRow(c *Connection, args ...interface{}) *Row {
+	rows, err := t.Run(c, args...)
 	return &Row{rows: rows, err: err}
 }
 
 // Run a write query
-func (t RqlTerm) RunWrite(c *Connection) (*Rows, error) {
-	rows, err := t.Run(c)
+func (t RqlTerm) RunWrite(c *Connection, args ...interface{}) (*Rows, error) {
+	rows, err := t.Run(c, args...)
 	return rows, err
 }
 
-func (t RqlTerm) Exec(c *Connection) error {
-	_, err := t.Run(c)
+func (t RqlTerm) Exec(c *Connection, args ...interface{}) error {
+	// Ensure that noreply is set to true
+	args = append(args, "noreply")
+	args = append(args, true)
+
+	_, err := t.Run(c, args...)
 	return err
 }

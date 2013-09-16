@@ -150,3 +150,30 @@ func prefixLines(s string, prefix string) (result string) {
 func protobufToString(p proto.Message, indentLevel int) string {
 	return prefixLines(proto.MarshalTextString(p), strings.Repeat("    ", indentLevel))
 }
+
+func optArgsToMap(keys []string, args []interface{}) map[string]interface{} {
+	result := make(map[string]interface{}, len(args)/2)
+	for i := 0; i < len(args); i++ {
+		// Check that the key is of type string
+		if key, ok := args[i].(string); ok {
+			i++
+
+			// Check if key is allowed
+			allowed := false
+			for _, k := range keys {
+				if k == key {
+					allowed = true
+				}
+			}
+			if !allowed {
+				break
+			}
+
+			result[key] = args[i]
+		} else {
+			panic("gorethink: OptArg key is not of type string")
+		}
+
+	}
+	return result
+}

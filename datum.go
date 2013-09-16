@@ -75,7 +75,7 @@ func constructDatum(t RqlTerm) *p.Term {
 	}
 }
 
-func deconstructDatum(datum *p.Datum) (interface{}, error) {
+func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{}, error) {
 	switch datum.GetType() {
 	case p.Datum_R_NULL:
 		return nil, nil
@@ -88,7 +88,7 @@ func deconstructDatum(datum *p.Datum) (interface{}, error) {
 	case p.Datum_R_ARRAY:
 		items := []interface{}{}
 		for _, d := range datum.GetRArray() {
-			item, err := deconstructDatum(d)
+			item, err := deconstructDatum(d, opts)
 			if err != nil {
 				return nil, err
 			}
@@ -101,7 +101,7 @@ func deconstructDatum(datum *p.Datum) (interface{}, error) {
 		for _, assoc := range datum.GetRObject() {
 			key := assoc.GetKey()
 
-			val, err := deconstructDatum(assoc.GetVal())
+			val, err := deconstructDatum(assoc.GetVal(), opts)
 			if err != nil {
 				return nil, err
 			}
@@ -111,14 +111,22 @@ func deconstructDatum(datum *p.Datum) (interface{}, error) {
 
 		if reqlType, ok := obj["$reql_type$"]; ok {
 			if reqlType == "TIME" {
-				// TODO: Add optional arguments and pass time format here
-				timeformat := "native"
-				if timeformat == "native" {
+				// load timeformat, set to native if the option was not set
+				timeFormat := "native"
+				if opt, ok := opts["time_format"]; ok {
+					if sopt, ok := opt.(string); ok {
+						timeFormat = sopt
+					} else {
+						return nil, fmt.Errorf("Invalid time_format run option \"%s\".", opt)
+					}
+				}
+
+				if timeFormat == "native" {
 					// Convert timestamp from float to int
 					seconds := int64(obj["epoch_time"].(float64))
 
 					return reqlTimeToNativeTime(seconds, obj["timezone"].(string))
-				} else if timeformat == "raw" {
+				} else if timeFormat == "raw" {
 					return obj, nil
 				} else {
 					return nil, fmt.Errorf("Unknown time_format run option \"%s\".", reqlType)
