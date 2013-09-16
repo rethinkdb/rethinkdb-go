@@ -63,28 +63,24 @@ func (t RqlTerm) SetDifference(arg interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "SetDifference", p.Term_SET_DIFFERENCE, List{arg}, Obj{})
 }
 
-func (t RqlTerm) InsertAt(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 2, args)
-
-	return newRqlTermFromPrevVal(t, "InsertAt", p.Term_INSERT_AT, args, Obj{})
+func (t RqlTerm) InsertAt(index, value interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "InsertAt", p.Term_INSERT_AT, List{index, value}, Obj{})
 }
 
-func (t RqlTerm) SpliceAt(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 2, args)
-
-	return newRqlTermFromPrevVal(t, "SpliceAt", p.Term_SPLICE_AT, args, Obj{})
+func (t RqlTerm) SpliceAt(index, value interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "SpliceAt", p.Term_SPLICE_AT, List{index, value}, Obj{})
 }
 
-func (t RqlTerm) DeleteAt(args ...interface{}) RqlTerm {
-	enforceArgLength(1, 2, args)
-
-	return newRqlTermFromPrevVal(t, "DeleteAt", p.Term_DELETE_AT, args, Obj{})
+func (t RqlTerm) DeleteAt(index interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "DeleteAt", p.Term_DELETE_AT, List{index}, Obj{})
 }
 
-func (t RqlTerm) ChangeAt(args ...interface{}) RqlTerm {
-	enforceArgLength(2, 2, args)
+func (t RqlTerm) DeleteAtRange(index, endIndex interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "DeleteAt", p.Term_DELETE_AT, List{index, endIndex}, Obj{})
+}
 
-	return newRqlTermFromPrevVal(t, "ChangeAt", p.Term_CHANGE_AT, args, Obj{})
+func (t RqlTerm) ChangeAt(index, value interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "ChangeAt", p.Term_CHANGE_AT, List{index, value}, Obj{})
 }
 
 func (t RqlTerm) Keys() RqlTerm {

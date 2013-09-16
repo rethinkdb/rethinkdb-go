@@ -40,8 +40,9 @@ func EpochTime(epochtime interface{}) RqlTerm {
 //
 //  var response time.Time{}
 //  err = r.Now().Run(session).One(&response)
-func ISO8601(date interface{}) RqlTerm {
-	return newRqlTerm("ISO8601", p.Term_ISO8601, List{date}, Obj{})
+func ISO8601(date interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"default_timezone"}, optArgs)
+	return newRqlTerm("ISO8601", p.Term_ISO8601, List{date}, optArgM)
 }
 
 // Returns a new time object with a different time zone. While the time
@@ -69,8 +70,9 @@ func (t RqlTerm) Timezone() RqlTerm {
 
 // Returns true if a time is between two other times
 // (by default, inclusive for the start, exclusive for the end).
-func (t RqlTerm) During(startTime, endTime interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "During", p.Term_DURING, List{startTime, endTime}, Obj{})
+func (t RqlTerm) During(startTime, endTime interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"left_bound", "right_bound"}, optArgs)
+	return newRqlTermFromPrevVal(t, "During", p.Term_DURING, List{startTime, endTime}, optArgM)
 }
 
 // Return a new time object only based on the day, month and year

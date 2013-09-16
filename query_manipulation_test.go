@@ -145,6 +145,26 @@ func (s *RethinkSuite) TestManipulationHasFieldsTrue(c *test.C) {
 	c.Assert(response, test.Equals, true)
 }
 
+func (s *RethinkSuite) TestManipulationHasFieldsNested(c *test.C) {
+	query := Expr(Obj{"a": Obj{"b": 1}}).HasFields(Obj{"a": Obj{"b": true}})
+
+	var response bool
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, true)
+}
+
+func (s *RethinkSuite) TestManipulationHasFieldsNestedShort(c *test.C) {
+	query := Expr(Obj{"a": Obj{"b": 1}}).HasFields(Obj{"a": "b"})
+
+	var response bool
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, true)
+}
+
 func (s *RethinkSuite) TestManipulationHasFieldsFalse(c *test.C) {
 	query := Expr(Obj{"a": 1}).HasFields("b")
 
@@ -186,7 +206,7 @@ func (s *RethinkSuite) TestManipulationDeleteAt(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationDeleteAtRange(c *test.C) {
-	query := Expr(List{1, 2, 3, 4}).DeleteAt(1, 3)
+	query := Expr(List{1, 2, 3, 4}).DeleteAtRange(1, 3)
 
 	var response List
 	err := query.RunRow(conn).Scan(&response)

@@ -93,15 +93,15 @@ func expr(value interface{}, depth int) RqlTerm {
 	}
 }
 
-func Js(js string) RqlTerm {
+func Js(js interface{}) RqlTerm {
 	return newRqlTerm("Js", p.Term_JAVASCRIPT, List{js}, Obj{})
 }
 
-func Json(json string) RqlTerm {
+func Json(json interface{}) RqlTerm {
 	return newRqlTerm("Json", p.Term_JSON, List{json}, Obj{})
 }
 
-func Error(message string) RqlTerm {
+func Error(message interface{}) RqlTerm {
 	return newRqlTerm("Error", p.Term_ERROR, List{message}, Obj{})
 }
 
@@ -149,7 +149,7 @@ func (t RqlTerm) Default(value interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, List{value}, Obj{})
 }
 
-func (t RqlTerm) CoerceTo(typeName string) RqlTerm {
+func (t RqlTerm) CoerceTo(typeName interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, List{typeName}, Obj{})
 }
 

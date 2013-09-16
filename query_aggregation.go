@@ -11,12 +11,12 @@ func (t RqlTerm) Reduce(f, base interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, List{funcWrap(f), base}, Obj{})
 }
 
-func (t RqlTerm) Count(args ...interface{}) RqlTerm {
-	enforceArgLength(0, 1, args)
-	for k, v := range args {
-		args[k] = funcWrap(v)
-	}
-	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, args, Obj{})
+func (t RqlTerm) Count() RqlTerm {
+	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, List{}, Obj{})
+}
+
+func (t RqlTerm) CountFiltered(f interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, List{funcWrap(f)}, Obj{})
 }
 
 func (t RqlTerm) Distinct() RqlTerm {

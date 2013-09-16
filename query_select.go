@@ -4,11 +4,11 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-func Db(name string) RqlTerm {
+func Db(name interface{}) RqlTerm {
 	return newRqlTerm("Db", p.Term_DB, List{name}, Obj{})
 }
 
-func (t RqlTerm) Table(name string, optArgs ...interface{}) RqlTerm {
+func (t RqlTerm) Table(name interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"use_outdated"}, optArgs)
 	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, List{name}, optArgM)
 }
@@ -21,8 +21,8 @@ func (t RqlTerm) GetAll(keys ...interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "GetAll", p.Term_GET_ALL, keys, Obj{})
 }
 
-func (t RqlTerm) GetAllIndex(index string, keys ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "GetAll", p.Term_GET_ALL, keys, Obj{index: index})
+func (t RqlTerm) GetAllByIndex(index interface{}, keys ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "GetAll", p.Term_GET_ALL, keys, Obj{"index": index})
 }
 
 func (t RqlTerm) Between(lowerKey, upperKey interface{}, optArgs ...interface{}) RqlTerm {
