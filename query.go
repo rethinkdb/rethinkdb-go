@@ -99,6 +99,19 @@ func (t RqlTerm) String() string {
 	}
 }
 
+type WriteResponse struct {
+	Inserted      int
+	Errors        int
+	Updated       int
+	Unchanged     int
+	Replaced      int
+	Deleted       int
+	GeneratedKeys []string    `json:"generated_keys"`
+	FirstError    string      `json:"first_error"` // populated if Errors > 0
+	NewValue      interface{} `json:"new_val"`
+	OldValue      interface{} `json:"old_val"`
+}
+
 func (t RqlTerm) Run(c *Connection, args ...interface{}) (*Rows, error) {
 	argm := optArgsToMap([]string{"use_outdated", "noreply", "time_format"}, args)
 	return c.startQuery(t, argm)
@@ -110,9 +123,11 @@ func (t RqlTerm) RunRow(c *Connection, args ...interface{}) *Row {
 }
 
 // Run a write query
-func (t RqlTerm) RunWrite(c *Connection, args ...interface{}) (*Rows, error) {
-	rows, err := t.Run(c, args...)
-	return rows, err
+func (t RqlTerm) RunWrite(c *Connection, args ...interface{}) (WriteResponse, error) {
+	var response WriteResponse
+	row := t.RunRow(c, args...)
+	err := row.Scan(response)
+	return response, err
 }
 
 func (t RqlTerm) Exec(c *Connection, args ...interface{}) error {
