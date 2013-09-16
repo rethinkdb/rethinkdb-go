@@ -4,18 +4,22 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-func (t RqlTerm) Insert(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Insert", p.Term_INSERT, List{funcWrap(arg)}, Obj{})
+func (t RqlTerm) Insert(arg interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"durability", "return_vals", "cache_size", "upsert"}, optArgs)
+	return newRqlTermFromPrevVal(t, "Insert", p.Term_INSERT, List{funcWrap(arg)}, optArgM)
 }
 
-func (t RqlTerm) Update(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Update", p.Term_UPDATE, List{funcWrap(arg)}, Obj{})
+func (t RqlTerm) Update(arg interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"durability", "return_vals", "non_atomic"}, optArgs)
+	return newRqlTermFromPrevVal(t, "Update", p.Term_UPDATE, List{funcWrap(arg)}, optArgM)
 }
 
-func (t RqlTerm) Replace(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Replace", p.Term_REPLACE, List{funcWrap(arg)}, Obj{})
+func (t RqlTerm) Replace(arg interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"durability", "return_vals", "non_atomic"}, optArgs)
+	return newRqlTermFromPrevVal(t, "Replace", p.Term_REPLACE, List{funcWrap(arg)}, optArgM)
 }
 
-func (t RqlTerm) Delete() RqlTerm {
-	return newRqlTermFromPrevVal(t, "Delete", p.Term_DELETE, List{}, Obj{})
+func (t RqlTerm) Delete(optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"durability", "return_vals"}, optArgs)
+	return newRqlTermFromPrevVal(t, "Delete", p.Term_DELETE, List{}, optArgM)
 }
