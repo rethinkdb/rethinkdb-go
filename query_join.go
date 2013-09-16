@@ -12,8 +12,9 @@ func (t RqlTerm) OuterJoin(other, predicate interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "OuterJoin", p.Term_OUTER_JOIN, List{other, predicate}, Obj{})
 }
 
-func (t RqlTerm) EqJoin(left, right interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "EqJoin", p.Term_EQ_JOIN, List{left, right}, Obj{})
+func (t RqlTerm) EqJoin(left, right interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"index"}, optArgs)
+	return newRqlTermFromPrevVal(t, "EqJoin", p.Term_EQ_JOIN, List{left, right}, optArgM)
 }
 
 func (t RqlTerm) Zip() RqlTerm {
