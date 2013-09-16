@@ -8,8 +8,8 @@ func (t RqlTerm) Map(f interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Map", p.Term_MAP, List{funcWrap(f)}, Obj{})
 }
 
-func (t RqlTerm) WithFields(fields ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "WithFields", p.Term_WITH_FIELDS, fields, Obj{})
+func (t RqlTerm) WithFields(selectors ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "WithFields", p.Term_WITH_FIELDS, selectors, Obj{})
 }
 
 func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {

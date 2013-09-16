@@ -4,11 +4,11 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-func DbCreate(name string) RqlTerm {
+func DbCreate(name interface{}) RqlTerm {
 	return newRqlTerm("DbCreate", p.Term_DB_CREATE, List{name}, Obj{})
 }
 
-func DbDrop(name string) RqlTerm {
+func DbDrop(name interface{}) RqlTerm {
 	return newRqlTerm("DbDrop", p.Term_DB_DROP, List{name}, Obj{})
 }
 
