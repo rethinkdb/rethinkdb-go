@@ -50,7 +50,7 @@ type Embed0 struct {
 	Level1b int // used because Embed0a's Level1b is renamed
 	Level1c int // used because Embed0a's Level1c is ignored
 	Level1d int // annihilated by Embed0a's Level1d
-	Level1e int `gorethink:"x"` // annihilated by Embed0a.Level1e
+	Level1e int `gorethink:"level1d"` // annihilated by Embed0a.Level1f
 }
 
 type Embed0a struct {
@@ -58,7 +58,7 @@ type Embed0a struct {
 	Level1b int `gorethink:"LEVEL1B,omitempty"`
 	Level1c int `gorethink:"-"`
 	Level1d int // annihilated by Embed0's Level1d
-	Level1f int `gorethink:"x"` // annihilated by Embed0's Level1e
+	Level1f int `gorethink:"level1d"` // annihilated by Embed0's Level1e
 }
 
 type Embed0b Embed0
@@ -176,7 +176,7 @@ var decodeTests = []decodeTest{
 			"Level0":  1,
 			"Level1b": 2,
 			"Level1c": 3,
-			"x":       4,
+			"level1d": 4,
 			"Level1a": 5,
 			"LEVEL1B": 6,
 			"e": map[string]interface{}{
