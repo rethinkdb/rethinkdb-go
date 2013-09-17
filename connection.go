@@ -216,15 +216,11 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 				opts:         opts,
 				buffer:       r.GetResponse(),
 				end:          len(r.GetResponse()),
-				closed:       r.GetType() == p.Response_SUCCESS_SEQUENCE,
 				token:        q.GetToken(),
 				responseType: r.GetType(),
 			}, nil
 		}
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
-		// beginning of stream of rows, there are more results available from the
-		// server than the ones we just received, so save the session we used in
-		// case the user wants more
 		return &Rows{
 			conn:         c,
 			query:        q,
@@ -232,7 +228,6 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 			opts:         opts,
 			buffer:       r.GetResponse(),
 			end:          len(r.GetResponse()),
-			closed:       r.GetType() == p.Response_SUCCESS_SEQUENCE,
 			token:        q.GetToken(),
 			responseType: r.GetType(),
 		}, nil

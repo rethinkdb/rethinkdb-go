@@ -91,3 +91,16 @@ var defaultObjList = []interface{}{
 	map[string]interface{}{"a": 1},
 	map[string]interface{}{},
 }
+var joinTable1 = List{
+	map[string]interface{}{"id": 0, "name": "bob"},
+	map[string]interface{}{"id": 1, "name": "tom"},
+	map[string]interface{}{"id": 2, "name": "joe"},
+}
+var joinTable2 = List{
+	map[string]interface{}{"id": 0, "title": "goof"},
+	map[string]interface{}{"id": 2, "title": "lmoe"},
+}
+var joinTable3 = List{
+	map[string]interface{}{"it": 0, "title": "goof"},
+	map[string]interface{}{"it": 2, "title": "lmoe"},
+}

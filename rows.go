@@ -147,9 +147,6 @@ func (r *Rows) advance() bool {
 // to the name used by the structs field (either the struct field name or its
 // key).
 func (r *Rows) Scan(dest interface{}) error {
-	if r.closed {
-		return errors.New("rethinkdb: no rows in the result set")
-	}
 	if r.err != nil {
 		return r.err
 	}
