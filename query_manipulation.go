@@ -5,9 +5,7 @@ import (
 )
 
 // Returns the currently visited document.
-func Doc() RqlTerm {
-	return newRqlTerm("Doc", p.Term_IMPLICIT_VAR, List{}, Obj{})
-}
+var Row = newRqlTerm("Doc", p.Term_IMPLICIT_VAR, List{}, Obj{})
 
 func Literal(args ...interface{}) RqlTerm {
 	enforceArgLength(0, 1, args)

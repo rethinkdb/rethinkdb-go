@@ -81,7 +81,7 @@ func (t RqlTerm) String() string {
 	case p.Term_VAR:
 		return fmt.Sprintf("var_%s", t.args[0])
 	case p.Term_IMPLICIT_VAR:
-		return "r.Doc()"
+		return "r.Row"
 	case p.Term_DATUM:
 		switch v := t.data.(type) {
 		case string:

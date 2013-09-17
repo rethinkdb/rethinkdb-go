@@ -145,9 +145,9 @@ func (s *RethinkSuite) TestControlBranchSimple(c *test.C) {
 func (s *RethinkSuite) TestControlBranchWithMapExpr(c *test.C) {
 	var response interface{}
 	query := Expr(List{1, 2, 3}).Map(Branch(
-		Doc().Eq(2),
-		Doc().Sub(1),
-		Doc().Add(1),
+		Row.Eq(2),
+		Row.Sub(1),
+		Row.Add(1),
 	))
 	err := query.RunRow(conn).Scan(&response)
 

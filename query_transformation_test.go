@@ -5,7 +5,7 @@ import (
 )
 
 func (s *RethinkSuite) TestTransformationMapImplicit(c *test.C) {
-	query := Expr(arr).Map(Doc().Add(1))
+	query := Expr(arr).Map(Row.Add(1))
 
 	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)

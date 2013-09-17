@@ -187,7 +187,7 @@ func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
 
 	// Test query
 	var response interface{}
-	query := Db("test").Table("Table1").Filter(Doc().Field("num").Ge(50)).OrderBy("id")
+	query := Db("test").Table("Table1").Filter(Row.Field("num").Ge(50)).OrderBy("id")
 	rows, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
