@@ -1,6 +1,7 @@
 package encoding
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"image"
 	"reflect"
 	"testing"
@@ -50,7 +51,7 @@ type Embed0 struct {
 	Level1b int // used because Embed0a's Level1b is renamed
 	Level1c int // used because Embed0a's Level1c is ignored
 	Level1d int // annihilated by Embed0a's Level1d
-	Level1e int `gorethink:"level1d"` // annihilated by Embed0a.Level1f
+	Level1e int `gorethink:"x"` // annihilated by Embed0a.Level1e
 }
 
 type Embed0a struct {
@@ -58,7 +59,7 @@ type Embed0a struct {
 	Level1b int `gorethink:"LEVEL1B,omitempty"`
 	Level1c int `gorethink:"-"`
 	Level1d int // annihilated by Embed0's Level1d
-	Level1f int `gorethink:"level1d"` // annihilated by Embed0's Level1e
+	Level1f int `gorethink:"x"` // annihilated by Embed0's Level1e
 }
 
 type Embed0b Embed0
@@ -241,6 +242,7 @@ var decodeTests = []decodeTest{
 }
 
 func TestDecode(t *testing.T) {
+	scs := spew.ConfigState{Indent: "\t", ContinueOnMethod: true}
 	for i, tt := range decodeTests {
 		if tt.ptr == nil {
 			continue
@@ -254,7 +256,8 @@ func TestDecode(t *testing.T) {
 			continue
 		}
 		if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
-			t.Errorf("#%d: mismatch\nhave: (%T)%#+v\nwant: (%T)%#+v", i, v.Elem().Interface(), v.Elem().Interface(), tt.out, tt.out)
+			scs.Dump(v.Elem().Interface(), tt.out)
+			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
 		}
 
