@@ -20,9 +20,9 @@ func (s *RethinkSuite) TestJoinInnerJoin(c *test.C) {
 		return a.Field("id").Eq(b.Field("id"))
 	})
 	rows, err := query.Run(conn)
+	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
-	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
 		map[string]interface{}{
 			"right": map[string]interface{}{"title": "goof", "id": 0},
@@ -51,6 +51,7 @@ func (s *RethinkSuite) TestJoinInnerJoinZip(c *test.C) {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip()
 	rows, err := query.Run(conn)
+	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
 	c.Assert(err, test.IsNil)
@@ -76,6 +77,7 @@ func (s *RethinkSuite) TestJoinOuterJoinZip(c *test.C) {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip()
 	rows, err := query.Run(conn)
+	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
 	c.Assert(err, test.IsNil)
@@ -101,7 +103,6 @@ func (s *RethinkSuite) TestJoinEqJoinZip(c *test.C) {
 	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join2")).Zip()
 	rows, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
-
 	response, err = rows.All()
 	c.Assert(response, JsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0},
@@ -127,7 +128,6 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join3"), "index", "it").Zip()
 	rows, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
-
 	response, err = rows.All()
 	c.Assert(response, JsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0, "it": 0},
