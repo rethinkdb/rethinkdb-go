@@ -206,11 +206,11 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 	// Deconstruct datum and return the result
 	switch r.GetType() {
 	case p.Response_CLIENT_ERROR:
-		return &ResultRows{}, RqlClientError{response: r}
+		return &ResultRows{}, RqlClientError{rqlResponseError{r, t}}
 	case p.Response_COMPILE_ERROR:
-		return &ResultRows{}, RqlCompileError{response: r}
+		return &ResultRows{}, RqlCompileError{rqlResponseError{r, t}}
 	case p.Response_RUNTIME_ERROR:
-		return &ResultRows{}, RqlRuntimeError{response: r}
+		return &ResultRows{}, RqlRuntimeError{rqlResponseError{r, t}}
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
 		return &ResultRows{
 			conn:         c,
@@ -234,6 +234,6 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 			responseType: r.GetType(),
 		}, nil
 	default:
-		return &ResultRows{}, RqlDriverError{"Unexpected response type received: %s", r.GetType()}
+		return &ResultRows{}, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", r.GetType())}
 	}
 }

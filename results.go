@@ -1,7 +1,6 @@
 package rethinkgo
 
 import (
-	"errors"
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 )

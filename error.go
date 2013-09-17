@@ -7,29 +7,27 @@ import (
 
 // Connection/Response errors
 // ----------------------------------------------------------------------------
-
-type RqlCompileError struct {
+type rqlResponseError struct {
 	response *p.Response
+	term     RqlTerm
 }
 
-func (e RqlCompileError) Error() string {
-	return "RqlCompileError"
+func (e rqlResponseError) Error() string {
+	message, _ := deconstructDatum(e.response.GetResponse()[0], map[string]interface{}{})
+
+	return fmt.Sprintf("gorethink: %s in: \n%s", message, e.term)
+}
+
+type RqlCompileError struct {
+	rqlResponseError
 }
 
 type RqlRuntimeError struct {
-	response *p.Response
-}
-
-func (e RqlRuntimeError) Error() string {
-	return "RqlRuntimeError"
+	rqlResponseError
 }
 
 type RqlClientError struct {
-	response *p.Response
-}
-
-func (e RqlClientError) Error() string {
-	return "RqlClientError"
+	rqlResponseError
 }
 
 type RqlDriverError struct {
