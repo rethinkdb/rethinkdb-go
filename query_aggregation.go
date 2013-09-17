@@ -8,7 +8,7 @@ import (
 // These commands are used to compute smaller values from large sequences.
 
 func (t RqlTerm) Reduce(f, base interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, List{funcWrap(f), base}, Obj{})
+	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, List{funcWrap(f)}, Obj{"base": base})
 }
 
 func (t RqlTerm) Count() RqlTerm {
@@ -28,13 +28,14 @@ func (t RqlTerm) GroupedMapReduce(grouping, mapping, reduction, base interface{}
 		t,
 		"GroupedMapReduce",
 		p.Term_GROUPED_MAP_REDUCE,
-		List{funcWrap(grouping), funcWrap(mapping), funcWrap(reduction), base},
-		Obj{},
+		List{funcWrap(grouping), funcWrap(mapping), funcWrap(reduction)},
+		Obj{"base": base},
 	)
 }
 
-func (t RqlTerm) GroupBy(args ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "GroupBy", p.Term_GROUPBY, args, Obj{})
+func (t RqlTerm) GroupBy(collector interface{}, args ...interface{}) RqlTerm {
+
+	return newRqlTermFromPrevVal(t, "GroupBy", p.Term_GROUPBY, List{args, collector}, Obj{})
 }
 
 func (t RqlTerm) Contains(args ...interface{}) RqlTerm {
@@ -50,15 +51,21 @@ func (t RqlTerm) Contains(args ...interface{}) RqlTerm {
 
 // Count the total size of the group.
 func Count() RqlTerm {
-	return newRqlTerm("Count", p.Term_COUNT, List{}, Obj{})
+	return Expr(map[string]interface{}{
+		"COUNT": true,
+	})
 }
 
 // Compute the sum of the given field in the group.
 func Sum(arg interface{}) RqlTerm {
-	return newRqlTerm("Count", p.Term_COUNT, List{arg}, Obj{})
+	return Expr(map[string]interface{}{
+		"SUM": arg,
+	})
 }
 
 // Compute the average value of the given attribute for the group.
 func Avg(arg interface{}) RqlTerm {
-	return newRqlTerm("Count", p.Term_COUNT, List{arg}, Obj{})
+	return Expr(map[string]interface{}{
+		"AVG": arg,
+	})
 }

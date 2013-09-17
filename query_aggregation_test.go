@@ -4,11 +4,152 @@ import (
 	test "launchpad.net/gocheck"
 )
 
+func (s *RethinkSuite) TestAggregationReduce(c *test.C) {
+	var response int
+	query := Expr(arr).Reduce(func(acc, val RqlTerm) RqlTerm {
+		return acc.Add(val)
+	}, 0)
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 45)
+}
+
 func (s *RethinkSuite) TestAggregationExprCount(c *test.C) {
 	var response int
-	query := Expr(List{1, 2, 3, 4, 5, 6, 7, 8, 9}).Count()
+	query := Expr(arr).Count()
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, 9)
+}
+
+func (s *RethinkSuite) TestAggregationDistinct(c *test.C) {
+	var response []int
+	query := Expr(darr).Distinct()
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.HasLen, 5)
+}
+
+func (s *RethinkSuite) TestAggregationGroupedMapReduce(c *test.C) {
+	var response interface{}
+	query := Expr(objList).GroupedMapReduce(
+		func(row RqlTerm) RqlTerm {
+			return row.Field("id").Mod(2).Eq(0)
+		},
+		func(row RqlTerm) RqlTerm {
+			return row.Field("num")
+		},
+		func(acc, num RqlTerm) RqlTerm {
+			return acc.Add(num)
+		},
+		0,
+	)
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 135, "group": false},
+		map[string]interface{}{"reduction": 70, "group": true},
+	})
+}
+
+func (s *RethinkSuite) TestAggregationGroupedMapReduceTable(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").Exec(conn)
+	Db("test").TableCreate("TestAggregationGroupedMapReduceTable").Exec(conn)
+
+	// Insert rows
+	err := Db("test").Table("TestAggregationGroupedMapReduceTable").Insert(objList).Exec(conn)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	query := Db("test").Table("TestAggregationGroupedMapReduceTable").GroupedMapReduce(
+		func(row RqlTerm) RqlTerm {
+			return row.Field("id").Mod(2).Eq(0)
+		},
+		func(row RqlTerm) RqlTerm {
+			return row.Field("num")
+		},
+		func(acc, num RqlTerm) RqlTerm {
+			return acc.Add(num)
+		},
+		0,
+	)
+	err = query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 135, "group": false},
+		map[string]interface{}{"reduction": 70, "group": true},
+	})
+}
+
+func (s *RethinkSuite) TestAggregationGroupByCount(c *test.C) {
+	var response interface{}
+	query := Expr(objList).GroupBy(Count(), "g1")
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 3, "group": map[string]interface{}{"g1": 1}},
+		map[string]interface{}{"reduction": 4, "group": map[string]interface{}{"g1": 2}},
+		map[string]interface{}{"reduction": 1, "group": map[string]interface{}{"g1": 3}},
+		map[string]interface{}{"reduction": 1, "group": map[string]interface{}{"g1": 4}},
+	})
+}
+
+func (s *RethinkSuite) TestAggregationGroupBySum(c *test.C) {
+	var response interface{}
+	query := Expr(objList).GroupBy(Sum("num"), "g1")
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 15, "group": map[string]interface{}{"g1": 1}},
+		map[string]interface{}{"reduction": 130, "group": map[string]interface{}{"g1": 2}},
+		map[string]interface{}{"reduction": 10, "group": map[string]interface{}{"g1": 3}},
+		map[string]interface{}{"reduction": 50, "group": map[string]interface{}{"g1": 4}},
+	})
+}
+
+func (s *RethinkSuite) TestAggregationGroupByAvg(c *test.C) {
+	var response interface{}
+	query := Expr(objList).GroupBy(Avg("num"), "g1")
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 5, "group": map[string]interface{}{"g1": 1}},
+		map[string]interface{}{"reduction": 32.5, "group": map[string]interface{}{"g1": 2}},
+		map[string]interface{}{"reduction": 10, "group": map[string]interface{}{"g1": 3}},
+		map[string]interface{}{"reduction": 50, "group": map[string]interface{}{"g1": 4}},
+	})
+}
+
+func (s *RethinkSuite) TestAggregationGroupBySumMultipleSelectors(c *test.C) {
+	var response interface{}
+	query := Expr(objList).GroupBy(Sum("num"), "g1", "g2")
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 15, "group": map[string]interface{}{"g2": 1, "g1": 1}},
+		map[string]interface{}{"reduction": 0, "group": map[string]interface{}{"g2": 2, "g1": 1}},
+		map[string]interface{}{"reduction": 5, "group": map[string]interface{}{"g2": 2, "g1": 2}},
+		map[string]interface{}{"reduction": 125, "group": map[string]interface{}{"g2": 3, "g1": 2}},
+		map[string]interface{}{"reduction": 10, "group": map[string]interface{}{"g2": 2, "g1": 3}},
+		map[string]interface{}{"reduction": 50, "group": map[string]interface{}{"g2": 2, "g1": 4}},
+	})
+}
+
+func (s *RethinkSuite) TestAggregationContains(c *test.C) {
+	var response interface{}
+	query := Expr(arr).Contains(2)
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, true)
 }

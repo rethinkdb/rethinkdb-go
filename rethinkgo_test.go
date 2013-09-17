@@ -71,3 +71,19 @@ func (j jsonChecker) Check(params []interface{}, names []string) (result bool, e
 var JsonEquals = &jsonChecker{
 	&test.CheckerInfo{Name: "JsonEquals", Params: []string{"obtained", "expected"}},
 }
+
+// Expressions used in tests
+var arr = []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}
+var darr = []interface{}{1, 1, 2, 2, 3, 3, 5, 5, 6}
+var obj = map[string]interface{}{"a": 1, "b": 2, "c": 3}
+var objList = []interface{}{
+	map[string]interface{}{"id": 1, "g1": 1, "g2": 1, "num": 0},
+	map[string]interface{}{"id": 2, "g1": 2, "g2": 2, "num": 5},
+	map[string]interface{}{"id": 3, "g1": 3, "g2": 2, "num": 10},
+	map[string]interface{}{"id": 4, "g1": 2, "g2": 3, "num": 0},
+	map[string]interface{}{"id": 5, "g1": 2, "g2": 3, "num": 100},
+	map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15},
+	map[string]interface{}{"id": 7, "g1": 1, "g2": 2, "num": 0},
+	map[string]interface{}{"id": 8, "g1": 4, "g2": 2, "num": 50},
+	map[string]interface{}{"id": 9, "g1": 2, "g2": 3, "num": 25},
+}
