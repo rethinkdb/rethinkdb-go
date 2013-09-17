@@ -21,7 +21,7 @@ func (r *ResultRow) Scan(dest interface{}) error {
 
 	defer r.rows.Close()
 	if !r.rows.Next() {
-		return errors.New("rethinkdb: no rows in the result set")
+		return RqlDriverError{"No rows in the result set"}
 	}
 	err := r.rows.Scan(dest)
 	if err != nil {
@@ -151,7 +151,7 @@ func (r *ResultRows) Scan(dest interface{}) error {
 		return r.err
 	}
 	if r.current == nil {
-		return errors.New("rethinkdb: Scan called without calling Next")
+		return RqlDriverError{"Scan called without calling Next"}
 	}
 
 	data, err := deconstructDatum(r.current, r.opts)

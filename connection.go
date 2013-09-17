@@ -92,7 +92,7 @@ func (c *Connection) Reconnect() error {
 	response := string(line[:len(line)-1])
 	if response != "SUCCESS" {
 		// we failed authorization or something else terrible happened
-		return fmt.Errorf("Failed to connect to server: %v", response)
+		return RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
 
 	c.conn = conn
@@ -165,7 +165,7 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 
 	// Ensure that the connection is not closed
 	if c.closed {
-		return nil, fmt.Errorf("Connection is closed.")
+		return nil, RqlDriverError{"Connection is closed"}
 	}
 
 	// Send query
@@ -200,26 +200,17 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 
 	// Ensure that this is the response we were expecting
 	if q.GetToken() != r.GetToken() {
-		return &ResultRows{}, fmt.Errorf("Unexpected response received.")
+		return &ResultRows{}, RqlDriverError{"Unexpected response received."}
 	}
 
 	// Deconstruct datum and return the result
 	switch r.GetType() {
-	case p.Response_SUCCESS_ATOM:
-		if len(r.GetResponse()) < 1 {
-			return &ResultRows{}, nil
-		} else {
-			return &ResultRows{
-				conn:         c,
-				query:        q,
-				term:         t,
-				opts:         opts,
-				buffer:       r.GetResponse(),
-				end:          len(r.GetResponse()),
-				token:        q.GetToken(),
-				responseType: r.GetType(),
-			}, nil
-		}
+	case p.Response_CLIENT_ERROR:
+		return &ResultRows{}, RqlClientError{response: r}
+	case p.Response_COMPILE_ERROR:
+		return &ResultRows{}, RqlCompileError{response: r}
+	case p.Response_RUNTIME_ERROR:
+		return &ResultRows{}, RqlRuntimeError{response: r}
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
 		return &ResultRows{
 			conn:         c,
@@ -231,10 +222,18 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 			token:        q.GetToken(),
 			responseType: r.GetType(),
 		}, nil
+	case p.Response_SUCCESS_ATOM:
+		return &ResultRows{
+			conn:         c,
+			query:        q,
+			term:         t,
+			opts:         opts,
+			buffer:       r.GetResponse(),
+			end:          len(r.GetResponse()),
+			token:        q.GetToken(),
+			responseType: r.GetType(),
+		}, nil
 	default:
-		data, err := deconstructDatum(r.GetResponse()[0], opts)
-		return nil, fmt.Errorf("%v, %v", data, err)
+		return &ResultRows{}, RqlDriverError{"Unexpected response type received: %s", r.GetType()}
 	}
-
-	return nil, nil
 }
