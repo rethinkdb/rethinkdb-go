@@ -143,24 +143,43 @@ func (s *RethinkSuite) TestControlBranchSimple(c *test.C) {
 }
 
 func (s *RethinkSuite) TestControlBranchWithMapExpr(c *test.C) {
-	c.Skip("Need to implement other functions first")
-	// query := Expr(List{1, 2, 3}).Map(Branch(
-	// 	Row.Eq(2),
-	// 	Row.Sub(1),
-	// 	Row.Add(1),
-	// ))
-	// fmt.Println(query.String())
-}
+	var response interface{}
+	query := Expr(List{1, 2, 3}).Map(Branch(
+		Doc().Eq(2),
+		Doc().Sub(1),
+		Doc().Add(1),
+	))
+	err := query.RunRow(conn).Scan(&response)
 
-func (s *RethinkSuite) TestControlForEach(c *test.C) {
-	c.Skip("Need to implement other functions first")
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{2, 1, 4})
 }
 
 func (s *RethinkSuite) TestControlDefault(c *test.C) {
-	c.Skip("Need to implement other functions first")
-	// query := Expr(List{
-	// 	Obj{"a": true},
-	// 	Obj{"a": true},
-	// }).Map(Row.Field("a").Default(false))
-	// fmt.Println(query.String())
+	var response interface{}
+	query := Expr(defaultObjList).Map(func(row RqlTerm) RqlTerm {
+		return row.Field("a").Default(1)
+	})
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{1, 1})
+}
+
+func (s *RethinkSuite) TestControlCoerceTo(c *test.C) {
+	var response string
+	query := Expr(1).CoerceTo("STRING")
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "1")
+}
+
+func (s *RethinkSuite) TestControlTypeOf(c *test.C) {
+	var response string
+	query := Expr(1).TypeOf()
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "NUMBER")
 }
