@@ -16,16 +16,16 @@ func (s *RethinkSuite) TestControlExecSimple(c *test.C) {
 
 func (s *RethinkSuite) TestControlExecList(c *test.C) {
 	var response []interface{}
-	query := Expr(List{
-		1, 2, 3, 4, 5, 6, List{
+	query := Expr([]interface{}{
+		1, 2, 3, 4, 5, 6, []interface{}{
 			7.1, 7.2, 7.3,
 		},
 	})
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{
-		1, 2, 3, 4, 5, 6, List{
+	c.Assert(response, JsonEquals, []interface{}{
+		1, 2, 3, 4, 5, 6, []interface{}{
 			7.1, 7.2, 7.3,
 		},
 	})
@@ -33,10 +33,10 @@ func (s *RethinkSuite) TestControlExecList(c *test.C) {
 
 func (s *RethinkSuite) TestControlExecObj(c *test.C) {
 	var response map[string]interface{}
-	query := Expr(Obj{
+	query := Expr(map[string]interface{}{
 		"A": 1,
 		"B": 2,
-		"C": Obj{
+		"C": map[string]interface{}{
 			"1": 3,
 			"2": 4,
 		},
@@ -44,10 +44,10 @@ func (s *RethinkSuite) TestControlExecObj(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{
+	c.Assert(response, JsonEquals, map[string]interface{}{
 		"A": 1,
 		"B": 2,
-		"C": Obj{
+		"C": map[string]interface{}{
 			"1": 3,
 			"2": 4,
 		},
@@ -56,11 +56,11 @@ func (s *RethinkSuite) TestControlExecObj(c *test.C) {
 
 func (s *RethinkSuite) TestControlExecTypes(c *test.C) {
 	var response []interface{}
-	query := Expr(List{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
+	query := Expr([]interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
+	c.Assert(response, JsonEquals, []interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
 }
 
 func (s *RethinkSuite) TestControlJs(c *test.C) {
@@ -78,7 +78,7 @@ func (s *RethinkSuite) TestControlJson(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
 }
 
 func (s *RethinkSuite) TestControlError(c *test.C) {
@@ -92,41 +92,41 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 
 func (s *RethinkSuite) TestControlDoNothing(c *test.C) {
 	var response []interface{}
-	query := Do(List{Obj{"a": 1}, Obj{"a": 2}, Obj{"a": 3}})
+	query := Do([]interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{Obj{"a": 1}, Obj{"a": 2}, Obj{"a": 3}})
+	c.Assert(response, JsonEquals, []interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
 }
 
 func (s *RethinkSuite) TestControlDo(c *test.C) {
 	var response []interface{}
-	query := Do(List{
-		Obj{"a": 1},
-		Obj{"a": 2},
-		Obj{"a": 3},
+	query := Do([]interface{}{
+		map[string]interface{}{"a": 1},
+		map[string]interface{}{"a": 2},
+		map[string]interface{}{"a": 3},
 	}, func(row RqlTerm) RqlTerm {
 		return row.Field("a")
 	})
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
 }
 
 func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
 	var response []interface{}
-	query := Expr(List{
-		Obj{"a": 1},
-		Obj{"a": 2},
-		Obj{"a": 3},
+	query := Expr([]interface{}{
+		map[string]interface{}{"a": 1},
+		map[string]interface{}{"a": 2},
+		map[string]interface{}{"a": 3},
 	}).Do(func(row RqlTerm) RqlTerm {
 		return row.Field("a")
 	})
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
 }
 
 func (s *RethinkSuite) TestControlBranchSimple(c *test.C) {
@@ -144,7 +144,7 @@ func (s *RethinkSuite) TestControlBranchSimple(c *test.C) {
 
 func (s *RethinkSuite) TestControlBranchWithMapExpr(c *test.C) {
 	var response interface{}
-	query := Expr(List{1, 2, 3}).Map(Branch(
+	query := Expr([]interface{}{1, 2, 3}).Map(Branch(
 		Row.Eq(2),
 		Row.Sub(1),
 		Row.Add(1),

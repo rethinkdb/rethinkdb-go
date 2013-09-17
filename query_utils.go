@@ -9,7 +9,6 @@ import (
 
 // makeArray takes a slice of terms and produces a single MAKE_ARRAY term
 func makeArray(args termsList) RqlTerm {
-
 	return RqlTerm{
 		name:     "[...]",
 		termType: p.Term_MAKE_ARRAY,
@@ -42,7 +41,7 @@ func makeFunc(f interface{}) RqlTerm {
 	var args []reflect.Value
 	for i := 0; i < valueType.NumIn(); i++ {
 		// Get a slice of the VARs to use as the function arguments
-		args = append(args, reflect.ValueOf(newRqlTerm("var", p.Term_VAR, List{nextVarId}, Obj{})))
+		args = append(args, reflect.ValueOf(newRqlTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{})))
 		argNums = append(argNums, nextVarId)
 		nextVarId++
 
@@ -59,7 +58,7 @@ func makeFunc(f interface{}) RqlTerm {
 	body := value.Call(args)[0].Interface()
 	argsArr := makeArray(listToTermsList(argNums))
 
-	return newRqlTerm("func", p.Term_FUNC, List{argsArr, body}, Obj{})
+	return newRqlTerm("func", p.Term_FUNC, []interface{}{argsArr, body}, map[string]interface{}{})
 }
 
 func funcWrap(value interface{}) RqlTerm {

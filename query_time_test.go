@@ -31,7 +31,7 @@ func (s *RethinkSuite) TestTimeInTimezone(c *test.C) {
 	loc, err := time.LoadLocation("MST")
 	c.Assert(err, test.IsNil)
 	var response []time.Time
-	err = Expr(List{Now(), Now().InTimezone("-07:00")}).RunRow(conn).Scan(&response)
+	err = Expr([]interface{}{Now(), Now().InTimezone("-07:00")}).RunRow(conn).Scan(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response[1].Equal(response[0].In(loc)), test.Equals, true)
 }
@@ -39,7 +39,7 @@ func (s *RethinkSuite) TestTimeInTimezone(c *test.C) {
 func (s *RethinkSuite) TestTimeBetween(c *test.C) {
 	var response interface{}
 
-	times := Expr(List{
+	times := Expr([]interface{}{
 		Time(1986, 9, 3, 12, 30, 15, "Z"),
 		Time(1986, 10, 3, 12, 30, 15, "Z"),
 		Time(1986, 11, 3, 12, 30, 15, "Z"),

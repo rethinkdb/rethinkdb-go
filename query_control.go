@@ -18,7 +18,7 @@ import (
 // Example usage:
 //
 //  var response interface{}
-//  rows := r.Expr(r.Obj{"go": "awesome", "rethinkdb": "awesomer"}).Run(session).One(&response)
+//  rows := r.Expr(r.map[string]interface{}{"go": "awesome", "rethinkdb": "awesomer"}).Run(session).One(&response)
 //
 // Example response:
 //
@@ -44,21 +44,7 @@ func expr(value interface{}, depth int) RqlTerm {
 		}
 
 		return makeArray(vals)
-	case List:
-		vals := []RqlTerm{}
-		for _, v := range val {
-			vals = append(vals, expr(v, depth))
-		}
-
-		return makeArray(vals)
 	case map[string]interface{}:
-		vals := map[string]RqlTerm{}
-		for k, v := range val {
-			vals[k] = expr(v, depth)
-		}
-
-		return makeObject(vals)
-	case Obj:
 		vals := map[string]RqlTerm{}
 		for k, v := range val {
 			vals[k] = expr(v, depth)
@@ -94,15 +80,15 @@ func expr(value interface{}, depth int) RqlTerm {
 }
 
 func Js(js interface{}) RqlTerm {
-	return newRqlTerm("Js", p.Term_JAVASCRIPT, List{js}, Obj{})
+	return newRqlTerm("Js", p.Term_JAVASCRIPT, []interface{}{js}, map[string]interface{}{})
 }
 
 func Json(json interface{}) RqlTerm {
-	return newRqlTerm("Json", p.Term_JSON, List{json}, Obj{})
+	return newRqlTerm("Json", p.Term_JSON, []interface{}{json}, map[string]interface{}{})
 }
 
 func Error(message interface{}) RqlTerm {
-	return newRqlTerm("Error", p.Term_ERROR, List{message}, Obj{})
+	return newRqlTerm("Error", p.Term_ERROR, []interface{}{message}, map[string]interface{}{})
 }
 
 // Do evalutes the last argument (a function) using all previous arguments as the arguments to the function.
@@ -113,50 +99,50 @@ func Error(message interface{}) RqlTerm {
 //
 //  var response interface{}
 //  err := r.Do(1, 2, 3, func(a, b, c r.Exp) interface{} {
-//      return r.List{a, b, c}
+//      return r.[]interface{}{a, b, c}
 //  }).Run(session).One(&response)
 //
 // Example response:
 //
 // [1,2,3]
 func (t RqlTerm) Do(f interface{}) RqlTerm {
-	newArgs := List{}
+	newArgs := []interface{}{}
 	newArgs = append(newArgs, funcWrap(f))
 	newArgs = append(newArgs, t)
 
-	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, Obj{})
+	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
 func Do(args ...interface{}) RqlTerm {
 	enforceArgLength(1, -1, args)
 
-	newArgs := List{}
+	newArgs := []interface{}{}
 	newArgs = append(newArgs, funcWrap(args[len(args)-1]))
 	newArgs = append(newArgs, args[:len(args)-1]...)
 
-	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, Obj{})
+	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
 func Branch(test, trueBranch, falseBranch interface{}) RqlTerm {
-	return newRqlTerm("Branch", p.Term_BRANCH, List{test, trueBranch, falseBranch}, Obj{})
+	return newRqlTerm("Branch", p.Term_BRANCH, []interface{}{test, trueBranch, falseBranch}, map[string]interface{}{})
 }
 
 func (t RqlTerm) ForEach(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Foreach", p.Term_FOREACH, List{funcWrap(f)}, Obj{})
+	return newRqlTermFromPrevVal(t, "Foreach", p.Term_FOREACH, []interface{}{funcWrap(f)}, map[string]interface{}{})
 }
 
 func (t RqlTerm) Default(value interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, List{value}, Obj{})
+	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, []interface{}{value}, map[string]interface{}{})
 }
 
 func (t RqlTerm) CoerceTo(typeName interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, List{typeName}, Obj{})
+	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, []interface{}{typeName}, map[string]interface{}{})
 }
 
 func (t RqlTerm) TypeOf() RqlTerm {
-	return newRqlTermFromPrevVal(t, "TypeOf", p.Term_TYPEOF, List{}, Obj{})
+	return newRqlTermFromPrevVal(t, "TypeOf", p.Term_TYPEOF, []interface{}{}, map[string]interface{}{})
 }
 
 func (t RqlTerm) Info() RqlTerm {
-	return newRqlTermFromPrevVal(t, "Info", p.Term_INFO, List{}, Obj{})
+	return newRqlTermFromPrevVal(t, "Info", p.Term_INFO, []interface{}{}, map[string]interface{}{})
 }

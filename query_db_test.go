@@ -16,7 +16,7 @@ func (s *RethinkSuite) TestDbCreate(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"created": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
 }
 
 func (s *RethinkSuite) TestDbList(c *test.C) {
@@ -53,7 +53,7 @@ func (s *RethinkSuite) TestDbDelete(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"dropped": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
 
 	// Ensure that there is still a test DB after the test has finished
 	DbCreate("test").Exec(conn)

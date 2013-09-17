@@ -11,7 +11,7 @@ import (
 // Helper functions for constructing terms
 
 // newRqlTerm is an alias for creating a new RqlTermue.
-func newRqlTerm(name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
+func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
 	return RqlTerm{
 		name:     name,
 		termType: termType,
@@ -20,13 +20,13 @@ func newRqlTerm(name string, termType p.Term_TermType, args List, optArgs Obj) R
 	}
 }
 
-// newRqlTermFromPrevVal is an alias for creating a new RqlTermue. Unlike newRqlTerm
+// newRqlTermFromPrevVal is an alias for creating a new RqlTerm. Unlike newRqlTerm
 // this function adds the previous expression in the tree to the argument list.
 // It is used when evalutating an expression like
 //
 // `r.Expr(1).Add(2).Mul(3)`
-func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args List, optArgs Obj) RqlTerm {
-	args = append(List{prevVal}, args...)
+func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
+	args = append([]interface{}{prevVal}, args...)
 
 	return RqlTerm{
 		name:     name,
@@ -37,7 +37,7 @@ func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermTyp
 }
 
 // Convert a list into a slice of terms
-func listToTermsList(l List) termsList {
+func listToTermsList(l []interface{}) termsList {
 	terms := termsList{}
 	for _, v := range l {
 		terms = append(terms, Expr(v))
@@ -47,7 +47,7 @@ func listToTermsList(l List) termsList {
 }
 
 // Convert a map into a map of terms
-func objToTermsObj(o Obj) termsObj {
+func objToTermsObj(o map[string]interface{}) termsObj {
 	terms := termsObj{}
 	for k, v := range o {
 		terms[k] = Expr(v)

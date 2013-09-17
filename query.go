@@ -8,17 +8,6 @@ import (
 	"strings"
 )
 
-// Let user create queries as RQL Exp trees, any errors are deferred
-// until the query is run, so most all functions take interface{} types.
-// interface{} is effectively a void* type that we look at later to determine
-// the underlying type and perform any conversions.
-
-// Obj is a shorter name for a mapping from strings to arbitrary objects
-type Obj map[string]interface{}
-
-// List is a shorter name for an array of arbitrary objects
-type List []interface{}
-
 type termsList []RqlTerm
 type termsObj map[string]RqlTerm
 

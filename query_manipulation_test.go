@@ -66,73 +66,73 @@ func (s *RethinkSuite) TestManipulationMergeLiteral(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationAppend(c *test.C) {
-	query := Expr(List{1, 2, 3}).Append(4).Append(5)
+	query := Expr([]interface{}{1, 2, 3}).Append(4).Append(5)
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3, 4, 5})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
 func (s *RethinkSuite) TestManipulationPrepend(c *test.C) {
-	query := Expr(List{3, 4, 5}).Prepend(2).Prepend(1)
+	query := Expr([]interface{}{3, 4, 5}).Prepend(2).Prepend(1)
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3, 4, 5})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
 func (s *RethinkSuite) TestManipulationDifference(c *test.C) {
-	query := Expr(List{3, 4, 5}).Difference(List{3, 4})
+	query := Expr([]interface{}{3, 4, 5}).Difference([]interface{}{3, 4})
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{5})
+	c.Assert(response, JsonEquals, []interface{}{5})
 }
 
 func (s *RethinkSuite) TestManipulationSetInsert(c *test.C) {
-	query := Expr(List{1, 2, 3}).SetInsert(3).SetInsert(4)
+	query := Expr([]interface{}{1, 2, 3}).SetInsert(3).SetInsert(4)
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3, 4})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
 }
 
 func (s *RethinkSuite) TestManipulationSetUnion(c *test.C) {
-	query := Expr(List{1, 2, 3}).SetUnion(List{3, 4})
+	query := Expr([]interface{}{1, 2, 3}).SetUnion([]interface{}{3, 4})
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3, 4})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
 }
 
 func (s *RethinkSuite) TestManipulationSetIntersection(c *test.C) {
-	query := Expr(List{1, 2, 3}).SetIntersection(List{2, 3, 3, 4})
+	query := Expr([]interface{}{1, 2, 3}).SetIntersection([]interface{}{2, 3, 3, 4})
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{2, 3})
+	c.Assert(response, JsonEquals, []interface{}{2, 3})
 }
 
 func (s *RethinkSuite) TestManipulationSetDifference(c *test.C) {
-	query := Expr(List{1, 2, 3}).SetDifference(List{2, 3, 4, 4})
+	query := Expr([]interface{}{1, 2, 3}).SetDifference([]interface{}{2, 3, 4, 4})
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1})
+	c.Assert(response, JsonEquals, []interface{}{1})
 }
 
 func (s *RethinkSuite) TestManipulationHasFieldsTrue(c *test.C) {
@@ -176,61 +176,61 @@ func (s *RethinkSuite) TestManipulationHasFieldsFalse(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationInsertAt(c *test.C) {
-	query := Expr(List{1, 2, 3}).InsertAt(1, 1.5)
+	query := Expr([]interface{}{1, 2, 3}).InsertAt(1, 1.5)
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 1.5, 2, 3})
+	c.Assert(response, JsonEquals, []interface{}{1, 1.5, 2, 3})
 }
 
 func (s *RethinkSuite) TestManipulationSpliceAt(c *test.C) {
-	query := Expr(List{1, 2, 3}).SpliceAt(1, List{1.25, 1.5, 1.75})
+	query := Expr([]interface{}{1, 2, 3}).SpliceAt(1, []interface{}{1.25, 1.5, 1.75})
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 1.25, 1.5, 1.75, 2, 3})
+	c.Assert(response, JsonEquals, []interface{}{1, 1.25, 1.5, 1.75, 2, 3})
 }
 
 func (s *RethinkSuite) TestManipulationDeleteAt(c *test.C) {
-	query := Expr(List{1, 2, 3}).DeleteAt(1)
+	query := Expr([]interface{}{1, 2, 3}).DeleteAt(1)
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 3})
+	c.Assert(response, JsonEquals, []interface{}{1, 3})
 }
 
 func (s *RethinkSuite) TestManipulationDeleteAtRange(c *test.C) {
-	query := Expr(List{1, 2, 3, 4}).DeleteAtRange(1, 3)
+	query := Expr([]interface{}{1, 2, 3, 4}).DeleteAtRange(1, 3)
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 4})
+	c.Assert(response, JsonEquals, []interface{}{1, 4})
 }
 
 func (s *RethinkSuite) TestManipulationChangeAt(c *test.C) {
-	query := Expr(List{1, 5, 3, 4}).ChangeAt(1, 2)
+	query := Expr([]interface{}{1, 5, 3, 4}).ChangeAt(1, 2)
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3, 4})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
 }
 
 func (s *RethinkSuite) TestManipulationKeys(c *test.C) {
 	query := Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Keys()
 
-	var response List
+	var response []interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{"a", "b", "c"})
+	c.Assert(response, JsonEquals, []interface{}{"a", "b", "c"})
 }

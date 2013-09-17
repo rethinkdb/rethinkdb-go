@@ -8,19 +8,19 @@ import (
 // These commands are used to compute smaller values from large sequences.
 
 func (t RqlTerm) Reduce(f, base interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, List{funcWrap(f)}, Obj{"base": base})
+	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, []interface{}{funcWrap(f)}, map[string]interface{}{"base": base})
 }
 
 func (t RqlTerm) Count() RqlTerm {
-	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, List{}, Obj{})
+	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, []interface{}{}, map[string]interface{}{})
 }
 
 func (t RqlTerm) CountFiltered(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, List{funcWrap(f)}, Obj{})
+	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, []interface{}{funcWrap(f)}, map[string]interface{}{})
 }
 
 func (t RqlTerm) Distinct() RqlTerm {
-	return newRqlTermFromPrevVal(t, "Distinct", p.Term_DISTINCT, List{}, Obj{})
+	return newRqlTermFromPrevVal(t, "Distinct", p.Term_DISTINCT, []interface{}{}, map[string]interface{}{})
 }
 
 func (t RqlTerm) GroupedMapReduce(grouping, mapping, reduction, base interface{}) RqlTerm {
@@ -28,14 +28,14 @@ func (t RqlTerm) GroupedMapReduce(grouping, mapping, reduction, base interface{}
 		t,
 		"GroupedMapReduce",
 		p.Term_GROUPED_MAP_REDUCE,
-		List{funcWrap(grouping), funcWrap(mapping), funcWrap(reduction)},
-		Obj{"base": base},
+		[]interface{}{funcWrap(grouping), funcWrap(mapping), funcWrap(reduction)},
+		map[string]interface{}{"base": base},
 	)
 }
 
 func (t RqlTerm) GroupBy(collector interface{}, args ...interface{}) RqlTerm {
 
-	return newRqlTermFromPrevVal(t, "GroupBy", p.Term_GROUPBY, List{args, collector}, Obj{})
+	return newRqlTermFromPrevVal(t, "GroupBy", p.Term_GROUPBY, []interface{}{args, collector}, map[string]interface{}{})
 }
 
 func (t RqlTerm) Contains(args ...interface{}) RqlTerm {
@@ -43,7 +43,7 @@ func (t RqlTerm) Contains(args ...interface{}) RqlTerm {
 		args[k] = funcWrap(v)
 	}
 
-	return newRqlTermFromPrevVal(t, "Contains", p.Term_CONTAINS, args, Obj{})
+	return newRqlTermFromPrevVal(t, "Contains", p.Term_CONTAINS, args, map[string]interface{}{})
 }
 
 // Aggregators

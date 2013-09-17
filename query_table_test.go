@@ -15,7 +15,7 @@ func (s *RethinkSuite) TestTableCreate(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"created": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
 }
 
 func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
@@ -31,7 +31,7 @@ func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"created": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
 }
 
 func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
@@ -47,7 +47,7 @@ func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"created": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
 }
 
 func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
@@ -64,7 +64,7 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"created": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
 
 	Db("test").TableDrop("test").Exec(conn)
 }
@@ -101,7 +101,7 @@ func (s *RethinkSuite) TestTableDelete(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"dropped": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
 }
 
 func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
@@ -116,7 +116,7 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"created": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
 }
 
 func (s *RethinkSuite) TestTableIndexList(c *test.C) {
@@ -153,5 +153,5 @@ func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"dropped": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
 }

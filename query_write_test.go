@@ -5,7 +5,7 @@ import (
 )
 
 func (s *RethinkSuite) TestWriteInsert(c *test.C) {
-	query := Db("test").Table("test").Insert(Obj{"num": 1})
+	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
 	_, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
 }
@@ -13,7 +13,7 @@ func (s *RethinkSuite) TestWriteInsert(c *test.C) {
 func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 	var response map[string]interface{}
 	o := object{
-		Name: "Object 3",
+		Name: "map[string]interface{}ect 3",
 		Attrs: []attr{
 			attr{
 				Name:  "Attr 2",
@@ -30,29 +30,29 @@ func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 }
 
 func (s *RethinkSuite) TestWriteUpdate(c *test.C) {
-	query := Db("test").Table("test").Insert(Obj{"num": 1})
+	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
 	_, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
 
 	// Update the first row in the table
-	query = Db("test").Table("test").Sample(1).Update(Obj{"num": 2})
+	query = Db("test").Table("test").Sample(1).Update(map[string]interface{}{"num": 2})
 	_, err = query.Run(conn)
 	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestWriteReplace(c *test.C) {
-	query := Db("test").Table("test").Insert(Obj{"num": 1})
+	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
 	_, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
 
 	// Replace the first row in the table
-	query = Db("test").Table("test").Sample(1).Update(Obj{"num": 2})
+	query = Db("test").Table("test").Sample(1).Update(map[string]interface{}{"num": 2})
 	_, err = query.Run(conn)
 	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestWriteDelete(c *test.C) {
-	query := Db("test").Table("test").Insert(Obj{"num": 1})
+	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
 	_, err := query.Run(conn)
 	c.Assert(err, test.IsNil)
 
