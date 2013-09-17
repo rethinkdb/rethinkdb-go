@@ -12,7 +12,7 @@ type UnsupportedTypeError struct {
 }
 
 func (e *UnsupportedTypeError) Error() string {
-	return "json: unsupported type: " + e.Type.String()
+	return "gorethink: unsupported type: " + e.Type.String()
 }
 
 type UnsupportedValueError struct {
@@ -21,7 +21,7 @@ type UnsupportedValueError struct {
 }
 
 func (e *UnsupportedValueError) Error() string {
-	return "json: unsupported value: " + e.Str
+	return "gorethink: unsupported value: " + e.Str
 }
 
 // An DecodeTypeError describes a JSON value that was
@@ -32,7 +32,7 @@ type DecodeTypeError struct {
 }
 
 func (e *DecodeTypeError) Error() string {
-	return "json: cannot decode " + e.Value + " into Go value of type " + e.Type.String()
+	return "gorethink: cannot decode " + e.Value + " into Go value of type " + e.Type.String()
 }
 
 // An DecodeFieldError describes a JSON object key that
@@ -45,7 +45,7 @@ type DecodeFieldError struct {
 }
 
 func (e *DecodeFieldError) Error() string {
-	return "json: cannot decode object key " + strconv.Quote(e.Key) + " into unexported field " + e.Field.Name + " of type " + e.Type.String()
+	return "gorethink: cannot decode object key " + strconv.Quote(e.Key) + " into unexported field " + e.Field.Name + " of type " + e.Type.String()
 }
 
 // An InvalidDecodeError describes an invalid argument passed to Decode.
@@ -60,7 +60,7 @@ func (e *InvalidDecodeError) Error() string {
 	}
 
 	if e.Type.Kind() != reflect.Ptr {
-		return "json: Decode(non-pointer " + e.Type.String() + ")"
+		return "gorethink: Decode(non-pointer " + e.Type.String() + ")"
 	}
-	return "json: Decode(nil " + e.Type.String() + ")"
+	return "gorethink: Decode(nil " + e.Type.String() + ")"
 }

@@ -8,7 +8,7 @@ import (
 	"unicode"
 )
 
-const TagName = "rethinkdb"
+const TagName = "gorethink"
 
 // tagOptions is the string following a comma in a struct field's
 // tag, or the empty string. It does not include the leading comma.

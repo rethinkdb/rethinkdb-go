@@ -9,11 +9,11 @@ import (
 type T struct {
 	X string
 	Y int
-	Z int `rethinkdb:"-"`
+	Z int `gorethink:"-"`
 }
 
 type U struct {
-	Alphabet string `rethinkdb:"alpha"`
+	Alphabet string `gorethink:"alpha"`
 }
 
 type V struct {
@@ -38,8 +38,8 @@ type Top struct {
 	Level0 int
 	Embed0
 	*Embed0a
-	*Embed0b `rethinkdb:"e,omitempty"` // treated as named
-	Embed0c  `rethinkdb:"-"`           // ignored
+	*Embed0b `gorethink:"e,omitempty"` // treated as named
+	Embed0c  `gorethink:"-"`           // ignored
 	Loop
 	Embed0p // has Point with X, Y, used
 	Embed0q // has Point with Z, used
@@ -50,15 +50,15 @@ type Embed0 struct {
 	Level1b int // used because Embed0a's Level1b is renamed
 	Level1c int // used because Embed0a's Level1c is ignored
 	Level1d int // annihilated by Embed0a's Level1d
-	Level1e int `rethinkdb:"x"` // annihilated by Embed0a.Level1e
+	Level1e int `gorethink:"x"` // annihilated by Embed0a.Level1e
 }
 
 type Embed0a struct {
-	Level1a int `rethinkdb:"Level1a,omitempty"`
-	Level1b int `rethinkdb:"LEVEL1B,omitempty"`
-	Level1c int `rethinkdb:"-"`
+	Level1a int `gorethink:"Level1a,omitempty"`
+	Level1b int `gorethink:"LEVEL1B,omitempty"`
+	Level1c int `gorethink:"-"`
 	Level1d int // annihilated by Embed0's Level1d
-	Level1f int `rethinkdb:"x"` // annihilated by Embed0's Level1e
+	Level1f int `gorethink:"x"` // annihilated by Embed0's Level1e
 }
 
 type Embed0b Embed0
@@ -74,8 +74,8 @@ type Embed0q struct {
 }
 
 type Loop struct {
-	Loop1 int `rethinkdb:",omitempty"`
-	Loop2 int `rethinkdb:",omitempty"`
+	Loop1 int `gorethink:",omitempty"`
+	Loop2 int `gorethink:",omitempty"`
 	*Loop
 }
 
@@ -131,8 +131,8 @@ type decodeTest struct {
 
 type Ambig struct {
 	// Given "hello", the first match should win.
-	First  int `rethinkdb:"HELLO"`
-	Second int `rethinkdb:"Hello"`
+	First  int `gorethink:"HELLO"`
+	Second int `gorethink:"Hello"`
 }
 
 var decodeTests = []decodeTest{
@@ -283,8 +283,8 @@ func TestDecode(t *testing.T) {
 // Issue 3450
 func TestEmptyString(t *testing.T) {
 	type T2 struct {
-		Number1 int `rethinkdb:",string"`
-		Number2 int `rethinkdb:",string"`
+		Number1 int `gorethink:",string"`
+		Number2 int `gorethink:",string"`
 	}
 	data := map[string]interface{}{
 		"Number1": "1",
@@ -349,8 +349,8 @@ func TestDecodeTypeError(t *testing.T) {
 // Test handling of unexported fields that should be ignored.
 type unexportedFields struct {
 	Name string
-	m    map[string]interface{} `rethinkdb:"-"`
-	m2   map[string]interface{} `rethinkdb:"abcd"`
+	m    map[string]interface{} `gorethink:"-"`
+	m2   map[string]interface{} `gorethink:"abcd"`
 }
 
 func TestDecodeUnexported(t *testing.T) {

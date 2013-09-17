@@ -67,18 +67,18 @@ func TestEncode(t *testing.T) {
 }
 
 type Optionals struct {
-	Sr string `rethinkdb:"sr"`
-	So string `rethinkdb:"so,omitempty"`
-	Sw string `rethinkdb:"-"`
+	Sr string `gorethink:"sr"`
+	So string `gorethink:"so,omitempty"`
+	Sw string `gorethink:"-"`
 
-	Ir int `rethinkdb:"omitempty"` // actually named omitempty, not an option
-	Io int `rethinkdb:"io,omitempty"`
+	Ir int `gorethink:"omitempty"` // actually named omitempty, not an option
+	Io int `gorethink:"io,omitempty"`
 
-	Slr []string `rethinkdb:"slr"`
-	Slo []string `rethinkdb:"slo,omitempty"`
+	Slr []string `gorethink:"slr"`
+	Slo []string `gorethink:"slo,omitempty"`
 
-	Mr map[string]interface{} `rethinkdb:"mr"`
-	Mo map[string]interface{} `rethinkdb:",omitempty"`
+	Mr map[string]interface{} `gorethink:"mr"`
+	Mo map[string]interface{} `gorethink:",omitempty"`
 }
 
 var optionalsExpected = map[string]interface{}{
@@ -172,7 +172,7 @@ func TestEmbeddedBug(t *testing.T) {
 }
 
 type BugD struct { // Same as BugA after tagging.
-	XXX string `rethinkdb:"S"`
+	XXX string `gorethink:"S"`
 }
 
 // BugD's tagged S field should dominate BugA's.
