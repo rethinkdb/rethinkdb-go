@@ -5,7 +5,7 @@ import (
 )
 
 func (s *RethinkSuite) TestManipulationDocField(c *test.C) {
-	query := Expr(Obj{"a": 1}).Do(Doc().Field("a"))
+	query := Expr(map[string]interface{}{"a": 1}).Do(Doc().Field("a"))
 
 	var response int
 	err := query.RunRow(conn).Scan(&response)
@@ -15,54 +15,54 @@ func (s *RethinkSuite) TestManipulationDocField(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationPluck(c *test.C) {
-	query := Expr(Obj{"a": 1, "b": 2, "c": 3}).Pluck("a", "c")
+	query := Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Pluck("a", "c")
 
-	var response Obj
+	var response map[string]interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"a": 1, "c": 3})
+	c.Assert(response, JsonEquals, map[string]interface{}{"a": 1, "c": 3})
 }
 
 func (s *RethinkSuite) TestManipulationWithout(c *test.C) {
-	query := Expr(Obj{"a": 1, "b": 2, "c": 3}).Pluck("a", "c")
+	query := Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Pluck("a", "c")
 
-	var response Obj
+	var response map[string]interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"a": 1, "c": 3})
+	c.Assert(response, JsonEquals, map[string]interface{}{"a": 1, "c": 3})
 }
 
 func (s *RethinkSuite) TestManipulationMerge(c *test.C) {
-	query := Expr(Obj{"a": 1, "c": 3}).Merge(Obj{"b": 2})
+	query := Expr(map[string]interface{}{"a": 1, "c": 3}).Merge(map[string]interface{}{"b": 2})
 
-	var response Obj
+	var response map[string]interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"a": 1, "b": 2, "c": 3})
+	c.Assert(response, JsonEquals, map[string]interface{}{"a": 1, "b": 2, "c": 3})
 }
 
 func (s *RethinkSuite) TestManipulationMergeLiteral(c *test.C) {
-	query := Expr(Obj{
-		"a": Obj{
-			"aa": Obj{
+	query := Expr(map[string]interface{}{
+		"a": map[string]interface{}{
+			"aa": map[string]interface{}{
 				"aaa": 1,
 				"aab": 2,
 			},
-			"ab": Obj{
+			"ab": map[string]interface{}{
 				"aba": 3,
 				"abb": 4,
 			},
 		},
-	}).Merge(Obj{"a": Obj{"ab": Literal()}})
+	}).Merge(map[string]interface{}{"a": map[string]interface{}{"ab": Literal()}})
 
-	var response Obj
+	var response map[string]interface{}
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{"a": Obj{"aa": Obj{"aab": 2, "aaa": 1}}})
+	c.Assert(response, JsonEquals, map[string]interface{}{"a": map[string]interface{}{"aa": map[string]interface{}{"aab": 2, "aaa": 1}}})
 }
 
 func (s *RethinkSuite) TestManipulationAppend(c *test.C) {
@@ -136,7 +136,7 @@ func (s *RethinkSuite) TestManipulationSetDifference(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationHasFieldsTrue(c *test.C) {
-	query := Expr(Obj{"a": 1}).HasFields("a")
+	query := Expr(map[string]interface{}{"a": 1}).HasFields("a")
 
 	var response bool
 	err := query.RunRow(conn).Scan(&response)
@@ -146,7 +146,7 @@ func (s *RethinkSuite) TestManipulationHasFieldsTrue(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationHasFieldsNested(c *test.C) {
-	query := Expr(Obj{"a": Obj{"b": 1}}).HasFields(Obj{"a": Obj{"b": true}})
+	query := Expr(map[string]interface{}{"a": map[string]interface{}{"b": 1}}).HasFields(map[string]interface{}{"a": map[string]interface{}{"b": true}})
 
 	var response bool
 	err := query.RunRow(conn).Scan(&response)
@@ -156,7 +156,7 @@ func (s *RethinkSuite) TestManipulationHasFieldsNested(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationHasFieldsNestedShort(c *test.C) {
-	query := Expr(Obj{"a": Obj{"b": 1}}).HasFields(Obj{"a": "b"})
+	query := Expr(map[string]interface{}{"a": map[string]interface{}{"b": 1}}).HasFields(map[string]interface{}{"a": "b"})
 
 	var response bool
 	err := query.RunRow(conn).Scan(&response)
@@ -166,7 +166,7 @@ func (s *RethinkSuite) TestManipulationHasFieldsNestedShort(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationHasFieldsFalse(c *test.C) {
-	query := Expr(Obj{"a": 1}).HasFields("b")
+	query := Expr(map[string]interface{}{"a": 1}).HasFields("b")
 
 	var response bool
 	err := query.RunRow(conn).Scan(&response)
@@ -226,7 +226,7 @@ func (s *RethinkSuite) TestManipulationChangeAt(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationKeys(c *test.C) {
-	query := Expr(Obj{"a": 1, "b": 2, "c": 3}).Keys()
+	query := Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Keys()
 
 	var response List
 	err := query.RunRow(conn).Scan(&response)

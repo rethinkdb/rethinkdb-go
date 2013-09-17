@@ -15,7 +15,7 @@ type attr struct {
 	Value interface{}
 }
 
-func (s *RethinkSuite) TestResultScanLiteral(c *test.C) {
+func (s *RethinkSuite) TestRowsScanLiteral(c *test.C) {
 	row := Expr(5).RunRow(conn)
 
 	var response interface{}
@@ -24,17 +24,17 @@ func (s *RethinkSuite) TestResultScanLiteral(c *test.C) {
 	c.Assert(response, JsonEquals, 5)
 }
 
-func (s *RethinkSuite) TestResultScanSlice(c *test.C) {
-	row := Expr(List{1, 2, 3, 4, 5}).RunRow(conn)
+func (s *RethinkSuite) TestRowsScanSlice(c *test.C) {
+	row := Expr([]interface{}{1, 2, 3, 4, 5}).RunRow(conn)
 
 	var response interface{}
 	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, List{1, 2, 3, 4, 5})
+	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
-func (s *RethinkSuite) TestResultScanMap(c *test.C) {
-	row := Expr(Obj{
+func (s *RethinkSuite) TestRowsScanMap(c *test.C) {
+	row := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 	}).RunRow(conn)
@@ -42,14 +42,14 @@ func (s *RethinkSuite) TestResultScanMap(c *test.C) {
 	var response map[string]interface{}
 	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{
+	c.Assert(response, JsonEquals, map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 	})
 }
 
-func (s *RethinkSuite) TestResultScanMapIntoInterface(c *test.C) {
-	row := Expr(Obj{
+func (s *RethinkSuite) TestRowsScanMapIntoInterface(c *test.C) {
+	row := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 	}).RunRow(conn)
@@ -57,17 +57,17 @@ func (s *RethinkSuite) TestResultScanMapIntoInterface(c *test.C) {
 	var response interface{}
 	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{
+	c.Assert(response, JsonEquals, map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 	})
 }
 
-func (s *RethinkSuite) TestResultScanMapNested(c *test.C) {
-	row := Expr(Obj{
+func (s *RethinkSuite) TestRowsScanMapNested(c *test.C) {
+	row := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-		"attr": List{Obj{
+		"attr": []interface{}{map[string]interface{}{
 			"name":  "attr 1",
 			"value": "value 1",
 		}},
@@ -76,21 +76,21 @@ func (s *RethinkSuite) TestResultScanMapNested(c *test.C) {
 	var response interface{}
 	err := row.Scan(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, Obj{
+	c.Assert(response, JsonEquals, map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-		"attr": List{Obj{
+		"attr": []interface{}{map[string]interface{}{
 			"name":  "attr 1",
 			"value": "value 1",
 		}},
 	})
 }
 
-func (s *RethinkSuite) TestResultScanStruct(c *test.C) {
-	row := Expr(Obj{
+func (s *RethinkSuite) TestRowsScanStruct(c *test.C) {
+	row := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-		"Attrs": List{Obj{
+		"Attrs": []interface{}{map[string]interface{}{
 			"Name":  "attr 1",
 			"Value": "value 1",
 		}},
@@ -109,7 +109,7 @@ func (s *RethinkSuite) TestResultScanStruct(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestResultAtomString(c *test.C) {
+func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
 	row := Expr("a").RunRow(conn)
 
 	var response string
@@ -118,8 +118,8 @@ func (s *RethinkSuite) TestResultAtomString(c *test.C) {
 	c.Assert(response, test.Equals, "a")
 }
 
-func (s *RethinkSuite) TestResultAtomArray(c *test.C) {
-	row := Expr(List{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).RunRow(conn)
+func (s *RethinkSuite) TestRowsAtomArray(c *test.C) {
+	row := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).RunRow(conn)
 
 	var response []int
 	err := row.Scan(&response)

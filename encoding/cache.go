@@ -79,6 +79,13 @@ func typeFields(t reflect.Type) []field {
 				}
 
 				tag := getTag(sf)
+
+				// Check if the field should be ignored
+				if tag == "-" {
+					continue
+				}
+
+				// Otherwise continue parsing tag
 				name, opts := parseTag(tag)
 				if !isValidTag(name) {
 					name = ""

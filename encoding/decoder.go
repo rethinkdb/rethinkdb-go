@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"runtime"
+	"strconv"
 	"strings"
 )
 
@@ -17,20 +19,44 @@ import (
 // Keys are "paths" in dotted notation to the struct fields and nested structs.
 //
 // See the package documentation for a full explanation of the mechanics.
-func Decode(dst interface{}, src interface{}) error {
+func Decode(dst interface{}, src interface{}) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(runtime.Error); ok {
+				panic(r)
+			}
+			if v, ok := r.(string); ok {
+				err = errors.New(v)
+			} else {
+				err = r.(error)
+			}
+		}
+	}()
+
 	dv := reflect.ValueOf(dst)
 	sv := reflect.ValueOf(src)
-
-	// Ensure that the destination is a pointer
-	if dv.Kind() != reflect.Ptr {
-		return errors.New("schema: destination must be a pointer")
+	if dv.Kind() != reflect.Ptr || dv.IsNil() {
+		return &InvalidDecodeError{reflect.TypeOf(dst)}
 	}
-	dv = dv.Elem()
+	s := &decodeState{}
+	decode(s, dv, sv)
 
-	return decode(dv, sv)
+	return s.savedError
 }
 
-func decode(dv, sv reflect.Value) error {
+type decodeState struct {
+	savedError error
+}
+
+// saveError saves the first err it is called with,
+// for reporting at the end of the unmarshal.
+func (d *decodeState) saveError(err error) {
+	if d.savedError == nil {
+		d.savedError = err
+	}
+}
+
+func decode(s *decodeState, dv, sv reflect.Value) {
 	if dv.IsValid() && sv.IsValid() {
 		// Ensure that the source value has the correct type of parsing
 		if sv.Kind() == reflect.Interface {
@@ -38,55 +64,188 @@ func decode(dv, sv reflect.Value) error {
 		}
 
 		switch sv.Kind() {
-		case reflect.Slice:
-			return decodeArray(dv, sv)
-		case reflect.Map:
-			return decodeObject(dv, sv)
-		case reflect.Struct:
-			dv.Set(sv)
 		default:
-			return decodeLiteral(dv, sv)
+			decodeLiteral(s, dv, sv)
+		case reflect.Slice, reflect.Array:
+			decodeArray(s, dv, sv)
+		case reflect.Map:
+			decodeObject(s, dv, sv)
+		case reflect.Struct:
+			dv = indirect(dv)
+			dv.Set(sv)
 		}
 	}
-
-	return nil
 }
 
-func decodeLiteral(dv reflect.Value, sv reflect.Value) error {
+func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
+	dv = indirect(dv)
+
+	// Special case for if sv is nil:
+	switch sv.Kind() {
+	case reflect.Invalid:
+		dv.Set(reflect.Zero(dv.Type()))
+		return
+	}
+
+	switch value := sv.Interface().(type) {
+	case nil:
+		switch dv.Kind() {
+		case reflect.Interface, reflect.Ptr, reflect.Map, reflect.Slice:
+			dv.Set(reflect.Zero(dv.Type()))
+		}
+	case bool:
+		switch dv.Kind() {
+		default:
+			s.saveError(&DecodeTypeError{"bool", dv.Type()})
+			return
+		case reflect.Bool:
+			dv.SetBool(value)
+		case reflect.String:
+			dv.SetString(strconv.FormatBool(value))
+		case reflect.Interface:
+			if dv.NumMethod() == 0 {
+				dv.Set(reflect.ValueOf(value))
+			} else {
+				s.saveError(&DecodeTypeError{"bool", dv.Type()})
+				return
+			}
+		}
+
+	case string:
+		switch dv.Kind() {
+		default:
+			s.saveError(&DecodeTypeError{"string", dv.Type()})
+			return
+		case reflect.String:
+			dv.SetString(value)
+		case reflect.Bool:
+			b, err := strconv.ParseBool(value)
+			if err != nil {
+				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				return
+			}
+			dv.SetBool(b)
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			n, err := strconv.ParseInt(value, 10, 64)
+			if err != nil || dv.OverflowInt(n) {
+				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				return
+			}
+			dv.SetInt(n)
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+			n, err := strconv.ParseUint(value, 10, 64)
+			if err != nil || dv.OverflowUint(n) {
+				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				return
+			}
+			dv.SetUint(n)
+		case reflect.Float32, reflect.Float64:
+			n, err := strconv.ParseFloat(value, 64)
+			if err != nil || dv.OverflowFloat(n) {
+				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				return
+			}
+			dv.SetFloat(n)
+		case reflect.Interface:
+			if dv.NumMethod() == 0 {
+				dv.Set(reflect.ValueOf(string(value)))
+			} else {
+				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				return
+			}
+		}
+
+	case int, int8, int16, int32, int64:
+		switch dv.Kind() {
+		default:
+			s.saveError(&DecodeTypeError{"int", dv.Type()})
+			return
+		case reflect.Interface:
+			if dv.NumMethod() != 0 {
+				s.saveError(&DecodeTypeError{"int", dv.Type()})
+				return
+			}
+			dv.Set(reflect.ValueOf(value))
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			dv.SetInt(int64(reflect.ValueOf(value).Int()))
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+			dv.SetUint(uint64(reflect.ValueOf(value).Int()))
+		case reflect.Float32, reflect.Float64:
+			dv.SetFloat(float64(reflect.ValueOf(value).Int()))
+		case reflect.String:
+			dv.SetString(strconv.FormatInt(int64(reflect.ValueOf(value).Int()), 10))
+		}
+	case uint, uint8, uint16, uint32, uint64:
+		switch dv.Kind() {
+		default:
+			s.saveError(&DecodeTypeError{"uint", dv.Type()})
+			return
+		case reflect.Interface:
+			if dv.NumMethod() != 0 {
+				s.saveError(&DecodeTypeError{"uint", dv.Type()})
+				return
+			}
+			dv.Set(reflect.ValueOf(value))
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			dv.SetInt(int64(reflect.ValueOf(value).Uint()))
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+			dv.SetUint(uint64(reflect.ValueOf(value).Uint()))
+		case reflect.Float32, reflect.Float64:
+			dv.SetFloat(float64(reflect.ValueOf(value).Uint()))
+		case reflect.String:
+			dv.SetString(strconv.FormatUint(uint64(reflect.ValueOf(value).Uint()), 10))
+		}
+	case float32, float64:
+		switch dv.Kind() {
+		default:
+			s.saveError(&DecodeTypeError{"float", dv.Type()})
+			return
+		case reflect.Interface:
+			if dv.NumMethod() != 0 {
+				s.saveError(&DecodeTypeError{"float", dv.Type()})
+				return
+			}
+			dv.Set(reflect.ValueOf(value))
+
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+			dv.SetInt(int64(reflect.ValueOf(value).Float()))
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+			dv.SetUint(uint64(reflect.ValueOf(value).Float()))
+		case reflect.Float32, reflect.Float64:
+			dv.SetFloat(float64(reflect.ValueOf(value).Float()))
+		case reflect.String:
+			dv.SetString(strconv.FormatFloat(float64(reflect.ValueOf(value).Float()), 'g', -1, 64))
+		}
+	default:
+		s.saveError(&DecodeTypeError{sv.Type().String(), dv.Type()})
+		return
+	}
+
+	return
+}
+
+func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	dv = indirect(dv)
 	dt := dv.Type()
 
-	if dv.Kind() == reflect.Interface {
-		dv.Set(reflect.ValueOf(decodeLiteralInterface(sv)))
-		return nil
-	}
-
-	if conv := converters[dt.Kind()]; conv != nil {
-		if value := conv(sv.Interface()); value.IsValid() {
-			dv.Set(value)
-		} else {
-			return ConversionError{Index: -1}
-		}
-	} else {
-		return fmt.Errorf("schema: converter not found for %v", dt)
-	}
-
-	return nil
-}
-
-func decodeArray(dv reflect.Value, sv reflect.Value) error {
-	dv = indirect(dv)
-	dt := dv.Type()
-
-	if dt.Kind() == reflect.Interface {
+	switch dt.Kind() {
+	case reflect.Interface:
 		if dv.NumMethod() == 0 {
 			// Decoding into nil interface?  Switch to non-reflect code.
-			dv.Set(reflect.ValueOf(decodeArrayInterface(sv)))
+			dv.Set(reflect.ValueOf(decodeArrayInterface(s, sv)))
 
-			return nil
-		} else {
-			return nil
+			return
 		}
+		// Otherwise it's invalid.
+		fallthrough
+	default:
+		s.saveError(&DecodeTypeError{"array", dv.Type()})
+		return
+	case reflect.Array:
+	case reflect.Slice:
+		break
 	}
 
 	if dv.Kind() == reflect.Slice {
@@ -113,16 +272,10 @@ func decodeArray(dv reflect.Value, sv reflect.Value) error {
 
 		if i < dv.Len() {
 			// Decode into element.
-			err := decode(dv.Index(i), sv.Index(i))
-			if err != nil {
-				return err
-			}
+			decode(s, dv.Index(i), sv.Index(i))
 		} else {
 			// Ran out of fixed array: skip.
-			err := decode(reflect.Value{}, sv.Index(i))
-			if err != nil {
-				return err
-			}
+			decode(s, reflect.Value{}, sv.Index(i))
 		}
 
 		i++
@@ -138,31 +291,34 @@ func decodeArray(dv reflect.Value, sv reflect.Value) error {
 			dv.SetLen(i)
 		}
 	}
-
-	return nil
 }
 
 // decode fills a struct field using a parsed path.
-func decodeObject(dv reflect.Value, sv reflect.Value) error {
+func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error) {
 	dv = indirect(dv)
 	dt := dv.Type()
 
 	// Decoding into nil interface?  Switch to non-reflect code.
 	if dv.Kind() == reflect.Interface && dv.NumMethod() == 0 {
-		dv.Set(reflect.ValueOf(decodeObjectInterface(sv)))
+		dv.Set(reflect.ValueOf(decodeObjectInterface(s, sv)))
 		return nil
 	}
 
-	if dv.Kind() == reflect.Map {
+	// Check type of target: struct or map[string]T
+	switch dv.Kind() {
+	case reflect.Map:
 		// map must have string kind
 		if dt.Key().Kind() != reflect.String {
-			// saveError(&UnmarshalTypeError{"object", dv.Type()})
-			return fmt.Errorf("Map key not string...")
+			s.saveError(&DecodeTypeError{"object", dv.Type()})
+			break
 		}
-
 		if dv.IsNil() {
 			dv.Set(reflect.MakeMap(dt))
 		}
+	case reflect.Struct:
+	default:
+		s.saveError(&DecodeTypeError{"object", dv.Type()})
+		return
 	}
 
 	var mapElem reflect.Value
@@ -208,10 +364,7 @@ func decodeObject(dv reflect.Value, sv reflect.Value) error {
 			}
 		}
 
-		err := decode(subdv, subsv)
-		if err != nil {
-			return err
-		}
+		decode(s, subdv, subsv)
 
 		if dv.Kind() == reflect.Map {
 			kv := reflect.ValueOf(skey)
@@ -227,40 +380,42 @@ func decodeObject(dv reflect.Value, sv reflect.Value) error {
 // but they avoid the weight of reflection in this common case.
 
 // valueInterface is like value but returns interface{}
-func decodeInterface(sv reflect.Value) interface{} {
+func decodeInterface(s *decodeState, sv reflect.Value) interface{} {
+	// Ensure that the source value has the correct type of parsing
+	if sv.Kind() == reflect.Interface {
+		sv = reflect.ValueOf(sv.Interface())
+	}
+
 	switch sv.Kind() {
-	case reflect.Array, reflect.Slice:
-		return decodeArrayInterface(sv)
-	case reflect.Struct, reflect.Map:
-		return decodeObjectInterface(sv)
+	case reflect.Slice, reflect.Array:
+		return decodeArrayInterface(s, sv)
+	case reflect.Map:
+		return decodeObjectInterface(s, sv)
 	default:
-		return decodeLiteralInterface(sv)
+		return decodeLiteralInterface(s, sv)
 	}
 }
 
 // arrayInterface is like array but returns []interface{}.
-func decodeArrayInterface(sv reflect.Value) []interface{} {
-	var arr = make([]interface{}, 0)
-	for _, v := range sv.Interface().([]interface{}) {
-		arr = append(arr, decodeInterface(reflect.ValueOf(v)))
+func decodeArrayInterface(s *decodeState, sv reflect.Value) []interface{} {
+	arr := []interface{}{}
+	for i := 0; i < sv.Len(); i++ {
+		arr = append(arr, decodeInterface(s, sv.Index(i)))
 	}
 	return arr
 }
 
 // objectInterface is like object but returns map[string]interface{}.
-func decodeObjectInterface(sv reflect.Value) map[string]interface{} {
-	m := make(map[string]interface{})
-	for k, v := range sv.Interface().(map[interface{}]interface{}) {
-		// Ensure that key is of type string
-		if key, ok := k.(string); ok {
-			m[key] = decodeInterface(reflect.ValueOf(v))
-		}
+func decodeObjectInterface(s *decodeState, sv reflect.Value) map[string]interface{} {
+	m := map[string]interface{}{}
+	for _, key := range sv.MapKeys() {
+		m[key.Interface().(string)] = decodeInterface(s, sv.MapIndex(key))
 	}
 	return m
 }
 
 // literalInterface is like literal but returns an interface value.
-func decodeLiteralInterface(sv reflect.Value) interface{} {
+func decodeLiteralInterface(s *decodeState, sv reflect.Value) interface{} {
 	return sv.Interface()
 }
 
@@ -310,26 +465,4 @@ func (e ConversionError) Error() string {
 	}
 	return fmt.Sprintf("schema: error converting value for index %d of %q",
 		e.Index, e.Key)
-}
-
-// MultiError stores multiple decoding errors.
-//
-// Borrowed from the App Engine SDK.
-type MultiError map[string]error
-
-func (e MultiError) Error() string {
-	s := ""
-	for _, err := range e {
-		s = err.Error()
-		break
-	}
-	switch len(e) {
-	case 0:
-		return "(0 errors)"
-	case 1:
-		return s
-	case 2:
-		return s + " (and 1 other error)"
-	}
-	return fmt.Sprintf("%s (and %d other errors)", s, len(e)-1)
 }

@@ -10,25 +10,20 @@ type Converter func(interface{}) reflect.Value
 
 // Default converters for basic types.
 var converters = map[reflect.Kind]Converter{
-	reflect.Interface: convertInterface,
-	reflect.Bool:      convertBool,
-	reflect.Float32:   convertFloat32,
-	reflect.Float64:   convertFloat64,
-	reflect.Int:       convertInt,
-	reflect.Int8:      convertInt8,
-	reflect.Int16:     convertInt16,
-	reflect.Int32:     convertInt32,
-	reflect.Int64:     convertInt64,
-	reflect.String:    convertString,
-	reflect.Uint:      convertUint,
-	reflect.Uint8:     convertUint8,
-	reflect.Uint16:    convertUint16,
-	reflect.Uint32:    convertUint32,
-	reflect.Uint64:    convertUint64,
-}
-
-func convertInterface(value interface{}) reflect.Value {
-	return reflect.ValueOf(value)
+	reflect.Bool:    convertBool,
+	reflect.Float32: convertFloat32,
+	reflect.Float64: convertFloat64,
+	reflect.Int:     convertInt,
+	reflect.Int8:    convertInt8,
+	reflect.Int16:   convertInt16,
+	reflect.Int32:   convertInt32,
+	reflect.Int64:   convertInt64,
+	reflect.String:  convertString,
+	reflect.Uint:    convertUint,
+	reflect.Uint8:   convertUint8,
+	reflect.Uint16:  convertUint16,
+	reflect.Uint32:  convertUint32,
+	reflect.Uint64:  convertUint64,
 }
 
 func convertBool(value interface{}) reflect.Value {
