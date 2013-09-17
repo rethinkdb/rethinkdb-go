@@ -112,14 +112,14 @@ type WriteResponse struct {
 	OldValue      interface{} `json:"old_val"`
 }
 
-func (t RqlTerm) Run(c *Connection, args ...interface{}) (*Rows, error) {
+func (t RqlTerm) Run(c *Connection, args ...interface{}) (*ResultRows, error) {
 	argm := optArgsToMap([]string{"use_outdated", "noreply", "time_format"}, args)
 	return c.startQuery(t, argm)
 }
 
-func (t RqlTerm) RunRow(c *Connection, args ...interface{}) *Row {
+func (t RqlTerm) RunRow(c *Connection, args ...interface{}) *ResultRow {
 	rows, err := t.Run(c, args...)
-	return &Row{rows: rows, err: err}
+	return &ResultRow{rows: rows, err: err}
 }
 
 // Run a write query

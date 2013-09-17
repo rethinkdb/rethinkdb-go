@@ -122,7 +122,7 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
 }
 
-func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*Rows, error) {
+func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
 	token := c.nextToken()
 
 	// Build query tree
@@ -141,7 +141,7 @@ func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*Rows, 
 	return c.send(query, t, opts)
 }
 
-func (c *Connection) continueQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*Rows, error) {
+func (c *Connection) continueQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
 	nq := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
 		Token: q.Token,
@@ -150,7 +150,7 @@ func (c *Connection) continueQuery(q *p.Query, t RqlTerm, opts map[string]interf
 	return c.send(nq, t, opts)
 }
 
-func (c *Connection) stopQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*Rows, error) {
+func (c *Connection) stopQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
 	nq := &p.Query{
 		Type:  p.Query_STOP.Enum(),
 		Token: q.Token,
@@ -159,7 +159,7 @@ func (c *Connection) stopQuery(q *p.Query, t RqlTerm, opts map[string]interface{
 	return c.send(nq, t, opts)
 }
 
-func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*Rows, error) {
+func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
 	var data []byte
 	var err error
 
@@ -200,16 +200,16 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 
 	// Ensure that this is the response we were expecting
 	if q.GetToken() != r.GetToken() {
-		return &Rows{}, fmt.Errorf("Unexpected response received.")
+		return &ResultRows{}, fmt.Errorf("Unexpected response received.")
 	}
 
 	// Deconstruct datum and return the result
 	switch r.GetType() {
 	case p.Response_SUCCESS_ATOM:
 		if len(r.GetResponse()) < 1 {
-			return &Rows{}, nil
+			return &ResultRows{}, nil
 		} else {
-			return &Rows{
+			return &ResultRows{
 				conn:         c,
 				query:        q,
 				term:         t,
@@ -221,7 +221,7 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 			}, nil
 		}
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
-		return &Rows{
+		return &ResultRows{
 			conn:         c,
 			query:        q,
 			term:         t,
