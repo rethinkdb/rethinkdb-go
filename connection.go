@@ -22,7 +22,6 @@ type Connection struct {
 	timeout    time.Duration
 	authkey    string
 	timeFormat string
-	debug      bool
 	closed     bool
 }
 
@@ -43,9 +42,6 @@ func newConnection(args map[string]interface{}) *Connection {
 	}
 	if authkey, ok := args["authkey"]; ok {
 		c.authkey = authkey.(string)
-	}
-	if debug, ok := args["debug"]; ok {
-		c.debug = debug.(bool)
 	}
 
 	return c
@@ -134,15 +130,34 @@ func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*Result
 	// Build query tree
 	pt := t.build()
 
-	// Construct query
-	query := &p.Query{
-		Type:  p.Query_START.Enum(),
-		Token: proto.Int64(token),
-		Query: pt,
+	// Build global options
+	globalOpts := []*p.Query_AssocPair{}
+	for k, v := range opts {
+		if k == "db" {
+			globalOpts = append(globalOpts, &p.Query_AssocPair{
+				Key: proto.String("db"),
+				Val: Db(v).build(),
+			})
+		} else if k == "use_outdated" {
+			globalOpts = append(globalOpts, &p.Query_AssocPair{
+				Key: proto.String("use_outdated"),
+				Val: Expr(v).build(),
+			})
+		} else if k == "noreply" {
+			globalOpts = append(globalOpts, &p.Query_AssocPair{
+				Key: proto.String("noreply"),
+				Val: Expr(v).build(),
+			})
+		}
 	}
 
-	// Set global defaults
-	// TODO:
+	// Construct query
+	query := &p.Query{
+		Type:          p.Query_START.Enum(),
+		Token:         proto.Int64(token),
+		Query:         pt,
+		GlobalOptargs: globalOpts,
+	}
 
 	return c.send(query, t, opts)
 }
@@ -176,6 +191,13 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 		return nil, RqlDriverError{"Connection is closed"}
 	}
 
+	// Set timeout
+	if c.timeout == 0 {
+		c.conn.SetDeadline(time.Time{})
+	} else {
+		c.conn.SetDeadline(time.Now().Add(c.timeout))
+	}
+
 	// Send query
 	if data, err = proto.Marshal(q); err != nil {
 		return nil, err
@@ -186,6 +208,11 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 
 	if err = binary.Write(c.conn, binary.BigEndian, data); err != nil {
 		return nil, err
+	}
+
+	// Return immediately if the noreply option was set
+	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		return nil, nil
 	}
 
 	// Read response
@@ -208,17 +235,17 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 
 	// Ensure that this is the response we were expecting
 	if q.GetToken() != r.GetToken() {
-		return &ResultRows{}, RqlDriverError{"Unexpected response received."}
+		return nil, RqlDriverError{"Unexpected response received."}
 	}
 
-	// Deconstruct datum and return the result
+	// De-construct datum and return the result
 	switch r.GetType() {
 	case p.Response_CLIENT_ERROR:
-		return &ResultRows{}, RqlClientError{rqlResponseError{r, t}}
+		return nil, RqlClientError{rqlResponseError{r, t}}
 	case p.Response_COMPILE_ERROR:
-		return &ResultRows{}, RqlCompileError{rqlResponseError{r, t}}
+		return nil, RqlCompileError{rqlResponseError{r, t}}
 	case p.Response_RUNTIME_ERROR:
-		return &ResultRows{}, RqlRuntimeError{rqlResponseError{r, t}}
+		return nil, RqlRuntimeError{rqlResponseError{r, t}}
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
 		return &ResultRows{
 			conn:         c,
@@ -242,6 +269,6 @@ func (c *Connection) send(q *p.Query, t RqlTerm, opts map[string]interface{}) (*
 			responseType: r.GetType(),
 		}, nil
 	default:
-		return &ResultRows{}, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", r.GetType())}
+		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", r.GetType())}
 	}
 }

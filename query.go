@@ -103,13 +103,14 @@ type WriteResponse struct {
 // Run runs a query using the given connection. Run takes the optional arguments
 // "use_outdated", "noreply" and "time_format".
 func (t RqlTerm) Run(c *Connection, args ...interface{}) (*ResultRows, error) {
-	argm := optArgsToMap([]string{"use_outdated", "noreply", "time_format"}, args)
+	argm := optArgsToMap([]string{"db", "use_outdated", "noreply", "time_format"}, args)
 	return c.startQuery(t, argm)
 }
 
 // Run runs a query using the given connection but unlike Run returns ResultRow.
 // This function should be used if your query only returns a single row.
-// RunRow takes the optional arguments "use_outdated", "noreply" and "time_format".
+// RunRow takes the optional arguments "db", "use_outdated", "noreply" and
+// "time_format".
 func (t RqlTerm) RunRow(c *Connection, args ...interface{}) *ResultRow {
 	rows, err := t.Run(c, args...)
 	return &ResultRow{rows: rows, err: err}
@@ -118,7 +119,7 @@ func (t RqlTerm) RunRow(c *Connection, args ...interface{}) *ResultRow {
 // RunWrite runs a query using the given connection but unlike Run automatically
 // scans yhe result into a variable of type WriteResponse. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
-// RunWrite takes the optional arguments "use_outdated","noreply" and "time_format".
+// RunWrite takes the optional arguments "db", "use_outdated","noreply" and "time_format".
 func (t RqlTerm) RunWrite(c *Connection, args ...interface{}) (WriteResponse, error) {
 	var response WriteResponse
 	row := t.RunRow(c, args...)
@@ -127,8 +128,8 @@ func (t RqlTerm) RunWrite(c *Connection, args ...interface{}) (WriteResponse, er
 }
 
 // Exec runs the query but does not return the result (It also automatically sets
-// the noreply option). RunRow takes the optional arguments "use_outdated" and
-// "time_format".
+// the noreply option). RunRow takes the optional arguments "db", "use_outdated"
+// and "time_format".
 func (t RqlTerm) Exec(c *Connection, args ...interface{}) error {
 	// Ensure that noreply is set to true
 	args = append(args, "noreply")
