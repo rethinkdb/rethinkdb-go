@@ -75,7 +75,20 @@ var JsonEquals = &jsonChecker{
 // Expressions used in tests
 var arr = []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}
 var darr = []interface{}{1, 1, 2, 2, 3, 3, 5, 5, 6}
+var narr = []interface{}{
+	1, 2, 3, 4, 5, 6, []interface{}{
+		7.1, 7.2, 7.3,
+	},
+}
 var obj = map[string]interface{}{"a": 1, "b": 2, "c": 3}
+var nobj = map[string]interface{}{
+	"A": 1,
+	"B": 2,
+	"C": map[string]interface{}{
+		"1": 3,
+		"2": 4,
+	},
+}
 var objList = []interface{}{
 	map[string]interface{}{"id": 1, "g1": 1, "g2": 1, "num": 0},
 	map[string]interface{}{"id": 2, "g1": 2, "g2": 2, "num": 5},

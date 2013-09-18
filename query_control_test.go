@@ -16,11 +16,7 @@ func (s *RethinkSuite) TestControlExecSimple(c *test.C) {
 
 func (s *RethinkSuite) TestControlExecList(c *test.C) {
 	var response []interface{}
-	query := Expr([]interface{}{
-		1, 2, 3, 4, 5, 6, []interface{}{
-			7.1, 7.2, 7.3,
-		},
-	})
+	query := Expr(narr)
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
@@ -33,14 +29,7 @@ func (s *RethinkSuite) TestControlExecList(c *test.C) {
 
 func (s *RethinkSuite) TestControlExecObj(c *test.C) {
 	var response map[string]interface{}
-	query := Expr(map[string]interface{}{
-		"A": 1,
-		"B": 2,
-		"C": map[string]interface{}{
-			"1": 3,
-			"2": 4,
-		},
-	})
+	query := Expr(nobj)
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
@@ -82,7 +71,6 @@ func (s *RethinkSuite) TestControlJson(c *test.C) {
 }
 
 func (s *RethinkSuite) TestControlError(c *test.C) {
-	c.Skip("Need to implement other functions first")
 	var response []interface{}
 	query := Error("An error occurred")
 	err := query.RunRow(conn).Scan(&response)
