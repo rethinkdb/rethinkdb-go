@@ -1,7 +1,6 @@
 package rethinkgo
 
 import (
-	"errors"
 	test "launchpad.net/gocheck"
 )
 
@@ -75,7 +74,9 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 	query := Error("An error occurred")
 	err := query.RunRow(conn).Scan(&response)
 
-	c.Assert(err, test.Equals, errors.New("An error occurred"))
+	c.Assert(err, test.NotNil)
+	c.Assert(err, test.FitsTypeOf, RqlRuntimeError{})
+	c.Assert(err.(RqlRuntimeError).Error(), test.Equals, "gorethink: An error occurred in: \nr.Error(\"An error occurred\")")
 }
 
 func (s *RethinkSuite) TestControlDoNothing(c *test.C) {

@@ -3,9 +3,9 @@
 package encoding
 
 import (
-	"runtime"
 	"errors"
 	"reflect"
+	"runtime"
 	"sort"
 )
 
@@ -14,7 +14,7 @@ import (
 // Encode  traverses the value v recursively and looks for structs. If a struct
 // is found then it is checked for tagged fields and convert to
 // map[string]interface{}
-senfunc Encode(v interface{}) (ev interface{}, err error) {
+func Encode(v interface{}) (ev interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if _, ok := r.(runtime.Error); ok {
