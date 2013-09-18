@@ -8,6 +8,19 @@ import (
 )
 
 func Encode(v interface{}) (ev interface{}, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(runtime.Error); ok {
+				panic(r)
+			}
+			if v, ok := r.(string); ok {
+				err = errors.New(v)
+			} else {
+				err = r.(error)
+			}
+		}
+	}()
+
 	val, err := encode(reflect.ValueOf(v))
 	if err != nil {
 		return nil, err
