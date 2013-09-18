@@ -51,6 +51,7 @@ func newConnection(args map[string]interface{}) *Connection {
 	return c
 }
 
+// Connect opens a connection between the driver and the client
 func Connect(args map[string]interface{}) (*Connection, error) {
 	c := newConnection(args)
 	err := c.Reconnect()
@@ -58,6 +59,7 @@ func Connect(args map[string]interface{}) (*Connection, error) {
 	return c, err
 }
 
+// Reconnect closes the previous connection and attempts to connect again.
 func (c *Connection) Reconnect() error {
 	var err error
 	if err = c.Close(); err != nil {
@@ -101,6 +103,7 @@ func (c *Connection) Reconnect() error {
 	return nil
 }
 
+// Close closes the connection
 func (c *Connection) Close() error {
 	if c.conn == nil || c.closed {
 		return nil
@@ -112,6 +115,7 @@ func (c *Connection) Close() error {
 	return err
 }
 
+// Use changes the default database used
 func (c *Connection) Use(database string) {
 	c.database = database
 }
@@ -122,6 +126,8 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
 }
 
+// startQuery creates a query from the term given and sends it to the server.
+// The result from the server is returned as ResultRows
 func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
 	token := c.nextToken()
 
@@ -141,6 +147,7 @@ func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*Result
 	return c.send(query, t, opts)
 }
 
+// continueQuery continues a previously run query.
 func (c *Connection) continueQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
 	nq := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
@@ -150,6 +157,7 @@ func (c *Connection) continueQuery(q *p.Query, t RqlTerm, opts map[string]interf
 	return c.send(nq, t, opts)
 }
 
+// stopQuery sends closes a query by sending Query_STOP to the server.
 func (c *Connection) stopQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
 	nq := &p.Query{
 		Type:  p.Query_STOP.Enum(),

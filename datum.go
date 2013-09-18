@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+// Converts a query term to a datum. If the term cannot be converted to a datum
+// object then the function panics.
 func constructDatum(t RqlTerm) *p.Term {
 	if t.data == nil {
 		return &p.Term{
@@ -75,6 +77,7 @@ func constructDatum(t RqlTerm) *p.Term {
 	}
 }
 
+// deconstructDatum converts a datum object to an arbitrary type
 func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{}, error) {
 	switch datum.GetType() {
 	case p.Datum_R_NULL:
@@ -109,6 +112,7 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 			obj[key] = val
 		}
 
+		// Handle ReQL pseudo-types
 		if reqlType, ok := obj["$reql_type$"]; ok {
 			if reqlType == "TIME" {
 				// load timeformat, set to native if the option was not set
