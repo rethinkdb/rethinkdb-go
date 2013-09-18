@@ -11,14 +11,8 @@ import (
 	"strings"
 )
 
-// Decode decodes a map[string][]string to a struct.
-//
-// The first parameter must be a pointer to a struct.
-//
-// The second parameter is a map, typically url.Values from an HTTP request.
-// Keys are "paths" in dotted notation to the struct fields and nested structs.
-//
-// See the package documentation for a full explanation of the mechanics.
+// Decode decodes map[string]interface{} into a struct. The first parameter
+// must be a pointer.
 func Decode(dst interface{}, src interface{}) (err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -48,14 +42,14 @@ type decodeState struct {
 	savedError error
 }
 
-// saveError saves the first err it is called with,
-// for reporting at the end of the unmarshal.
+// saveError saves the first err it is called with.
 func (d *decodeState) saveError(err error) {
 	if d.savedError == nil {
 		d.savedError = err
 	}
 }
 
+// decodeInterface decodes the source value into the destination value
 func decode(s *decodeState, dv, sv reflect.Value) {
 	if dv.IsValid() && sv.IsValid() {
 		// Ensure that the source value has the correct type of parsing
@@ -77,6 +71,8 @@ func decode(s *decodeState, dv, sv reflect.Value) {
 	}
 }
 
+// decodeLiteral decodes the source value into the destination value. This function
+// is used to decode literal values.
 func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	dv = indirect(dv)
 
@@ -87,6 +83,7 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 		return
 	}
 
+	// Attempt to convert the value from the source type to the destination type
 	switch value := sv.Interface().(type) {
 	case nil:
 		switch dv.Kind() {
@@ -226,10 +223,13 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	return
 }
 
+// decodeArray decodes the source value into the destination value. This function
+// is used when the source value is a slice or array.
 func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	dv = indirect(dv)
 	dt := dv.Type()
 
+	// Ensure that the dest is also a slice or array
 	switch dt.Kind() {
 	case reflect.Interface:
 		if dv.NumMethod() == 0 {
@@ -252,6 +252,8 @@ func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 		dv.Set(reflect.MakeSlice(dt, 0, 0))
 	}
 
+	// Iterate through the slice/array and decode each element before adding it
+	// to the dest slice/array
 	i := 0
 	for i < sv.Len() {
 		if dv.Kind() == reflect.Slice {
@@ -280,6 +282,8 @@ func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 
 		i++
 	}
+
+	// Ensure that the destination is the correct size
 	if i < dv.Len() {
 		if dv.Kind() == reflect.Array {
 			// Array.  Zero the rest.
@@ -293,7 +297,8 @@ func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	}
 }
 
-// decode fills a struct field using a parsed path.
+// decodeObject decodes the source value into the destination value. This function
+// is used when the source value is a map or struct.
 func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error) {
 	dv = indirect(dv)
 	dt := dv.Type()
@@ -375,11 +380,10 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 	return nil
 }
 
-// The xxxInterface routines build up a value to be stored
-// in an empty interface.  They are not strictly necessary,
-// but they avoid the weight of reflection in this common case.
+// The following methods are simplified versions of those above designed to use
+// less reflection
 
-// valueInterface is like value but returns interface{}
+// decodeInterface decodes the source value into interface{}
 func decodeInterface(s *decodeState, sv reflect.Value) interface{} {
 	// Ensure that the source value has the correct type of parsing
 	if sv.Kind() == reflect.Interface {
@@ -396,7 +400,7 @@ func decodeInterface(s *decodeState, sv reflect.Value) interface{} {
 	}
 }
 
-// arrayInterface is like array but returns []interface{}.
+// decodeArrayInterface decodes the source value into []interface{}
 func decodeArrayInterface(s *decodeState, sv reflect.Value) []interface{} {
 	arr := []interface{}{}
 	for i := 0; i < sv.Len(); i++ {
@@ -405,7 +409,7 @@ func decodeArrayInterface(s *decodeState, sv reflect.Value) []interface{} {
 	return arr
 }
 
-// objectInterface is like object but returns map[string]interface{}.
+// decodeObjectInterface decodes the source value into map[string]interface{}
 func decodeObjectInterface(s *decodeState, sv reflect.Value) map[string]interface{} {
 	m := map[string]interface{}{}
 	for _, key := range sv.MapKeys() {
@@ -414,7 +418,7 @@ func decodeObjectInterface(s *decodeState, sv reflect.Value) map[string]interfac
 	return m
 }
 
-// literalInterface is like literal but returns an interface value.
+// decodeLiteralInterface returns the interface of the source value
 func decodeLiteralInterface(s *decodeState, sv reflect.Value) interface{} {
 	return sv.Interface()
 }

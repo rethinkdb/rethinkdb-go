@@ -3,11 +3,18 @@
 package encoding
 
 import (
+	"runtime"
+	"errors"
 	"reflect"
 	"sort"
 )
 
-func Encode(v interface{}) (ev interface{}, err error) {
+// Encode returns the encoded value of v.
+//
+// Encode  traverses the value v recursively and looks for structs. If a struct
+// is found then it is checked for tagged fields and convert to
+// map[string]interface{}
+senfunc Encode(v interface{}) (ev interface{}, err error) {
 	defer func() {
 		if r := recover(); r != nil {
 			if _, ok := r.(runtime.Error); ok {
@@ -38,6 +45,8 @@ func encode(v reflect.Value) (reflect.Value, error) {
 
 	switch v.Kind() {
 	case reflect.Struct:
+		// If the value is a struct then get the name used by each field and
+		// insert the encoded values into a map
 		m := reflect.MakeMap(reflect.TypeOf(map[string]interface{}{}))
 
 		for _, f := range cachedTypeFields(v.Type()) {
@@ -55,6 +64,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 
 		return m, nil
 	case reflect.Map:
+		// If the value is a map then encode each element
 		m := reflect.MakeMap(reflect.TypeOf(map[string]interface{}{}))
 
 		if v.Type().Key().Kind() != reflect.String {
@@ -77,6 +87,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 
 		return m, nil
 	case reflect.Slice:
+		// If the value is a slice then encode each element
 		s := reflect.MakeSlice(reflect.TypeOf([]interface{}{}), v.Len(), v.Len())
 
 		if v.IsNil() {
@@ -94,6 +105,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 
 		return s, nil
 	case reflect.Array:
+		// If the value is a array then encode each element
 		s := reflect.MakeSlice(reflect.TypeOf([]interface{}{}), v.Len(), v.Len())
 		for i := 0; i < v.Len(); i++ {
 			ev, err := encode(v.Index(i))
@@ -105,6 +117,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 		}
 		return s, nil
 	case reflect.Interface, reflect.Ptr:
+		// If the value is an interface or pointer then encode its element
 		if v.IsNil() {
 			return reflect.Value{}, nil
 		}
