@@ -94,10 +94,10 @@ type WriteResponse struct {
 	Unchanged     int
 	Replaced      int
 	Deleted       int
-	GeneratedKeys []string    `json:"generated_keys"`
-	FirstError    string      `json:"first_error"` // populated if Errors > 0
-	NewValue      interface{} `json:"new_val"`
-	OldValue      interface{} `json:"old_val"`
+	GeneratedKeys []string    `gorethink:"generated_keys"`
+	FirstError    string      `gorethink:"first_error"` // populated if Errors > 0
+	NewValue      interface{} `gorethink:"new_val"`
+	OldValue      interface{} `gorethink:"old_val"`
 }
 
 // Run runs a query using the given connection. Run takes the optional arguments

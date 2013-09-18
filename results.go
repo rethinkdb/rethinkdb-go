@@ -126,7 +126,7 @@ func (r *ResultRows) Next() bool {
 	return true
 }
 
-// advance moves the interal buffer pointer ahead to point to the next row
+// advance moves the internal buffer pointer ahead to point to the next row
 func (r *ResultRows) advance() bool {
 	if r.end <= r.start {
 		return false
@@ -139,10 +139,10 @@ func (r *ResultRows) advance() bool {
 // Scan copies the result in the current row into the value pointed at by dest.
 //
 // If an argument as type *interface{}, Scan copies the value provided by the
-// database wihtout conversion.
+// database without conversion.
 //
 // If the value is a struct then Scan traverses
-// the result recursivly and attempts to match the keys returned by the database
+// the result recursively and attempts to match the keys returned by the database
 // to the name used by the structs field (either the struct field name or its
 // key).
 func (r *ResultRows) Scan(dest interface{}) error {

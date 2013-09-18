@@ -24,10 +24,10 @@ func (e *UnsupportedValueError) Error() string {
 	return "gorethink: unsupported value: " + e.Str
 }
 
-// An DecodeTypeError describes a JSON value that was
+// An DecodeTypeError describes a value that was
 // not appropriate for a value of a specific Go type.
 type DecodeTypeError struct {
-	Value string       // description of JSON value - "bool", "array", "number -5"
+	Value string       // description of value - "bool", "array", "number -5"
 	Type  reflect.Type // type of Go value it could not be assigned to
 }
 
@@ -35,7 +35,7 @@ func (e *DecodeTypeError) Error() string {
 	return "gorethink: cannot decode " + e.Value + " into Go value of type " + e.Type.String()
 }
 
-// An DecodeFieldError describes a JSON object key that
+// An DecodeFieldError describes a object key that
 // led to an unexported (and therefore unwritable) struct field.
 // (No longer used; kept for compatibility.)
 type DecodeFieldError struct {
@@ -56,7 +56,7 @@ type InvalidDecodeError struct {
 
 func (e *InvalidDecodeError) Error() string {
 	if e.Type == nil {
-		return "json: Decode(nil)"
+		return "gorethink: Decode(nil)"
 	}
 
 	if e.Type.Kind() != reflect.Ptr {

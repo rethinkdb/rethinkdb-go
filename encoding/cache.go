@@ -43,7 +43,7 @@ func cachedTypeFields(t reflect.Type) []field {
 	return f
 }
 
-// typeFields returns a list of fields that JSON should recognize for the given type.
+// typeFields returns a list of fields that should be recognized for the given type.
 // The algorithm is breadth-first search over the set of structs to include - the top struct
 // and then any reachable anonymous structs.
 func typeFields(t reflect.Type) []field {
@@ -129,7 +129,7 @@ func typeFields(t reflect.Type) []field {
 	sort.Sort(byName(fields))
 
 	// Delete all fields that are hidden by the Go rules for embedded fields,
-	// except that fields with JSON tags are promoted.
+	// except that fields with tags are promoted.
 
 	// The fields are sorted in primary order of name, secondary order
 	// of field index length. Loop over names; for each name, delete
@@ -165,7 +165,7 @@ func typeFields(t reflect.Type) []field {
 // dominantField looks through the fields, all of which are known to
 // have the same name, to find the single field that dominates the
 // others using Go's embedding rules, modified by the presence of
-// JSON tags. If there are multiple top-level fields, the boolean
+// tags. If there are multiple top-level fields, the boolean
 // will be false: This condition is an error in Go and we skip all
 // the fields.
 func dominantField(fields []field) (field, bool) {
@@ -211,7 +211,7 @@ type field struct {
 }
 
 // byName sorts field by name, breaking ties with depth,
-// then breaking ties with "name came from json tag", then
+// then breaking ties with "name came from gorethink tag", then
 // breaking ties with index sequence.
 type byName []field
 

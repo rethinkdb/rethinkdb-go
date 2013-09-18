@@ -136,7 +136,7 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 					return nil, fmt.Errorf("Unknown time_format run option \"%s\".", reqlType)
 				}
 			} else {
-				return nil, fmt.Errorf("Unknown psudo-type %.", reqlType)
+				return nil, fmt.Errorf("Unknown pseudo-type %.", reqlType)
 			}
 		}
 
