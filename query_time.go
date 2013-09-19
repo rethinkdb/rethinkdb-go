@@ -5,41 +5,21 @@ import (
 )
 
 // Returns a time object representing the current time in UTC
-//
-// Example usage:
-//
-//  var response time.Time{}
-//  err = r.Now().Run(session).One(&response)
 func Now() RqlTerm {
 	return newRqlTerm("Now", p.Term_NOW, []interface{}{}, map[string]interface{}{})
 }
 
 // Create a time object for a specific time
-//
-// Example usage:
-//
-//  var response time.Time{}
-//  err = r.Time(2006, 12, 12, 11, 30, 0, "Z").Run(session).One(&response)
 func Time(year, month, day, hour, min, sec interface{}, tz string) RqlTerm {
 	return newRqlTerm("Time", p.Term_TIME, []interface{}{year, month, day, hour, min, sec, tz}, map[string]interface{}{})
 }
 
 // Returns a time object based on seconds since epoch
-//
-// Example usage:
-//
-//  var response time.Time{}
-//  err = r.Now().Run(session).One(&response)
 func EpochTime(epochtime interface{}) RqlTerm {
 	return newRqlTerm("EpochTime", p.Term_EPOCH_TIME, []interface{}{epochtime}, map[string]interface{}{})
 }
 
 // Returns a time object based on an ISO8601 formatted date-time string
-//
-// Example usage:
-//
-//  var response time.Time{}
-//  err = r.Now().Run(session).One(&response)
 func ISO8601(date interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"default_timezone"}, optArgs)
 	return newRqlTerm("ISO8601", p.Term_ISO8601, []interface{}{date}, optArgM)
@@ -49,21 +29,11 @@ func ISO8601(date interface{}, optArgs ...interface{}) RqlTerm {
 // stays the same, the results returned by methods such as hours() will
 // change since they take the timezone into account. The timezone argument
 // has to be of the ISO 8601 format.
-//
-// Example usage:
-//
-//  var response time.Time{}
-//  err = r.Now().InTimezone("-08:00").Hours().Run(session).One(&response)
 func (t RqlTerm) InTimezone(tz interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "InTimezone", p.Term_IN_TIMEZONE, []interface{}{tz}, map[string]interface{}{})
 }
 
 // Returns the timezone of the time object
-//
-// Example usage:
-//
-//  var response time.Time{}
-//  err = r.Now().Timezone().Run(session).One(&response)
 func (t RqlTerm) Timezone() RqlTerm {
 	return newRqlTermFromPrevVal(t, "Timezone", p.Term_TIMEZONE, []interface{}{}, map[string]interface{}{})
 }

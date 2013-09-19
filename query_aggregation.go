@@ -7,22 +7,36 @@ import (
 // Aggregation
 // These commands are used to compute smaller values from large sequences.
 
+// Produce a single value from a sequence through repeated application of a
+// reduction function.
+//
+// The reduce function gets invoked repeatedly not only for the input values but
+// also for results of previous reduce invocations. The type and format of the
+// object that is passed in to reduce must be the same with the one returned
+// from reduce.
 func (t RqlTerm) Reduce(f, base interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Reduce", p.Term_REDUCE, []interface{}{funcWrap(f)}, map[string]interface{}{"base": base})
 }
 
+// Count the number of elements in the sequence.
 func (t RqlTerm) Count() RqlTerm {
 	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, []interface{}{}, map[string]interface{}{})
 }
 
+// Count the number of elements in the sequence. CountFiltered uses the argument
+// passed to it to filter the results before counting.
 func (t RqlTerm) CountFiltered(f interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Count", p.Term_COUNT, []interface{}{funcWrap(f)}, map[string]interface{}{})
 }
 
+// Remove duplicate elements from the sequence.
 func (t RqlTerm) Distinct() RqlTerm {
 	return newRqlTermFromPrevVal(t, "Distinct", p.Term_DISTINCT, []interface{}{}, map[string]interface{}{})
 }
 
+// Partition the sequence into groups based on the grouping function. The elements
+// of each group are then mapped using the mapping function and reduced using the
+// reduction function.
 func (t RqlTerm) GroupedMapReduce(grouping, mapping, reduction, base interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(
 		t,
@@ -33,11 +47,17 @@ func (t RqlTerm) GroupedMapReduce(grouping, mapping, reduction, base interface{}
 	)
 }
 
+// Groups elements by the values of the given attributes and then applies the given
+// reduction. Though similar to GroupedMapReduce, GroupBy takes a standardized
+// object for specifying the reduction. Can be used with a number of predefined
+// common reductions
 func (t RqlTerm) GroupBy(collector interface{}, args ...interface{}) RqlTerm {
-
 	return newRqlTermFromPrevVal(t, "GroupBy", p.Term_GROUPBY, []interface{}{args, collector}, map[string]interface{}{})
 }
 
+//Returns whether or not a sequence contains all the specified values, or if
+//functions are provided instead, returns whether or not a sequence contains
+//values matching all the specified functions.
 func (t RqlTerm) Contains(args ...interface{}) RqlTerm {
 	for k, v := range args {
 		args[k] = funcWrap(v)

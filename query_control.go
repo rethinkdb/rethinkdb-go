@@ -14,15 +14,6 @@ import (
 //
 // If you want to call expression methods on an object that is not yet an
 // expression, this is the function you want.
-//
-// Example usage:
-//
-//  var response interface{}
-//  rows := r.Expr(r.map[string]interface{}{"go": "awesome", "rethinkdb": "awesomer"}).Run(session).One(&response)
-//
-// Example response:
-//
-//  {"go": "awesome", "rethinkdb": "awesomer"}
 func Expr(value interface{}) RqlTerm {
 	return expr(value, 20)
 }
@@ -79,32 +70,24 @@ func expr(value interface{}, depth int) RqlTerm {
 	}
 }
 
+// Create a JavaScript expression.
 func Js(js interface{}) RqlTerm {
 	return newRqlTerm("Js", p.Term_JAVASCRIPT, []interface{}{js}, map[string]interface{}{})
 }
 
+// Parse a JSON string on the server.
 func Json(json interface{}) RqlTerm {
 	return newRqlTerm("Json", p.Term_JSON, []interface{}{json}, map[string]interface{}{})
 }
 
+// Throw a runtime error. If called with no arguments inside the second argument
+// to `default`, re-throw the current error.
 func Error(message interface{}) RqlTerm {
 	return newRqlTerm("Error", p.Term_ERROR, []interface{}{message}, map[string]interface{}{})
 }
 
-// Do evalutes the last argument (a function) using all previous arguments as the arguments to the function.
-//
-// For instance, Do(a, b, c, f) will be run as f(a, b, c).
-//
-// Example usage:
-//
-//  var response interface{}
-//  err := r.Do(1, 2, 3, func(a, b, c r.Exp) interface{} {
-//      return r.[]interface{}{a, b, c}
-//  }).Run(session).One(&response)
-//
-// Example response:
-//
-// [1,2,3]
+// Evaluate the expr in the context of one or more value bindings. The type of
+// the result is the type of the value returned from expr.
 func (t RqlTerm) Do(f interface{}) RqlTerm {
 	newArgs := []interface{}{}
 	newArgs = append(newArgs, funcWrap(f))
@@ -113,6 +96,8 @@ func (t RqlTerm) Do(f interface{}) RqlTerm {
 	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
+// Evaluate the expr in the context of one or more value bindings. The type of
+// the result is the type of the value returned from expr.
 func Do(args ...interface{}) RqlTerm {
 	enforceArgLength(1, -1, args)
 
@@ -123,26 +108,42 @@ func Do(args ...interface{}) RqlTerm {
 	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
+// Evaluate one of two control paths based on the value of an expression.
+// branch is effectively an if renamed due to language constraints.
+//
+// The type of the result is determined by the type of the branch that gets executed.
 func Branch(test, trueBranch, falseBranch interface{}) RqlTerm {
 	return newRqlTerm("Branch", p.Term_BRANCH, []interface{}{test, trueBranch, falseBranch}, map[string]interface{}{})
 }
 
+// Loop over a sequence, evaluating the given write query for each element.
 func (t RqlTerm) ForEach(f interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Foreach", p.Term_FOREACH, []interface{}{funcWrap(f)}, map[string]interface{}{})
 }
 
+// Handle non-existence errors. Tries to evaluate and return its first argument.
+// If an error related to the absence of a value is thrown in the process, or if
+// its first argument returns null, returns its second argument. (Alternatively,
+// the second argument may be a function which will be called with either the
+// text of the non-existence error or null.)
 func (t RqlTerm) Default(value interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, []interface{}{value}, map[string]interface{}{})
 }
 
+// Converts a value of one type into another.
+//
+// You can convert: a selection, sequence, or object into an ARRAY, an array of
+// pairs into an OBJECT, and any DATUM into a STRING.
 func (t RqlTerm) CoerceTo(typeName interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, []interface{}{typeName}, map[string]interface{}{})
 }
 
+// Gets the type of a value.
 func (t RqlTerm) TypeOf() RqlTerm {
 	return newRqlTermFromPrevVal(t, "TypeOf", p.Term_TYPEOF, []interface{}{}, map[string]interface{}{})
 }
 
+// Get information about a RQL value.
 func (t RqlTerm) Info() RqlTerm {
 	return newRqlTermFromPrevVal(t, "Info", p.Term_INFO, []interface{}{}, map[string]interface{}{})
 }
