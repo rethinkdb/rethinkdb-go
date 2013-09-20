@@ -150,6 +150,13 @@ func (c *Connection) startQuery(t RqlTerm, opts map[string]interface{}) (*Result
 			})
 		}
 	}
+	// If no DB option was set default to the value set in the connection
+	if _, ok := opts["db"]; !ok {
+		globalOpts = append(globalOpts, &p.Query_AssocPair{
+			Key: proto.String("db"),
+			Val: Db(c.database).build(),
+		})
+	}
 
 	// Construct query
 	query := &p.Query{
