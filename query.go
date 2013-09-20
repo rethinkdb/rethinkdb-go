@@ -117,13 +117,13 @@ func (t RqlTerm) RunRow(c *Connection, args ...interface{}) *ResultRow {
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
-// scans yhe result into a variable of type WriteResponse. This function should be used
+// scans the result into a variable of type WriteResponse. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
 // RunWrite takes the optional arguments "db", "use_outdated","noreply" and "time_format".
 func (t RqlTerm) RunWrite(c *Connection, args ...interface{}) (WriteResponse, error) {
 	var response WriteResponse
 	row := t.RunRow(c, args...)
-	err := row.Scan(response)
+	err := row.Scan(&response)
 	return response, err
 }
 
