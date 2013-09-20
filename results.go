@@ -1,4 +1,4 @@
-package rethinkgo
+package gorethink
 
 import (
 	"github.com/dancannon/gorethink/encoding"

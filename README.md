@@ -113,4 +113,4 @@ for rows.Next() {
 }
 ```
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dancannon/rethinkgo/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dancannon/gorethink/trend.png)](https://bitdeli.com/free "Bitdeli Badge")

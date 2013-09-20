@@ -1,4 +1,4 @@
-// Package rethinkgo implements the RethinkDB API for Go.  RethinkDB
+// package gorethink implements the RethinkDB API for Go.  RethinkDB
 // (http://www.rethinkdb.com/) is an open-source distributed database in the
 // style of MongoDB.
 //
@@ -63,4 +63,4 @@
 // Besides this simple read query, you can run almost arbitrary expressions on
 // the server, even Javascript code.  See the rest of these docs for more
 // details.
-package rethinkgo
+package gorethink

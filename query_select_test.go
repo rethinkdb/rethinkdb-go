@@ -1,4 +1,4 @@
-package rethinkgo
+package gorethink
 
 import (
 	test "launchpad.net/gocheck"

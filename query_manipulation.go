@@ -1,4 +1,4 @@
-package rethinkgo
+package gorethink
 
 import (
 	p "github.com/dancannon/gorethink/ql2"

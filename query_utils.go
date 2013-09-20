@@ -1,4 +1,4 @@
-package rethinkgo
+package gorethink
 
 import (
 	p "github.com/dancannon/gorethink/ql2"
@@ -45,9 +45,9 @@ func makeFunc(f interface{}) RqlTerm {
 		argNums = append(argNums, nextVarId)
 		nextVarId++
 
-		// make sure all input arguments are of type Exp
-		if valueType.In(i).String() != "rethinkgo.RqlTerm" {
-			panic("Function argument is not of type Exp")
+		// make sure all input arguments are of type RqlTerm
+		if valueType.In(i).String() != "gorethink.RqlTerm" {
+			panic("Function argument is not of type RqlTerm")
 		}
 	}
 
