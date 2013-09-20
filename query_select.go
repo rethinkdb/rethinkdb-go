@@ -11,6 +11,13 @@ func Db(name interface{}) RqlTerm {
 
 // Select all documents in a table. This command can be chained with other
 // commands to do further processing on the data.
+func Table(name interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"use_outdated"}, optArgs)
+	return newRqlTerm("Table", p.Term_TABLE, []interface{}{name}, optArgM)
+}
+
+// Select all documents in a table. This command can be chained with other
+// commands to do further processing on the data.
 func (t RqlTerm) Table(name interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"use_outdated"}, optArgs)
 	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, []interface{}{name}, optArgM)
