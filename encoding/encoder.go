@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"runtime"
 	"sort"
+	"time"
 )
 
 // Encode returns the encoded value of v.
@@ -41,6 +42,12 @@ func Encode(v interface{}) (ev interface{}, err error) {
 func encode(v reflect.Value) (reflect.Value, error) {
 	if !v.IsValid() {
 		return reflect.Value{}, nil
+	}
+
+	// Special cases
+	// Time should not be encoded as it is handled by the Expr method
+	if v.Type() == reflect.TypeOf(time.Time{}) {
+		return v, nil
 	}
 
 	switch v.Kind() {
