@@ -81,8 +81,10 @@ func mergeArgs(args ...interface{}) []interface{} {
 	return newArgs
 }
 
-func reqlTimeToNativeTime(timestamp int64, timezone string) (time.Time, error) {
-	t := time.Unix(timestamp, 0)
+func reqlTimeToNativeTime(timestamp float64, timezone string) (time.Time, error) {
+	sec := int64(timestamp)
+
+	t := time.Unix(sec, 0)
 
 	// Caclulate the timezone
 	if timezone != "" {

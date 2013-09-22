@@ -74,6 +74,7 @@ var JsonEquals = &jsonChecker{
 }
 
 // Expressions used in tests
+var now = time.Now()
 var arr = []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9}
 var darr = []interface{}{1, 1, 2, 2, 3, 3, 5, 5, 6}
 var narr = []interface{}{
@@ -119,7 +120,6 @@ var joinTable3 = []interface{}{
 	map[string]interface{}{"it": 2, "title": "lmoe"},
 }
 
-type TStr string
 type T struct {
 	A string `gorethink:"id, omitempty"`
 	B int
@@ -127,7 +127,6 @@ type T struct {
 	D map[string]interface{}
 	E []interface{}
 	F X
-	G time.Time
 }
 
 type X struct {
@@ -135,8 +134,8 @@ type X struct {
 	XB string
 	XC []string
 	XD Y
-	XE TStr
-	XF []TStr
+	XE string
+	XF []string
 }
 
 type Y struct {
@@ -172,9 +171,8 @@ var str T = T{
 			},
 		},
 		XE: "XE",
-		XF: []TStr{
+		XF: []string{
 			"XE1", "XE2",
 		},
 	},
-	G: time.Now(),
 }

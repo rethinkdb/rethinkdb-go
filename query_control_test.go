@@ -48,14 +48,7 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 	err := query.RunRow(conn).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
-		"A": 1,
-		"B": 2,
-		"C": map[string]interface{}{
-			"1": 3,
-			"2": 4,
-		},
-	})
+	c.Assert(response, JsonEquals, map[string]interface{}{"id": "A", "F": map[string]interface{}{"XF": []interface{}{"XE1", "XE2"}, "XE": "XE", "XD": map[string]interface{}{"YA": 3}, "XC": []interface{}{"XC1", "XC2"}, "XB": "B", "XA": 2}, "E": []interface{}{"E1", "E2", "E3", 4}, "D": map[string]interface{}{"D2": "2", "D1": 1}, "B": 1})
 }
 
 func (s *RethinkSuite) TestControlExecTypes(c *test.C) {

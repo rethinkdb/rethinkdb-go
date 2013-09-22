@@ -72,9 +72,9 @@ func (s *RethinkSuite) TestTransformationOrderByDesc(c *test.C) {
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
-		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 0, "id": 4, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 0, "id": 7, "g2": 2, "g1": 1},
+		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 	})
 }
 
