@@ -91,6 +91,15 @@ var nobj = map[string]interface{}{
 		"2": 4,
 	},
 }
+var noDupNumObjList = []interface{}{
+	map[string]interface{}{"id": 1, "g1": 1, "g2": 1, "num": 0},
+	map[string]interface{}{"id": 2, "g1": 2, "g2": 2, "num": 5},
+	map[string]interface{}{"id": 3, "g1": 3, "g2": 2, "num": 10},
+	map[string]interface{}{"id": 5, "g1": 2, "g2": 3, "num": 100},
+	map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15},
+	map[string]interface{}{"id": 8, "g1": 4, "g2": 2, "num": 50},
+	map[string]interface{}{"id": 9, "g1": 2, "g2": 3, "num": 25},
+}
 var objList = []interface{}{
 	map[string]interface{}{"id": 1, "g1": 1, "g2": 1, "num": 0},
 	map[string]interface{}{"id": 2, "g1": 2, "g2": 2, "num": 5},

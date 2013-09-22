@@ -59,7 +59,7 @@ func (s *RethinkSuite) TestTransformationConcatMap(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationOrderByDesc(c *test.C) {
-	query := Expr(objList).OrderBy(Desc("num"))
+	query := Expr(noDupNumObjList).OrderBy(Desc("num"))
 
 	var response interface{}
 	err := query.RunRow(conn).Scan(&response)
@@ -72,14 +72,12 @@ func (s *RethinkSuite) TestTransformationOrderByDesc(c *test.C) {
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
-		map[string]interface{}{"num": 0, "id": 4, "g2": 3, "g1": 2},
-		map[string]interface{}{"num": 0, "id": 7, "g2": 2, "g1": 1},
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 	})
 }
 
 func (s *RethinkSuite) TestTransformationOrderByAsc(c *test.C) {
-	query := Expr(objList).OrderBy(Asc("num"))
+	query := Expr(noDupNumObjList).OrderBy(Asc("num"))
 
 	var response interface{}
 	err := query.RunRow(conn).Scan(&response)
@@ -87,8 +85,6 @@ func (s *RethinkSuite) TestTransformationOrderByAsc(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
-		map[string]interface{}{"num": 0, "id": 4, "g2": 3, "g1": 2},
-		map[string]interface{}{"num": 0, "id": 7, "g2": 2, "g1": 1},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
