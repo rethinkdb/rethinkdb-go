@@ -6,6 +6,7 @@ import (
 	test "launchpad.net/gocheck"
 	"os"
 	"testing"
+	"time"
 )
 
 var conn *Connection
@@ -116,4 +117,64 @@ var joinTable2 = []interface{}{
 var joinTable3 = []interface{}{
 	map[string]interface{}{"it": 0, "title": "goof"},
 	map[string]interface{}{"it": 2, "title": "lmoe"},
+}
+
+type TStr string
+type T struct {
+	A string `gorethink:"id, omitempty"`
+	B int
+	C int `gorethink:"-"`
+	D map[string]interface{}
+	E []interface{}
+	F X
+	G time.Time
+}
+
+type X struct {
+	XA int
+	XB string
+	XC []string
+	XD Y
+	XE TStr
+	XF []TStr
+}
+
+type Y struct {
+	YA int
+	YB map[int]interface{}
+	YC map[string]string
+}
+
+var str T = T{
+	A: "A",
+	B: 1,
+	C: 1,
+	D: map[string]interface{}{
+		"D1": 1,
+		"D2": "2",
+	},
+	E: []interface{}{
+		"E1", "E2", "E3", 4,
+	},
+	F: X{
+		XA: 2,
+		XB: "B",
+		XC: []string{"XC1", "XC2"},
+		XD: Y{
+			YA: 3,
+			YB: map[int]interface{}{
+				1: "1",
+				2: "2",
+				3: 3,
+			},
+			YC: map[string]string{
+				"YC1": "YC1",
+			},
+		},
+		XE: "XE",
+		XF: []TStr{
+			"XE1", "XE2",
+		},
+	},
+	G: time.Now(),
 }

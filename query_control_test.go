@@ -42,6 +42,22 @@ func (s *RethinkSuite) TestControlExecObj(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestControlStruct(c *test.C) {
+	var response map[string]interface{}
+	query := Expr(str)
+	err := query.RunRow(conn).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, map[string]interface{}{
+		"A": 1,
+		"B": 2,
+		"C": map[string]interface{}{
+			"1": 3,
+			"2": 4,
+		},
+	})
+}
+
 func (s *RethinkSuite) TestControlExecTypes(c *test.C) {
 	var response []interface{}
 	query := Expr([]interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
