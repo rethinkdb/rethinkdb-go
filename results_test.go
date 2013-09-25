@@ -16,7 +16,7 @@ type attr struct {
 }
 
 func (s *RethinkSuite) TestRowsScanLiteral(c *test.C) {
-	row := Expr(5).RunRow(conn)
+	row := Expr(5).RunRow(sess)
 
 	var response interface{}
 	err := row.Scan(&response)
@@ -25,7 +25,7 @@ func (s *RethinkSuite) TestRowsScanLiteral(c *test.C) {
 }
 
 func (s *RethinkSuite) TestRowsScanSlice(c *test.C) {
-	row := Expr([]interface{}{1, 2, 3, 4, 5}).RunRow(conn)
+	row := Expr([]interface{}{1, 2, 3, 4, 5}).RunRow(sess)
 
 	var response interface{}
 	err := row.Scan(&response)
@@ -37,7 +37,7 @@ func (s *RethinkSuite) TestRowsScanMap(c *test.C) {
 	row := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-	}).RunRow(conn)
+	}).RunRow(sess)
 
 	var response map[string]interface{}
 	err := row.Scan(&response)
@@ -52,7 +52,7 @@ func (s *RethinkSuite) TestRowsScanMapIntoInterface(c *test.C) {
 	row := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-	}).RunRow(conn)
+	}).RunRow(sess)
 
 	var response interface{}
 	err := row.Scan(&response)
@@ -71,7 +71,7 @@ func (s *RethinkSuite) TestRowsScanMapNested(c *test.C) {
 			"name":  "attr 1",
 			"value": "value 1",
 		}},
-	}).RunRow(conn)
+	}).RunRow(sess)
 
 	var response interface{}
 	err := row.Scan(&response)
@@ -94,7 +94,7 @@ func (s *RethinkSuite) TestRowsScanStruct(c *test.C) {
 			"Name":  "attr 1",
 			"Value": "value 1",
 		}},
-	}).RunRow(conn)
+	}).RunRow(sess)
 
 	var response object
 	err := row.Scan(&response)
@@ -110,7 +110,7 @@ func (s *RethinkSuite) TestRowsScanStruct(c *test.C) {
 }
 
 func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
-	row := Expr("a").RunRow(conn)
+	row := Expr("a").RunRow(sess)
 
 	var response string
 	err := row.Scan(&response)
@@ -119,7 +119,7 @@ func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
 }
 
 func (s *RethinkSuite) TestRowsAtomArray(c *test.C) {
-	row := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).RunRow(conn)
+	row := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).RunRow(sess)
 
 	var response []int
 	err := row.Scan(&response)

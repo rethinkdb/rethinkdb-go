@@ -33,7 +33,7 @@ func (r *ResultRow) Scan(dest interface{}) error {
 // ResultRows contains the result of a query. Its cursor starts before the first row
 // of the result set. Use Next to advance through the rows.
 type ResultRows struct {
-	conn         *Connection
+	session      *Session
 	query        *p.Query
 	term         RqlTerm
 	opts         map[string]interface{}
@@ -53,7 +53,7 @@ func (r *ResultRows) Close() error {
 	var err error
 
 	if !r.closed {
-		_, err = r.conn.stopQuery(r.query, r.term, r.opts)
+		_, err = r.session.stopQuery(r.query, r.term, r.opts)
 		r.closed = true
 	}
 
@@ -111,7 +111,7 @@ func (r *ResultRows) Next() bool {
 	}
 
 	// Continue the query
-	newResult, err := r.conn.continueQuery(r.query, r.term, r.opts)
+	newResult, err := r.session.continueQuery(r.query, r.term, r.opts)
 	if err != nil {
 		r.err = err
 		return false

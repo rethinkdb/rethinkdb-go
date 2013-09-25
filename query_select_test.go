@@ -6,16 +6,16 @@ import (
 
 func (s *RethinkSuite) TestSelectGet(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table1").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table1").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table1").Insert(objList).Exec(conn)
+	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").Get(6)
-	err := query.RunRow(conn).Scan(&response)
+	err := query.RunRow(sess).Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -23,17 +23,17 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 
 func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table1").Exec(conn)
-	Db("test").Table("Table1").IndexCreate("num").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table1").Exec(sess)
+	Db("test").Table("Table1").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table1").Insert(objList).Exec(conn)
+	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").GetAll(6).OrderBy("id")
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -45,17 +45,17 @@ func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
 
 func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table1").Exec(conn)
-	Db("test").Table("Table1").IndexCreate("num").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table1").Exec(sess)
+	Db("test").Table("Table1").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table1").Insert(objList).Exec(conn)
+	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").GetAll(1, 2, 3).OrderBy("id")
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -69,17 +69,17 @@ func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
 
 func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table1").Exec(conn)
-	Db("test").Table("Table1").IndexCreate("num").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table1").Exec(sess)
+	Db("test").Table("Table1").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table1").Insert(objList).Exec(conn)
+	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").GetAllByIndex("num", 15).OrderBy("id")
-	err := query.RunRow(conn).Scan(&response)
+	err := query.RunRow(sess).Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -87,17 +87,17 @@ func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
 
 func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table2").Exec(conn)
-	Db("test").Table("Table2").IndexCreate("num").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table2").Exec(sess)
+	Db("test").Table("Table2").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table2").Insert(objList).Exec(conn)
+	Db("test").Table("Table2").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table2").GetAllByIndex("num", 15).OrderBy("id")
-	err := query.RunRow(conn).Scan(&response)
+	err := query.RunRow(sess).Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -105,16 +105,16 @@ func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 
 func (s *RethinkSuite) TestSelectBetween(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table1").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table1").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table1").Insert(objList).Exec(conn)
+	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").Between(1, 3).OrderBy("id")
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -127,17 +127,17 @@ func (s *RethinkSuite) TestSelectBetween(c *test.C) {
 
 func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table2").Exec(conn)
-	Db("test").Table("Table2").IndexCreate("num").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table2").Exec(sess)
+	Db("test").Table("Table2").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table2").Insert(objList).Exec(conn)
+	Db("test").Table("Table2").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table2").Between(10, 50, "index", "num").OrderBy("id")
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -151,12 +151,12 @@ func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 
 func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table2").Exec(conn)
-	Db("test").Table("Table2").IndexCreate("num").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table2").Exec(sess)
+	Db("test").Table("Table2").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table2").Insert(objList).Exec(conn)
+	Db("test").Table("Table2").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
@@ -164,7 +164,7 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 		"index", "num",
 		"right_bound", "closed",
 	).OrderBy("id")
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -179,16 +179,16 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 
 func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table1").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table1").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table1").Insert(objList).Exec(conn)
+	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").Filter(Row.Field("num").Ge(50)).OrderBy("id")
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -201,18 +201,18 @@ func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
 
 func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Table1").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table1").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table1").Insert(objList).Exec(conn)
+	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").Filter(func(row RqlTerm) RqlTerm {
 		return row.Field("num").Ge(50)
 	}).OrderBy("id")
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 

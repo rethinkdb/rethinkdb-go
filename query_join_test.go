@@ -6,20 +6,20 @@ import (
 
 func (s *RethinkSuite) TestJoinInnerJoin(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Join1").Exec(conn)
-	Db("test").TableCreate("Join2").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Join1").Exec(sess)
+	Db("test").TableCreate("Join2").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Join1").Insert(joinTable1).Exec(conn)
-	Db("test").Table("Join2").Insert(joinTable2).Exec(conn)
+	Db("test").Table("Join1").Insert(joinTable1).Exec(sess)
+	Db("test").Table("Join2").Insert(joinTable2).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
 		return a.Field("id").Eq(b.Field("id"))
 	})
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -37,20 +37,20 @@ func (s *RethinkSuite) TestJoinInnerJoin(c *test.C) {
 
 func (s *RethinkSuite) TestJoinInnerJoinZip(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Join1").Exec(conn)
-	Db("test").TableCreate("Join2").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Join1").Exec(sess)
+	Db("test").TableCreate("Join2").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Join1").Insert(joinTable1).Exec(conn)
-	Db("test").Table("Join2").Insert(joinTable2).Exec(conn)
+	Db("test").Table("Join1").Insert(joinTable1).Exec(sess)
+	Db("test").Table("Join2").Insert(joinTable2).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip()
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -63,20 +63,20 @@ func (s *RethinkSuite) TestJoinInnerJoinZip(c *test.C) {
 
 func (s *RethinkSuite) TestJoinOuterJoinZip(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Join1").Exec(conn)
-	Db("test").TableCreate("Join2").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Join1").Exec(sess)
+	Db("test").TableCreate("Join2").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Join1").Insert(joinTable1).Exec(conn)
-	Db("test").Table("Join2").Insert(joinTable2).Exec(conn)
+	Db("test").Table("Join1").Insert(joinTable1).Exec(sess)
+	Db("test").Table("Join2").Insert(joinTable2).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Join1").OuterJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip()
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 
@@ -90,18 +90,18 @@ func (s *RethinkSuite) TestJoinOuterJoinZip(c *test.C) {
 
 func (s *RethinkSuite) TestJoinEqJoinZip(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Join1").Exec(conn)
-	Db("test").TableCreate("Join2").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Join1").Exec(sess)
+	Db("test").TableCreate("Join2").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Join1").Insert(joinTable1).Exec(conn)
-	Db("test").Table("Join2").Insert(joinTable2).Exec(conn)
+	Db("test").Table("Join1").Insert(joinTable1).Exec(sess)
+	Db("test").Table("Join2").Insert(joinTable2).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join2")).Zip()
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 	c.Assert(response, JsonEquals, []interface{}{
@@ -112,21 +112,21 @@ func (s *RethinkSuite) TestJoinEqJoinZip(c *test.C) {
 
 func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(conn)
-	Db("test").TableCreate("Join1").Exec(conn)
-	Db("test").TableCreate("Join3", "primary_key", "it").Exec(conn)
-	Db("test").Table("Join3").IndexCreate("it").Exec(conn)
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Join1").Exec(sess)
+	Db("test").TableCreate("Join3", "primary_key", "it").Exec(sess)
+	Db("test").Table("Join3").IndexCreate("it").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Join1").Delete().Exec(conn)
-	Db("test").Table("Join3").Delete().Exec(conn)
-	Db("test").Table("Join1").Insert(joinTable1).Exec(conn)
-	Db("test").Table("Join3").Insert(joinTable3).Exec(conn)
+	Db("test").Table("Join1").Delete().Exec(sess)
+	Db("test").Table("Join3").Delete().Exec(sess)
+	Db("test").Table("Join1").Insert(joinTable1).Exec(sess)
+	Db("test").Table("Join3").Insert(joinTable3).Exec(sess)
 
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join3"), "index", "it").Zip()
-	rows, err := query.Run(conn)
+	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 	response, err = rows.All()
 	c.Assert(response, JsonEquals, []interface{}{
