@@ -95,7 +95,7 @@ func (p *Pool) get() (*Connection, error) {
 
 	if p.closed {
 		p.mu.Unlock()
-		return nil, errors.New("redigo: get on closed pool")
+		return nil, errors.New("gorethink: get on closed pool")
 	}
 
 	// Prune stale connections.
