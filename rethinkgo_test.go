@@ -39,8 +39,8 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 	var err error
 	sess, err = Connect(map[string]interface{}{
 		"address":   url,
-		"maxIdle":   5,
-		"maxActive": 5,
+		"maxIdle":   3,
+		"maxActive": 3,
 	})
 	c.Assert(err, test.IsNil)
 }
