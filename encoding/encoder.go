@@ -78,7 +78,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 			return reflect.Value{}, &UnsupportedTypeError{v.Type()}
 		}
 		if v.IsNil() {
-			return reflect.Zero(v.Type()), nil
+			return reflect.Zero(reflect.TypeOf(map[string]interface{}{})), nil
 		}
 
 		var sv stringValues = v.MapKeys()
@@ -98,7 +98,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 		s := reflect.MakeSlice(reflect.TypeOf([]interface{}{}), v.Len(), v.Len())
 
 		if v.IsNil() {
-			return reflect.Zero(v.Type()), nil
+			return reflect.Zero(reflect.TypeOf([]interface{}{})), nil
 		}
 
 		for i := 0; i < v.Len(); i++ {
