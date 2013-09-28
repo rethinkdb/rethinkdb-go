@@ -114,6 +114,29 @@ func (s *Session) SetTimeout(timeout time.Duration) {
 	s.timeout = timeout
 }
 
+// SetMaxIdleConns sets the maximum number of connections in the idle
+// connection pool.
+//
+// If MaxOpenConns is greater than 0 but less than the new MaxIdleConns
+// then the new MaxIdleConns will be reduced to match the MaxOpenConns limit
+//
+// If n <= 0, no idle connections are retained.
+func (s *Session) SetMaxIdleConns(n int) {
+	s.pool.MaxIdle = n
+}
+
+// SetMaxOpenConns sets the maximum number of open connections to the database.
+//
+// If MaxIdleConns is greater than 0 and the new MaxOpenConns is less than
+// MaxIdleConns, then MaxIdleConns will be reduced to match the new
+// MaxOpenConns limit
+//
+// If n <= 0, then there is no limit on the number of open connections.
+// The default is 0 (unlimited).
+func (s *Session) SetMaxOpenConns(n int) {
+	s.pool.MaxActive = n
+}
+
 // getToken generates the next query token, used to number requests and match
 // responses with requests.
 func (s *Session) nextToken() int64 {
