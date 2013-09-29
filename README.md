@@ -23,7 +23,27 @@ go get code.google.com/p/goprotobuf/{proto,protoc-gen-go}
 
 ### Basic Connection
 
-TODO: Add instructions for basic connections
+Setting up a basic connection with RethinkDB is simple:
+
+```go
+import (
+    r "github.com/dancannon/gorethink"
+)
+
+var session *r.Session
+
+session, err := r.Connect(map[string]interface{}{
+        "address":  "localhost:28015",
+        "database": "test",
+        "authkey":  "14daak1cad13dj",
+    })
+
+    if err != nil {
+        log.Fatalln(err.Error())
+    }
+
+```
+See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect) for a list of supported arguments to Connect().
 
 ### Connection Pool
 
