@@ -63,6 +63,22 @@ func newSession(args map[string]interface{}) *Session {
 }
 
 // Connect creates a new database session.
+//
+// Supported arguments include token, address, database, timeout, authkey,
+// and timeFormat. Pool options include maxIdle, maxActive and idleTimeout.
+//
+// By default maxIdle and maxActive are set to 1: passing values greater
+// than the default (e.g. maxIdle: "10", maxActive: "20") will provide a
+// pool of re-usable connections.
+//
+// Basic connection example:
+//
+// var session *r.Session
+// session, err := r.Connect(map[string]interface{}{
+//        	"address":  "localhost:28015",
+//       	"database": "test",
+//        	"authkey":  "14daak1cad13dj",
+//    })
 func Connect(args map[string]interface{}) (*Session, error) {
 	s := newSession(args)
 	err := s.Reconnect()

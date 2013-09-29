@@ -23,11 +23,53 @@ go get code.google.com/p/goprotobuf/{proto,protoc-gen-go}
 
 ### Basic Connection
 
-TODO: Add instructions for basic connections
+Setting up a basic connection with RethinkDB is simple:
+
+```go
+import (
+    r "github.com/dancannon/gorethink"
+)
+
+var session *r.Session
+
+session, err := r.Connect(map[string]interface{}{
+        "address":  "localhost:28015",
+        "database": "test",
+        "authkey":  "14daak1cad13dj",
+    })
+
+    if err != nil {
+        log.Fatalln(err.Error())
+    }
+
+```
+See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect) for a list of supported arguments to Connect().
 
 ### Connection Pool
 
-TODO: Add instructions for basic connections
+The driver uses a connection pool at all times, however by default there is only a single connection available. In order to turn this into a proper connection pool, we need to pass the `maxIdle`, `maxActive` and/or `idleTimeout` parameters to Connect():
+
+```go
+import (
+    r "github.com/dancannon/gorethink"
+)
+
+var session *r.Session
+
+session, err := r.Connect(map[string]interface{}{
+        "address":  "localhost:28015",
+        "database": "test",
+        "maxIdle": 10,
+        "maxActive": 30,
+        "idleTimeout": time.Second * 10,
+    })
+
+    if err != nil {
+        log.Fatalln(err.Error())
+    }
+```
+
+A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) instance can also be passed to Connect().
 
 ## Query Functions
 
