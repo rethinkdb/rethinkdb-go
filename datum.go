@@ -133,7 +133,7 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 					return nil, fmt.Errorf("Unknown time_format run option \"%s\".", reqlType)
 				}
 			} else {
-				return obj
+				return obj, nil
 			}
 		}
 
