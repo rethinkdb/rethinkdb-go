@@ -4,7 +4,7 @@
 
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) made by [Daniel Cannon](http://github.com/dancannon) and based off of Christopher Hesse's [RethinkGo](https://github.com/christopherhesse/rethinkgo) driver.
 
-Current supported RethinkDB version: 1.9 | Documentation: [GoDoc](http://godoc.org/github.com/dancannon/gorethink)
+Current supported RethinkDB version: 1.10 | Documentation: [GoDoc](http://godoc.org/github.com/dancannon/gorethink)
 
 ## Installation
 
