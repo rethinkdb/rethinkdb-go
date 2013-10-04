@@ -4,7 +4,6 @@ package encoding
 
 import (
 	"errors"
-	"github.com/davecgh/go-spew/spew"
 	"reflect"
 	"runtime"
 	"sort"
