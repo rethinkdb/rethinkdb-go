@@ -454,19 +454,3 @@ func indirect(v reflect.Value) reflect.Value {
 	}
 	return v
 }
-
-// Errors ---------------------------------------------------------------------
-
-// ConversionError stores information about a failed conversion.
-type ConversionError struct {
-	Key   string // key from the source map.
-	Index int    // index for multi-value fields; -1 for single-value fields.
-}
-
-func (e ConversionError) Error() string {
-	if e.Index < 0 {
-		return fmt.Sprintf("schema: error converting value for %q", e.Key)
-	}
-	return fmt.Sprintf("schema: error converting value for index %d of %q",
-		e.Index, e.Key)
-}
