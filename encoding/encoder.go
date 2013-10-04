@@ -4,6 +4,7 @@ package encoding
 
 import (
 	"errors"
+	"github.com/davecgh/go-spew/spew"
 	"reflect"
 	"runtime"
 	"sort"
@@ -51,6 +52,16 @@ func encode(v reflect.Value) (reflect.Value, error) {
 	}
 
 	switch v.Kind() {
+	case reflect.Bool:
+		return reflect.ValueOf(v.Bool()), nil
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return reflect.ValueOf(v.Int()), nil
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return reflect.ValueOf(v.Uint()), nil
+	case reflect.Float32, reflect.Float64:
+		return reflect.ValueOf(v.Float()), nil
+	case reflect.String:
+		return reflect.ValueOf(v.String()), nil
 	case reflect.Struct:
 		// If the value is a struct then get the name used by each field and
 		// insert the encoded values into a map
@@ -64,7 +75,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 
 			ev, err := encode(fv)
 			if err != nil {
-				break
+				return reflect.Value{}, err
 			}
 			m.SetMapIndex(reflect.ValueOf(f.name), ev)
 		}
@@ -86,7 +97,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 		for _, k := range sv {
 			ev, err := encode(v.MapIndex(k))
 			if err != nil {
-				break
+				return reflect.Value{}, err
 			}
 
 			m.SetMapIndex(k, ev)
@@ -104,7 +115,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 		for i := 0; i < v.Len(); i++ {
 			ev, err := encode(v.Index(i))
 			if err != nil {
-				break
+				return reflect.Value{}, err
 			}
 
 			s.Index(i).Set(ev)
@@ -117,7 +128,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 		for i := 0; i < v.Len(); i++ {
 			ev, err := encode(v.Index(i))
 			if err != nil {
-				break
+				return reflect.Value{}, err
 			}
 
 			s.Index(i).Set(ev)
@@ -131,7 +142,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 
 		return encode(v.Elem())
 	default:
-		return v, nil
+		return reflect.Value{}, &UnsupportedTypeError{v.Type()}
 	}
 }
 

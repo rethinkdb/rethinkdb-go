@@ -9,14 +9,14 @@ import (
 
 // Converts a query term to a datum. If the term cannot be converted to a datum
 // object then the function panics.
-func constructDatum(t RqlTerm) *p.Term {
+func constructDatum(t RqlTerm) (*p.Term, error) {
 	if t.data == nil {
 		return &p.Term{
 			Type: p.Term_DATUM.Enum(),
 			Datum: &p.Datum{
 				Type: p.Datum_R_NULL.Enum(),
 			},
-		}
+		}, nil
 	} else {
 		switch val := t.data.(type) {
 		case bool:
@@ -26,7 +26,7 @@ func constructDatum(t RqlTerm) *p.Term {
 					Type:  p.Datum_R_BOOL.Enum(),
 					RBool: proto.Bool(val),
 				},
-			}
+			}, nil
 		case uint, uint8, uint16, uint32, uint64:
 			// Cast value to float64
 			rv := reflect.ValueOf(val)
@@ -38,7 +38,7 @@ func constructDatum(t RqlTerm) *p.Term {
 					Type: p.Datum_R_NUM.Enum(),
 					RNum: proto.Float64(fv),
 				},
-			}
+			}, nil
 		case int, int8, int16, int32, int64:
 			// Cast value to float64
 			rv := reflect.ValueOf(val)
@@ -50,7 +50,7 @@ func constructDatum(t RqlTerm) *p.Term {
 					Type: p.Datum_R_NUM.Enum(),
 					RNum: proto.Float64(fv),
 				},
-			}
+			}, nil
 		case float32, float64:
 			// Cast value to float64
 			rv := reflect.ValueOf(val)
@@ -62,7 +62,7 @@ func constructDatum(t RqlTerm) *p.Term {
 					Type: p.Datum_R_NUM.Enum(),
 					RNum: proto.Float64(fv),
 				},
-			}
+			}, nil
 		case string:
 			return &p.Term{
 				Type: p.Term_DATUM.Enum(),
@@ -70,9 +70,9 @@ func constructDatum(t RqlTerm) *p.Term {
 					Type: p.Datum_R_STR.Enum(),
 					RStr: proto.String(val),
 				},
-			}
+			}, nil
 		default:
-			panic(fmt.Sprintf("Cannot convert type '%T' to Datum", val))
+			return &p.Term{}, fmt.Errorf("Cannot convert type '%T' to Datum", val)
 		}
 	}
 }

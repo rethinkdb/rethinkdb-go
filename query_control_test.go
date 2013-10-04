@@ -48,7 +48,33 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 	err := query.RunRow(sess).Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"id": "A", "F": map[string]interface{}{"XF": []interface{}{"XE1", "XE2"}, "XE": "XE", "XD": map[string]interface{}{"YA": 3}, "XC": []interface{}{"XC1", "XC2"}, "XB": "B", "XA": 2}, "E": []interface{}{"E1", "E2", "E3", 4}, "D": map[string]interface{}{"D2": "2", "D1": 1}, "B": 1})
+	c.Assert(response, JsonEquals, map[string]interface{}{
+		"id": "A",
+		"B":  1,
+		"D":  map[string]interface{}{"D2": "2", "D1": 1},
+		"E":  []interface{}{"E1", "E2", "E3", 4},
+		"F": map[string]interface{}{
+			"XA": 2,
+			"XB": "B",
+			"XC": []interface{}{"XC1", "XC2"},
+			"XD": map[string]interface{}{
+				"YA": 3,
+				"YB": map[string]interface{}{
+					"1": "1",
+					"2": "2",
+					"3": 3,
+				},
+				"YC": map[string]interface{}{
+					"YC1": "YC1",
+				},
+				"YD": map[string]interface{}{
+					"YD1": "YD1",
+				},
+			},
+			"XE": "XE",
+			"XF": []interface{}{"XE1", "XE2"},
+		},
+	})
 }
 
 func (s *RethinkSuite) TestControlExecTypes(c *test.C) {

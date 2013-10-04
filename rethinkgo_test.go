@@ -131,6 +131,9 @@ var joinTable3 = []interface{}{
 	map[string]interface{}{"it": 2, "title": "lmoe"},
 }
 
+type TStr string
+type TMap map[string]interface{}
+
 type T struct {
 	A string `gorethink:"id, omitempty"`
 	B int
@@ -145,14 +148,15 @@ type X struct {
 	XB string
 	XC []string
 	XD Y
-	XE string
-	XF []string
+	XE TStr
+	XF []TStr
 }
 
 type Y struct {
 	YA int
-	YB map[int]interface{}
+	YB map[string]interface{}
 	YC map[string]string
+	YD TMap
 }
 
 var str T = T{
@@ -172,17 +176,20 @@ var str T = T{
 		XC: []string{"XC1", "XC2"},
 		XD: Y{
 			YA: 3,
-			YB: map[int]interface{}{
-				1: "1",
-				2: "2",
-				3: 3,
+			YB: map[string]interface{}{
+				"1": "1",
+				"2": "2",
+				"3": 3,
 			},
 			YC: map[string]string{
 				"YC1": "YC1",
 			},
+			YD: TMap{
+				"YD1": "YD1",
+			},
 		},
 		XE: "XE",
-		XF: []string{
+		XF: []TStr{
 			"XE1", "XE2",
 		},
 	},

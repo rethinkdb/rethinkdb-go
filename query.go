@@ -22,7 +22,11 @@ type RqlTerm struct {
 func (t RqlTerm) build() *p.Term {
 	switch t.termType {
 	case p.Term_DATUM:
-		return constructDatum(t)
+		datum, err := constructDatum(t)
+		if err != nil {
+			panic(err)
+		}
+		return datum
 	default:
 		args := []*p.Term{}
 		optArgs := []*p.Term_AssocPair{}
