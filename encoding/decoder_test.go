@@ -1,7 +1,6 @@
 package encoding
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	"image"
 	"reflect"
 	"testing"
@@ -242,7 +241,6 @@ var decodeTests = []decodeTest{
 }
 
 func TestDecode(t *testing.T) {
-	scs := spew.ConfigState{Indent: "\t", ContinueOnMethod: true}
 	for i, tt := range decodeTests {
 		if tt.ptr == nil {
 			continue
@@ -256,7 +254,6 @@ func TestDecode(t *testing.T) {
 			continue
 		}
 		if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
-			scs.Dump(v.Elem().Interface(), tt.out)
 			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
 		}

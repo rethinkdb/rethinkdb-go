@@ -4,7 +4,6 @@ package encoding
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"runtime"
 	"strconv"

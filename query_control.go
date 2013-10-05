@@ -61,6 +61,38 @@ func expr(value interface{}, depth int) RqlTerm {
 
 			return expr(data, depth-1)
 		}
+		if typ.Kind() == reflect.Slice {
+			data, err := encoding.Encode(val)
+			if err != nil || data == nil {
+				return RqlTerm{
+					termType: p.Term_DATUM,
+					data:     nil,
+				}
+			}
+
+			vals := []RqlTerm{}
+			for _, v := range data.([]interface{}) {
+				vals = append(vals, expr(v, depth))
+			}
+
+			return makeArray(vals)
+		}
+		if typ.Kind() == reflect.Map {
+			data, err := encoding.Encode(val)
+			if err != nil || data == nil {
+				return RqlTerm{
+					termType: p.Term_DATUM,
+					data:     nil,
+				}
+			}
+
+			vals := map[string]RqlTerm{}
+			for k, v := range data.(map[string]interface{}) {
+				vals[k] = expr(v, depth)
+			}
+
+			return makeObject(vals)
+		}
 
 		// If no other match was found then return a datum value
 		return RqlTerm{

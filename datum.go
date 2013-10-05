@@ -18,18 +18,23 @@ func constructDatum(t RqlTerm) (*p.Term, error) {
 			},
 		}, nil
 	} else {
-		switch val := t.data.(type) {
-		case bool:
+		typ := reflect.TypeOf(t.data)
+		switch typ.Kind() {
+		case reflect.Bool:
+			// Cast value to string
+			rv := reflect.ValueOf(t.data)
+			fv := rv.Bool()
+
 			return &p.Term{
 				Type: p.Term_DATUM.Enum(),
 				Datum: &p.Datum{
 					Type:  p.Datum_R_BOOL.Enum(),
-					RBool: proto.Bool(val),
+					RBool: proto.Bool(fv),
 				},
 			}, nil
-		case uint, uint8, uint16, uint32, uint64:
+		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 			// Cast value to float64
-			rv := reflect.ValueOf(val)
+			rv := reflect.ValueOf(t.data)
 			fv := float64(rv.Uint())
 
 			return &p.Term{
@@ -39,9 +44,9 @@ func constructDatum(t RqlTerm) (*p.Term, error) {
 					RNum: proto.Float64(fv),
 				},
 			}, nil
-		case int, int8, int16, int32, int64:
+		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			// Cast value to float64
-			rv := reflect.ValueOf(val)
+			rv := reflect.ValueOf(t.data)
 			fv := float64(rv.Int())
 
 			return &p.Term{
@@ -51,9 +56,9 @@ func constructDatum(t RqlTerm) (*p.Term, error) {
 					RNum: proto.Float64(fv),
 				},
 			}, nil
-		case float32, float64:
+		case reflect.Float32, reflect.Float64:
 			// Cast value to float64
-			rv := reflect.ValueOf(val)
+			rv := reflect.ValueOf(t.data)
 			fv := rv.Float()
 
 			return &p.Term{
@@ -63,16 +68,20 @@ func constructDatum(t RqlTerm) (*p.Term, error) {
 					RNum: proto.Float64(fv),
 				},
 			}, nil
-		case string:
+		case reflect.String:
+			// Cast value to string
+			rv := reflect.ValueOf(t.data)
+			fv := rv.String()
+
 			return &p.Term{
 				Type: p.Term_DATUM.Enum(),
 				Datum: &p.Datum{
 					Type: p.Datum_R_STR.Enum(),
-					RStr: proto.String(val),
+					RStr: proto.String(fv),
 				},
 			}, nil
 		default:
-			return &p.Term{}, fmt.Errorf("Cannot convert type '%T' to Datum", val)
+			return &p.Term{}, fmt.Errorf("Cannot convert type '%T' to Datum", t.data)
 		}
 	}
 }

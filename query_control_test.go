@@ -77,6 +77,24 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestControlMapTypeAlias(c *test.C) {
+	var response TMap
+	query := Expr(TMap{"A": 1, "B": 2})
+	err := query.RunRow(sess).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, TMap{"A": 1, "B": 2})
+}
+
+func (s *RethinkSuite) TestControlStringTypeAlias(c *test.C) {
+	var response TStr
+	query := Expr(TStr("Hello"))
+	err := query.RunRow(sess).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, TStr("Hello"))
+}
+
 func (s *RethinkSuite) TestControlExecTypes(c *test.C) {
 	var response []interface{}
 	query := Expr([]interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
