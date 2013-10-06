@@ -51,16 +51,13 @@ func encode(v reflect.Value) (reflect.Value, error) {
 	}
 
 	switch v.Kind() {
-	case reflect.Bool:
-		return reflect.ValueOf(v.Bool()), nil
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return reflect.ValueOf(v.Int()), nil
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		return reflect.ValueOf(v.Uint()), nil
-	case reflect.Float32, reflect.Float64:
-		return reflect.ValueOf(v.Float()), nil
-	case reflect.String:
-		return reflect.ValueOf(v.String()), nil
+	case
+		reflect.Bool,
+		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
+		reflect.Float32, reflect.Float64,
+		reflect.String:
+		return v, nil
 	case reflect.Struct:
 		// If the value is a struct then get the name used by each field and
 		// insert the encoded values into a map

@@ -84,7 +84,7 @@ type Optionals struct {
 var optionalsExpected = map[string]interface{}{
 	"sr":        "",
 	"omitempty": 0,
-	"slr":       []string(nil),
+	"slr":       []interface{}(nil),
 	"mr":        map[string]interface{}{},
 }
 
