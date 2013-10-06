@@ -135,10 +135,12 @@ Both ResultRows and ResultRow have the function `Scan` which is used to bind a r
 Example:
 
 ```go
-row := Expr("Hello World").RunRow(conn)
-
-var response interface{}
-err := row.Scan(&response)
+row := Table("tablename").Get(key).RunRow(conn)
+// Check if something was found
+if !row.IsNil() {
+	var response interface{}
+	err := row.Scan(&response)
+}
 ```
 
 ResultRows also has the function `Next` which is used to iterate through a result set. If a partial sequence is returned by the server Next will automatically fetch the result of the sequence.
