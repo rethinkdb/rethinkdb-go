@@ -46,6 +46,20 @@ func expr(value interface{}, depth int) RqlTerm {
 		// Use reflection to check for other types
 		typ := reflect.TypeOf(val)
 
+		if typ.Kind() == reflect.Ptr || typ.Kind() == reflect.Interface {
+			v := reflect.ValueOf(val)
+
+			if v.IsNil() {
+				return RqlTerm{
+					termType: p.Term_DATUM,
+					data:     nil,
+				}
+			}
+
+			val = v.Elem().Interface()
+			typ = reflect.TypeOf(val)
+		}
+
 		if typ.Kind() == reflect.Func {
 			return makeFunc(val)
 		}

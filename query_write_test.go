@@ -29,6 +29,25 @@ func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 	c.Assert(response["inserted"], test.Equals, float64(1))
 }
 
+func (s *RethinkSuite) TestWriteInsertStructPointer(c *test.C) {
+	var response map[string]interface{}
+	o := object{
+		Name: "map[string]interface{}ect 3",
+		Attrs: []attr{
+			attr{
+				Name:  "Attr 2",
+				Value: "Value",
+			},
+		},
+	}
+
+	query := Db("test").Table("test").Insert(&o)
+	err := query.RunRow(sess).Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response["inserted"], test.Equals, float64(1))
+}
+
 func (s *RethinkSuite) TestWriteUpdate(c *test.C) {
 	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
 	_, err := query.Run(sess)

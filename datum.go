@@ -19,6 +19,7 @@ func constructDatum(t RqlTerm) (*p.Term, error) {
 		}, nil
 	} else {
 		typ := reflect.TypeOf(t.data)
+
 		switch typ.Kind() {
 		case reflect.Bool:
 			// Cast value to string
