@@ -9,14 +9,14 @@ func (s *RethinkSuite) TestTimeTime(c *test.C) {
 	var response time.Time
 	err := Time(1986, 11, 3, 12, 30, 15, "Z").RunRow(sess).Scan(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.Equal(time.Date(1986, 11, 3, 12, 30, 15, 0, time.Local)), test.Equals, true)
+	c.Assert(response.Equal(time.Date(1986, 11, 3, 12, 30, 15, 0, time.UTC)), test.Equals, true)
 }
 
 func (s *RethinkSuite) TestTimeEpochTime(c *test.C) {
 	var response time.Time
 	err := EpochTime(531360000).RunRow(sess).Scan(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.Equal(time.Date(1986, 11, 3, 0, 0, 0, 0, time.Local)), test.Equals, true)
+	c.Assert(response.Equal(time.Date(1986, 11, 3, 0, 0, 0, 0, time.UTC)), test.Equals, true)
 }
 
 func (s *RethinkSuite) TestTimeISO8601(c *test.C) {
