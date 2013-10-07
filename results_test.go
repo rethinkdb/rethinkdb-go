@@ -126,3 +126,24 @@ func (s *RethinkSuite) TestRowsAtomArray(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.DeepEquals, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
 }
+
+func (s *RethinkSuite) TestEmptyResults(c *test.C) {
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
+	row := Db("test").Table("test").Get("missing value").RunRow(sess)
+	c.Assert(row.IsNil(), test.Equals, true)
+
+	row = Db("test").Table("test").Get("missing value").RunRow(sess)
+	var response interface{}
+	row.Scan(response)
+	c.Assert(row.IsNil(), test.Equals, true)
+
+	rows, err := Db("test").Table("test").Get("missing value").Run(sess)
+	c.Assert(err, test.IsNil)
+	rows.Next()
+	c.Assert(rows.IsNil(), test.Equals, true)
+
+	rows, err = Db("test").Table("test").GetAll("missing value", "another missing value").Run(sess)
+	c.Assert(err, test.IsNil)
+	c.Assert(rows.Next(), test.Equals, false)
+}
