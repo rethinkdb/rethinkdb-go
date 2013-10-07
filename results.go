@@ -6,21 +6,28 @@ import (
 )
 
 type ResultRow struct {
-	err  error
-	rows *ResultRows
+	err     error
+	rows    *ResultRows
+	fetched bool
 }
 
 // Scan copies the result from the matched row into the value pointed at by dest.
 // If more than one row is returned by the query then Scan returns the first and
 // ignores the rest. If no row is found then Scan returns an error.
+//
+// RethinkDB returns an nil value on Get queries when nothing is found, and Scan
+// won't fail in this case.
 func (r *ResultRow) Scan(dest interface{}) error {
 	if r.err != nil {
 		return r.err
 	}
 
-	defer r.rows.Close()
-	if !r.rows.Next() {
-		return RqlDriverError{"No rows in the result set"}
+	if !r.fetched {
+		r.fetched = true
+		defer r.rows.Close()
+		if !r.rows.Next() {
+			return RqlDriverError{"No rows in the result set"}
+		}
 	}
 	err := r.rows.Scan(dest)
 	if err != nil {
@@ -28,6 +35,24 @@ func (r *ResultRow) Scan(dest interface{}) error {
 	}
 
 	return nil
+}
+
+// Tests if the result is nil.
+// RethinkDB returns an nil value on Get queries when nothing is found.
+func (r *ResultRow) IsNil() bool {
+	if r.err != nil {
+		return true
+	}
+
+	if !r.fetched {
+		r.fetched = true
+		defer r.rows.Close()
+		if !r.rows.Next() {
+			return true
+		}
+	}
+
+	return r.rows.IsNil()
 }
 
 // ResultRows contains the result of a query. Its cursor starts before the first row
@@ -164,6 +189,15 @@ func (r *ResultRows) Scan(dest interface{}) error {
 	}
 
 	return nil
+}
+
+// Tests if the current row is nil.
+func (r *ResultRows) IsNil() bool {
+	if r.current == nil {
+		return false
+	}
+
+	return (r.current.GetType() == p.Datum_R_NULL)
 }
 
 // All is a helper method for returning a slice containing all rows. The slice

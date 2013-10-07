@@ -23,7 +23,7 @@ func (t RqlTerm) Table(name interface{}, optArgs ...interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, []interface{}{name}, optArgM)
 }
 
-// Get a document by primary key.
+// Get a document by primary key. If nothing was found, RethinkDB will return a nil value.
 func (t RqlTerm) Get(key interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Get", p.Term_GET, []interface{}{key}, map[string]interface{}{})
 }
