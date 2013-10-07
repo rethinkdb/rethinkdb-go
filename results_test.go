@@ -142,4 +142,8 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	c.Assert(err, test.IsNil)
 	rows.Next()
 	c.Assert(rows.IsNil(), test.Equals, true)
+
+	rows, err = Db("test").Table("test").GetAll("missing value", "another missing value").Run(sess)
+	c.Assert(err, test.IsNil)
+	c.Assert(rows.Next(), test.Equals, false)
 }
