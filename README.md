@@ -157,6 +157,10 @@ for rows.Next() {
 }
 ```
 
+## Examples
+
+View other examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).
+
 ## License
 
 Copyright 2013 Daniel Cannon
