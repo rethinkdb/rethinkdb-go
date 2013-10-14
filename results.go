@@ -8,7 +8,6 @@ import (
 type ResultRow struct {
 	err     error
 	rows    *ResultRows
-	fetched bool
 }
 
 // Scan copies the result from the matched row into the value pointed at by dest.
@@ -22,19 +21,7 @@ func (r *ResultRow) Scan(dest interface{}) error {
 		return r.err
 	}
 
-	if !r.fetched {
-		r.fetched = true
-		defer r.rows.Close()
-		if !r.rows.Next() {
-			return RqlDriverError{"No rows in the result set"}
-		}
-	}
-	err := r.rows.Scan(dest)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return r.rows.Scan(dest)
 }
 
 // Tests if the result is nil.
@@ -43,15 +30,6 @@ func (r *ResultRow) IsNil() bool {
 	if r.err != nil {
 		return true
 	}
-
-	if !r.fetched {
-		r.fetched = true
-		defer r.rows.Close()
-		if !r.rows.Next() {
-			return true
-		}
-	}
-
 	return r.rows.IsNil()
 }
 

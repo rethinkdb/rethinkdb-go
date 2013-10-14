@@ -12,7 +12,10 @@ func (s *RethinkSuite) TestTableCreate(c *test.C) {
 	// Test database creation
 	query := Db("test").TableCreate("test")
 
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -28,7 +31,10 @@ func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
 		"primary_key", "it",
 	)
 
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -44,7 +50,10 @@ func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
 		"durability", "soft",
 	)
 
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -61,7 +70,10 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 		"durability", "soft",
 	)
 
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -76,7 +88,10 @@ func (s *RethinkSuite) TestTableList(c *test.C) {
 
 	// Try and find it in the list
 	success := false
-	err := Db("test").TableList().RunRow(sess).Scan(&response)
+	row, err := Db("test").TableList().RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	row.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
@@ -98,7 +113,10 @@ func (s *RethinkSuite) TestTableDelete(c *test.C) {
 	// Test database creation
 	query := Db("test").TableDrop("test")
 
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
@@ -113,7 +131,10 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 	// Test database creation
 	query := Db("test").Table("test").IndexCreate("test")
 
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -127,7 +148,10 @@ func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 
 	// Try and find it in the list
 	success := false
-	err := Db("test").Table("test").IndexList().RunRow(sess).Scan(&response)
+	row, err := Db("test").Table("test").IndexList().RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = row.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
@@ -150,7 +174,10 @@ func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 	// Test database creation
 	query := Db("test").Table("test").IndexDrop("test")
 
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
