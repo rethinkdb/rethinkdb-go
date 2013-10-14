@@ -115,9 +115,15 @@ func (t RqlTerm) Run(s *Session, args ...interface{}) (*ResultRows, error) {
 // This function should be used if your query only returns a single row.
 // RunRow takes the optional arguments "db", "use_outdated", "noreply" and
 // "time_format".
-func (t RqlTerm) RunRow(s *Session, args ...interface{}) *ResultRow {
+func (t RqlTerm) RunRow(s *Session, args ...interface{}) (*ResultRow, error) {
 	rows, err := t.Run(s, args...)
-	return &ResultRow{rows: rows, err: err}
+	if err == nil {
+		defer rows.Close()
+		if !rows.Next() {
+			err = RqlDriverError{"No rows in the result set"}
+		}
+	}
+	return &ResultRow{rows: rows, err: err}, err
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
@@ -126,8 +132,10 @@ func (t RqlTerm) RunRow(s *Session, args ...interface{}) *ResultRow {
 // RunWrite takes the optional arguments "db", "use_outdated","noreply" and "time_format".
 func (t RqlTerm) RunWrite(s *Session, args ...interface{}) (WriteResponse, error) {
 	var response WriteResponse
-	row := t.RunRow(s, args...)
-	err := row.Scan(&response)
+	row, err := t.RunRow(s, args...)
+	if err == nil {
+		err = row.Scan(&response)
+	}
 	return response, err
 }
 

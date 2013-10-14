@@ -7,7 +7,10 @@ import (
 func (s *RethinkSuite) TestQueryRun(c *test.C) {
 	var response string
 
-	err := Expr("Test").RunRow(sess).Scan(&response)
+	row, err := Expr("Test").RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = row.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, "Test")
@@ -16,7 +19,10 @@ func (s *RethinkSuite) TestQueryRun(c *test.C) {
 func (s *RethinkSuite) TestQueryRunRawTime(c *test.C) {
 	var response map[string]interface{}
 
-	err := Now().RunRow(sess, "time_format", "raw").Scan(&response)
+	row, err := Now().RunRow(sess, "time_format", "raw")
+	c.Assert(err, test.IsNil)
+
+	err = row.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response["$reql_type$"], test.NotNil)
