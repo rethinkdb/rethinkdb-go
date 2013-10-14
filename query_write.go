@@ -9,6 +9,9 @@ import (
 // 'hard' or 'soft', to override the table or query's default durability setting,
 // or the optional argument return_vals, which will return the value of the row
 // you're inserting (and the old value if you use upsert) when set to true.
+//
+//	table.Insert(map[string]interface{}{"name": "Joe", "email": "joe@example.com"}).RunWrite(sess)
+//	table.Insert([]interface{}{map[string]interface{}{"name": "Joe"}, map[string]interface{}{"name": "Paul"}}).RunWrite(sess)
 func (t RqlTerm) Insert(arg interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"durability", "return_vals", "cache_size", "upsert"}, optArgs)
 	return newRqlTermFromPrevVal(t, "Insert", p.Term_INSERT, []interface{}{funcWrap(arg)}, optArgM)

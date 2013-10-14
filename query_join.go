@@ -6,9 +6,9 @@ import (
 
 // Returns the inner product of two sequences (e.g. a table, a filter result)
 // filtered by the predicate. The query compares each row of the left sequence
-//  with each row of the right sequence to find all pairs of rows which satisfy
-//   the predicate. When the predicate is satisfied, each matched pair of rows
-//   of both sequences are combined into a result row.
+// with each row of the right sequence to find all pairs of rows which satisfy
+// the predicate. When the predicate is satisfied, each matched pair of rows
+// of both sequences are combined into a result row.
 func (t RqlTerm) InnerJoin(other, predicate interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "InnerJoin", p.Term_INNER_JOIN, []interface{}{other, predicate}, map[string]interface{}{})
 }
@@ -20,6 +20,8 @@ func (t RqlTerm) OuterJoin(other, predicate interface{}) RqlTerm {
 }
 
 // An efficient join that looks up elements in the right table by primary key.
+//
+// Optional arguments: "index" (string - name of the index to use in right table instead of the primary key)
 func (t RqlTerm) EqJoin(left, right interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"index"}, optArgs)
 	return newRqlTermFromPrevVal(t, "EqJoin", p.Term_EQ_JOIN, []interface{}{left, right}, optArgM)

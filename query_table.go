@@ -7,9 +7,17 @@ import (
 // Create a table. A RethinkDB table is a collection of JSON documents.
 //
 // If successful, the operation returns an object: {created: 1}. If a table with
-//  the same name already exists, the operation throws RqlRuntimeError.
+// the same name already exists, the operation throws RqlRuntimeError.
+//
 // Note: that you can only use alphanumeric characters and underscores for the
 // table name.
+//
+// Optional arguments (see http://www.rethinkdb.com/api/#js:manipulating_tables-table_create for more details):
+// "primary_key" (string, defaults to "id"),
+// "durability" ("soft" or "hard"),
+// "cache_size" and "datacenter"
+//
+// r.Database("database").TableCreate("table", "durability", "soft").Run(sess)
 func (t RqlTerm) TableCreate(name interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"primary_key", "durability", "cache_size", "datacenter"}, optArgs)
 	return newRqlTermFromPrevVal(t, "TableCreate", p.Term_TABLE_CREATE, []interface{}{name}, optArgM)
