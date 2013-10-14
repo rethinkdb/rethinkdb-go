@@ -20,6 +20,9 @@ func EpochTime(epochtime interface{}) RqlTerm {
 }
 
 // Returns a time object based on an ISO8601 formatted date-time string
+//
+// Optional arguments (see http://www.rethinkdb.com/api/#js:dates_and_times-iso8601 for more information):
+// "default_timezone" (string)
 func ISO8601(date interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"default_timezone"}, optArgs)
 	return newRqlTerm("ISO8601", p.Term_ISO8601, []interface{}{date}, optArgM)
@@ -40,6 +43,9 @@ func (t RqlTerm) Timezone() RqlTerm {
 
 // Returns true if a time is between two other times
 // (by default, inclusive for the start, exclusive for the end).
+//
+// Optional arguments (see http://www.rethinkdb.com/api/#js:dates_and_times-during for more information):
+// "left_bound" and "right_bound" ("open" for exclusive or "closed" for inclusive)
 func (t RqlTerm) During(startTime, endTime interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"left_bound", "right_bound"}, optArgs)
 	return newRqlTermFromPrevVal(t, "During", p.Term_DURING, []interface{}{startTime, endTime}, optArgM)

@@ -9,6 +9,7 @@ import (
 //
 // If successful, the operation returns an object: {created: 1}. If a database
 // with the same name already exists the operation throws RqlRuntimeError.
+//
 // Note: that you can only use alphanumeric characters and underscores for the database name.
 func DbCreate(name interface{}) RqlTerm {
 	return newRqlTerm("DbCreate", p.Term_DB_CREATE, []interface{}{name}, map[string]interface{}{})

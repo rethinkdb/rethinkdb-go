@@ -11,6 +11,9 @@ func Db(name interface{}) RqlTerm {
 
 // Select all documents in a table. This command can be chained with other
 // commands to do further processing on the data.
+//
+// Optional arguments (see http://www.rethinkdb.com/api/#js:selecting_data-table for more information):
+// "use_outdated" (boolean - defaults to false)
 func Table(name interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"use_outdated"}, optArgs)
 	return newRqlTerm("Table", p.Term_TABLE, []interface{}{name}, optArgM)
@@ -18,6 +21,9 @@ func Table(name interface{}, optArgs ...interface{}) RqlTerm {
 
 // Select all documents in a table. This command can be chained with other
 // commands to do further processing on the data.
+//
+// Optional arguments (see http://www.rethinkdb.com/api/#js:selecting_data-table for more information):
+// "use_outdated" (boolean - defaults to false)
 func (t RqlTerm) Table(name interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"use_outdated"}, optArgs)
 	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, []interface{}{name}, optArgM)
@@ -52,7 +58,7 @@ func (t RqlTerm) Between(lowerKey, upperKey interface{}, optArgs ...interface{})
 
 // Get all the documents for which the given predicate is true.
 //
-// filter can be called on a sequence, selection, or a field containing an array
+// Filter can be called on a sequence, selection, or a field containing an array
 // of elements. The return type is the same as the type on which the function was
 // called on. The body of every filter is wrapped in an implicit `.default(false)`,
 // and the default value can be changed by passing the optional argument `default`.

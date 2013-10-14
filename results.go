@@ -5,9 +5,10 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+// ResultRow contains the result of a RunRow query
 type ResultRow struct {
-	err     error
-	rows    *ResultRows
+	err  error
+	rows *ResultRows
 }
 
 // Scan copies the result from the matched row into the value pointed at by dest.

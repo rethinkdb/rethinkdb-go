@@ -135,7 +135,10 @@ Both ResultRows and ResultRow have the function `Scan` which is used to bind a r
 Example:
 
 ```go
-row := Table("tablename").Get(key).RunRow(conn)
+row, err := Table("tablename").Get(key).RunRow(conn)
+if err != nil {
+	// error
+}
 // Check if something was found
 if !row.IsNil() {
 	var response interface{}
@@ -148,7 +151,10 @@ ResultRows also has the function `Next` which is used to iterate through a resul
 Example:
 
 ```go
-rows := Table("tablename").Run(conn)
+rows, err := Table("tablename").Run(conn)
+if err != nil {
+	// error
+}
 for rows.Next() {
     var row interface{}
     err := r.Scan(&row)
