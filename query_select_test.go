@@ -15,7 +15,10 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").Get(6)
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -79,7 +82,10 @@ func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").GetAllByIndex("num", 15).OrderBy("id")
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -97,7 +103,10 @@ func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table2").GetAllByIndex("num", 15).OrderBy("id")
-	err := query.RunRow(sess).Scan(&response)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
