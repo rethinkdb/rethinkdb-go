@@ -27,6 +27,10 @@ func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {
 //
 // OrderBy defaults to ascending ordering. To explicitly specify the ordering,
 // wrap the attribute with either Asc or Desc.
+//
+//	query.OrderBy("name")
+//	query.OrderBy(Asc("name"))
+//	query.OrderBy(Desc("name"))
 func (t RqlTerm) OrderBy(args ...interface{}) RqlTerm {
 	for k, arg := range args {
 		if t, ok := arg.(RqlTerm); !(ok && (t.termType == p.Term_DESC || t.termType == p.Term_ASC)) {

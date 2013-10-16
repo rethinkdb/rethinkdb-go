@@ -73,12 +73,12 @@ func newSession(args map[string]interface{}) *Session {
 //
 // Basic connection example:
 //
-// var session *r.Session
-// session, err := r.Connect(map[string]interface{}{
-//        	"address":  "localhost:28015",
-//       	"database": "test",
-//        	"authkey":  "14daak1cad13dj",
-//    })
+//	var session *r.Session
+//	session, err := r.Connect(map[string]interface{}{
+//		"address":  "localhost:28015",
+//		"database": "test",
+//		"authkey":  "14daak1cad13dj",
+//	})
 func Connect(args map[string]interface{}) (*Session, error) {
 	s := newSession(args)
 	err := s.Reconnect()

@@ -104,8 +104,20 @@ type WriteResponse struct {
 	OldValue      interface{} `gorethink:"old_val"`
 }
 
-// Run runs a query using the given connection. Run takes the optional arguments
-// "use_outdated", "noreply" and "time_format".
+// Run runs a query using the given connection.
+//
+// Optional arguments :
+// "db", "use_outdated" (defaults to false), "noreply" (defaults to false) and "time_format".
+//
+//	rows, err := query.Run(sess)
+//	if err != nil {
+//		// error
+//	}
+//	for rows.Next() {
+//		doc := MyDocumentType{}
+//		err := r.Scan(&doc)
+//		    // Do something with row
+//	}
 func (t RqlTerm) Run(s *Session, args ...interface{}) (*ResultRows, error) {
 	argm := optArgsToMap([]string{"db", "use_outdated", "noreply", "time_format"}, args)
 	return s.startQuery(t, argm)
@@ -113,8 +125,18 @@ func (t RqlTerm) Run(s *Session, args ...interface{}) (*ResultRows, error) {
 
 // Run runs a query using the given connection but unlike Run returns ResultRow.
 // This function should be used if your query only returns a single row.
-// RunRow takes the optional arguments "db", "use_outdated", "noreply" and
-// "time_format".
+//
+// Optional arguments :
+// "db", "use_outdated" (defaults to false), "noreply" (defaults to false) and "time_format".
+//
+//	row, err := query.RunRow(sess, "use_outdated", true)
+//	if err != nil {
+//		// error
+//	}
+//	if row.IsNil() {
+//		// nothing was found
+//	}
+//	err = row.Scan(&doc)
 func (t RqlTerm) RunRow(s *Session, args ...interface{}) (*ResultRow, error) {
 	rows, err := t.Run(s, args...)
 	if err == nil {
@@ -129,7 +151,11 @@ func (t RqlTerm) RunRow(s *Session, args ...interface{}) (*ResultRow, error) {
 // RunWrite runs a query using the given connection but unlike Run automatically
 // scans the result into a variable of type WriteResponse. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
-// RunWrite takes the optional arguments "db", "use_outdated","noreply" and "time_format".
+//
+// Optional arguments :
+// "db", "use_outdated" (defaults to false), "noreply" (defaults to false) and "time_format".
+//
+//	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess, "noreply", true)
 func (t RqlTerm) RunWrite(s *Session, args ...interface{}) (WriteResponse, error) {
 	var response WriteResponse
 	row, err := t.RunRow(s, args...)
@@ -140,8 +166,10 @@ func (t RqlTerm) RunWrite(s *Session, args ...interface{}) (WriteResponse, error
 }
 
 // Exec runs the query but does not return the result (It also automatically sets
-// the noreply option). RunRow takes the optional arguments "db", "use_outdated"
-// and "time_format".
+// the noreply option).
+//
+// Optional arguments :
+// "db", "use_outdated" (defaults to false) and "time_format".
 func (t RqlTerm) Exec(s *Session, args ...interface{}) error {
 	// Ensure that noreply is set to true
 	args = append(args, "noreply")
