@@ -173,17 +173,35 @@ func (r *ResultRows) Scan(dest interface{}) error {
 
 // ScanAll copies all the rows in the result buffer into the value pointed at by
 // dest.
-func (r *ResultRows) ScanAll(dest []interface{}) error {
-	for r.Next() {
-		elem := reflect.New(reflect.TypeOf(dest).Elem())
+func (r *ResultRows) ScanAll(dest interface{}) error {
 
-		err := r.Scan(&elem)
+	// Validate the data types
+	pval := reflect.ValueOf(dest)
+	if pval.Kind() != reflect.Ptr {
+		return RqlDriverError{"ScanAll must be passed a pointer"}
+	}
+
+	val := pval.Elem()
+	if val.Kind() != reflect.Slice {
+		return RqlDriverError{"ScanAll must be passed a pointer to a slice"}
+	}
+
+	elems := reflect.MakeSlice(val.Type(), 0, 0)
+
+	// Iterate through each row in the buffer and scan into an element of the slice
+	for r.Next() {
+		elem := reflect.New(val.Type().Elem())
+
+		err := r.Scan(elem.Interface())
 		if err != nil {
 			return err
 		}
 
-		dest = append(dest, elem)
+		elems = reflect.Append(elems, elem.Elem())
 	}
+
+	// Copy the value from the temporary slice to the destination
+	val.Set(elems)
 
 	return nil
 }
