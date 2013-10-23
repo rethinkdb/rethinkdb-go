@@ -34,11 +34,12 @@ func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
 	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
-	var response interface{}
+	var response []interface{}
 	query := Db("test").Table("Table1").GetAll(6).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	response, err = rows.All()
+
+	err = rows.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -56,11 +57,12 @@ func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
 	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
-	var response interface{}
+	var response []interface{}
 	query := Db("test").Table("Table1").GetAll(1, 2, 3).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	response, err = rows.All()
+
+	err = rows.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -121,11 +123,12 @@ func (s *RethinkSuite) TestSelectBetween(c *test.C) {
 	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
-	var response interface{}
+	var response []interface{}
 	query := Db("test").Table("Table1").Between(1, 3).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	response, err = rows.All()
+
+	err = rows.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -144,11 +147,12 @@ func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 	Db("test").Table("Table2").Insert(objList).Exec(sess)
 
 	// Test query
-	var response interface{}
+	var response []interface{}
 	query := Db("test").Table("Table2").Between(10, 50, "index", "num").OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	response, err = rows.All()
+
+	err = rows.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -168,14 +172,15 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 	Db("test").Table("Table2").Insert(objList).Exec(sess)
 
 	// Test query
-	var response interface{}
+	var response []interface{}
 	query := Db("test").Table("Table2").Between(10, 50,
 		"index", "num",
 		"right_bound", "closed",
 	).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	response, err = rows.All()
+
+	err = rows.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -195,11 +200,12 @@ func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
 	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
-	var response interface{}
+	var response []interface{}
 	query := Db("test").Table("Table1").Filter(Row.Field("num").Ge(50)).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	response, err = rows.All()
+
+	err = rows.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -217,13 +223,14 @@ func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 	Db("test").Table("Table1").Insert(objList).Exec(sess)
 
 	// Test query
-	var response interface{}
+	var response []interface{}
 	query := Db("test").Table("Table1").Filter(func(row RqlTerm) RqlTerm {
 		return row.Field("num").Ge(50)
 	}).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	response, err = rows.All()
+
+	err = rows.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{

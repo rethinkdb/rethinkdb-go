@@ -214,22 +214,3 @@ func (r *ResultRows) IsNil() bool {
 
 	return (r.current.GetType() == p.Datum_R_NULL)
 }
-
-// All is a helper method for returning a slice containing all rows. The slice
-// is of type []interface{}.
-func (r *ResultRows) All() ([]interface{}, error) {
-	rows := []interface{}{}
-
-	for r.Next() {
-		var row interface{}
-
-		err := r.Scan(&row)
-		if err != nil {
-			return rows, err
-		}
-
-		rows = append(rows, row)
-	}
-
-	return rows, nil
-}
