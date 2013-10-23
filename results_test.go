@@ -157,3 +157,47 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(rows.Next(), test.Equals, false)
 }
+
+func (s *RethinkSuite) TestRowsScanAll(c *test.C) {
+	rows := Expr([]interface{}{
+		map[string]interface{}{
+			"id":   2,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		},
+		map[string]interface{}{
+			"id":   2,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		},
+	}).RunRow(sess)
+
+	var response []object
+	err := rows.Scan(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.HasLen, 2)
+	c.Assert(response, test.DeepEquals, []object{
+		object{
+			Id:   2,
+			Name: "Object 1",
+			Attrs: []attr{attr{
+				Name:  "attr 1",
+				Value: "value 1",
+			}},
+		},
+		object{
+			Id:   2,
+			Name: "Object 1",
+			Attrs: []attr{attr{
+				Name:  "attr 1",
+				Value: "value 1",
+			}},
+		},
+	})
+}

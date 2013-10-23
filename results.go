@@ -3,6 +3,7 @@ package gorethink
 import (
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
+	"reflect"
 )
 
 // ResultRow contains the result of a RunRow query
@@ -142,7 +143,7 @@ func (r *ResultRows) advance() bool {
 
 // Scan copies the result in the current row into the value pointed at by dest.
 //
-// If an argument as type *interface{}, Scan copies the value provided by the
+// If an argument is of type *interface{}, Scan copies the value provided by the
 // database without conversion.
 //
 // If the value is a struct then Scan traverses
@@ -165,6 +166,23 @@ func (r *ResultRows) Scan(dest interface{}) error {
 	err = encoding.Decode(dest, data)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ScanAll copies all the rows in the result buffer into the value pointed at by
+// dest.
+func (r *ResultRows) ScanAll(dest []interface{}) error {
+	for r.Next() {
+		elem := reflect.New(reflect.TypeOf(dest).Elem())
+
+		err := r.Scan(&elem)
+		if err != nil {
+			return err
+		}
+
+		dest = append(dest, elem)
 	}
 
 	return nil
