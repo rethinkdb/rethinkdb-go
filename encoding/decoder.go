@@ -64,7 +64,7 @@ func decode(s *decodeState, dv, sv reflect.Value) {
 		case reflect.Map:
 			decodeObject(s, dv, sv)
 		case reflect.Struct:
-			dv = indirect(dv)
+			dv = indirect(dv, false)
 			dv.Set(sv)
 		}
 	}
@@ -73,7 +73,7 @@ func decode(s *decodeState, dv, sv reflect.Value) {
 // decodeLiteral decodes the source value into the destination value. This function
 // is used to decode literal values.
 func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
-	dv = indirect(dv)
+	dv = indirect(dv, true)
 
 	// Special case for if sv is nil:
 	switch sv.Kind() {
@@ -225,7 +225,7 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 // decodeArray decodes the source value into the destination value. This function
 // is used when the source value is a slice or array.
 func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
-	dv = indirect(dv)
+	dv = indirect(dv, false)
 	dt := dv.Type()
 
 	// Ensure that the dest is also a slice or array
@@ -299,7 +299,7 @@ func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 // decodeObject decodes the source value into the destination value. This function
 // is used when the source value is a map or struct.
 func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error) {
-	dv = indirect(dv)
+	dv = indirect(dv, false)
 	dt := dv.Type()
 
 	// Decoding into nil interface?  Switch to non-reflect code.
@@ -424,7 +424,7 @@ func decodeLiteralInterface(s *decodeState, sv reflect.Value) interface{} {
 
 // indirect walks down v allocating pointers as needed,
 // until it gets to a non-pointer.
-func indirect(v reflect.Value) reflect.Value {
+func indirect(v reflect.Value, decodeNull bool) reflect.Value {
 	// If v is a named type and is addressable,
 	// start with its address, so that if the type has pointer methods,
 	// we find them.
@@ -436,7 +436,7 @@ func indirect(v reflect.Value) reflect.Value {
 		// usefully addressable.
 		if v.Kind() == reflect.Interface && !v.IsNil() {
 			e := v.Elem()
-			if e.Kind() == reflect.Ptr && !e.IsNil() && e.Elem().Kind() == reflect.Ptr {
+			if e.Kind() == reflect.Ptr && !e.IsNil() && (!decodeNull || e.Elem().Kind() == reflect.Ptr) {
 				v = e
 				continue
 			}
