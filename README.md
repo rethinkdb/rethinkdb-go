@@ -73,7 +73,7 @@ A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) in
 
 ## Query Functions
 
-This library is based on the official drivers so the code on the [API](www.rethinkdb.com/api/) page should require very few changes to work.
+This library is based on the official drivers so the code on the [API](http://www.rethinkdb.com/api/) page should require very few changes to work.
 
 To view full documentation for the query functions check the [GoDoc](http://godoc.org/github.com/dancannon/gorethink#RqlTerm)
 
