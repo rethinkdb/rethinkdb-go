@@ -17,7 +17,7 @@ import (
 // "durability" ("soft" or "hard"),
 // "cache_size" and "datacenter"
 //
-// r.Database("database").TableCreate("table", "durability", "soft").Run(sess)
+// r.Db("database").TableCreate("table", "durability", "soft").Run(sess)
 func (t RqlTerm) TableCreate(name interface{}, optArgs ...interface{}) RqlTerm {
 	optArgM := optArgsToMap([]string{"primary_key", "durability", "cache_size", "datacenter"}, optArgs)
 	return newRqlTermFromPrevVal(t, "TableCreate", p.Term_TABLE_CREATE, []interface{}{name}, optArgM)
