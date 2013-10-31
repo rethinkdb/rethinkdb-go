@@ -98,6 +98,7 @@ type WriteResponse struct {
 	Unchanged     int
 	Replaced      int
 	Deleted       int
+	Created       int
 	GeneratedKeys []string    `gorethink:"generated_keys"`
 	FirstError    string      `gorethink:"first_error"` // populated if Errors > 0
 	NewValue      interface{} `gorethink:"new_val"`
