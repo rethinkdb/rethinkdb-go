@@ -92,8 +92,9 @@ func (t RqlTerm) String() string {
 }
 
 type WriteResponse struct {
-	Inserted      int
 	Errors        int
+	Created       int
+	Inserted      int
 	Updated       int
 	Unchanged     int
 	Replaced      int
