@@ -60,7 +60,6 @@ session, err := r.Connect(map[string]interface{}{
         "address":  "localhost:28015",
         "database": "test",
         "maxIdle": 10,
-        "maxActive": 30,
         "idleTimeout": time.Second * 10,
     })
 

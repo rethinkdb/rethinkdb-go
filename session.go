@@ -53,7 +53,7 @@ func newSession(args map[string]interface{}) *Session {
 	if maxActive, ok := args["maxActive"]; ok {
 		s.maxActive = maxActive.(int)
 	} else {
-		s.maxActive = 1
+		s.maxActive = 0
 	}
 	if idleTimeout, ok := args["idleTimeout"]; ok {
 		s.idleTimeout = idleTimeout.(time.Duration)
