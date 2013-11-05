@@ -37,14 +37,16 @@ func (t RqlTerm) TableList() RqlTerm {
 }
 
 // Create a new secondary index on this table.
-func (t RqlTerm) IndexCreate(name interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name}, map[string]interface{}{})
+func (t RqlTerm) IndexCreate(name interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"multi"}, optArgs)
+	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name}, optArgM)
 }
 
 // Create a new secondary index on this table based on the value of the function
 // passed.
-func (t RqlTerm) IndexCreateFunc(name, f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name, funcWrap(f)}, map[string]interface{}{})
+func (t RqlTerm) IndexCreateFunc(name, f interface{}, optArgs ...interface{}) RqlTerm {
+	optArgM := optArgsToMap([]string{"multi"}, optArgs)
+	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name, funcWrap(f)}, optArgM)
 }
 
 // Delete a previously created secondary index of this table.

@@ -129,7 +129,7 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 	Db("test").Table("test").IndexDrop("test").Exec(sess)
 
 	// Test database creation
-	query := Db("test").Table("test").IndexCreate("test")
+	query := Db("test").Table("test").IndexCreate("test", "multi", true)
 
 	r, err := query.RunRow(sess)
 	c.Assert(err, test.IsNil)
