@@ -32,13 +32,23 @@ func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {
 //	query.OrderBy(Asc("name"))
 //	query.OrderBy(Desc("name"))
 func (t RqlTerm) OrderBy(args ...interface{}) RqlTerm {
+	var opts map[string]interface{} = map[string]interface{}{}
+
+	// Look for options map
+	if len(args) > 0 {
+		if possibleOpts, ok := args[len(args)-1].(map[string]interface{}); ok {
+			opts = possibleOpts
+			args = args[:len(args)-1]
+		}
+	}
+
 	for k, arg := range args {
 		if t, ok := arg.(RqlTerm); !(ok && (t.termType == p.Term_DESC || t.termType == p.Term_ASC)) {
 			args[k] = funcWrap(arg)
 		}
 	}
 
-	return newRqlTermFromPrevVal(t, "OrderBy", p.Term_ORDERBY, args, map[string]interface{}{})
+	return newRqlTermFromPrevVal(t, "OrderBy", p.Term_ORDERBY, args, opts)
 }
 
 func Desc(arg interface{}) RqlTerm {
