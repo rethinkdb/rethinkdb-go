@@ -4,6 +4,18 @@ import (
 	test "launchpad.net/gocheck"
 )
 
+func (s *RethinkSuite) TestControlExecNil(c *test.C) {
+	var response interface{}
+	query := Expr(nil)
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, nil)
+}
+
 func (s *RethinkSuite) TestControlExecSimple(c *test.C) {
 	var response int
 	query := Expr(1)

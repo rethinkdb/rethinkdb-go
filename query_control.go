@@ -23,6 +23,13 @@ func expr(value interface{}, depth int) RqlTerm {
 		panic("Maximum nesting depth limit exceeded")
 	}
 
+	if value == nil {
+		return RqlTerm{
+			termType: p.Term_DATUM,
+			data:     nil,
+		}
+	}
+
 	switch val := value.(type) {
 	case RqlTerm:
 		return val
