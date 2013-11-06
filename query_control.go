@@ -52,6 +52,7 @@ func expr(value interface{}, depth int) RqlTerm {
 	default:
 		// Use reflection to check for other types
 		typ := reflect.TypeOf(val)
+		rval := reflect.ValueOf(val)
 
 		if typ.Kind() == reflect.Ptr || typ.Kind() == reflect.Interface {
 			v := reflect.ValueOf(val)
@@ -83,33 +84,17 @@ func expr(value interface{}, depth int) RqlTerm {
 			return expr(data, depth-1)
 		}
 		if typ.Kind() == reflect.Slice {
-			data, err := encoding.Encode(val)
-			if err != nil || data == nil {
-				return RqlTerm{
-					termType: p.Term_DATUM,
-					data:     nil,
-				}
-			}
-
 			vals := []RqlTerm{}
-			for _, v := range data.([]interface{}) {
-				vals = append(vals, expr(v, depth))
+			for i := 0; i < rval.Len(); i++ {
+				vals = append(vals, expr(rval.Index(i).Interface(), depth))
 			}
 
 			return makeArray(vals)
 		}
 		if typ.Kind() == reflect.Map {
-			data, err := encoding.Encode(val)
-			if err != nil || data == nil {
-				return RqlTerm{
-					termType: p.Term_DATUM,
-					data:     nil,
-				}
-			}
-
 			vals := map[string]RqlTerm{}
-			for k, v := range data.(map[string]interface{}) {
-				vals[k] = expr(v, depth)
+			for _, k := range rval.MapKeys() {
+				vals[k.String()] = expr(rval.MapIndex(k).Interface(), depth)
 			}
 
 			return makeObject(vals)

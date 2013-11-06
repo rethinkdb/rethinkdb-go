@@ -16,7 +16,7 @@ func Literal(args ...interface{}) RqlTerm {
 // Get a single field from an object. If called on a sequence, gets that field
 // from every object in the sequence, skipping objects that lack it.
 func (t RqlTerm) Field(field interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "(...)", p.Term_GET_FIELD, []interface{}{field}, map[string]interface{}{})
+	return newRqlTermFromPrevVal(t, "Field", p.Term_GET_FIELD, []interface{}{field}, map[string]interface{}{})
 }
 
 // Test if an object has all of the specified fields. An object has a field if
