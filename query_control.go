@@ -83,7 +83,7 @@ func expr(value interface{}, depth int) RqlTerm {
 
 			return expr(data, depth-1)
 		}
-		if typ.Kind() == reflect.Slice {
+		if typ.Kind() == reflect.Slice || typ.Kind() == reflect.Array {
 			vals := []RqlTerm{}
 			for i := 0; i < rval.Len(); i++ {
 				vals = append(vals, expr(rval.Index(i).Interface(), depth))

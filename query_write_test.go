@@ -65,6 +65,17 @@ func (s *RethinkSuite) TestWriteUpdate(c *test.C) {
 	c.Assert(err, test.IsNil)
 }
 
+func (s *RethinkSuite) TestWriteUpdateArray(c *test.C) {
+	query := Db("test").Table("test").Insert(map[string]interface{}{"num": [2]int{1, 2}})
+	_, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	// Update the first row in the table
+	query = Db("test").Table("test").Sample(1).Update(map[string]interface{}{"num": 2})
+	_, err = query.Run(sess)
+	c.Assert(err, test.IsNil)
+}
+
 func (s *RethinkSuite) TestWriteReplace(c *test.C) {
 	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
 	_, err := query.Run(sess)
