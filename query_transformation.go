@@ -24,6 +24,9 @@ func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {
 }
 
 // Sort the sequence by document values of the given key(s).
+// To specify the index to use for ordering us a last argument in the following form:
+//
+//	map[string]interface{}{"index": "index-name"}
 //
 // OrderBy defaults to ascending ordering. To explicitly specify the ordering,
 // wrap the attribute with either Asc or Desc.
@@ -32,7 +35,7 @@ func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {
 //	query.OrderBy(Asc("name"))
 //	query.OrderBy(Desc("name"))
 func (t RqlTerm) OrderBy(args ...interface{}) RqlTerm {
-	var opts map[string]interface{} = map[string]interface{}{}
+	var opts = map[string]interface{}{}
 
 	// Look for options map
 	if len(args) > 0 {
