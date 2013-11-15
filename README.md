@@ -162,6 +162,31 @@ for rows.Next() {
 }
 ```
 
+## Encoding/Decoding Structs
+When passing structs to Expr(And functions that use Expr such as Insert, Update) the structs are encoded into a map before being sent to the server. Each exported field is added to the map unless
+
+  - the field's tag is "-", or
+  - the field is empty and its tag specifies the "omitempty" option.
+
+Each fields default name in the map is the field name but can be specified in the struct field's tag value. The "gorethink" key in
+the struct field's tag value is the key name, followed by an optional comma
+and options. Examples:
+
+```go
+// Field is ignored by this package.
+Field int `gorethink:"-"`
+// Field appears as key "myName".
+Field int `gorethink:"myName"`
+// Field appears as key "myName" and
+// the field is omitted from the object if its value is empty,
+// as defined above.
+Field int `gorethink:"myName,omitempty"`
+// Field appears as key "Field" (the default), but
+// the field is skipped if empty.
+// Note the leading comma.
+Field int `gorethink:",omitempty"`
+```
+
 ## Examples
 
 View other examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).
