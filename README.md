@@ -100,24 +100,16 @@ r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(r.Row.Add(1)).Run(conn)
 ```
 Between (Optional Args) Example
 ```go
-r.Db("database").Table("table").Between(1, 10,
-        "index", "num",
-        "right_bound", "closed",
-    ).Run(conn)
+r.Db("database").Table("table").Between(1, 10, r.BetweenOpts{
+    Index: "num",
+    RightBound: "closed",
+}).Run(conn)
 ```
 
 
 ### Optional Arguments
 
-As shown above in the Between example optional arguments are passed to the function as extra parameters. The parameters must be in the format:
-
-```go
-Function(arg1, arg2, arg3, ...
-    optArg1Key, optArg1Value,
-    optArg2Key, optArg2Value,
-    ...
-)
-```
+As shown above in the Between example optional arguments are passed to the function as a struct. Each function that has optional arguments as a related struct. This structs are named in the format FunctionNameOpts, for example BetweenOpts is the related struct for Between.
 
 ## Results
 
