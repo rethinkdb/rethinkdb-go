@@ -37,3 +37,7 @@ type RqlDriverError struct {
 func (e RqlDriverError) Error() string {
 	return fmt.Sprintf("gorethink: %s", e.message)
 }
+
+func (e RqlDriverError) String() string {
+	return fmt.Sprintf("gorethink: %s", e.message)
+}

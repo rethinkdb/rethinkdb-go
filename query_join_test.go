@@ -117,7 +117,10 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 	// Ensure table + database exist
 	DbCreate("test").Exec(sess)
 	Db("test").TableCreate("Join1").Exec(sess)
-	Db("test").TableCreate("Join3", "primary_key", "it").Exec(sess)
+	err := Db("test").TableCreate("Join3", TableCreateOpts{
+		PrimaryKey: "it",
+	}).Exec(sess)
+	c.Assert(err, test.IsNil)
 	Db("test").Table("Join3").IndexCreate("it").Exec(sess)
 
 	// Insert rows
@@ -128,7 +131,9 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join3"), "index", "it").Zip()
+	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join3"), EqJoinOpts{
+		Index: "it",
+	}).Zip()
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
