@@ -209,7 +209,7 @@ func (r *ResultRows) ScanAll(dest interface{}) error {
 // Tests if the current row is nil.
 func (r *ResultRows) IsNil() bool {
 	if r.current == nil {
-		return false
+		return true
 	}
 
 	return (r.current.GetType() == p.Datum_R_NULL)

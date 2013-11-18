@@ -142,9 +142,7 @@ func (t RqlTerm) RunRow(s *Session, args ...interface{}) (*ResultRow, error) {
 	rows, err := t.Run(s, args...)
 	if err == nil {
 		defer rows.Close()
-		if !rows.Next() {
-			err = RqlDriverError{"No rows in the result set"}
-		}
+		rows.Next()
 	}
 	return &ResultRow{rows: rows, err: err}, err
 }

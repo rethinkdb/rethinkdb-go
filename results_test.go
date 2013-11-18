@@ -156,6 +156,12 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	rows, err = Db("test").Table("test").GetAll("missing value", "another missing value").Run(sess)
 	c.Assert(err, test.IsNil)
 	c.Assert(rows.Next(), test.Equals, false)
+
+	var obj object
+	obj.Name = "missing value"
+	row, err = Db("test").Table("test").Filter(obj).RunRow(sess)
+	c.Assert(err, test.IsNil)
+	c.Assert(row.IsNil(), test.Equals, true)
 }
 
 func (s *RethinkSuite) TestRowsScanAll(c *test.C) {
