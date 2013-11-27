@@ -86,9 +86,17 @@ func Connect(args map[string]interface{}) (*Session, error) {
 	return s, err
 }
 
+type CloseOpts struct {
+	NoReplyWait bool `gorethink:"noreplyWait,omitempty"`
+}
+
+func (o *CloseOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Reconnect closes and re-opens a session.
-func (s *Session) Reconnect() error {
-	if err := s.Close(); err != nil {
+func (s *Session) Reconnect(optArgs ...CloseOpts) error {
+	if err := s.Close(optArgs...); err != nil {
 		return err
 	}
 
@@ -105,9 +113,15 @@ func (s *Session) Reconnect() error {
 }
 
 // Close closes the session
-func (s *Session) Close() error {
+func (s *Session) Close(optArgs ...CloseOpts) error {
 	if s.closed {
 		return nil
+	}
+
+	if len(optArgs) >= 1 {
+		if optArgs[0].NoReplyWait {
+			s.NoReplyWait()
+		}
 	}
 
 	var err error
@@ -117,6 +131,11 @@ func (s *Session) Close() error {
 	s.closed = true
 
 	return err
+}
+
+// Close closes the session
+func (s *Session) NoReplyWait() {
+	s.noreplyWaitQuery()
 }
 
 // Use changes the default database used
@@ -197,7 +216,7 @@ func (s *Session) startQuery(t RqlTerm, opts map[string]interface{}) (*ResultRow
 
 	// Construct query
 	query := &p.Query{
-		// AcceptsRJson:  proto.Bool(true),
+		AcceptsRJson:  proto.Bool(true),
 		Type:          p.Query_START.Enum(),
 		Token:         proto.Int64(token),
 		Query:         pt,
@@ -234,4 +253,17 @@ func (s *Session) stopQuery(q *p.Query, t RqlTerm, opts map[string]interface{}) 
 	defer conn.Close()
 
 	return conn.SendQuery(s, nq, t, opts)
+}
+
+// noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
+func (s *Session) noreplyWaitQuery() (*ResultRows, error) {
+	nq := &p.Query{
+		Type:  p.Query_NOREPLY_WAIT.Enum(),
+		Token: proto.Int64(s.nextToken()),
+	}
+
+	conn := s.pool.Get()
+	defer conn.Close()
+
+	return conn.SendQuery(s, nq, RqlTerm{}, map[string]interface{}{})
 }
