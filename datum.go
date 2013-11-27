@@ -88,6 +88,21 @@ func constructDatum(t RqlTerm) (*p.Term, error) {
 	}
 }
 
+func deconstructDatums(datums []*p.Datum, opts map[string]interface{}) ([]interface{}, error) {
+	res := []interface{}{}
+
+	for _, datum := range datums {
+		value, err := deconstructDatum(datum, opts)
+		if err != nil {
+			return []interface{}{}, err
+		}
+
+		res = append(res, value)
+	}
+
+	return res, nil
+}
+
 // deconstructDatum converts a datum object to an arbitrary type
 func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{}, error) {
 	switch datum.GetType() {
@@ -95,7 +110,7 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 		return nil, nil
 	case p.Datum_R_JSON:
 		var v interface{}
-		err := json.Unmarshal(datum.GetRStr(), &v)
+		err := json.Unmarshal([]byte(datum.GetRStr()), &v)
 
 		return v, err
 	case p.Datum_R_BOOL:

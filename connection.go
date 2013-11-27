@@ -124,13 +124,18 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 	case p.Response_RUNTIME_ERROR:
 		return nil, RqlRuntimeError{rqlResponseError{r, t}}
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
+		value, err := deconstructDatums(r.GetResponse(), opts)
+		if err != nil {
+			return nil, RqlDriverError{err.Error()}
+		}
+
 		return &ResultRows{
 			session:      s,
 			query:        q,
 			term:         t,
 			opts:         opts,
-			buffer:       r.GetResponse(),
-			end:          len(r.GetResponse()),
+			buffer:       value,
+			end:          len(value),
 			token:        q.GetToken(),
 			responseType: r.GetType(),
 		}, nil
@@ -139,11 +144,26 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 			return &ResultRows{}, nil
 		}
 
-		var buffer []*p.Datum
+		var value []interface{}
+		var err error
 		if r.GetResponse()[0].GetType() == p.Datum_R_ARRAY {
-			buffer = r.GetResponse()[0].GetRArray()
+			value, err = deconstructDatums(r.GetResponse()[0].GetRArray(), opts)
+			if err != nil {
+				return nil, RqlDriverError{err.Error()}
+			}
 		} else {
-			buffer = r.GetResponse()
+			var v interface{}
+
+			v, err = deconstructDatum(r.GetResponse()[0], opts)
+			if err != nil {
+				return nil, RqlDriverError{err.Error()}
+			}
+
+			if sv, ok := v.([]interface{}); ok {
+				value = sv
+			} else {
+				value = []interface{}{v}
+			}
 		}
 
 		return &ResultRows{
@@ -151,8 +171,8 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 			query:        q,
 			term:         t,
 			opts:         opts,
-			buffer:       buffer,
-			end:          len(buffer),
+			buffer:       value,
+			end:          len(value),
 			token:        q.GetToken(),
 			responseType: r.GetType(),
 		}, nil

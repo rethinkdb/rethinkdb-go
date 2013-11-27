@@ -42,12 +42,13 @@ type ResultRows struct {
 	query        *p.Query
 	term         RqlTerm
 	opts         map[string]interface{}
-	buffer       []*p.Datum
-	current      *p.Datum
+	buffer       []interface{}
+	current      interface{}
 	start        int
 	end          int
 	token        int64
 	err          error
+	initialized  bool
 	closed       bool
 	responseType p.Response_ResponseType
 }
@@ -75,6 +76,8 @@ func (r *ResultRows) Err() error {
 // to next. If all rows in the buffer have been read and a partial sequence was
 // returned then Next will load more from the database
 func (r *ResultRows) Next() bool {
+	r.initialized = true
+
 	if r.closed {
 		return false
 	}
@@ -154,16 +157,11 @@ func (r *ResultRows) Scan(dest interface{}) error {
 	if r.err != nil {
 		return r.err
 	}
-	if r.current == nil {
+	if r.initialized == false {
 		return RqlDriverError{"Scan called without calling Next"}
 	}
 
-	data, err := deconstructDatum(r.current, r.opts)
-	if err != nil {
-		return err
-	}
-
-	err = encoding.Decode(dest, data)
+	err := encoding.Decode(dest, r.current)
 	if err != nil {
 		return err
 	}
@@ -212,5 +210,5 @@ func (r *ResultRows) IsNil() bool {
 		return true
 	}
 
-	return (r.current.GetType() == p.Datum_R_NULL)
+	return false
 }
