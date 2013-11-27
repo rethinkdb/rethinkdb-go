@@ -1,7 +1,6 @@
 package gorethink
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	test "launchpad.net/gocheck"
 	"time"
 )
@@ -12,7 +11,6 @@ func (s *RethinkSuite) TestTimeTime(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	err = row.Scan(&response)
-	spew.Dump(response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.Equal(time.Date(1986, 11, 3, 12, 30, 15, 0, time.UTC)), test.Equals, true)
 }

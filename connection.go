@@ -6,7 +6,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
-	"github.com/davecgh/go-spew/spew"
 	"io"
 	"net"
 	"time"

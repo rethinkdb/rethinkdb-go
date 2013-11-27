@@ -1,7 +1,6 @@
 package gorethink
 
 import (
-	"github.com/davecgh/go-spew/spew"
 	test "launchpad.net/gocheck"
 )
 
