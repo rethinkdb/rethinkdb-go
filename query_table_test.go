@@ -27,9 +27,9 @@ func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
 	Db("test").TableDrop("testOpts").Exec(sess)
 
 	// Test database creation
-	query := Db("test").TableCreate("testOpts",
-		"primary_key", "it",
-	)
+	query := Db("test").TableCreate("testOpts", TableCreateOpts{
+		PrimaryKey: "it",
+	})
 
 	r, err := query.RunRow(sess)
 	c.Assert(err, test.IsNil)
@@ -46,9 +46,9 @@ func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
 	Db("test").TableDrop("testOpts").Exec(sess)
 
 	// Test database creation
-	query := Db("test").TableCreate("testOpts",
-		"durability", "soft",
-	)
+	query := Db("test").TableCreate("testOpts", TableCreateOpts{
+		Durability: "soft",
+	})
 
 	r, err := query.RunRow(sess)
 	c.Assert(err, test.IsNil)
@@ -65,10 +65,10 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 	Db("test").TableDrop("testOpts").Exec(sess)
 
 	// Test database creation
-	query := Db("test").TableCreate("testOpts",
-		"primary_key", "it",
-		"durability", "soft",
-	)
+	query := Db("test").TableCreate("testOpts", TableCreateOpts{
+		PrimaryKey: "it",
+		Durability: "soft",
+	})
 
 	r, err := query.RunRow(sess)
 	c.Assert(err, test.IsNil)
@@ -129,7 +129,9 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 	Db("test").Table("test").IndexDrop("test").Exec(sess)
 
 	// Test database creation
-	query := Db("test").Table("test").IndexCreate("test", "multi", true)
+	query := Db("test").Table("test").IndexCreate("test", IndexCreateOpts{
+		Multi: true,
+	})
 
 	r, err := query.RunRow(sess)
 	c.Assert(err, test.IsNil)

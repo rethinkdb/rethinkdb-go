@@ -19,13 +19,25 @@ func EpochTime(epochtime interface{}) RqlTerm {
 	return newRqlTerm("EpochTime", p.Term_EPOCH_TIME, []interface{}{epochtime}, map[string]interface{}{})
 }
 
+type ISO8601Opts struct {
+	DefaultTimezone interface{} `gorethink:"default_timezone,omitempty"`
+}
+
+func (o *ISO8601Opts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Returns a time object based on an ISO8601 formatted date-time string
 //
 // Optional arguments (see http://www.rethinkdb.com/api/#js:dates_and_times-iso8601 for more information):
 // "default_timezone" (string)
-func ISO8601(date interface{}, optArgs ...interface{}) RqlTerm {
-	optArgM := optArgsToMap([]string{"default_timezone"}, optArgs)
-	return newRqlTerm("ISO8601", p.Term_ISO8601, []interface{}{date}, optArgM)
+func ISO8601(date interface{}, optArgs ...ISO8601Opts) RqlTerm {
+
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTerm("ISO8601", p.Term_ISO8601, []interface{}{date}, opts)
 }
 
 // Returns a new time object with a different time zone. While the time
@@ -41,14 +53,26 @@ func (t RqlTerm) Timezone() RqlTerm {
 	return newRqlTermFromPrevVal(t, "Timezone", p.Term_TIMEZONE, []interface{}{}, map[string]interface{}{})
 }
 
+type DuringOpts struct {
+	LeftBound  string `gorethink:"left_bound,omitempty"`
+	RightBound string `gorethink:"right_bound,omitempty"`
+}
+
+func (o *DuringOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Returns true if a time is between two other times
 // (by default, inclusive for the start, exclusive for the end).
 //
 // Optional arguments (see http://www.rethinkdb.com/api/#js:dates_and_times-during for more information):
 // "left_bound" and "right_bound" ("open" for exclusive or "closed" for inclusive)
-func (t RqlTerm) During(startTime, endTime interface{}, optArgs ...interface{}) RqlTerm {
-	optArgM := optArgsToMap([]string{"left_bound", "right_bound"}, optArgs)
-	return newRqlTermFromPrevVal(t, "During", p.Term_DURING, []interface{}{startTime, endTime}, optArgM)
+func (t RqlTerm) During(startTime, endTime interface{}, optArgs ...DuringOpts) RqlTerm {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTermFromPrevVal(t, "During", p.Term_DURING, []interface{}{startTime, endTime}, opts)
 }
 
 // Return a new time object only based on the day, month and year

@@ -19,7 +19,9 @@ func (s *RethinkSuite) TestQueryRun(c *test.C) {
 func (s *RethinkSuite) TestQueryRunRawTime(c *test.C) {
 	var response map[string]interface{}
 
-	row, err := Now().RunRow(sess, "time_format", "raw")
+	row, err := Now().RunRow(sess, RunOpts{
+		TimeFormat: "raw",
+	})
 	c.Assert(err, test.IsNil)
 
 	err = row.Scan(&response)

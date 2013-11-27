@@ -148,7 +148,9 @@ func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Table2").Between(10, 50, "index", "num").OrderBy("id")
+	query := Db("test").Table("Table2").Between(10, 50, BetweenOpts{
+		Index: "num",
+	}).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -173,10 +175,10 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Table2").Between(10, 50,
-		"index", "num",
-		"right_bound", "closed",
-	).OrderBy("id")
+	query := Db("test").Table("Table2").Between(10, 50, BetweenOpts{
+		Index:      "num",
+		RightBound: "closed",
+	}).OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 

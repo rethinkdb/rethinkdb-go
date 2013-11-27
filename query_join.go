@@ -19,12 +19,23 @@ func (t RqlTerm) OuterJoin(other, predicate interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "OuterJoin", p.Term_OUTER_JOIN, []interface{}{other, predicate}, map[string]interface{}{})
 }
 
+type EqJoinOpts struct {
+	Index interface{} `gorethink:"index,omitempty"`
+}
+
+func (o *EqJoinOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // An efficient join that looks up elements in the right table by primary key.
 //
 // Optional arguments: "index" (string - name of the index to use in right table instead of the primary key)
-func (t RqlTerm) EqJoin(left, right interface{}, optArgs ...interface{}) RqlTerm {
-	optArgM := optArgsToMap([]string{"index"}, optArgs)
-	return newRqlTermFromPrevVal(t, "EqJoin", p.Term_EQ_JOIN, []interface{}{left, right}, optArgM)
+func (t RqlTerm) EqJoin(left, right interface{}, optArgs ...EqJoinOpts) RqlTerm {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTermFromPrevVal(t, "EqJoin", p.Term_EQ_JOIN, []interface{}{left, right}, opts)
 }
 
 // Used to 'zip' up the result of a join by merging the 'right' fields into 'left'

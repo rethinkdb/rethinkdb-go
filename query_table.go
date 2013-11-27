@@ -4,6 +4,17 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+type TableCreateOpts struct {
+	PrimaryKey interface{} `gorethink:"primary_key,omitempty"`
+	Durability interface{} `gorethink:"durability,omitempty"`
+	CacheSize  interface{} `gorethink:"cache_size,omitempty"`
+	DataCenter interface{} `gorethink:"datacenter,omitempty"`
+}
+
+func (o *TableCreateOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Create a table. A RethinkDB table is a collection of JSON documents.
 //
 // If successful, the operation returns an object: {created: 1}. If a table with
@@ -12,15 +23,13 @@ import (
 // Note: that you can only use alphanumeric characters and underscores for the
 // table name.
 //
-// Optional arguments (see http://www.rethinkdb.com/api/#js:manipulating_tables-table_create for more details):
-// "primary_key" (string, defaults to "id"),
-// "durability" ("soft" or "hard"),
-// "cache_size" and "datacenter"
-//
 // r.Db("database").TableCreate("table", "durability", "soft").Run(sess)
-func (t RqlTerm) TableCreate(name interface{}, optArgs ...interface{}) RqlTerm {
-	optArgM := optArgsToMap([]string{"primary_key", "durability", "cache_size", "datacenter"}, optArgs)
-	return newRqlTermFromPrevVal(t, "TableCreate", p.Term_TABLE_CREATE, []interface{}{name}, optArgM)
+func (t RqlTerm) TableCreate(name interface{}, optArgs ...TableCreateOpts) RqlTerm {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTermFromPrevVal(t, "TableCreate", p.Term_TABLE_CREATE, []interface{}{name}, opts)
 }
 
 // Drop a table. The table and all its data will be deleted.
@@ -36,17 +45,31 @@ func (t RqlTerm) TableList() RqlTerm {
 	return newRqlTermFromPrevVal(t, "TableList", p.Term_TABLE_LIST, []interface{}{}, map[string]interface{}{})
 }
 
+type IndexCreateOpts struct {
+	Multi interface{} `gorethink:"multi,omitempty"`
+}
+
+func (o *IndexCreateOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Create a new secondary index on this table.
-func (t RqlTerm) IndexCreate(name interface{}, optArgs ...interface{}) RqlTerm {
-	optArgM := optArgsToMap([]string{"multi"}, optArgs)
-	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name}, optArgM)
+func (t RqlTerm) IndexCreate(name interface{}, optArgs ...IndexCreateOpts) RqlTerm {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name}, opts)
 }
 
 // Create a new secondary index on this table based on the value of the function
 // passed.
-func (t RqlTerm) IndexCreateFunc(name, f interface{}, optArgs ...interface{}) RqlTerm {
-	optArgM := optArgsToMap([]string{"multi"}, optArgs)
-	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name, funcWrap(f)}, optArgM)
+func (t RqlTerm) IndexCreateFunc(name, f interface{}, optArgs ...IndexCreateOpts) RqlTerm {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name, funcWrap(f)}, opts)
 }
 
 // Delete a previously created secondary index of this table.
