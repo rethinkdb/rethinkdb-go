@@ -135,13 +135,24 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 			responseType: r.GetType(),
 		}, nil
 	case p.Response_SUCCESS_ATOM:
+		if len(r.GetResponse()) < 1 {
+			return &ResultRows{}, nil
+		}
+
+		var buffer []*p.Datum
+		if r.GetResponse()[0].GetType() == p.Datum_R_ARRAY {
+			buffer = r.GetResponse()[0].GetRArray()
+		} else {
+			buffer = r.GetResponse()
+		}
+
 		return &ResultRows{
 			session:      s,
 			query:        q,
 			term:         t,
 			opts:         opts,
-			buffer:       r.GetResponse(),
-			end:          len(r.GetResponse()),
+			buffer:       buffer,
+			end:          len(buffer),
 			token:        q.GetToken(),
 			responseType: r.GetType(),
 		}, nil

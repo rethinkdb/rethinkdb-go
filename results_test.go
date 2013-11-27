@@ -26,11 +26,11 @@ func (s *RethinkSuite) TestRowsScanLiteral(c *test.C) {
 }
 
 func (s *RethinkSuite) TestRowsScanSlice(c *test.C) {
-	row, err := Expr([]interface{}{1, 2, 3, 4, 5}).RunRow(sess)
+	row, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(sess)
 	c.Assert(err, test.IsNil)
 
-	var response interface{}
-	err = row.Scan(&response)
+	var response []interface{}
+	err = row.ScanAll(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
@@ -126,11 +126,11 @@ func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
 }
 
 func (s *RethinkSuite) TestRowsAtomArray(c *test.C) {
-	row, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).RunRow(sess)
+	row, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response []int
-	err = row.Scan(&response)
+	err = row.ScanAll(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.DeepEquals, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
 }

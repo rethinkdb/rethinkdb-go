@@ -98,7 +98,7 @@ func (r *ResultRows) Next() bool {
 	}
 
 	// Check if all rows have been loaded
-	if r.responseType == p.Response_SUCCESS_SEQUENCE {
+	if r.responseType == p.Response_SUCCESS_SEQUENCE || r.responseType == p.Response_SUCCESS_ATOM {
 		r.closed = true
 		r.start = 0
 		r.end = 0

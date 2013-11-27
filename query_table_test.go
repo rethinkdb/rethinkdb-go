@@ -82,21 +82,21 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableList(c *test.C) {
-	var response interface{}
+	var response []interface{}
 
 	Db("test").TableCreate("test").Exec(sess)
 
 	// Try and find it in the list
 	success := false
-	row, err := Db("test").TableList().RunRow(sess)
+	row, err := Db("test").TableList().Run(sess)
 	c.Assert(err, test.IsNil)
 
-	row.Scan(&response)
+	row.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
 
-	for _, db := range response.([]interface{}) {
+	for _, db := range response {
 		if db == "test" {
 			success = true
 		}
@@ -141,22 +141,22 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableIndexList(c *test.C) {
-	var response interface{}
+	var response []interface{}
 
 	Db("test").TableCreate("test").Exec(sess)
 	Db("test").Table("test").IndexCreate("test").Exec(sess)
 
 	// Try and find it in the list
 	success := false
-	row, err := Db("test").Table("test").IndexList().RunRow(sess)
+	row, err := Db("test").Table("test").IndexList().Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = row.Scan(&response)
+	err = row.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
 
-	for _, db := range response.([]interface{}) {
+	for _, db := range response {
 		if db == "test" {
 			success = true
 		}

@@ -50,10 +50,10 @@ func (s *RethinkSuite) TestTimeInTimezone(c *test.C) {
 	loc, err := time.LoadLocation("MST")
 	c.Assert(err, test.IsNil)
 	var response []time.Time
-	row, err2 := Expr([]interface{}{Now(), Now().InTimezone("-07:00")}).RunRow(sess)
+	row, err2 := Expr([]interface{}{Now(), Now().InTimezone("-07:00")}).Run(sess)
 	c.Assert(err2, test.IsNil)
 
-	err = row.Scan(&response)
+	err = row.ScanAll(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response[1].Equal(response[0].In(loc)), test.Equals, true)
 }

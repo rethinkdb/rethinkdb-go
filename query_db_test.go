@@ -23,22 +23,22 @@ func (s *RethinkSuite) TestDbCreate(c *test.C) {
 }
 
 func (s *RethinkSuite) TestDbList(c *test.C) {
-	var response interface{}
+	var response []interface{}
 
 	// create database
 	DbCreate("test").Exec(sess)
 
 	// Try and find it in the list
 	success := false
-	r, err := DbList().RunRow(sess)
+	r, err := DbList().Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
 
-	for _, db := range response.([]interface{}) {
+	for _, db := range response {
 		if db == "test" {
 			success = true
 		}

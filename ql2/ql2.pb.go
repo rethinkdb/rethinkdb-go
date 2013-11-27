@@ -52,20 +52,23 @@ func (x *VersionDummy_Version) UnmarshalJSON(data []byte) error {
 type Query_QueryType int32
 
 const (
-	Query_START    Query_QueryType = 1
-	Query_CONTINUE Query_QueryType = 2
-	Query_STOP     Query_QueryType = 3
+	Query_START        Query_QueryType = 1
+	Query_CONTINUE     Query_QueryType = 2
+	Query_STOP         Query_QueryType = 3
+	Query_NOREPLY_WAIT Query_QueryType = 4
 )
 
 var Query_QueryType_name = map[int32]string{
 	1: "START",
 	2: "CONTINUE",
 	3: "STOP",
+	4: "NOREPLY_WAIT",
 }
 var Query_QueryType_value = map[string]int32{
-	"START":    1,
-	"CONTINUE": 2,
-	"STOP":     3,
+	"START":        1,
+	"CONTINUE":     2,
+	"STOP":         3,
+	"NOREPLY_WAIT": 4,
 }
 
 func (x Query_QueryType) Enum() *Query_QueryType {
@@ -130,6 +133,7 @@ const (
 	Response_SUCCESS_ATOM     Response_ResponseType = 1
 	Response_SUCCESS_SEQUENCE Response_ResponseType = 2
 	Response_SUCCESS_PARTIAL  Response_ResponseType = 3
+	Response_WAIT_COMPLETE    Response_ResponseType = 4
 	Response_CLIENT_ERROR     Response_ResponseType = 16
 	Response_COMPILE_ERROR    Response_ResponseType = 17
 	Response_RUNTIME_ERROR    Response_ResponseType = 18
@@ -139,6 +143,7 @@ var Response_ResponseType_name = map[int32]string{
 	1:  "SUCCESS_ATOM",
 	2:  "SUCCESS_SEQUENCE",
 	3:  "SUCCESS_PARTIAL",
+	4:  "WAIT_COMPLETE",
 	16: "CLIENT_ERROR",
 	17: "COMPILE_ERROR",
 	18: "RUNTIME_ERROR",
@@ -147,6 +152,7 @@ var Response_ResponseType_value = map[string]int32{
 	"SUCCESS_ATOM":     1,
 	"SUCCESS_SEQUENCE": 2,
 	"SUCCESS_PARTIAL":  3,
+	"WAIT_COMPLETE":    4,
 	"CLIENT_ERROR":     16,
 	"COMPILE_ERROR":    17,
 	"RUNTIME_ERROR":    18,
@@ -181,6 +187,7 @@ const (
 	Datum_R_STR    Datum_DatumType = 4
 	Datum_R_ARRAY  Datum_DatumType = 5
 	Datum_R_OBJECT Datum_DatumType = 6
+	Datum_R_JSON   Datum_DatumType = 7
 )
 
 var Datum_DatumType_name = map[int32]string{
@@ -190,6 +197,7 @@ var Datum_DatumType_name = map[int32]string{
 	4: "R_STR",
 	5: "R_ARRAY",
 	6: "R_OBJECT",
+	7: "R_JSON",
 }
 var Datum_DatumType_value = map[string]int32{
 	"R_NULL":   1,
@@ -198,6 +206,7 @@ var Datum_DatumType_value = map[string]int32{
 	"R_STR":    4,
 	"R_ARRAY":  5,
 	"R_OBJECT": 6,
+	"R_JSON":   7,
 }
 
 func (x Datum_DatumType) Enum() *Datum_DatumType {
@@ -298,9 +307,12 @@ const (
 	Term_TABLE_CREATE       Term_TermType = 60
 	Term_TABLE_DROP         Term_TermType = 61
 	Term_TABLE_LIST         Term_TermType = 62
+	Term_SYNC               Term_TermType = 138
 	Term_INDEX_CREATE       Term_TermType = 75
 	Term_INDEX_DROP         Term_TermType = 76
 	Term_INDEX_LIST         Term_TermType = 77
+	Term_INDEX_STATUS       Term_TermType = 139
+	Term_INDEX_WAIT         Term_TermType = 140
 	Term_FUNCALL            Term_TermType = 64
 	Term_BRANCH             Term_TermType = 65
 	Term_ANY                Term_TermType = 66
@@ -431,9 +443,12 @@ var Term_TermType_name = map[int32]string{
 	60:  "TABLE_CREATE",
 	61:  "TABLE_DROP",
 	62:  "TABLE_LIST",
+	138: "SYNC",
 	75:  "INDEX_CREATE",
 	76:  "INDEX_DROP",
 	77:  "INDEX_LIST",
+	139: "INDEX_STATUS",
+	140: "INDEX_WAIT",
 	64:  "FUNCALL",
 	65:  "BRANCH",
 	66:  "ANY",
@@ -563,9 +578,12 @@ var Term_TermType_value = map[string]int32{
 	"TABLE_CREATE":       60,
 	"TABLE_DROP":         61,
 	"TABLE_LIST":         62,
+	"SYNC":               138,
 	"INDEX_CREATE":       75,
 	"INDEX_DROP":         76,
 	"INDEX_LIST":         77,
+	"INDEX_STATUS":       139,
+	"INDEX_WAIT":         140,
 	"FUNCALL":            64,
 	"BRANCH":             65,
 	"ANY":                66,
@@ -653,6 +671,7 @@ type Query struct {
 	Query            *Term              `protobuf:"bytes,2,opt,name=query" json:"query,omitempty"`
 	Token            *int64             `protobuf:"varint,3,opt,name=token" json:"token,omitempty"`
 	OBSOLETENoreply  *bool              `protobuf:"varint,4,opt,name=OBSOLETE_noreply,def=0" json:"OBSOLETE_noreply,omitempty"`
+	AcceptsRJson     *bool              `protobuf:"varint,5,opt,name=accepts_r_json,def=0" json:"accepts_r_json,omitempty"`
 	GlobalOptargs    []*Query_AssocPair `protobuf:"bytes,6,rep,name=global_optargs" json:"global_optargs,omitempty"`
 	XXX_unrecognized []byte             `json:"-"`
 }
@@ -662,6 +681,7 @@ func (m *Query) String() string { return proto.CompactTextString(m) }
 func (*Query) ProtoMessage()    {}
 
 const Default_Query_OBSOLETENoreply bool = false
+const Default_Query_AcceptsRJson bool = false
 
 func (m *Query) GetType() Query_QueryType {
 	if m != nil && m.Type != nil {
@@ -689,6 +709,13 @@ func (m *Query) GetOBSOLETENoreply() bool {
 		return *m.OBSOLETENoreply
 	}
 	return Default_Query_OBSOLETENoreply
+}
+
+func (m *Query) GetAcceptsRJson() bool {
+	if m != nil && m.AcceptsRJson != nil {
+		return *m.AcceptsRJson
+	}
+	return Default_Query_AcceptsRJson
 }
 
 func (m *Query) GetGlobalOptargs() []*Query_AssocPair {
@@ -775,6 +802,7 @@ type Response struct {
 	Token            *int64                 `protobuf:"varint,2,opt,name=token" json:"token,omitempty"`
 	Response         []*Datum               `protobuf:"bytes,3,rep,name=response" json:"response,omitempty"`
 	Backtrace        *Backtrace             `protobuf:"bytes,4,opt,name=backtrace" json:"backtrace,omitempty"`
+	Profile          *Datum                 `protobuf:"bytes,5,opt,name=profile" json:"profile,omitempty"`
 	XXX_unrecognized []byte                 `json:"-"`
 }
 
@@ -806,6 +834,13 @@ func (m *Response) GetResponse() []*Datum {
 func (m *Response) GetBacktrace() *Backtrace {
 	if m != nil {
 		return m.Backtrace
+	}
+	return nil
+}
+
+func (m *Response) GetProfile() *Datum {
+	if m != nil {
+		return m.Profile
 	}
 	return nil
 }

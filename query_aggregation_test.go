@@ -32,17 +32,17 @@ func (s *RethinkSuite) TestAggregationExprCount(c *test.C) {
 func (s *RethinkSuite) TestAggregationDistinct(c *test.C) {
 	var response []int
 	query := Expr(darr).Distinct()
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.HasLen, 5)
 }
 
 func (s *RethinkSuite) TestAggregationGroupedMapReduce(c *test.C) {
-	var response interface{}
+	var response []interface{}
 	query := Expr(objList).GroupedMapReduce(
 		func(row RqlTerm) RqlTerm {
 			return row.Field("id").Mod(2).Eq(0)
@@ -55,10 +55,10 @@ func (s *RethinkSuite) TestAggregationGroupedMapReduce(c *test.C) {
 		},
 		0,
 	)
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -89,10 +89,10 @@ func (s *RethinkSuite) TestAggregationGroupedMapReduceTable(c *test.C) {
 		},
 		0,
 	)
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -102,12 +102,12 @@ func (s *RethinkSuite) TestAggregationGroupedMapReduceTable(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAggregationGroupByCount(c *test.C) {
-	var response interface{}
+	var response []interface{}
 	query := Expr(objList).GroupBy(Count(), "g1")
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -119,12 +119,12 @@ func (s *RethinkSuite) TestAggregationGroupByCount(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAggregationGroupBySum(c *test.C) {
-	var response interface{}
+	var response []interface{}
 	query := Expr(objList).GroupBy(Sum("num"), "g1")
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -136,12 +136,12 @@ func (s *RethinkSuite) TestAggregationGroupBySum(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAggregationGroupByAvg(c *test.C) {
-	var response interface{}
+	var response []interface{}
 	query := Expr(objList).GroupBy(Avg("num"), "g1")
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -153,12 +153,12 @@ func (s *RethinkSuite) TestAggregationGroupByAvg(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAggregationGroupBySumMultipleSelectors(c *test.C) {
-	var response interface{}
+	var response []interface{}
 	query := Expr(objList).GroupBy(Sum("num"), "g1", "g2")
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{

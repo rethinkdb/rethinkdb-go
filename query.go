@@ -141,7 +141,6 @@ func (t RqlTerm) Run(s *Session, args ...interface{}) (*ResultRows, error) {
 func (t RqlTerm) RunRow(s *Session, args ...interface{}) (*ResultRow, error) {
 	rows, err := t.Run(s, args...)
 	if err == nil {
-		defer rows.Close()
 		rows.Next()
 	}
 	return &ResultRow{rows: rows, err: err}, err

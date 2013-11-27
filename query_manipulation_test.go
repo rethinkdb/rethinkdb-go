@@ -84,10 +84,10 @@ func (s *RethinkSuite) TestManipulationAppend(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).Append(4).Append(5)
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
@@ -97,10 +97,10 @@ func (s *RethinkSuite) TestManipulationPrepend(c *test.C) {
 	query := Expr([]interface{}{3, 4, 5}).Prepend(2).Prepend(1)
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
@@ -110,10 +110,10 @@ func (s *RethinkSuite) TestManipulationDifference(c *test.C) {
 	query := Expr([]interface{}{3, 4, 5}).Difference([]interface{}{3, 4})
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{5})
@@ -123,10 +123,10 @@ func (s *RethinkSuite) TestManipulationSetInsert(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).SetInsert(3).SetInsert(4)
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
@@ -136,10 +136,10 @@ func (s *RethinkSuite) TestManipulationSetUnion(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).SetUnion([]interface{}{3, 4})
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
@@ -149,10 +149,10 @@ func (s *RethinkSuite) TestManipulationSetIntersection(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).SetIntersection([]interface{}{2, 3, 3, 4})
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{2, 3})
@@ -162,10 +162,10 @@ func (s *RethinkSuite) TestManipulationSetDifference(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).SetDifference([]interface{}{2, 3, 4, 4})
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1})
@@ -227,10 +227,10 @@ func (s *RethinkSuite) TestManipulationInsertAt(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).InsertAt(1, 1.5)
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 1.5, 2, 3})
@@ -240,10 +240,10 @@ func (s *RethinkSuite) TestManipulationSpliceAt(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).SpliceAt(1, []interface{}{1.25, 1.5, 1.75})
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 1.25, 1.5, 1.75, 2, 3})
@@ -253,10 +253,10 @@ func (s *RethinkSuite) TestManipulationDeleteAt(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3}).DeleteAt(1)
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 3})
@@ -266,10 +266,10 @@ func (s *RethinkSuite) TestManipulationDeleteAtRange(c *test.C) {
 	query := Expr([]interface{}{1, 2, 3, 4}).DeleteAtRange(1, 3)
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 4})
@@ -279,10 +279,10 @@ func (s *RethinkSuite) TestManipulationChangeAt(c *test.C) {
 	query := Expr([]interface{}{1, 5, 3, 4}).ChangeAt(1, 2)
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
@@ -292,10 +292,10 @@ func (s *RethinkSuite) TestManipulationKeys(c *test.C) {
 	query := Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Keys()
 
 	var response []interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{"a", "b", "c"})

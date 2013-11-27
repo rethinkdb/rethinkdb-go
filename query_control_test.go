@@ -31,10 +31,10 @@ func (s *RethinkSuite) TestControlExecSimple(c *test.C) {
 func (s *RethinkSuite) TestControlExecList(c *test.C) {
 	var response []interface{}
 	query := Expr(narr)
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -128,10 +128,10 @@ func (s *RethinkSuite) TestControlStringTypeAlias(c *test.C) {
 func (s *RethinkSuite) TestControlExecTypes(c *test.C) {
 	var response []interface{}
 	query := Expr([]interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
@@ -152,17 +152,17 @@ func (s *RethinkSuite) TestControlJs(c *test.C) {
 func (s *RethinkSuite) TestControlJson(c *test.C) {
 	var response []int
 	query := Json("[1,2,3]")
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
 }
 
 func (s *RethinkSuite) TestControlError(c *test.C) {
-	var response []interface{}
+	var response interface{}
 	query := Error("An error occurred")
 	r, err := query.RunRow(sess)
 	c.Assert(err, test.NotNil)
@@ -177,10 +177,10 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 func (s *RethinkSuite) TestControlDoNothing(c *test.C) {
 	var response []interface{}
 	query := Do([]interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
@@ -195,10 +195,10 @@ func (s *RethinkSuite) TestControlDo(c *test.C) {
 	}, func(row RqlTerm) RqlTerm {
 		return row.Field("a")
 	})
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
@@ -213,10 +213,10 @@ func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
 	}).Do(func(row RqlTerm) RqlTerm {
 		return row.Field("a")
 	})
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
@@ -239,30 +239,30 @@ func (s *RethinkSuite) TestControlBranchSimple(c *test.C) {
 }
 
 func (s *RethinkSuite) TestControlBranchWithMapExpr(c *test.C) {
-	var response interface{}
+	var response []interface{}
 	query := Expr([]interface{}{1, 2, 3}).Map(Branch(
 		Row.Eq(2),
 		Row.Sub(1),
 		Row.Add(1),
 	))
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{2, 1, 4})
 }
 
 func (s *RethinkSuite) TestControlDefault(c *test.C) {
-	var response interface{}
+	var response []interface{}
 	query := Expr(defaultObjList).Map(func(row RqlTerm) RqlTerm {
 		return row.Field("a").Default(1)
 	})
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.ScanAll(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 1})
