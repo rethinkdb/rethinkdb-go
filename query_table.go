@@ -81,3 +81,15 @@ func (t RqlTerm) IndexDrop(name interface{}) RqlTerm {
 func (t RqlTerm) IndexList() RqlTerm {
 	return newRqlTermFromPrevVal(t, "IndexList", p.Term_INDEX_LIST, []interface{}{}, map[string]interface{}{})
 }
+
+// Get the status of the specified indexes on this table, or the status of all
+// indexes on this table if no indexes are specified.
+func (t RqlTerm) IndexStatus(indexes ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IndexStatus", p.Term_INDEX_STATUS, indexes, map[string]interface{}{})
+}
+
+// Wait for the specified indexes on this table to be ready, or for all indexes
+// on this table to be ready if no indexes are specified.
+func (t RqlTerm) IndexWait(indexes ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IndexWait", p.Term_INDEX_WAIT, indexes, map[string]interface{}{})
+}
