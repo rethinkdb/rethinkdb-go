@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"code.google.com/p/goprotobuf/proto"
+	"encoding/json"
 	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
 	"reflect"
@@ -92,6 +93,11 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 	switch datum.GetType() {
 	case p.Datum_R_NULL:
 		return nil, nil
+	case p.Datum_R_JSON:
+		var v interface{}
+		err := json.Unmarshal(datum.GetRStr(), &v)
+
+		return v, err
 	case p.Datum_R_BOOL:
 		return datum.GetRBool(), nil
 	case p.Datum_R_NUM:
