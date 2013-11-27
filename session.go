@@ -194,6 +194,11 @@ func (s *Session) startQuery(t RqlTerm, opts map[string]interface{}) (*ResultRow
 				Key: proto.String("db"),
 				Val: Db(v).build(),
 			})
+		} else if k == "profile" {
+			globalOpts = append(globalOpts, &p.Query_AssocPair{
+				Key: proto.String("profile"),
+				Val: Expr(v).build(),
+			})
 		} else if k == "use_outdated" {
 			globalOpts = append(globalOpts, &p.Query_AssocPair{
 				Key: proto.String("use_outdated"),

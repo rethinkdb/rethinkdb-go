@@ -12,6 +12,10 @@ type ResultRow struct {
 	rows *ResultRows
 }
 
+func (r *ResultRow) Profile() interface{} {
+	return r.rows.profile
+}
+
 // Scan copies the result from the matched row into the value pointed at by dest.
 // If more than one row is returned by the query then Scan returns the first and
 // ignores the rest. If no row is found then Scan returns an error.
@@ -41,6 +45,7 @@ type ResultRows struct {
 	session      *Session
 	query        *p.Query
 	term         RqlTerm
+	profile      interface{}
 	opts         map[string]interface{}
 	buffer       []interface{}
 	current      interface{}
@@ -51,6 +56,10 @@ type ResultRows struct {
 	initialized  bool
 	closed       bool
 	responseType p.Response_ResponseType
+}
+
+func (r *ResultRows) Profile() interface{} {
+	return r.profile
 }
 
 // Close closes the Rows, preventing further enumeration. If the end is

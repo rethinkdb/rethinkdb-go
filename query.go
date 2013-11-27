@@ -109,10 +109,11 @@ type WriteResponse struct {
 }
 
 type RunOpts struct {
-	Db          string `gorethink:"db,omitempty"`
-	UseOutdated bool   `gorethink:"use_outdated,omitempty"`
-	NoReply     bool   `gorethink:"noreply,omitempty"`
-	TimeFormat  string `gorethink:"time_format,omitempty"`
+	Db          interface{} `gorethink:"db,omitempty"`
+	Profile     interface{} `gorethink:"profile,omitempty"`
+	UseOutdated interface{} `gorethink:"use_outdated,omitempty"`
+	NoReply     interface{} `gorethink:"noreply,omitempty"`
+	TimeFormat  interface{} `gorethink:"time_format,omitempty"`
 }
 
 func (o *RunOpts) toMap() map[string]interface{} {

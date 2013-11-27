@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	p "github.com/dancannon/gorethink/ql2"
+	"github.com/davecgh/go-spew/spew"
 	"io"
 	"net"
 	"time"
@@ -115,6 +116,17 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 		return nil, RqlDriverError{"Unexpected response received."}
 	}
 
+	// De-construct the profile datum if it exists
+	var profile interface{}
+	if r.GetProfile() != nil {
+		var err error
+
+		profile, err = deconstructDatum(r.GetProfile(), opts)
+		if err != nil {
+			return nil, RqlDriverError{err.Error()}
+		}
+	}
+
 	// De-construct datum and return the result
 	switch r.GetType() {
 	case p.Response_CLIENT_ERROR:
@@ -133,6 +145,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 			session:      s,
 			query:        q,
 			term:         t,
+			profile:      profile,
 			opts:         opts,
 			buffer:       value,
 			end:          len(value),
@@ -170,6 +183,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 			session:      s,
 			query:        q,
 			term:         t,
+			profile:      profile,
 			opts:         opts,
 			buffer:       value,
 			end:          len(value),

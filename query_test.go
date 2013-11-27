@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	test "launchpad.net/gocheck"
 )
 
@@ -13,6 +14,21 @@ func (s *RethinkSuite) TestQueryRun(c *test.C) {
 	err = row.Scan(&response)
 
 	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "Test")
+}
+
+func (s *RethinkSuite) TestQueryProfile(c *test.C) {
+	var response string
+
+	row, err := Expr("Test").RunRow(sess, RunOpts{
+		Profile: true,
+	})
+	c.Assert(err, test.IsNil)
+
+	err = row.Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(row.Profile(), test.NotNil)
 	c.Assert(response, test.Equals, "Test")
 }
 

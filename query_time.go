@@ -54,8 +54,8 @@ func (t RqlTerm) Timezone() RqlTerm {
 }
 
 type DuringOpts struct {
-	LeftBound  string `gorethink:"left_bound,omitempty"`
-	RightBound string `gorethink:"right_bound,omitempty"`
+	LeftBound  interface{} `gorethink:"left_bound,omitempty"`
+	RightBound interface{} `gorethink:"right_bound,omitempty"`
 }
 
 func (o *DuringOpts) toMap() map[string]interface{} {
