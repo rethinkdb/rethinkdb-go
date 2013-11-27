@@ -138,3 +138,39 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 		map[string]interface{}{"title": "lmoe", "name": "joe", "id": 2, "it": 2},
 	})
 }
+
+func (s *RethinkSuite) TestOrderByJoinEq(c *test.C) {
+	type Map map[string]interface{}
+	var err error
+
+	// Ensure table + database exist
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
+	Db("test").TableCreate("test2").Exec(sess)
+	tab := Db("test").Table("test")
+	tab2 := Db("test").Table("test2")
+
+	// insert rows
+	err = tab.Insert(Map{"S": "s1", "T": 2}).Exec(sess)
+	err = tab.Insert(Map{"S": "s1", "T": 1}).Exec(sess)
+	err = tab.Insert(Map{"S": "s1", "T": 3}).Exec(sess)
+	err = tab.Insert(Map{"S": "s2", "T": 3}).Exec(sess)
+	c.Assert(err, test.IsNil)
+
+	err = tab2.Insert(Map{"id": "s1", "N": "Rob"}).Exec(sess)
+	err = tab2.Insert(Map{"id": "s2", "N": "Zar"}).Exec(sess)
+	c.Assert(err, test.IsNil)
+
+	// Test query
+	rows, err := tab.OrderBy("T").EqJoin("S", tab2).Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var out []Map
+	for rows.Next() {
+		p := Map{}
+		err = rows.Scan(&p)
+		c.Assert(err, test.IsNil)
+		out = append(out, p)
+	}
+	c.Check(len(out), test.Equals, 4, test.Commentf("%v", out))
+}
