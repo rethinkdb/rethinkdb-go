@@ -3,6 +3,7 @@ package gorethink
 import (
 	"code.google.com/p/goprotobuf/proto"
 	p "github.com/dancannon/gorethink/ql2"
+	"math"
 	"strconv"
 	"strings"
 	"time"
@@ -82,9 +83,9 @@ func mergeArgs(args ...interface{}) []interface{} {
 }
 
 func reqlTimeToNativeTime(timestamp float64, timezone string) (time.Time, error) {
-	sec := int64(timestamp)
+	sec, ms := math.Modf(timestamp)
 
-	t := time.Unix(sec, 0)
+	t := time.Unix(int64(sec), int64(ms*1000*1000*1000))
 
 	// Caclulate the timezone
 	if timezone != "" {

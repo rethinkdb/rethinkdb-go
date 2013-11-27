@@ -15,6 +15,16 @@ func (s *RethinkSuite) TestTimeTime(c *test.C) {
 	c.Assert(response.Equal(time.Date(1986, 11, 3, 12, 30, 15, 0, time.UTC)), test.Equals, true)
 }
 
+func (s *RethinkSuite) TestTimeTimeMillisecond(c *test.C) {
+	var response time.Time
+	row, err := Time(1986, 11, 3, 12, 30, 15.679, "Z").RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = row.Scan(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response.Equal(time.Date(1986, 11, 3, 12, 30, 15, 679.00002*1000*1000, time.UTC)), test.Equals, true)
+}
+
 func (s *RethinkSuite) TestTimeEpochTime(c *test.C) {
 	var response time.Time
 	row, err := EpochTime(531360000).RunRow(sess)
