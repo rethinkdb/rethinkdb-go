@@ -111,8 +111,16 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 	case p.Datum_R_JSON:
 		var v interface{}
 		err := json.Unmarshal([]byte(datum.GetRStr()), &v)
+		if err != nil {
+			return nil, err
+		}
 
-		return v, err
+		v, err = recursivelyConvertPseudotype(v, opts)
+		if err != nil {
+			return nil, err
+		}
+
+		return v, nil
 	case p.Datum_R_BOOL:
 		return datum.GetRBool(), nil
 	case p.Datum_R_NUM:
@@ -130,7 +138,7 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 		}
 		return items, nil
 	case p.Datum_R_OBJECT:
-		obj := map[interface{}]interface{}{}
+		obj := map[string]interface{}{}
 
 		for _, assoc := range datum.GetRObject() {
 			key := assoc.GetKey()
@@ -140,36 +148,74 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 				return nil, err
 			}
 
-			obj[key] = val
+			obj[string(key)] = val
 		}
 
-		// Handle ReQL pseudo-types
-		if reqlType, ok := obj["$reql_type$"]; ok {
-			if reqlType == "TIME" {
-				// load timeformat, set to native if the option was not set
-				timeFormat := "native"
-				if opt, ok := opts["time_format"]; ok {
-					if sopt, ok := opt.(string); ok {
-						timeFormat = sopt
-					} else {
-						return nil, fmt.Errorf("Invalid time_format run option \"%s\".", opt)
-					}
-				}
-
-				if timeFormat == "native" {
-					return reqlTimeToNativeTime(obj["epoch_time"].(float64), obj["timezone"].(string))
-				} else if timeFormat == "raw" {
-					return obj, nil
-				} else {
-					return nil, fmt.Errorf("Unknown time_format run option \"%s\".", reqlType)
-				}
-			} else {
-				return obj, nil
-			}
+		pobj, err := convertPseudotype(obj, opts)
+		if err != nil {
+			return nil, err
 		}
 
-		return obj, nil
+		return pobj, nil
 	}
 
 	return nil, fmt.Errorf("Unknown Datum type %s encountered in response.", datum.GetType().String())
+}
+
+func convertPseudotype(obj map[string]interface{}, opts map[string]interface{}) (interface{}, error) {
+	if reqlType, ok := obj["$reql_type$"]; ok {
+		if reqlType == "TIME" {
+			// load timeformat, set to native if the option was not set
+			timeFormat := "native"
+			if opt, ok := opts["time_format"]; ok {
+				if sopt, ok := opt.(string); ok {
+					timeFormat = sopt
+				} else {
+					return nil, fmt.Errorf("Invalid time_format run option \"%s\".", opt)
+				}
+			}
+
+			if timeFormat == "native" {
+				return reqlTimeToNativeTime(obj["epoch_time"].(float64), obj["timezone"].(string))
+			} else if timeFormat == "raw" {
+				return obj, nil
+			} else {
+				return nil, fmt.Errorf("Unknown time_format run option \"%s\".", reqlType)
+			}
+		} else {
+			return obj, nil
+		}
+	}
+
+	return obj, nil
+}
+
+func recursivelyConvertPseudotype(obj interface{}, opts map[string]interface{}) (interface{}, error) {
+	var err error
+
+	switch obj := obj.(type) {
+	case []interface{}:
+		for key, val := range obj {
+			obj[key], err = recursivelyConvertPseudotype(val, opts)
+			if err != nil {
+				return nil, err
+			}
+		}
+	case map[string]interface{}:
+		for key, val := range obj {
+			obj[key], err = recursivelyConvertPseudotype(val, opts)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		pobj, err := convertPseudotype(obj, opts)
+		if err != nil {
+			return nil, err
+		}
+
+		return pobj, nil
+	}
+
+	return obj, nil
 }

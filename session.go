@@ -221,7 +221,7 @@ func (s *Session) startQuery(t RqlTerm, opts map[string]interface{}) (*ResultRow
 
 	// Construct query
 	query := &p.Query{
-		// AcceptsRJson:  proto.Bool(true),
+		AcceptsRJson:  proto.Bool(true),
 		Type:          p.Query_START.Enum(),
 		Token:         proto.Int64(token),
 		Query:         pt,
