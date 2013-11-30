@@ -109,7 +109,14 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 			IdleTimeout: s.idleTimeout,
 		}
 	}
-	return nil
+
+	// Check the connection
+	conn, err := s.pool.get()
+	if err == nil {
+		conn.Close()
+	}
+
+	return err
 }
 
 // Close closes the session
