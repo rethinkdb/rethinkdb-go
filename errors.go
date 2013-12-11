@@ -18,6 +18,10 @@ func (e rqlResponseError) Error() string {
 	return fmt.Sprintf("gorethink: %s in: \n%s", message, e.term)
 }
 
+func (e rqlResponseError) String() string {
+	return e.Error()
+}
+
 type RqlCompileError struct {
 	rqlResponseError
 }
@@ -39,5 +43,5 @@ func (e RqlDriverError) Error() string {
 }
 
 func (e RqlDriverError) String() string {
-	return fmt.Sprintf("gorethink: %s", e.message)
+	return e.Error()
 }
