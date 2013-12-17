@@ -185,6 +185,10 @@ func (t RqlTerm) Exec(s *Session, optArgs ...RunOpts) error {
 	// Ensure that noreply is set to true
 	if len(optArgs) >= 1 {
 		optArgs[0].NoReply = true
+	} else {
+		optArgs = append(optArgs, RunOpts{
+			NoReply: true,
+		})
 	}
 
 	_, err := t.Run(s, optArgs...)
