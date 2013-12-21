@@ -47,6 +47,9 @@ func Dial(s *Session) (*Connection, error) {
 	reader := bufio.NewReader(conn)
 	line, err := reader.ReadBytes('\x00')
 	if err != nil {
+		if err == io.EOF {
+			return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
+		}
 		return nil, err
 	}
 	// convert to string and remove trailing NUL byte
