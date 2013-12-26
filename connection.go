@@ -58,6 +58,9 @@ func (c *Connection) connect(s *Session) error {
 	reader := bufio.NewReader(conn)
 	line, err := reader.ReadBytes('\x00')
 	if err != nil {
+		if err == io.EOF {
+			return fmt.Errorf("Unexpected EOF: %s", string(line))
+		}
 		return err
 	}
 	// convert to string and remove trailing NUL byte
