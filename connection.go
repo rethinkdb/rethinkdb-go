@@ -221,12 +221,13 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 // reconnects if configured to retry on failure
 func (c *Connection) reconnect(s *Session) bool {
 	for ; s.retries == -1 || c.attempts < s.retries; c.attempts++ {
-		time.Sleep(s.retryDelay)
 		c.Close()
+		time.Sleep(s.retryDelay)
 		if err := c.connect(s); err == nil {
 			c.attempts = 0
 			return true
 		}
 	}
+	c.Close()
 	return false
 }
