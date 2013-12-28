@@ -20,6 +20,10 @@ type Session struct {
 	maxActive   int
 	idleTimeout time.Duration
 
+	// Retry configuration
+	retries    int
+	retryDelay time.Duration
+
 	closed bool
 
 	pool *Pool
@@ -59,6 +63,16 @@ func newSession(args map[string]interface{}) *Session {
 		s.idleTimeout = idleTimeout.(time.Duration)
 	}
 
+	// Retry configuration
+	if retries, ok := args["retries"]; ok {
+		s.retries = retries.(int)
+	}
+	if retryDelay, ok := args["retryDelay"]; ok {
+		s.retryDelay = retryDelay.(time.Duration)
+	} else {
+		s.retryDelay = time.Millisecond
+	}
+
 	return s
 }
 
@@ -66,10 +80,17 @@ func newSession(args map[string]interface{}) *Session {
 //
 // Supported arguments include token, address, database, timeout, authkey,
 // and timeFormat. Pool options include maxIdle, maxActive and idleTimeout.
+// Retry options include retries and retryDelay
 //
 // By default maxIdle and maxActive are set to 1: passing values greater
 // than the default (e.g. maxIdle: "10", maxActive: "20") will provide a
 // pool of re-usable connections.
+
+// By default, retry is disable. You can tell gorethink to retry a connection
+// on failure by setting retries to the # of times to attempt a reconnection.
+// Alternatively, setting retries to -1 will continue to attempt restablishing
+// the connection. retryDelay specifies the delay to wait between connection
+// attempts. retryDetail defaults to 1 milliseconds
 //
 // Basic connection example:
 //

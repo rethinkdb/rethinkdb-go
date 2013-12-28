@@ -78,32 +78,32 @@ To view full documentation for the query functions check the [GoDoc](http://godo
 
 Slice Expr Example
 ```go
-r.Expr([]interface{}{1, 2, 3, 4, 5}).RunRow(conn)
+r.Expr([]interface{}{1, 2, 3, 4, 5}).RunRow(session)
 ```
 Map Expr Example
 ```go
-r.Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).RunRow(conn)
+r.Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).RunRow(session)
 ```
 Get Example
 ```go
-r.Db("database").Table("table").Get("GUID").RunRow(conn)
+r.Db("database").Table("table").Get("GUID").RunRow(session)
 ```
 Map Example (Func)
 ```go
 r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(func (row RqlTerm) RqlTerm {
     return row.Add(1)
-}).Run(conn)
+}).Run(session)
 ```
 Map Example (Implicit)
 ```go
-r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(r.Row.Add(1)).Run(conn)
+r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(r.Row.Add(1)).Run(session)
 ```
 Between (Optional Args) Example
 ```go
 r.Db("database").Table("table").Between(1, 10, r.BetweenOpts{
     Index: "num",
     RightBound: "closed",
-}).Run(conn)
+}).Run(session)
 ```
 
 
@@ -126,7 +126,7 @@ Both ResultRows and ResultRow have the function `Scan` which is used to bind a r
 Example:
 
 ```go
-row, err := Table("tablename").Get(key).RunRow(conn)
+row, err := Table("tablename").Get(key).RunRow(session)
 if err != nil {
 	// error
 }
@@ -142,7 +142,7 @@ ResultRows also has the function `Next` which is used to iterate through a resul
 Example:
 
 ```go
-rows, err := Table("tablename").Run(conn)
+rows, err := Table("tablename").Run(session)
 if err != nil {
 	// error
 }

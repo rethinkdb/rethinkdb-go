@@ -21,26 +21,37 @@ type Connection struct {
 	// embed the net.Conn type, so that we can effectively define new methods on
 	// it (interfaces do not allow that)
 	net.Conn
+	attempts int
 }
 
-// Reconnect closes the previous connection and attempts to connect again.
+// Dial opens a connection to the server
 func Dial(s *Session) (*Connection, error) {
+	c := new(Connection)
+	if err := c.connect(s); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+// connects to the server, can be used for a new or existing connections
+// calling code is responsible for closing the existing connection
+func (c *Connection) connect(s *Session) error {
 	conn, err := net.Dial("tcp", s.address)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_2); err != nil {
-		return nil, err
+		return err
 	}
 
 	// authorization key
 	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
-		return nil, err
+		return err
 	}
 
 	if err := binary.Write(conn, binary.BigEndian, []byte(s.authkey)); err != nil {
-		return nil, err
+		return err
 	}
 
 	// read server response to authorization key (terminated by NUL)
@@ -48,18 +59,19 @@ func Dial(s *Session) (*Connection, error) {
 	line, err := reader.ReadBytes('\x00')
 	if err != nil {
 		if err == io.EOF {
-			return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
+			return fmt.Errorf("Unexpected EOF: %s", string(line))
 		}
-		return nil, err
+		return err
 	}
 	// convert to string and remove trailing NUL byte
 	response := string(line[:len(line)-1])
 	if response != "SUCCESS" {
 		// we failed authorization or something else terrible happened
-		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
+		return RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
 
-	return &Connection{conn}, nil
+	c.Conn = conn
+	return nil
 }
 
 func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
@@ -82,12 +94,21 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 	if data, err = proto.Marshal(q); err != nil {
 		return nil, err
 	}
-	if err = binary.Write(c, binary.LittleEndian, uint32(len(data))); err != nil {
-		return nil, err
-	}
+	for {
+		if err = binary.Write(c, binary.LittleEndian, uint32(len(data))); err != nil {
+			if c.reconnect(s) {
+				continue
+			}
+			return nil, err
+		}
 
-	if err = binary.Write(c, binary.BigEndian, data); err != nil {
-		return nil, err
+		if err = binary.Write(c, binary.BigEndian, data); err != nil {
+			if c.reconnect(s) {
+				continue
+			}
+			return nil, err
+		}
+		break
 	}
 
 	// Return immediately if the noreply option was set
@@ -195,4 +216,18 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 	default:
 		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", r.GetType())}
 	}
+}
+
+// reconnects if configured to retry on failure
+func (c *Connection) reconnect(s *Session) bool {
+	for ; s.retries == -1 || c.attempts < s.retries; c.attempts++ {
+		c.Close()
+		time.Sleep(s.retryDelay)
+		if err := c.connect(s); err == nil {
+			c.attempts = 0
+			return true
+		}
+	}
+	c.Close()
+	return false
 }
