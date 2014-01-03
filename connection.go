@@ -27,20 +27,20 @@ type Connection struct {
 func Dial(s *Session) (*Connection, error) {
 	conn, err := net.Dial("tcp", s.address)
 	if err != nil {
-		return nil, err
+		return nil, RqlConnectionError{err.Error()}
 	}
 
 	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_2); err != nil {
-		return nil, err
+		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// authorization key
 	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
-		return nil, err
+		return nil, RqlConnectionError{err.Error()}
 	}
 
 	if err := binary.Write(conn, binary.BigEndian, []byte(s.authkey)); err != nil {
-		return nil, err
+		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// read server response to authorization key (terminated by NUL)
@@ -50,7 +50,7 @@ func Dial(s *Session) (*Connection, error) {
 		if err == io.EOF {
 			return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
 		}
-		return nil, err
+		return nil, RqlDriverError{err.Error()}
 	}
 	// convert to string and remove trailing NUL byte
 	response := string(line[:len(line)-1])
@@ -80,14 +80,14 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 
 	// Send query
 	if data, err = proto.Marshal(q); err != nil {
-		return nil, err
+		return nil, RqlDriverError{err.Error()}
 	}
 	if err = binary.Write(c, binary.LittleEndian, uint32(len(data))); err != nil {
-		return nil, err
+		return nil, RqlConnectionError{err.Error()}
 	}
 
 	if err = binary.Write(c, binary.BigEndian, data); err != nil {
-		return nil, err
+		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Return immediately if the noreply option was set
@@ -98,19 +98,19 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 	// Read response
 	var messageLength uint32
 	if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
-		return nil, err
+		return nil, RqlConnectionError{err.Error()}
 	}
 
 	buffer := make([]byte, messageLength)
 	_, err = io.ReadFull(c, buffer)
 	if err != nil {
-		return nil, err
+		return nil, RqlDriverError{err.Error()}
 	}
 
 	r := &p.Response{}
 	err = proto.Unmarshal(buffer, r)
 	if err != nil {
-		return nil, err
+		return nil, RqlDriverError{err.Error()}
 	}
 
 	// Ensure that this is the response we were expecting

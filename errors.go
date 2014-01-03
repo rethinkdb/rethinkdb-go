@@ -45,3 +45,15 @@ func (e RqlDriverError) Error() string {
 func (e RqlDriverError) String() string {
 	return e.Error()
 }
+
+type RqlConnectionError struct {
+	message string
+}
+
+func (e RqlConnectionError) Error() string {
+	return fmt.Sprintf("gorethink: %s", e.message)
+}
+
+func (e RqlConnectionError) String() string {
+	return e.Error()
+}
