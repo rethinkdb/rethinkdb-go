@@ -201,3 +201,4 @@ limitations under the License.
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/dancannon/gorethink/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/52e520509342596a401cd9ef0ee0d504 "githalytics.com")](http://githalytics.com/dancannon/gorethink)
