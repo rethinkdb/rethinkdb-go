@@ -179,6 +179,20 @@ Field int `gorethink:"myName,omitempty"`
 Field int `gorethink:",omitempty"`
 ```
 
+Alternatively you can implement the FieldMapper interface  by providing the FieldMap function which returns a map of strings in the form of `"FieldName": "NewName"`. For example:
+
+```go
+type A struct {
+    Field int
+}
+
+func (a A) FieldMap() map[string]string {
+    return map[string]string{
+        "Field": "myName",
+    }
+}
+```
+
 ## Examples
 
 View other examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).

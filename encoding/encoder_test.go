@@ -67,6 +67,34 @@ func TestEncode(t *testing.T) {
 	}
 }
 
+type FieldMappable struct {
+	Str string
+	Int int
+}
+
+func (f FieldMappable) FieldMap() map[string]string {
+	return map[string]string{
+		"Str": "str",
+		"Int": "int",
+	}
+}
+
+func TestFieldMapper(t *testing.T) {
+	var in = FieldMappable{"string", 123}
+	var out = map[string]interface{}{
+		"str": "string",
+		"int": 123,
+	}
+
+	got, err := Encode(&in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(got, out) {
+		t.Errorf(" got: %v\nwant: %v\n", got, out)
+	}
+}
+
 type Optionals struct {
 	Sr string `gorethink:"sr"`
 	So string `gorethink:"so,omitempty"`

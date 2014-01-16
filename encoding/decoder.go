@@ -343,7 +343,7 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 			subdv = mapElem
 		} else {
 			var f *field
-			fields := cachedTypeFields(dv.Type())
+			fields := cachedTypeFields(dv)
 			for i := range fields {
 				ff := &fields[i]
 				if ff.name == skey {

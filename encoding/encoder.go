@@ -63,7 +63,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 		// insert the encoded values into a map
 		m := reflect.MakeMap(reflect.TypeOf(map[string]interface{}{}))
 
-		for _, f := range cachedTypeFields(v.Type()) {
+		for _, f := range cachedTypeFields(v) {
 			fv := fieldByIndex(v, f.index)
 			if !fv.IsValid() || f.omitEmpty && isEmptyValue(fv) {
 				continue

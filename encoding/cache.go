@@ -8,6 +8,10 @@ import (
 	"sync"
 )
 
+type FieldMapper interface {
+	FieldMap() map[string]string
+}
+
 // newCache returns a new cache.
 func init() {
 	fieldCache.m = make(map[reflect.Type][]field)
@@ -19,7 +23,9 @@ var fieldCache struct {
 	m map[reflect.Type][]field
 }
 
-func cachedTypeFields(t reflect.Type) []field {
+func cachedTypeFields(v reflect.Value) []field {
+	t := v.Type()
+
 	fieldCache.l.RLock()
 	f := fieldCache.m[t]
 	fieldCache.l.RUnlock()
@@ -29,7 +35,7 @@ func cachedTypeFields(t reflect.Type) []field {
 
 	// Compute fields without lock.
 	// Might duplicate effort but won't hold other computations back.
-	f = typeFields(t)
+	f = typeFields(v)
 	if f == nil {
 		f = []field{}
 	}
@@ -46,7 +52,9 @@ func cachedTypeFields(t reflect.Type) []field {
 // typeFields returns a list of fields that should be recognized for the given type.
 // The algorithm is breadth-first search over the set of structs to include - the top struct
 // and then any reachable anonymous structs.
-func typeFields(t reflect.Type) []field {
+func typeFields(v reflect.Value) []field {
+	t := v.Type()
+
 	// Anonymous fields to explore at the current level and the next.
 	current := []field{}
 	next := []field{{typ: t}}
@@ -157,6 +165,18 @@ func typeFields(t reflect.Type) []field {
 	}
 
 	fields = out
+
+	var fieldMapperType = reflect.TypeOf(new(FieldMapper)).Elem()
+	if t.Implements(fieldMapperType) {
+		fm := v.Interface().(FieldMapper).FieldMap()
+
+		for index, field := range fields {
+			if mappedName, ok := fm[field.name]; ok {
+				fields[index].name = mappedName
+			}
+		}
+	}
+
 	sort.Sort(byIndex(fields))
 
 	return fields
