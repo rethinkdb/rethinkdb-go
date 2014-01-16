@@ -57,6 +57,8 @@ func newSession(args map[string]interface{}) *Session {
 	}
 	if idleTimeout, ok := args["idleTimeout"]; ok {
 		s.idleTimeout = idleTimeout.(time.Duration)
+	} else {
+		s.idleTimeout = 10 * time.Second
 	}
 
 	return s

@@ -99,7 +99,6 @@ func (p *Pool) get() (*Connection, error) {
 	}
 
 	// Prune stale connections.
-
 	if timeout := p.IdleTimeout; timeout > 0 {
 		for i, n := 0, p.idle.Len(); i < n; i++ {
 			e := p.idle.Back()
@@ -118,8 +117,21 @@ func (p *Pool) get() (*Connection, error) {
 		}
 	}
 
-	// Get idle connection.
+	// Prune dead connections
+	for i, n := 0, p.idle.Len(); i < n; i++ {
+		e := p.idle.Back()
+		if e == nil {
+			break
+		}
+		ic := e.Value.(idleConn)
+		if !ic.c.closed {
+			break
+		}
+		p.idle.Remove(e)
+		p.active -= 1
+	}
 
+	// Get idle connection.
 	for i, n := 0, p.idle.Len(); i < n; i++ {
 		e := p.idle.Front()
 		if e == nil {

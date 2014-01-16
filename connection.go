@@ -21,6 +21,8 @@ type Connection struct {
 	// embed the net.Conn type, so that we can effectively define new methods on
 	// it (interfaces do not allow that)
 	net.Conn
+
+	closed bool
 }
 
 // Reconnect closes the previous connection and attempts to connect again.
@@ -59,7 +61,22 @@ func Dial(s *Session) (*Connection, error) {
 		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
 
-	return &Connection{conn}, nil
+	return &Connection{conn, false}, nil
+}
+
+func TestOnBorrow(c *Connection, t time.Time) error {
+	c.SetReadDeadline(t)
+
+	data := make([]byte, 1)
+	if _, err := c.Read(data); err != nil {
+		e, ok := err.(net.Error)
+		if err != nil && !(ok && e.Timeout()) {
+			return err
+		}
+	}
+
+	c.SetReadDeadline(time.Time{})
+	return nil
 }
 
 func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
@@ -83,10 +100,12 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 		return nil, RqlDriverError{err.Error()}
 	}
 	if err = binary.Write(c, binary.LittleEndian, uint32(len(data))); err != nil {
+		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	if err = binary.Write(c, binary.BigEndian, data); err != nil {
+		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
@@ -98,12 +117,14 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 	// Read response
 	var messageLength uint32
 	if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
+		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	buffer := make([]byte, messageLength)
 	_, err = io.ReadFull(c, buffer)
 	if err != nil {
+		c.Close()
 		return nil, RqlDriverError{err.Error()}
 	}
 
@@ -195,4 +216,9 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 	default:
 		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", r.GetType())}
 	}
+}
+
+func (c *Connection) Close() error {
+	c.closed = true
+	return c.Conn.Close()
 }
