@@ -215,9 +215,24 @@ func (r *ResultRows) ScanAll(dest interface{}) error {
 
 // Tests if the current row is nil.
 func (r *ResultRows) IsNil() bool {
+	if !r.initialized {
+		return r.buffer == nil || len(r.buffer) == 0
+	}
 	if r.current == nil {
 		return true
 	}
 
 	return false
+}
+
+// Returns the number of rows currently in the buffer. If only a partial response
+// was returned from the server then the more flag is set to true.
+func (r *ResultRows) Count() (count int, more bool) {
+	if r.IsNil() {
+		return 0, false
+	}
+
+	more = !(r.responseType == p.Response_SUCCESS_SEQUENCE || r.responseType == p.Response_SUCCESS_ATOM)
+	count = len(r.buffer)
+	return
 }
