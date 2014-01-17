@@ -125,7 +125,7 @@ func (p *Pool) get() (*Connection, error) {
 		}
 		ic := e.Value.(idleConn)
 		if !ic.c.closed {
-			break
+			continue
 		}
 		p.idle.Remove(e)
 		p.active -= 1
