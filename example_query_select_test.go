@@ -15,7 +15,7 @@ func ExampleRqlTerm_Get() {
 	}
 
 	sess, err := r.Connect(map[string]interface{}{
-		"address": "localhost:28015",
+		"address": url,
 	})
 
 	// Setup table
@@ -54,7 +54,7 @@ func ExampleRqlTerm_GetAll_compound() {
 	}
 
 	sess, err := r.Connect(map[string]interface{}{
-		"address": "localhost:28015",
+		"address": url,
 	})
 
 	// Setup table
