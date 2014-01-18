@@ -142,6 +142,17 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
 }
 
+func (s *RethinkSuite) TestTableCompoundIndexCreate(c *test.C) {
+	DbCreate("test").Exec(sess)
+	Db("test").TableDrop("TableCompound").Exec(sess)
+	Db("test").TableCreate("TableCompound").Exec(sess)
+	response, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row RqlTerm) interface{} {
+		return []interface{}{row.Field("first_name"), row.Field("last_name")}
+	}).RunWrite(sess)
+	c.Assert(err, test.IsNil)
+	c.Assert(response.Created, test.Equals, 1)
+}
+
 func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 	var response []interface{}
 

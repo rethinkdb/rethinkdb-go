@@ -54,6 +54,11 @@ func (o *IndexCreateOpts) toMap() map[string]interface{} {
 }
 
 // Create a new secondary index on this table.
+//
+// A multi index can be created by passing an optional multi argument. Multi indexes
+//  functions should return arrays and allow you to query based on whether a value
+//  is present in the returned array. The example would allow us to get heroes who
+//  possess a specific ability (the field 'abilities' is an array).
 func (t RqlTerm) IndexCreate(name interface{}, optArgs ...IndexCreateOpts) RqlTerm {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
@@ -64,6 +69,8 @@ func (t RqlTerm) IndexCreate(name interface{}, optArgs ...IndexCreateOpts) RqlTe
 
 // Create a new secondary index on this table based on the value of the function
 // passed.
+//
+// A compound index can be created by returning an array of values to use as the secondary index key.
 func (t RqlTerm) IndexCreateFunc(name, f interface{}, optArgs ...IndexCreateOpts) RqlTerm {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {

@@ -114,6 +114,32 @@ func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
 }
 
+func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").Exec(sess)
+	Db("test").TableDrop("TableCompound").Exec(sess)
+	Db("test").TableCreate("TableCompound").Exec(sess)
+	write, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row RqlTerm) interface{} {
+		return []interface{}{row.Field("first_name"), row.Field("last_name")}
+	}).RunWrite(sess)
+	c.Assert(err, test.IsNil)
+	c.Assert(write.Created, test.Equals, 1)
+
+	// Insert rows
+	Db("test").Table("TableCompound").Insert(nameList).Exec(sess)
+
+	// Test query
+	var response interface{}
+	query := Db("test").Table("TableCompound").GetAllByIndex("full_name", []interface{}{"John", "Smith"})
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, map[string]interface{}{"id": 1, "first_name": "John", "last_name": "Smith", "gender": "M"})
+}
+
 func (s *RethinkSuite) TestSelectBetween(c *test.C) {
 	// Ensure table + database exist
 	DbCreate("test").Exec(sess)

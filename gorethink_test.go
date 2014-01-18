@@ -113,6 +113,10 @@ var objList = []interface{}{
 	map[string]interface{}{"id": 8, "g1": 4, "g2": 2, "num": 50},
 	map[string]interface{}{"id": 9, "g1": 2, "g2": 3, "num": 25},
 }
+var nameList = []interface{}{
+	map[string]interface{}{"id": 1, "first_name": "John", "last_name": "Smith", "gender": "M"},
+	map[string]interface{}{"id": 2, "first_name": "Jane", "last_name": "Smith", "gender": "F"},
+}
 var defaultObjList = []interface{}{
 	map[string]interface{}{"a": 1},
 	map[string]interface{}{},
