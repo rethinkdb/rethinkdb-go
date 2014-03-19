@@ -35,6 +35,22 @@ func (s *RethinkSuite) TestRowsScanSlice(c *test.C) {
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
+func (s *RethinkSuite) TestRowsPartiallyNilSlice(c *test.C) {
+	row, err := Expr([]interface{}{
+		map[string]interface{}{"num": 1},
+		map[string]interface{}{"num": 2},
+		nil,
+		nil,
+		map[string]interface{}{"num": 5},
+	}).Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	err = row.ScanAll(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{1, 2, nil, nil, 5})
+}
+
 func (s *RethinkSuite) TestRowsScanMap(c *test.C) {
 	row, err := Expr(map[string]interface{}{
 		"id":   2,
