@@ -3,9 +3,10 @@
 package encoding
 
 import (
-	"errors"
+
+	// "errors"
 	"reflect"
-	"runtime"
+	// "runtime"
 	"strconv"
 	"strings"
 )
@@ -13,21 +14,22 @@ import (
 // Decode decodes map[string]interface{} into a struct. The first parameter
 // must be a pointer.
 func Decode(dst interface{}, src interface{}) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			if _, ok := r.(runtime.Error); ok {
-				panic(r)
-			}
-			if v, ok := r.(string); ok {
-				err = errors.New(v)
-			} else {
-				err = r.(error)
-			}
-		}
-	}()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		if _, ok := r.(runtime.Error); ok {
+	// 			panic(r)
+	// 		}
+	// 		if v, ok := r.(string); ok {
+	// 			err = errors.New(v)
+	// 		} else {
+	// 			err = r.(error)
+	// 		}
+	// 	}
+	// }()
 
 	dv := reflect.ValueOf(dst)
 	sv := reflect.ValueOf(src)
+
 	if dv.Kind() != reflect.Ptr || dv.IsNil() {
 		return &InvalidDecodeError{reflect.TypeOf(dst)}
 	}
@@ -419,6 +421,10 @@ func decodeObjectInterface(s *decodeState, sv reflect.Value) map[string]interfac
 
 // decodeLiteralInterface returns the interface of the source value
 func decodeLiteralInterface(s *decodeState, sv reflect.Value) interface{} {
+	if !sv.IsValid() {
+		return nil
+	}
+
 	return sv.Interface()
 }
 

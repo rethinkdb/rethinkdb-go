@@ -104,9 +104,7 @@ func (r *ResultRows) Next() bool {
 		}
 
 		r.current = row
-		if row != nil {
-			return true
-		}
+		return true
 	}
 
 	// Check if all rows have been loaded
