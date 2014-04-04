@@ -1,3 +1,5 @@
+# Update for RethinkDB 1.12 is coming soon, see [Issue #71](https://github.com/dancannon/gorethink/issues/71)
+
 # GoRethink - RethinkDB Driver for Go
 
 [![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/m "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2)
