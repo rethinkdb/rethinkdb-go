@@ -304,14 +304,14 @@ func (s *RethinkSuite) TestManipulationKeys(c *test.C) {
 func (s *RethinkSuite) TestManipulationObject(c *test.C) {
 	query := Object("a", 1, "b", 2)
 
-	var response map[interface{}]interface{}
-	r, err := query.Run(sess)
+	var response interface{}
+	r, err := query.RunRow(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = r.Scan(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[interface{}]interface{}{
+	c.Assert(response, JsonEquals, map[string]interface{}{
 		"a": 1,
 		"b": 2,
 	})
