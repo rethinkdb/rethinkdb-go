@@ -1,10 +1,11 @@
 package gorethink
 
 import (
-	"github.com/dancannon/gorethink/encoding"
-	p "github.com/dancannon/gorethink/ql2"
 	"reflect"
 	"time"
+
+	"github.com/dancannon/gorethink/encoding"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 // Expr converts any value to an expression.  Internally it uses the `json`

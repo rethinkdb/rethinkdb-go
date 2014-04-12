@@ -111,3 +111,8 @@ func (t RqlTerm) ChangeAt(index, value interface{}) RqlTerm {
 func (t RqlTerm) Keys() RqlTerm {
 	return newRqlTermFromPrevVal(t, "Keys", p.Term_KEYS, []interface{}{}, map[string]interface{}{})
 }
+
+// Creates an object from a list of key-value pairs, where the keys must be strings.
+func Object(args ...interface{}) RqlTerm {
+	return newRqlTerm("Object", p.Term_OBJECT, args, map[string]interface{}{})
+}

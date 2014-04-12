@@ -76,7 +76,7 @@ func (s *RethinkSuite) TestJoinOuterJoinZip(c *test.C) {
 	var response []interface{}
 	query := Db("test").Table("Join1").OuterJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
 		return a.Field("id").Eq(b.Field("id"))
-	}).Zip()
+	}).Zip().OrderBy("id")
 	rows, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 

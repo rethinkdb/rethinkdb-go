@@ -2,8 +2,9 @@ package gorethink_test
 
 import (
 	"fmt"
-	r "github.com/dancannon/gorethink"
 	"log"
+
+	r "github.com/dancannon/gorethink"
 )
 
 func ExampleRqlTerm_Get() {
@@ -64,6 +65,7 @@ func ExampleRqlTerm_GetAll_compound() {
 	r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.RqlTerm) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).Run(sess)
+	r.Db("test").Table("table").IndexWait().Run(sess)
 
 	// Fetch the row from the database
 	row, err := r.Db("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).RunRow(sess)

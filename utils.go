@@ -1,13 +1,15 @@
 package gorethink
 
 import (
-	"code.google.com/p/goprotobuf/proto"
-	"github.com/dancannon/gorethink/encoding"
-	p "github.com/dancannon/gorethink/ql2"
+	"fmt"
 	"math"
 	"strconv"
 	"strings"
 	"time"
+
+	"code.google.com/p/goprotobuf/proto"
+	"github.com/dancannon/gorethink/encoding"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 // Helper functions for constructing terms
@@ -107,6 +109,22 @@ func reqlTimeToNativeTime(timestamp float64, timezone string) (time.Time, error)
 	}
 
 	return t, nil
+}
+
+func reqlGroupedDataToObj(obj map[string]interface{}) (interface{}, error) {
+	if data, ok := obj["data"]; ok {
+		ret := []interface{}{}
+		for _, v := range data.([]interface{}) {
+			v := v.([]interface{})
+			ret = append(ret, map[string]interface{}{
+				"group":     v[0],
+				"reduction": v[1],
+			})
+		}
+		return ret, nil
+	} else {
+		return nil, fmt.Errorf("pseudo-type GROUPED_DATA object %v does not have the expected field \"data\"", obj)
+	}
 }
 
 // Helper functions for debugging

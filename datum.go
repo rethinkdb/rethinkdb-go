@@ -1,11 +1,12 @@
 package gorethink
 
 import (
-	"code.google.com/p/goprotobuf/proto"
 	"encoding/json"
 	"fmt"
-	p "github.com/dancannon/gorethink/ql2"
 	"reflect"
+
+	"code.google.com/p/goprotobuf/proto"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 // Converts a query term to a datum. If the term cannot be converted to a datum
@@ -165,7 +166,7 @@ func deconstructDatum(datum *p.Datum, opts map[string]interface{}) (interface{},
 func convertPseudotype(obj map[string]interface{}, opts map[string]interface{}) (interface{}, error) {
 	if reqlType, ok := obj["$reql_type$"]; ok {
 		if reqlType == "TIME" {
-			// load timeformat, set to native if the option was not set
+			// load timeFormat, set to native if the option was not set
 			timeFormat := "native"
 			if opt, ok := opts["time_format"]; ok {
 				if sopt, ok := opt.(string); ok {
@@ -181,6 +182,24 @@ func convertPseudotype(obj map[string]interface{}, opts map[string]interface{}) 
 				return obj, nil
 			} else {
 				return nil, fmt.Errorf("Unknown time_format run option \"%s\".", reqlType)
+			}
+		} else if reqlType == "GROUPED_DATA" {
+			// load groupFormat, set to native if the option was not set
+			groupFormat := "native"
+			if opt, ok := opts["group_format"]; ok {
+				if sopt, ok := opt.(string); ok {
+					groupFormat = sopt
+				} else {
+					return nil, fmt.Errorf("Invalid group_format run option \"%s\".", opt)
+				}
+			}
+
+			if groupFormat == "native" {
+				return reqlGroupedDataToObj(obj)
+			} else if groupFormat == "raw" {
+				return obj, nil
+			} else {
+				return nil, fmt.Errorf("Unknown group_format run option \"%s\".", reqlType)
 			}
 		} else {
 			return obj, nil
