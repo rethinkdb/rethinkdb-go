@@ -41,65 +41,76 @@ func (s *RethinkSuite) TestAggregationDistinct(c *test.C) {
 	c.Assert(response, test.HasLen, 5)
 }
 
-// func (s *RethinkSuite) TestAggregationGroupedMapReduce(c *test.C) {
-// 	var response []interface{}
-// 	query := Expr(objList).GroupedMapReduce(
-// 		func(row RqlTerm) RqlTerm {
-// 			return row.Field("id").Mod(2).Eq(0)
-// 		},
-// 		func(row RqlTerm) RqlTerm {
-// 			return row.Field("num")
-// 		},
-// 		func(acc, num RqlTerm) RqlTerm {
-// 			return acc.Add(num)
-// 		},
-// 		0,
-// 	)
-// 	r, err := query.Run(sess)
-// 	c.Assert(err, test.IsNil)
+func (s *RethinkSuite) TestAggregationGroupMapReduce(c *test.C) {
+	var response []interface{}
+	query := Expr(objList).Group(func(row RqlTerm) RqlTerm {
+		return row.Field("id").Mod(2).Eq(0)
+	}).Map(func(row RqlTerm) RqlTerm {
+		return row.Field("num")
+	}).Reduce(func(acc, num RqlTerm) RqlTerm {
+		return acc.Add(num)
+	})
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
 
-// 	err = r.ScanAll(&response)
+	err = r.ScanAll(&response)
 
-// 	c.Assert(err, test.IsNil)
-// 	c.Assert(response, JsonEquals, []interface{}{
-// 		map[string]interface{}{"reduction": 135, "group": false},
-// 		map[string]interface{}{"reduction": 70, "group": true},
-// 	})
-// }
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 135, "group": false},
+		map[string]interface{}{"reduction": 70, "group": true},
+	})
+}
 
-// func (s *RethinkSuite) TestAggregationGroupedMapReduceTable(c *test.C) {
-// 	// Ensure table + database exist
-// 	DbCreate("test").Exec(sess)
-// 	Db("test").TableCreate("TestAggregationGroupedMapReduceTable").Exec(sess)
+func (s *RethinkSuite) TestAggregationGroupMapReduceUngroup(c *test.C) {
+	var response []interface{}
+	query := Expr(objList).Group(func(row RqlTerm) RqlTerm {
+		return row.Field("id").Mod(2).Eq(0)
+	}).Map(func(row RqlTerm) RqlTerm {
+		return row.Field("num")
+	}).Reduce(func(acc, num RqlTerm) RqlTerm {
+		return acc.Add(num)
+	}).Ungroup().OrderBy("reduction")
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
 
-// 	// Insert rows
-// 	err := Db("test").Table("TestAggregationGroupedMapReduceTable").Insert(objList).Exec(sess)
-// 	c.Assert(err, test.IsNil)
+	err = r.ScanAll(&response)
 
-// 	var response []interface{}
-// 	query := Db("test").Table("TestAggregationGroupedMapReduceTable").GroupedMapReduce(
-// 		func(row RqlTerm) RqlTerm {
-// 			return row.Field("id").Mod(2).Eq(0)
-// 		},
-// 		func(row RqlTerm) RqlTerm {
-// 			return row.Field("num")
-// 		},
-// 		func(acc, num RqlTerm) RqlTerm {
-// 			return acc.Add(num)
-// 		},
-// 		0,
-// 	)
-// 	r, err := query.Run(sess)
-// 	c.Assert(err, test.IsNil)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 70, "group": true},
+		map[string]interface{}{"reduction": 135, "group": false},
+	})
+}
 
-// 	err = r.ScanAll(&response)
+func (s *RethinkSuite) TestAggregationGroupMapReduceTable(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("TestAggregationGroupedMapReduceTable").Exec(sess)
 
-// 	c.Assert(err, test.IsNil)
-// 	c.Assert(response, JsonEquals, []interface{}{
-// 		map[string]interface{}{"reduction": 135, "group": false},
-// 		map[string]interface{}{"reduction": 70, "group": true},
-// 	})
-// }
+	// Insert rows
+	err := Db("test").Table("TestAggregationGroupedMapReduceTable").Insert(objList).Exec(sess)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	query := Db("test").Table("TestAggregationGroupedMapReduceTable").Group(func(row RqlTerm) RqlTerm {
+		return row.Field("id").Mod(2).Eq(0)
+	}).Map(func(row RqlTerm) RqlTerm {
+		return row.Field("num")
+	}).Reduce(func(acc, num RqlTerm) RqlTerm {
+		return acc.Add(num)
+	})
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.ScanAll(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"reduction": 135, "group": false},
+		map[string]interface{}{"reduction": 70, "group": true},
+	})
+}
 
 func (s *RethinkSuite) TestAggregationGroupCount(c *test.C) {
 	var response []interface{}
