@@ -10,7 +10,7 @@ func Db(name interface{}) RqlTerm {
 }
 
 type TableOpts struct {
-	UseOutdated string `gorethink:"use_outdated,omitempty"`
+	UseOutdated interface{} `gorethink:"use_outdated,omitempty"`
 }
 
 func (o *TableOpts) toMap() map[string]interface{} {

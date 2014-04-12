@@ -1,8 +1,6 @@
 package gorethink
 
-import (
-	test "launchpad.net/gocheck"
-)
+import test "launchpad.net/gocheck"
 
 func (s *RethinkSuite) TestQueryRun(c *test.C) {
 	var response string
