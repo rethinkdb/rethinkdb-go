@@ -3,10 +3,11 @@ package gorethink
 import (
 	"encoding/json"
 	"flag"
-	test "launchpad.net/gocheck"
 	"os"
 	"testing"
 	"time"
+
+	test "launchpad.net/gocheck"
 )
 
 var sess *Session
@@ -37,10 +38,10 @@ var _ = test.Suite(&RethinkSuite{})
 
 func (s *RethinkSuite) SetUpSuite(c *test.C) {
 	var err error
-	sess, err = Connect(map[string]interface{}{
-		"address":   url,
-		"maxIdle":   3,
-		"maxActive": 3,
+	sess, err = Connect(ConnectOpts{
+		Address:   url,
+		MaxIdle:   3,
+		MaxActive: 3,
 	})
 	c.Assert(err, test.IsNil)
 }
