@@ -158,7 +158,9 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	return err
 }
 
-// Close closes the session
+// noreplyWait ensures that previous queries with the noreply flag have been 
+// processed by the server. Note that this guarantee only applies to queries 
+// run on the given connection
 func (s *Session) NoReplyWait() {
 	s.noreplyWaitQuery()
 }
