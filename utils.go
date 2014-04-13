@@ -18,6 +18,7 @@ import (
 func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
 	return RqlTerm{
 		name:     name,
+		rootTerm: true,
 		termType: termType,
 		args:     listToTermsList(args),
 		optArgs:  objToTermsObj(optArgs),
@@ -34,6 +35,7 @@ func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermTyp
 
 	return RqlTerm{
 		name:     name,
+		rootTerm: false,
 		termType: termType,
 		args:     listToTermsList(args),
 		optArgs:  objToTermsObj(optArgs),

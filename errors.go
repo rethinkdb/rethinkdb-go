@@ -1,9 +1,49 @@
 package gorethink
 
 import (
+	"bytes"
 	"fmt"
+
 	p "github.com/dancannon/gorethink/ql2"
 )
+
+func printCarrots(t RqlTerm, frames []*p.Frame) string {
+	var frame *p.Frame
+	if len(frames) > 1 {
+		frame, frames = frames[0], frames[1:]
+	} else if len(frames) == 1 {
+		frame, frames = frames[0], []*p.Frame{}
+	}
+
+	for i, arg := range t.args {
+		if frame.GetPos() == int64(i) {
+			t.args[i] = RqlTerm{
+				termType: p.Term_DATUM,
+				data:     printCarrots(arg, frames),
+			}
+		}
+	}
+
+	for k, arg := range t.optArgs {
+		if frame.GetOpt() == k {
+			t.optArgs[k] = RqlTerm{
+				termType: p.Term_DATUM,
+				data:     printCarrots(arg, frames),
+			}
+		}
+	}
+
+	b := &bytes.Buffer{}
+	for _, c := range t.String() {
+		if c != '^' {
+			b.WriteString(" ")
+		} else {
+			b.WriteString("^")
+		}
+	}
+
+	return b.String()
+}
 
 // Connection/Response errors
 // ----------------------------------------------------------------------------

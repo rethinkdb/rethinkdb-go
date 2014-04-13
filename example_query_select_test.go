@@ -15,8 +15,8 @@ func ExampleRqlTerm_Get() {
 		Gender    string `gorethink:"gender"`
 	}
 
-	sess, err := r.Connect(map[string]interface{}{
-		"address": url,
+	sess, err := r.Connect(r.ConnectOpts{
+		Address: url,
 	})
 
 	// Setup table
@@ -54,8 +54,8 @@ func ExampleRqlTerm_GetAll_compound() {
 		Gender    string `gorethink:"gender"`
 	}
 
-	sess, err := r.Connect(map[string]interface{}{
-		"address": url,
+	sess, err := r.Connect(r.ConnectOpts{
+		Address: url,
 	})
 
 	// Setup table

@@ -2,13 +2,14 @@ package gorethink_test
 
 import (
 	"fmt"
-	r "github.com/dancannon/gorethink"
 	"log"
+
+	r "github.com/dancannon/gorethink"
 )
 
 func ExampleRqlTerm_TableCreate() {
-	sess, err := r.Connect(map[string]interface{}{
-		"address": url,
+	sess, err := r.Connect(r.ConnectOpts{
+		Address: url,
 	})
 
 	// Setup database
@@ -26,8 +27,8 @@ func ExampleRqlTerm_TableCreate() {
 }
 
 func ExampleRqlTerm_IndexCreate() {
-	sess, err := r.Connect(map[string]interface{}{
-		"address": url,
+	sess, err := r.Connect(r.ConnectOpts{
+		Address: url,
 	})
 
 	// Setup database
@@ -46,8 +47,8 @@ func ExampleRqlTerm_IndexCreate() {
 }
 
 func ExampleRqlTerm_IndexCreate_compound() {
-	sess, err := r.Connect(map[string]interface{}{
-		"address": url,
+	sess, err := r.Connect(r.ConnectOpts{
+		Address: url,
 	})
 
 	// Setup database

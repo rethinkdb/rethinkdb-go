@@ -1,10 +1,11 @@
 package gorethink
 
 import (
-	"code.google.com/p/goprotobuf/proto"
-	p "github.com/dancannon/gorethink/ql2"
 	"sync/atomic"
 	"time"
+
+	"code.google.com/p/goprotobuf/proto"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 type Session struct {
@@ -64,6 +65,21 @@ func newSession(args map[string]interface{}) *Session {
 	return s
 }
 
+type ConnectOpts struct {
+	Token       int64         `gorethink:"token,omitempty"`
+	Address     string        `gorethink:"address,omitempty"`
+	Database    string        `gorethink:"database,omitempty"`
+	Timeout     time.Duration `gorethink:"timeout,omitempty"`
+	AuthKey     string        `gorethink:"authkey,omitempty"`
+	MaxIdle     int           `gorethink:"max_idle,omitempty"`
+	MaxActive   int           `gorethink:"max_active,omitempty"`
+	IdleTimeout time.Duration `gorethink:"idle_timeout,omitempty"`
+}
+
+func (o *ConnectOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Connect creates a new database session.
 //
 // Supported arguments include token, address, database, timeout, authkey,
@@ -76,13 +92,13 @@ func newSession(args map[string]interface{}) *Session {
 // Basic connection example:
 //
 //	var session *r.Session
-//	session, err := r.Connect(map[string]interface{}{
-//		"address":  "localhost:28015",
-//		"database": "test",
-//		"authkey":  "14daak1cad13dj",
-//	})
-func Connect(args map[string]interface{}) (*Session, error) {
-	s := newSession(args)
+// session, err := r.Connect(r.ConnectOpts{
+// 	Address:  "localhost:28015",
+// 	Database: "test",
+// 	AuthKey:  "14daak1cad13dj",
+// })
+func Connect(args ConnectOpts) (*Session, error) {
+	s := newSession(args.toMap())
 	err := s.Reconnect()
 
 	return s, err
