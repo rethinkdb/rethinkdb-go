@@ -6,10 +6,10 @@ import (
 
 func (s *RethinkSuite) TestSessionConnectError(c *test.C) {
 	var err error
-	_, err = Connect(map[string]interface{}{
-		"address":   "nonexistanturl",
-		"maxIdle":   3,
-		"maxActive": 3,
+	_, err = Connect(ConnectOpts{
+		Address:   "nonexistanturl",
+		MaxIdle:   3,
+		MaxActive: 3,
 	})
 	c.Assert(err, test.NotNil)
 }

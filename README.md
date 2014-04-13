@@ -1,22 +1,16 @@
-# GoRethink - RethinkDB Driver for Go
-
-[![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/m "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2)
+GoRethink - RethinkDB Driver for Go [![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/s/master "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2) [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
+=====================
 
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) made by [Daniel Cannon](http://github.com/dancannon) and based off of Christopher Hesse's [RethinkGo](https://github.com/christopherhesse/rethinkgo) driver.
 
-Current supported RethinkDB version: 1.11 | Documentation: [GoDoc](http://godoc.org/github.com/dancannon/gorethink)
+Current version: v0.2 (RethinkDB v1.12) 
+
+**Version 0.2 introduced some BC breaking changes, for more information check the [change log](CHANGELOG.md)**
 
 ## Installation
 
 ```sh
 go get -u github.com/dancannon/gorethink
-```
-
-If you do not have the [goprotobuf](https://code.google.com/p/goprotobuf/) runtime installed, it is required:
-
-```sh
-brew install mercurial # if you do not have mercurial installed
-go get code.google.com/p/goprotobuf/{proto,protoc-gen-go}
 ```
 
 ## Connection
@@ -32,15 +26,14 @@ import (
 
 var session *r.Session
 
-session, err := r.Connect(map[string]interface{}{
-        "address":  "localhost:28015",
-        "database": "test",
-        "authkey":  "14daak1cad13dj",
-    })
+session, err := r.Connect(r.ConnectOpts{
+    Address:  "localhost:28015",
+    Database: "test",
+})
 
-    if err != nil {
-        log.Fatalln(err.Error())
-    }
+if err != nil {
+    log.Fatalln(err.Error())
+}
 
 ```
 See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect) for a list of supported arguments to Connect().
@@ -56,16 +49,16 @@ import (
 
 var session *r.Session
 
-session, err := r.Connect(map[string]interface{}{
-        "address":  "localhost:28015",
-        "database": "test",
-        "maxIdle": 10,
-        "idleTimeout": time.Second * 10,
-    })
+session, err := r.Connect(r.ConnectOpts{
+    Address:  "localhost:28015",
+    Database: "test",
+    MaxIdle: 10,
+    IdleTimeout: time.Second * 10,
+})
 
-    if err != nil {
-        log.Fatalln(err.Error())
-    }
+if err != nil {
+    log.Fatalln(err.Error())
+}
 ```
 
 A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) instance can also be passed to Connect().

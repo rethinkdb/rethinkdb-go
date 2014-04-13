@@ -1,11 +1,12 @@
 package gorethink
 
 import (
-	"code.google.com/p/goprotobuf/proto"
 	"fmt"
-	p "github.com/dancannon/gorethink/ql2"
 	"strconv"
 	"strings"
+
+	"code.google.com/p/goprotobuf/proto"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 type OptArgs interface {
@@ -15,6 +16,7 @@ type termsList []RqlTerm
 type termsObj map[string]RqlTerm
 type RqlTerm struct {
 	name     string
+	rootTerm bool
 	termType p.Term_TermType
 	data     interface{}
 	args     []RqlTerm
@@ -55,7 +57,45 @@ func (t RqlTerm) build() *p.Term {
 	}
 }
 
-// compose returns a string representation of the query tree
+func (t RqlTerm) compose(args []string, optArgs map[string]string) string {
+	switch t.termType {
+	case p.Term_MAKE_ARRAY:
+		return fmt.Sprintf("[%s]", strings.Join(argsToStringSlice(t.args), ", "))
+	case p.Term_MAKE_OBJ:
+		return fmt.Sprintf("{%s}", strings.Join(optArgsToStringSlice(t.optArgs), ", "))
+	case p.Term_FUNC:
+		// Get string representation of each argument
+		args := []string{}
+		for _, v := range t.args[0].args {
+			args = append(args, fmt.Sprintf("var_%d", v.data))
+		}
+
+		return fmt.Sprintf("func(%s r.RqlTerm) r.RqlTerm { return %s }",
+			strings.Join(args, ", "),
+			t.args[1].String(),
+		)
+	case p.Term_VAR:
+		return fmt.Sprintf("var_%s", t.args[0])
+	case p.Term_IMPLICIT_VAR:
+		return "r.Row"
+	case p.Term_DATUM:
+		switch v := t.data.(type) {
+		case string:
+			return strconv.Quote(v)
+		default:
+			return fmt.Sprintf("%v", v)
+		}
+
+	default:
+		if t.rootTerm {
+			return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
+		} else {
+			return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
+		}
+	}
+}
+
+// String returns a string representation of the query tree
 func (t RqlTerm) String() string {
 	switch t.termType {
 	case p.Term_MAKE_ARRAY:
@@ -86,10 +126,10 @@ func (t RqlTerm) String() string {
 		}
 
 	default:
-		if t.name != "" {
+		if t.rootTerm {
 			return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 		} else {
-			return fmt.Sprintf("(%s)", strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
+			return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
 		}
 	}
 }

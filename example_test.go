@@ -2,9 +2,10 @@ package gorethink_test
 
 import (
 	"fmt"
-	r "github.com/dancannon/gorethink"
 	"log"
 	"os"
+
+	r "github.com/dancannon/gorethink"
 )
 
 var session *r.Session
@@ -19,8 +20,8 @@ func init() {
 }
 
 func Example() {
-	session, err := r.Connect(map[string]interface{}{
-		"address": url,
+	session, err := r.Connect(r.ConnectOpts{
+		Address: url,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
