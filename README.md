@@ -32,15 +32,14 @@ import (
 
 var session *r.Session
 
-session, err := r.Connect(map[string]interface{}{
-        "address":  "localhost:28015",
-        "database": "test",
-        "authkey":  "14daak1cad13dj",
-    })
+session, err := r.Connect(r.ConnectOpts{
+    Address:  "localhost:28015",
+    Database: "test",
+})
 
-    if err != nil {
-        log.Fatalln(err.Error())
-    }
+if err != nil {
+    log.Fatalln(err.Error())
+}
 
 ```
 See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect) for a list of supported arguments to Connect().
@@ -56,16 +55,16 @@ import (
 
 var session *r.Session
 
-session, err := r.Connect(map[string]interface{}{
-        "address":  "localhost:28015",
-        "database": "test",
-        "maxIdle": 10,
-        "idleTimeout": time.Second * 10,
-    })
+session, err := r.Connect(r.ConnectOpts{
+    Address:  "localhost:28015",
+    Database: "test",
+    MaxIdle: 10,
+    IdleTimeout: time.Second * 10,
+})
 
-    if err != nil {
-        log.Fatalln(err.Error())
-    }
+if err != nil {
+    log.Fatalln(err.Error())
+}
 ```
 
 A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) instance can also be passed to Connect().
