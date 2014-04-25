@@ -141,7 +141,7 @@ if err != nil {
 }
 for rows.Next() {
     var row interface{}
-    err := r.Scan(&row)
+    err := rows.Scan(&row)
 
     // Do something with row
 }

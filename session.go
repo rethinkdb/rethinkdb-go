@@ -92,11 +92,11 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 // Basic connection example:
 //
 //	var session *r.Session
-// session, err := r.Connect(r.ConnectOpts{
-// 	Address:  "localhost:28015",
-// 	Database: "test",
-// 	AuthKey:  "14daak1cad13dj",
-// })
+// 	session, err := r.Connect(r.ConnectOpts{
+// 		Address:  "localhost:28015",
+// 		Database: "test",
+// 		AuthKey:  "14daak1cad13dj",
+// 	})
 func Connect(args ConnectOpts) (*Session, error) {
 	s := newSession(args.toMap())
 	err := s.Reconnect()
@@ -158,7 +158,9 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	return err
 }
 
-// Close closes the session
+// noreplyWait ensures that previous queries with the noreply flag have been 
+// processed by the server. Note that this guarantee only applies to queries 
+// run on the given connection
 func (s *Session) NoReplyWait() {
 	s.noreplyWaitQuery()
 }
