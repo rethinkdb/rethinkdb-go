@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/dancannon/gorethink.png?label=ready&title=Ready)](https://waffle.io/dancannon/gorethink)
 GoRethink - RethinkDB Driver for Go [![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/s/master "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2) [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
 =====================
 
