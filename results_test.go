@@ -1,8 +1,6 @@
 package gorethink
 
-import (
-	test "launchpad.net/gocheck"
-)
+import test "launchpad.net/gocheck"
 
 type object struct {
 	Id    int64  `gorethink:"id,omitempty"`
@@ -238,11 +236,4 @@ func (s *RethinkSuite) TestRowsScanAll(c *test.C) {
 			}},
 		},
 	})
-}
-
-func (s *RethinkSuite) TestRowsCount(c *test.C) {
-	rows, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
-	c.Assert(err, test.IsNil)
-	count, _ := rows.Count()
-	c.Assert(count, test.Equals, 10)
 }

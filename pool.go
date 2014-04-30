@@ -19,9 +19,10 @@ package gorethink
 import (
 	"container/list"
 	"errors"
-	p "github.com/dancannon/gorethink/ql2"
 	"sync"
 	"time"
+
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 var nowFunc = time.Now // for testing
@@ -204,10 +205,16 @@ func (c *pooledConnection) Close() (err error) {
 	return err
 }
 
-func (c *pooledConnection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
+func (c *pooledConnection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error) {
 	if err := c.get(); err != nil {
 		return nil, err
 	}
-	return c.c.SendQuery(s, q, t, opts)
+	return c.c.SendQuery(s, q, t, opts, async)
+}
 
+func (c *pooledConnection) ReadResponse(s *Session, token int64) (*p.Response, error) {
+	if err := c.get(); err != nil {
+		return nil, err
+	}
+	return c.c.ReadResponse(s, token)
 }

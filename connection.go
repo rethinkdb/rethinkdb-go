@@ -2,17 +2,19 @@ package gorethink
 
 import (
 	"bufio"
-	"code.google.com/p/goprotobuf/proto"
 	"encoding/binary"
 	"fmt"
-	p "github.com/dancannon/gorethink/ql2"
 	"io"
 	"net"
 	"time"
+
+	"code.google.com/p/goprotobuf/proto"
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 type Conn interface {
-	SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error)
+	SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error)
+	ReadResponse(s *Session, token int64) (*p.Response, error)
 	Close() error
 }
 
@@ -79,7 +81,37 @@ func TestOnBorrow(c *Connection, t time.Time) error {
 	return nil
 }
 
-func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
+func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) {
+	for {
+		var messageLength uint32
+		if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
+			c.Close()
+			return nil, RqlConnectionError{err.Error()}
+		}
+
+		buffer := make([]byte, messageLength)
+		if _, err := io.ReadFull(c, buffer); err != nil {
+			c.Close()
+			return nil, RqlDriverError{err.Error()}
+		}
+
+		response := &p.Response{}
+		if err := proto.Unmarshal(buffer, response); err != nil {
+			return nil, RqlDriverError{err.Error()}
+		}
+
+		if response.GetToken() == token {
+			return response, nil
+		} else if _, ok := s.cache[response.GetToken()]; ok {
+			// Handle batch response
+			s.handleBatchResponse(response)
+		} else {
+			return nil, RqlDriverError{"Unexpected response received"}
+		}
+	}
+}
+
+func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error) {
 	var data []byte
 	var err error
 
@@ -112,113 +144,108 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 	// Return immediately if the noreply option was set
 	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
 		return nil, nil
+	} else if async {
+		return nil, nil
 	}
 
-	// Read response
-	var messageLength uint32
-	if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
-		c.Close()
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	buffer := make([]byte, messageLength)
-	_, err = io.ReadFull(c, buffer)
+	// Get response
+	response, err := c.ReadResponse(s, *q.Token)
 	if err != nil {
-		c.Close()
-		return nil, RqlDriverError{err.Error()}
+		return nil, err
 	}
 
-	r := &p.Response{}
-	err = proto.Unmarshal(buffer, r)
+	err = checkErrorResponse(response, t)
 	if err != nil {
-		return nil, RqlDriverError{err.Error()}
-	}
-
-	// Ensure that this is the response we were expecting
-	if q.GetToken() != r.GetToken() {
-		return nil, RqlDriverError{"Unexpected response received."}
+		return nil, err
 	}
 
 	// De-construct the profile datum if it exists
 	var profile interface{}
-	if r.GetProfile() != nil {
+	if response.GetProfile() != nil {
 		var err error
 
-		profile, err = deconstructDatum(r.GetProfile(), opts)
+		profile, err = deconstructDatum(response.GetProfile(), opts)
 		if err != nil {
 			return nil, RqlDriverError{err.Error()}
 		}
 	}
 
 	// De-construct datum and return the result
-	switch r.GetType() {
-	case p.Response_CLIENT_ERROR:
-		return nil, RqlClientError{rqlResponseError{r, t}}
-	case p.Response_COMPILE_ERROR:
-		return nil, RqlCompileError{rqlResponseError{r, t}}
-	case p.Response_RUNTIME_ERROR:
-		return nil, RqlRuntimeError{rqlResponseError{r, t}}
+	switch response.GetType() {
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
-		value, err := deconstructDatums(r.GetResponse(), opts)
-		if err != nil {
-			return nil, RqlDriverError{err.Error()}
+		result := &ResultRows{
+			session: s,
+			query:   q,
+			term:    t,
+			opts:    opts,
+			profile: profile,
 		}
 
-		return &ResultRows{
-			session:      s,
-			query:        q,
-			term:         t,
-			profile:      profile,
-			opts:         opts,
-			buffer:       value,
-			end:          len(value),
-			token:        q.GetToken(),
-			responseType: r.GetType(),
-		}, nil
+		s.Lock()
+		s.cache[*q.Token] = result
+		s.Unlock()
+
+		result.extend(response)
+
+		return result, nil
 	case p.Response_SUCCESS_ATOM:
-		if len(r.GetResponse()) < 1 {
-			return &ResultRows{}, nil
-		}
-
 		var value []interface{}
 		var err error
-		if r.GetResponse()[0].GetType() == p.Datum_R_ARRAY {
-			value, err = deconstructDatums(r.GetResponse()[0].GetRArray(), opts)
+
+		if len(response.GetResponse()) < 1 {
+			value = []interface{}{}
+		} else if response.GetResponse()[0].GetType() == p.Datum_R_ARRAY {
+			value, err = deconstructDatums(response.GetResponse()[0].GetRArray(), opts)
 			if err != nil {
-				return nil, RqlDriverError{err.Error()}
+				return nil, err
 			}
 		} else {
 			var v interface{}
 
-			v, err = deconstructDatum(r.GetResponse()[0], opts)
+			v, err = deconstructDatum(response.GetResponse()[0], opts)
 			if err != nil {
 				return nil, RqlDriverError{err.Error()}
 			}
 
 			if sv, ok := v.([]interface{}); ok {
 				value = sv
+			} else if v == nil {
+				value = []interface{}{nil}
 			} else {
 				value = []interface{}{v}
 			}
 		}
 
 		return &ResultRows{
-			session:      s,
-			query:        q,
-			term:         t,
-			profile:      profile,
-			opts:         opts,
-			buffer:       value,
-			end:          len(value),
-			token:        q.GetToken(),
-			responseType: r.GetType(),
+			session:  s,
+			query:    q,
+			term:     t,
+			opts:     opts,
+			profile:  profile,
+			buffer:   value,
+			finished: true,
 		}, nil
+	case p.Response_WAIT_COMPLETE:
+		return nil, nil
 	default:
-		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", r.GetType())}
+		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", response.GetType())}
 	}
 }
 
 func (c *Connection) Close() error {
 	c.closed = true
 	return c.Conn.Close()
+}
+
+func checkErrorResponse(response *p.Response, t RqlTerm) error {
+	switch response.GetType() {
+	case p.Response_CLIENT_ERROR:
+		return RqlClientError{rqlResponseError{response, t}}
+	case p.Response_COMPILE_ERROR:
+		return RqlCompileError{rqlResponseError{response, t}}
+	case p.Response_RUNTIME_ERROR:
+		return RqlRuntimeError{rqlResponseError{response, t}}
+	}
+
+	return nil
 }
