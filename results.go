@@ -1,9 +1,11 @@
 package gorethink
 
 import (
+	"reflect"
+	"sync"
+
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
-	"reflect"
 )
 
 // ResultRow contains the result of a RunRow query
@@ -13,7 +15,11 @@ type ResultRow struct {
 }
 
 func (r *ResultRow) Profile() interface{} {
-	return r.rows.profile
+	return r.rows.Profile()
+}
+
+func (r *ResultRow) Err() error {
+	return r.err
 }
 
 // Scan copies the result from the matched row into the value pointed at by dest.
@@ -42,20 +48,24 @@ func (r *ResultRow) IsNil() bool {
 // ResultRows contains the result of a query. Its cursor starts before the first row
 // of the result set. Use Next to advance through the rows.
 type ResultRows struct {
-	session      *Session
-	query        *p.Query
-	term         RqlTerm
-	profile      interface{}
-	opts         map[string]interface{}
-	buffer       []interface{}
-	current      interface{}
-	start        int
-	end          int
-	token        int64
-	err          error
-	initialized  bool
-	closed       bool
-	responseType p.Response_ResponseType
+	sync.Mutex
+
+	session *Session
+	query   *p.Query
+	term    RqlTerm
+	opts    map[string]interface{}
+
+	profile interface{}
+
+	initialized bool
+	closed      bool
+	err         error
+
+	outstandingRequests int
+	finished            bool
+	responses           []*p.Response
+	current             interface{}
+	buffer              []interface{}
 }
 
 func (r *ResultRows) Profile() interface{} {
@@ -68,7 +78,7 @@ func (r *ResultRows) Close() error {
 	var err error
 
 	if !r.closed {
-		_, err = r.session.stopQuery(r.query, r.term, r.opts)
+		err = r.session.stopQuery(r)
 		r.closed = true
 	}
 
@@ -85,8 +95,6 @@ func (r *ResultRows) Err() error {
 // to next. If all rows in the buffer have been read and a partial sequence was
 // returned then Next will load more from the database
 func (r *ResultRows) Next() bool {
-	r.initialized = true
-
 	if r.closed {
 		return false
 	}
@@ -95,60 +103,58 @@ func (r *ResultRows) Next() bool {
 		return false
 	}
 
-	// Attempt to get a result in the buffer
-	if r.end > r.start {
-		row := r.buffer[r.start]
+	if !r.initialized {
+		r.initialized = true
+	}
 
-		if !r.advance() {
-			return false
-		}
-
-		r.current = row
+	// Attempt to load a row from the buffer
+	if len(r.buffer) > 0 {
+		r.current, r.buffer = r.buffer[0], r.buffer[1:]
 		return true
 	}
 
-	// Check if all rows have been loaded
-	if r.responseType == p.Response_SUCCESS_SEQUENCE || r.responseType == p.Response_SUCCESS_ATOM {
-		r.closed = true
-		r.start = 0
-		r.end = 0
+	// Fetch new batch from the server
+	if len(r.responses) == 0 && !r.finished {
+		if err := r.session.continueQuery(r); err != nil {
+			r.err = err
+
+			return false
+		}
+	}
+
+	// Check if we  are finished
+	if len(r.responses) == 0 && r.finished {
 		return false
 	}
 
-	// Load more data from the database
+	// If we have more batches in the response cache then load a new response
+	// into the buffer
+	if len(r.responses) > 0 {
+		v, err := deconstructDatums(r.responses[0].GetResponse(), r.opts)
+		if err != nil {
+			r.err = err
 
-	// First, shift data to beginning of buffer if there's lots of empty space
-	// or space is neded.
-	if r.start > 0 && (r.end == len(r.buffer) || r.start > len(r.buffer)/2) {
-		copy(r.buffer, r.buffer[r.start:r.end])
-		r.end -= r.start
-		r.start = 0
+			return false
+		}
+		r.buffer = v
+		r.responses = r.responses[1:]
 	}
 
-	// Continue the query
-	newResult, err := r.session.continueQuery(r.query, r.term, r.opts)
-	if err != nil {
-		r.err = err
-		return false
+	// Check the buffer again to make sure it is not empty
+	if len(r.buffer) > 0 {
+		r.current, r.buffer = r.buffer[0], r.buffer[1:]
+
+		return true
 	}
 
-	r.buffer = append(r.buffer, newResult.buffer...)
-	r.end += len(newResult.buffer)
-
-	r.advance()
-	r.current = r.buffer[r.start]
-
-	return true
+	return false
 }
 
-// advance moves the internal buffer pointer ahead to point to the next row
-func (r *ResultRows) advance() bool {
-	if r.end <= r.start {
-		return false
-	}
-
-	r.start++
-	return true
+func (r *ResultRows) extend(response *p.Response) {
+	r.finished = response.GetType() != p.Response_SUCCESS_PARTIAL
+	r.Lock()
+	r.responses = append(r.responses, response)
+	r.Unlock()
 }
 
 // Scan copies the result in the current row into the value pointed at by dest.
@@ -179,7 +185,6 @@ func (r *ResultRows) Scan(dest interface{}) error {
 // ScanAll copies all the rows in the result buffer into the value pointed at by
 // dest.
 func (r *ResultRows) ScanAll(dest interface{}) error {
-
 	// Validate the data types
 	pval := reflect.ValueOf(dest)
 	if pval.Kind() != reflect.Ptr {
@@ -205,6 +210,10 @@ func (r *ResultRows) ScanAll(dest interface{}) error {
 		elems = reflect.Append(elems, elem.Elem())
 	}
 
+	if r.err != nil {
+		return r.err
+	}
+
 	// Copy the value from the temporary slice to the destination
 	val.Set(elems)
 
@@ -213,24 +222,5 @@ func (r *ResultRows) ScanAll(dest interface{}) error {
 
 // Tests if the current row is nil.
 func (r *ResultRows) IsNil() bool {
-	if !r.initialized {
-		return r.buffer == nil || len(r.buffer) == 0
-	}
-	if r.current == nil {
-		return true
-	}
-
-	return false
-}
-
-// Returns the number of rows currently in the buffer. If only a partial response
-// was returned from the server then the more flag is set to true.
-func (r *ResultRows) Count() (count int, more bool) {
-	if r.IsNil() {
-		return 0, false
-	}
-
-	more = !(r.responseType == p.Response_SUCCESS_SEQUENCE || r.responseType == p.Response_SUCCESS_ATOM)
-	count = len(r.buffer)
-	return
+	return len(r.responses) == 0 && r.current == nil
 }

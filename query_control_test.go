@@ -162,12 +162,9 @@ func (s *RethinkSuite) TestControlJson(c *test.C) {
 }
 
 func (s *RethinkSuite) TestControlError(c *test.C) {
-	var response interface{}
 	query := Error("An error occurred")
-	r, err := query.RunRow(sess)
+	_, err := query.RunRow(sess)
 	c.Assert(err, test.NotNil)
-
-	err = r.Scan(&response)
 
 	c.Assert(err, test.NotNil)
 	c.Assert(err, test.FitsTypeOf, RqlRuntimeError{})

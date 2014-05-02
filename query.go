@@ -154,6 +154,10 @@ type RunOpts struct {
 	UseOutdated interface{} `gorethink:"use_outdated,omitempty"`
 	NoReply     interface{} `gorethink:"noreply,omitempty"`
 	TimeFormat  interface{} `gorethink:"time_format,omitempty"`
+
+	// Unsupported options
+
+	BatchConf interface{} `gorethink:"batch_conf,omitempty"`
 }
 
 func (o *RunOpts) toMap() map[string]interface{} {
@@ -194,9 +198,12 @@ func (t RqlTerm) Run(s *Session, optArgs ...RunOpts) (*ResultRows, error) {
 //	err = row.Scan(&doc)
 func (t RqlTerm) RunRow(s *Session, optArgs ...RunOpts) (*ResultRow, error) {
 	rows, err := t.Run(s, optArgs...)
-	if err == nil {
-		rows.Next()
+	if err != nil {
+		return nil, err
 	}
+
+	rows.Next()
+
 	return &ResultRow{rows: rows, err: err}, err
 }
 

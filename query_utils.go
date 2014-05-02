@@ -1,8 +1,10 @@
 package gorethink
 
 import (
-	p "github.com/dancannon/gorethink/ql2"
 	"reflect"
+	"sync/atomic"
+
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 // Helper functions for creating internal RQL types
@@ -43,7 +45,7 @@ func makeFunc(f interface{}) RqlTerm {
 		// Get a slice of the VARs to use as the function arguments
 		args = append(args, reflect.ValueOf(newRqlTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{})))
 		argNums = append(argNums, nextVarId)
-		nextVarId++
+		atomic.AddInt64(&nextVarId, 1)
 
 		// make sure all input arguments are of type RqlTerm
 		if valueType.In(i).String() != "gorethink.RqlTerm" {
