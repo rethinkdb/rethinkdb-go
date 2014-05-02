@@ -2,7 +2,6 @@ package gorethink
 
 import (
 	"log"
-	"testing"
 
 	test "launchpad.net/gocheck"
 )
@@ -271,17 +270,13 @@ func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 }
 
 func (s *RethinkSuite) TestSelectMany(c *test.C) {
-	if testing.Short() {
-		c.Skip("Skipping long test")
-	}
-
 	// Ensure table + database exist
 	DbCreate("test").RunWrite(sess)
 	Db("test").TableCreate("TestMany").RunWrite(sess)
 	Db("test").Table("TestMany").Delete().RunWrite(sess)
 
 	// Insert rows
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 1; i++ {
 		data := []interface{}{}
 
 		for j := 0; j < 100; j++ {
@@ -291,7 +286,9 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 			})
 		}
 
-		Db("test").Table("TestMany").Insert(data).RunWrite(sess)
+		Db("test").Table("TestMany").Insert(data).RunWrite(sess, RunOpts{
+			BatchConf: map[string]interface{}{"max_els": 5},
+		})
 	}
 
 	// Test query
@@ -313,5 +310,5 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 	}
 
 	c.Assert(rows.Err(), test.IsNil)
-	c.Assert(n, test.Equals, 10000)
+	c.Assert(n, test.Equals, 100)
 }

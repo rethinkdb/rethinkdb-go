@@ -154,6 +154,10 @@ type RunOpts struct {
 	UseOutdated interface{} `gorethink:"use_outdated,omitempty"`
 	NoReply     interface{} `gorethink:"noreply,omitempty"`
 	TimeFormat  interface{} `gorethink:"time_format,omitempty"`
+
+	// Unsupported options
+
+	BatchConf interface{} `gorethink:"batch_conf,omitempty"`
 }
 
 func (o *RunOpts) toMap() map[string]interface{} {
