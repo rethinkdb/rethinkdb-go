@@ -5,7 +5,7 @@ GoRethink - RethinkDB Driver for Go [![wercker status](https://app.wercker.com/s
 
 Current version: v0.2.1 (RethinkDB v1.12) 
 
-**Version 0.2.1 introduced some BC breaking changes, for more information check the [change log](CHANGELOG.md)**
+**Version 0.2 introduced some BC breaking changes, for more information check the [change log](CHANGELOG.md)**
 
 ## Installation
 
