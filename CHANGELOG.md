@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.2.1 (RethinkDB v1.12) - 13 April
+## v0.2 (RethinkDB v1.12) - 13 April
 
 * Changed `Connect` to use `ConnectOpts` instead of `map[string]interface{}`
 * Migrated to new `Group`/`Ungroup` functions, these replace `GroupedMapReduce` and `GroupBy`
