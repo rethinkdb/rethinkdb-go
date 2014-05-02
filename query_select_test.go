@@ -1,6 +1,8 @@
 package gorethink
 
 import (
+	"log"
+
 	test "launchpad.net/gocheck"
 )
 
@@ -265,4 +267,48 @@ func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 	})
+}
+
+func (s *RethinkSuite) TestSelectMany(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	for i := 0; i < 1; i++ {
+		data := []interface{}{}
+
+		for j := 0; j < 100; j++ {
+			data = append(data, map[string]interface{}{
+				"i": i,
+				"j": j,
+			})
+		}
+
+		Db("test").Table("TestMany").Insert(data).RunWrite(sess, RunOpts{
+			BatchConf: map[string]interface{}{"max_els": 5},
+		})
+	}
+
+	// Test query
+	query := Db("test").Table("TestMany")
+
+	rows, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var n int
+	for rows.Next() {
+		var v interface{}
+
+		err := rows.Scan(&v)
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		n++
+	}
+
+	c.Assert(rows.Err(), test.IsNil)
+	c.Assert(n, test.Equals, 100)
 }

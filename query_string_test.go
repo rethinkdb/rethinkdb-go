@@ -20,13 +20,9 @@ func (s *RethinkSuite) TestStringMatchSuccess(c *test.C) {
 func (s *RethinkSuite) TestStringMatchFail(c *test.C) {
 	query := Expr("id:0,foo:bar").Match("name:(\\w+)").Field("groups").Nth(0).Field("str")
 
-	var response int
 	r, err := query.RunRow(sess)
 	c.Assert(err, test.NotNil)
-
-	err = r.Scan(&response)
-
-	c.Assert(err, test.NotNil)
+	c.Assert(r, test.IsNil)
 }
 
 func (s *RethinkSuite) TestStringSplit(c *test.C) {
