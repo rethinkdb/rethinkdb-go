@@ -157,8 +157,8 @@ func isEmptyValue(v reflect.Value) bool {
 	case reflect.Interface, reflect.Ptr:
 		return v.IsNil()
 	}
-
-	return v.Interface() == reflect.Zero(v.Type()).Interface()
+	e
+	return reflect.DeepEqual(v.Interface(), reflect.Zero(v.Type()).Interface())
 }
 
 func fieldByIndex(v reflect.Value, index []int) reflect.Value {
