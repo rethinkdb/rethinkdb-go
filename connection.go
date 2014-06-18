@@ -27,23 +27,33 @@ type Connection struct {
 	closed bool
 }
 
-// Reconnect closes the previous connection and attempts to connect again.
+// Dial closes the previous connection and attempts to connect again.
 func Dial(s *Session) (*Connection, error) {
 	conn, err := net.Dial("tcp", s.address)
 	if err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_2); err != nil {
+	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
+	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
-	// authorization key
+	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
 	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
-	if err := binary.Write(conn, binary.BigEndian, []byte(s.authkey)); err != nil {
+	// Send the auth key as an ASCII string
+	// If there is no auth key, skip this step
+	if s.authkey != "" {
+		if _, err := io.WriteString(conn, s.authkey); err != nil {
+			return nil, RqlConnectionError{err.Error()}
+		}
+	}
+
+	// Send the protocol type as a 4-byte little-endian-encoded integer
+	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_PROTOBUF); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
