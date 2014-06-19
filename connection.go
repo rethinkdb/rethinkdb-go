@@ -182,7 +182,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 
 	// De-construct datum and return the result
 	switch response.GetType() {
-	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
+	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE, p.Response_SUCCESS_FEED:
 		result := &ResultRows{
 			session: s,
 			query:   q,

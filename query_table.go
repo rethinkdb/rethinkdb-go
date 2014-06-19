@@ -100,3 +100,11 @@ func (t RqlTerm) IndexStatus(indexes ...interface{}) RqlTerm {
 func (t RqlTerm) IndexWait(indexes ...interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "IndexWait", p.Term_INDEX_WAIT, indexes, map[string]interface{}{})
 }
+
+// Takes a table and returns an infinite stream of objects representing changes to that table.
+// Whenever an insert, delete, update or replace is performed on the table, an object of the form
+// {old_val:..., new_val:...} will be added to the stream. For an insert, old_val will be
+// null, and for a delete, new_val will be null.
+func (t RqlTerm) Changes() RqlTerm {
+	return newRqlTermFromPrevVal(t, "Changes", p.Term_CHANGES, []interface{}{}, map[string]interface{}{})
+}
