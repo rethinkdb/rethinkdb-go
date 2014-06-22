@@ -10,6 +10,7 @@ import (
 func ExampleRqlTerm_TableCreate() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 
 	// Setup database
@@ -29,6 +30,7 @@ func ExampleRqlTerm_TableCreate() {
 func ExampleRqlTerm_IndexCreate() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 
 	// Setup database
@@ -49,6 +51,7 @@ func ExampleRqlTerm_IndexCreate() {
 func ExampleRqlTerm_IndexCreate_compound() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 
 	// Setup database
