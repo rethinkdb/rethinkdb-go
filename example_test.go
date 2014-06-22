@@ -9,7 +9,7 @@ import (
 )
 
 var session *r.Session
-var url string
+var url, authKey string
 
 func init() {
 	// Needed for wercker. By default url is "localhost:28015"
@@ -17,11 +17,15 @@ func init() {
 	if url == "" {
 		url = "localhost:28015"
 	}
+
+	// Needed for running tests for RethinkDB with a non-empty authkey
+	authKey = os.Getenv("RETHINKDB_AUTHKEY")
 }
 
 func Example() {
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
