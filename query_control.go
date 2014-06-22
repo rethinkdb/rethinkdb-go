@@ -138,8 +138,6 @@ func (t RqlTerm) Do(f interface{}) RqlTerm {
 // Evaluate the expr in the context of one or more value bindings. The type of
 // the result is the type of the value returned from expr.
 func Do(args ...interface{}) RqlTerm {
-	enforceArgLength(1, -1, args)
-
 	newArgs := []interface{}{}
 	newArgs = append(newArgs, funcWrap(args[len(args)-1]))
 	newArgs = append(newArgs, args[:len(args)-1]...)

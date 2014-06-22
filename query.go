@@ -22,6 +22,7 @@ type RqlTerm struct {
 	args     []RqlTerm
 	optArgs  map[string]RqlTerm
 }
+type Term RqlTerm
 
 // build takes the query tree and turns it into a protobuf term tree.
 func (t RqlTerm) build() *p.Term {

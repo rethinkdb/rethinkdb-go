@@ -8,8 +8,6 @@ import (
 var Row = newRqlTerm("Doc", p.Term_IMPLICIT_VAR, []interface{}{}, map[string]interface{}{})
 
 func Literal(args ...interface{}) RqlTerm {
-	enforceArgLength(0, 1, args)
-
 	return newRqlTerm("Literal", p.Term_LITERAL, args, map[string]interface{}{})
 }
 
