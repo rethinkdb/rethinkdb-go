@@ -134,8 +134,8 @@ func Le(args ...interface{}) RqlTerm {
 }
 
 // Not performs a logical not on a value.
-func (t RqlTerm) Not() RqlTerm {
-	return newRqlTermFromPrevVal(t, "Not", p.Term_NOT, []interface{}{}, map[string]interface{}{})
+func (t RqlTerm) Not(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Not", p.Term_NOT, args, map[string]interface{}{})
 }
 
 // Not performs a logical not on a value.

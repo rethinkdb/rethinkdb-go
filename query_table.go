@@ -36,13 +36,13 @@ func (t RqlTerm) TableCreate(name interface{}, optArgs ...TableCreateOpts) RqlTe
 //
 // If successful, the operation returns an object: {dropped: 1}. If the specified
 // table doesn't exist a RqlRuntimeError is thrown.
-func (t RqlTerm) TableDrop(name interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "TableDrop", p.Term_TABLE_DROP, []interface{}{name}, map[string]interface{}{})
+func (t RqlTerm) TableDrop(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "TableDrop", p.Term_TABLE_DROP, args, map[string]interface{}{})
 }
 
 // List all table names in a database.
-func (t RqlTerm) TableList() RqlTerm {
-	return newRqlTermFromPrevVal(t, "TableList", p.Term_TABLE_LIST, []interface{}{}, map[string]interface{}{})
+func (t RqlTerm) TableList(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "TableList", p.Term_TABLE_LIST, args, map[string]interface{}{})
 }
 
 type IndexCreateOpts struct {
@@ -80,23 +80,23 @@ func (t RqlTerm) IndexCreateFunc(name, f interface{}, optArgs ...IndexCreateOpts
 }
 
 // Delete a previously created secondary index of this table.
-func (t RqlTerm) IndexDrop(name interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexDrop", p.Term_INDEX_DROP, []interface{}{name}, map[string]interface{}{})
+func (t RqlTerm) IndexDrop(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IndexDrop", p.Term_INDEX_DROP, args, map[string]interface{}{})
 }
 
 // List all the secondary indexes of this table.
-func (t RqlTerm) IndexList() RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexList", p.Term_INDEX_LIST, []interface{}{}, map[string]interface{}{})
+func (t RqlTerm) IndexList(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IndexList", p.Term_INDEX_LIST, args, map[string]interface{}{})
 }
 
 // Get the status of the specified indexes on this table, or the status of all
 // indexes on this table if no indexes are specified.
-func (t RqlTerm) IndexStatus(indexes ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexStatus", p.Term_INDEX_STATUS, indexes, map[string]interface{}{})
+func (t RqlTerm) IndexStatus(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IndexStatus", p.Term_INDEX_STATUS, args, map[string]interface{}{})
 }
 
 // Wait for the specified indexes on this table to be ready, or for all indexes
 // on this table to be ready if no indexes are specified.
-func (t RqlTerm) IndexWait(indexes ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexWait", p.Term_INDEX_WAIT, indexes, map[string]interface{}{})
+func (t RqlTerm) IndexWait(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IndexWait", p.Term_INDEX_WAIT, args, map[string]interface{}{})
 }

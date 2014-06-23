@@ -5,8 +5,8 @@ import (
 )
 
 // Reference a database.
-func Db(name interface{}) RqlTerm {
-	return newRqlTerm("Db", p.Term_DB, []interface{}{name}, map[string]interface{}{})
+func Db(args ...interface{}) RqlTerm {
+	return newRqlTerm("Db", p.Term_DB, args, map[string]interface{}{})
 }
 
 type TableOpts struct {
@@ -44,8 +44,8 @@ func (t RqlTerm) Table(name interface{}, optArgs ...TableOpts) RqlTerm {
 }
 
 // Get a document by primary key. If nothing was found, RethinkDB will return a nil value.
-func (t RqlTerm) Get(key interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Get", p.Term_GET, []interface{}{key}, map[string]interface{}{})
+func (t RqlTerm) Get(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Get", p.Term_GET, args, map[string]interface{}{})
 }
 
 // Get all documents where the given value matches the value of the primary index.
@@ -83,6 +83,14 @@ func (t RqlTerm) Between(lowerKey, upperKey interface{}, optArgs ...BetweenOpts)
 	return newRqlTermFromPrevVal(t, "Between", p.Term_BETWEEN, []interface{}{lowerKey, upperKey}, opts)
 }
 
+type FilterOpts struct {
+	Default interface{} `gorethink:"default,omitempty"`
+}
+
+func (o *FilterOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Get all the documents for which the given predicate is true.
 //
 // Filter can be called on a sequence, selection, or a field containing an array
@@ -91,6 +99,10 @@ func (t RqlTerm) Between(lowerKey, upperKey interface{}, optArgs ...BetweenOpts)
 // and the default value can be changed by passing the optional argument `default`.
 // Setting this optional argument to `r.error()` will cause any non-existence
 // errors to abort the filter.
-func (t RqlTerm) Filter(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Filter", p.Term_FILTER, []interface{}{funcWrap(f)}, map[string]interface{}{})
+func (t RqlTerm) Filter(f interface{}, optArgs ...FilterOpts) RqlTerm {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTermFromPrevVal(t, "Filter", p.Term_FILTER, []interface{}{funcWrap(f)}, opts)
 }

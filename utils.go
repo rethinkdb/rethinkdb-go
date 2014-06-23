@@ -14,6 +14,36 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+// Helper functions for constructing terms
+
+// newRqlTerm is an alias for creating a new RqlTermue.
+func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
+	return RqlTerm{
+		name:     name,
+		rootTerm: true,
+		termType: termType,
+		args:     convertTermList(args),
+		optArgs:  convertTermObj(optArgs),
+	}
+}
+
+// newRqlTermFromPrevVal is an alias for creating a new RqlTerm. Unlike newRqlTerm
+// this function adds the previous expression in the tree to the argument list.
+// It is used when evalutating an expression like
+//
+// `r.Expr(1).Add(2).Mul(3)`
+func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
+	args = append([]interface{}{prevVal}, args...)
+
+	return RqlTerm{
+		name:     name,
+		rootTerm: false,
+		termType: termType,
+		args:     convertTermList(args),
+		optArgs:  convertTermObj(optArgs),
+	}
+}
+
 // Helper functions for creating internal RQL types
 
 // makeArray takes a slice of terms and produces a single MAKE_ARRAY term
@@ -82,6 +112,14 @@ func funcWrap(value interface{}) RqlTerm {
 	}
 }
 
+func funcWrapArgs(args []interface{}) []interface{} {
+	for i, arg := range args {
+		args[i] = funcWrap(arg)
+	}
+
+	return args
+}
+
 // implVarScan recursivly checks a value to see if it contains an
 // IMPLICIT_VAR term. If it does it returns true
 func implVarScan(value RqlTerm) bool {
@@ -101,36 +139,6 @@ func implVarScan(value RqlTerm) bool {
 		}
 
 		return false
-	}
-}
-
-// Helper functions for constructing terms
-
-// newRqlTerm is an alias for creating a new RqlTermue.
-func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
-	return RqlTerm{
-		name:     name,
-		rootTerm: true,
-		termType: termType,
-		args:     convertTermList(args),
-		optArgs:  convertTermObj(optArgs),
-	}
-}
-
-// newRqlTermFromPrevVal is an alias for creating a new RqlTerm. Unlike newRqlTerm
-// this function adds the previous expression in the tree to the argument list.
-// It is used when evalutating an expression like
-//
-// `r.Expr(1).Add(2).Mul(3)`
-func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
-	args = append([]interface{}{prevVal}, args...)
-
-	return RqlTerm{
-		name:     name,
-		rootTerm: false,
-		termType: termType,
-		args:     convertTermList(args),
-		optArgs:  convertTermObj(optArgs),
 	}
 }
 
