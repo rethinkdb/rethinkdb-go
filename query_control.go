@@ -125,6 +125,13 @@ func Error(args ...interface{}) RqlTerm {
 	return newRqlTerm("Error", p.Term_ERROR, args, map[string]interface{}{})
 }
 
+// Args is a special term usd to splice an array of arguments into another term.
+// This is useful when you want to call a varadic term such as GetAll with a set
+// of arguments provided at runtime.
+func Args(args ...interface{}) RqlTerm {
+	return newRqlTerm("Args", p.Term_ARGS, args, map[string]interface{}{})
+}
+
 // Evaluate the expr in the context of one or more value bindings. The type of
 // the result is the type of the value returned from expr.
 func (t RqlTerm) Do(args ...interface{}) RqlTerm {
