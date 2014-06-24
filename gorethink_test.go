@@ -18,12 +18,12 @@ func init() {
 	flag.Parse()
 
 	// If the test is being run by wercker look for the rethink url
-	url = os.Getenv("WERCKER_RETHINKDB_URL")
+	url = os.Getenv("RETHINKDB_URL")
 	if url == "" {
 		url = "localhost:28015"
 	}
 
-	db = os.Getenv("WERCKER_RETHINKDB_DB")
+	db = os.Getenv("RETHINKDB_DB")
 	if db == "" {
 		db = "test"
 	}
