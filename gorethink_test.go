@@ -46,7 +46,6 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 		AuthKey:   os.Getenv("RETHINKDB_AUTHKEY"),
 		MaxIdle:   3,
 		MaxActive: 3,
-		AuthKey:   authKey,
 	})
 	c.Assert(err, test.IsNil)
 }
