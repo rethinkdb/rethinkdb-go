@@ -32,5 +32,5 @@ build:
       - script:
           name: test auth keys
           code: |
-            echo "set auth test_key" | rethinkdb admin --join $$HOST$$:29015
+            sh -c "echo 'set auth test_key' | rethinkdb admin --join $$HOST$$:29015"
             RETHINKDB_AUTHKEY=test_key go test -test.run="Test" -test.v=true -gocheck.f="TestConnectAuthKey"
