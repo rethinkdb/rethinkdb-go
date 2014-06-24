@@ -17,6 +17,7 @@ func ExampleRqlTerm_Get() {
 
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 
 	// Setup table
@@ -56,6 +57,7 @@ func ExampleRqlTerm_GetAll_compound() {
 
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 
 	// Setup table
