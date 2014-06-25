@@ -168,7 +168,7 @@ func (t RqlTerm) Random(args ...interface{}) RqlTerm {
 	// Look for options map
 	if len(args) > 0 {
 		if possibleOpts, ok := args[len(args)-1].(RandomOpts); ok {
-			opts = possibleOpts
+			opts = possibleOpts.toMap()
 			args = args[:len(args)-1]
 		}
 	}
