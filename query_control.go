@@ -114,6 +114,39 @@ func Js(jssrc interface{}) RqlTerm {
 	return newRqlTerm("Js", p.Term_JAVASCRIPT, []interface{}{jssrc}, map[string]interface{}{})
 }
 
+type HttpOpts struct {
+	// General Options
+	Timeout      interface{} `gorethink:"timeout,omitempty"`
+	Reattempts   interface{} `gorethink:"reattempts,omitempty"`
+	Redirects    interface{} `gorethink:"redirect,omitempty"`
+	Verify       interface{} `gorethink:"verify,omitempty"`
+	ResultFormat interface{} `gorethink:"resul_format,omitempty"`
+
+	// Request Options
+	Method interface{} `gorethink:"method,omitempty"`
+	Auth   interface{} `gorethink:"auth,omitempty"`
+	Params interface{} `gorethink:"params,omitempty"`
+	Header interface{} `gorethink:"header,omitempty"`
+	Data   interface{} `gorethink:"data,omitempty"`
+
+	// Pagination
+	Page      interface{} `gorethink:"page,omitempty"`
+	PageLimit interface{} `gorethink:"page_limit,omitempty"`
+}
+
+func (o *HttpOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
+// Parse a JSON string on the server.
+func Http(url interface{}, optArgs ...HttpOpts) RqlTerm {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return newRqlTerm("Http", p.Term_HTTP, []interface{}{url}, opts)
+}
+
 // Parse a JSON string on the server.
 func Json(args ...interface{}) RqlTerm {
 	return newRqlTerm("Json", p.Term_JSON, args, map[string]interface{}{})

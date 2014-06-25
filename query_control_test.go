@@ -151,6 +151,20 @@ func (s *RethinkSuite) TestControlJs(c *test.C) {
 	c.Assert(response, test.Equals, 1)
 }
 
+func (s *RethinkSuite) TestControlHttp(c *test.C) {
+	var response map[string]interface{}
+	query := Http("httpbin.org/get?data=1")
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response["args"], JsonEquals, map[string]interface{}{
+		"data": "1",
+	})
+}
+
 func (s *RethinkSuite) TestControlJson(c *test.C) {
 	var response []int
 	query := Json("[1,2,3]")
