@@ -58,7 +58,7 @@ func ExampleRqlTerm_IndexCreate_compound() {
 	r.Db("test").TableDrop("table").Run(sess)
 	r.Db("test").TableCreate("table").Run(sess)
 
-	response, err := r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.RqlTerm) interface{} {
+	response, err := r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(sess)
 	if err != nil {

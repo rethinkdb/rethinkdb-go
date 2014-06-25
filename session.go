@@ -214,7 +214,7 @@ func (s *Session) nextToken() int64 {
 
 // startQuery creates a query from the term given and sends it to the server.
 // The result from the server is returned as ResultRows
-func (s *Session) startQuery(t RqlTerm, opts map[string]interface{}) (*ResultRows, error) {
+func (s *Session) startQuery(t Term, opts map[string]interface{}) (*ResultRows, error) {
 	token := s.nextToken()
 
 	// Build query tree
@@ -355,7 +355,7 @@ func (s *Session) noreplyWaitQuery() error {
 	conn := s.pool.Get()
 	defer conn.Close()
 
-	_, err := conn.SendQuery(s, q, RqlTerm{}, map[string]interface{}{}, false)
+	_, err := conn.SendQuery(s, q, Term{}, map[string]interface{}{}, false)
 
 	return err
 }

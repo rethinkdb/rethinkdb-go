@@ -6,7 +6,7 @@ import (
 
 func (s *RethinkSuite) TestAggregationReduce(c *test.C) {
 	var response int
-	query := Expr(arr).Reduce(func(acc, val RqlTerm) RqlTerm {
+	query := Expr(arr).Reduce(func(acc, val Term) Term {
 		return acc.Add(val)
 	})
 	r, err := query.RunRow(sess)
@@ -43,11 +43,11 @@ func (s *RethinkSuite) TestAggregationDistinct(c *test.C) {
 
 func (s *RethinkSuite) TestAggregationGroupMapReduce(c *test.C) {
 	var response []interface{}
-	query := Expr(objList).Group(func(row RqlTerm) RqlTerm {
+	query := Expr(objList).Group(func(row Term) Term {
 		return row.Field("id").Mod(2).Eq(0)
-	}).Map(func(row RqlTerm) RqlTerm {
+	}).Map(func(row Term) Term {
 		return row.Field("num")
-	}).Reduce(func(acc, num RqlTerm) RqlTerm {
+	}).Reduce(func(acc, num Term) Term {
 		return acc.Add(num)
 	})
 	r, err := query.Run(sess)
@@ -64,11 +64,11 @@ func (s *RethinkSuite) TestAggregationGroupMapReduce(c *test.C) {
 
 func (s *RethinkSuite) TestAggregationGroupMapReduceUngroup(c *test.C) {
 	var response []interface{}
-	query := Expr(objList).Group(func(row RqlTerm) RqlTerm {
+	query := Expr(objList).Group(func(row Term) Term {
 		return row.Field("id").Mod(2).Eq(0)
-	}).Map(func(row RqlTerm) RqlTerm {
+	}).Map(func(row Term) Term {
 		return row.Field("num")
-	}).Reduce(func(acc, num RqlTerm) RqlTerm {
+	}).Reduce(func(acc, num Term) Term {
 		return acc.Add(num)
 	}).Ungroup().OrderBy("reduction")
 	r, err := query.Run(sess)
@@ -93,11 +93,11 @@ func (s *RethinkSuite) TestAggregationGroupMapReduceTable(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	var response []interface{}
-	query := Db("test").Table("TestAggregationGroupedMapReduceTable").Group(func(row RqlTerm) RqlTerm {
+	query := Db("test").Table("TestAggregationGroupedMapReduceTable").Group(func(row Term) Term {
 		return row.Field("id").Mod(2).Eq(0)
-	}).Map(func(row RqlTerm) RqlTerm {
+	}).Map(func(row Term) Term {
 		return row.Field("num")
-	}).Reduce(func(acc, num RqlTerm) RqlTerm {
+	}).Reduce(func(acc, num Term) Term {
 		return acc.Add(num)
 	})
 	r, err := query.Run(sess)

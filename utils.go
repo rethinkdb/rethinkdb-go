@@ -17,8 +17,8 @@ import (
 // Helper functions for constructing terms
 
 // newRqlTerm is an alias for creating a new RqlTermue.
-func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
-	return RqlTerm{
+func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) Term {
+	return Term{
 		name:     name,
 		rootTerm: true,
 		termType: termType,
@@ -27,15 +27,15 @@ func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optAr
 	}
 }
 
-// newRqlTermFromPrevVal is an alias for creating a new RqlTerm. Unlike newRqlTerm
+// newRqlTermFromPrevVal is an alias for creating a new Term. Unlike newRqlTerm
 // this function adds the previous expression in the tree to the argument list.
 // It is used when evalutating an expression like
 //
 // `r.Expr(1).Add(2).Mul(3)`
-func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) RqlTerm {
+func newRqlTermFromPrevVal(prevVal Term, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) Term {
 	args = append([]interface{}{prevVal}, args...)
 
-	return RqlTerm{
+	return Term{
 		name:     name,
 		rootTerm: false,
 		termType: termType,
@@ -47,8 +47,8 @@ func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermTyp
 // Helper functions for creating internal RQL types
 
 // makeArray takes a slice of terms and produces a single MAKE_ARRAY term
-func makeArray(args termsList) RqlTerm {
-	return RqlTerm{
+func makeArray(args termsList) Term {
+	return Term{
 		name:     "[...]",
 		termType: p.Term_MAKE_ARRAY,
 		args:     args,
@@ -56,14 +56,14 @@ func makeArray(args termsList) RqlTerm {
 }
 
 // makeObject takes a map of terms and produces a single MAKE_OBJECT term
-func makeObject(args termsObj) RqlTerm {
+func makeObject(args termsObj) Term {
 	// First all evaluate all fields in the map
 	temp := termsObj{}
 	for k, v := range args {
 		temp[k] = Expr(v)
 	}
 
-	return RqlTerm{
+	return Term{
 		name:     "{...}",
 		termType: p.Term_MAKE_OBJ,
 		optArgs:  temp,
@@ -72,7 +72,7 @@ func makeObject(args termsObj) RqlTerm {
 
 var nextVarId int64 = 0
 
-func makeFunc(f interface{}) RqlTerm {
+func makeFunc(f interface{}) Term {
 	value := reflect.ValueOf(f)
 	valueType := value.Type()
 
@@ -84,9 +84,9 @@ func makeFunc(f interface{}) RqlTerm {
 		argNums = append(argNums, nextVarId)
 		atomic.AddInt64(&nextVarId, 1)
 
-		// make sure all input arguments are of type RqlTerm
-		if valueType.In(i).String() != "gorethink.RqlTerm" {
-			panic("Function argument is not of type RqlTerm")
+		// make sure all input arguments are of type Term
+		if valueType.In(i).String() != "gorethink.Term" {
+			panic("Function argument is not of type Term")
 		}
 	}
 
@@ -100,11 +100,11 @@ func makeFunc(f interface{}) RqlTerm {
 	return newRqlTerm("func", p.Term_FUNC, []interface{}{argsArr, body}, map[string]interface{}{})
 }
 
-func funcWrap(value interface{}) RqlTerm {
+func funcWrap(value interface{}) Term {
 	val := Expr(value)
 
 	if implVarScan(val) {
-		return makeFunc(func(x RqlTerm) RqlTerm {
+		return makeFunc(func(x Term) Term {
 			return val
 		})
 	} else {
@@ -122,7 +122,7 @@ func funcWrapArgs(args []interface{}) []interface{} {
 
 // implVarScan recursivly checks a value to see if it contains an
 // IMPLICIT_VAR term. If it does it returns true
-func implVarScan(value RqlTerm) bool {
+func implVarScan(value Term) bool {
 	if value.termType == p.Term_IMPLICIT_VAR {
 		return true
 	} else {

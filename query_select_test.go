@@ -121,7 +121,7 @@ func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
 	DbCreate("test").Exec(sess)
 	Db("test").TableDrop("TableCompound").Exec(sess)
 	Db("test").TableCreate("TableCompound").Exec(sess)
-	write, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row RqlTerm) interface{} {
+	write, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(sess)
 	c.Assert(err, test.IsNil)
@@ -254,7 +254,7 @@ func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Table1").Filter(func(row RqlTerm) RqlTerm {
+	query := Db("test").Table("Table1").Filter(func(row Term) Term {
 		return row.Field("num").Ge(50)
 	}).OrderBy("id")
 	rows, err := query.Run(sess)

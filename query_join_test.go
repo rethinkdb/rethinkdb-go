@@ -16,7 +16,7 @@ func (s *RethinkSuite) TestJoinInnerJoin(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
+	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b Term) Term {
 		return a.Field("id").Eq(b.Field("id"))
 	})
 	rows, err := query.Run(sess)
@@ -47,7 +47,7 @@ func (s *RethinkSuite) TestJoinInnerJoinZip(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
+	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b Term) Term {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip()
 	rows, err := query.Run(sess)
@@ -74,7 +74,7 @@ func (s *RethinkSuite) TestJoinOuterJoinZip(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Join1").OuterJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
+	query := Db("test").Table("Join1").OuterJoin(Db("test").Table("Join2"), func(a, b Term) Term {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip().OrderBy("id")
 	rows, err := query.Run(sess)

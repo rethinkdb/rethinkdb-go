@@ -148,7 +148,7 @@ func (s *RethinkSuite) TestTableCompoundIndexCreate(c *test.C) {
 	DbCreate("test").Exec(sess)
 	Db("test").TableDrop("TableCompound").Exec(sess)
 	Db("test").TableCreate("TableCompound").Exec(sess)
-	response, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row RqlTerm) interface{} {
+	response, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(sess)
 	c.Assert(err, test.IsNil)

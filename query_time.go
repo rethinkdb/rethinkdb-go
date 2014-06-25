@@ -5,17 +5,17 @@ import (
 )
 
 // Returns a time object representing the current time in UTC
-func Now(args ...interface{}) RqlTerm {
+func Now(args ...interface{}) Term {
 	return newRqlTerm("Now", p.Term_NOW, args, map[string]interface{}{})
 }
 
 // Create a time object for a specific time
-func Time(args ...interface{}) RqlTerm {
+func Time(args ...interface{}) Term {
 	return newRqlTerm("Time", p.Term_TIME, args, map[string]interface{}{})
 }
 
 // Returns a time object based on seconds since epoch
-func EpochTime(args ...interface{}) RqlTerm {
+func EpochTime(args ...interface{}) Term {
 	return newRqlTerm("EpochTime", p.Term_EPOCH_TIME, args, map[string]interface{}{})
 }
 
@@ -31,7 +31,7 @@ func (o *ISO8601Opts) toMap() map[string]interface{} {
 //
 // Optional arguments (see http://www.rethinkdb.com/api/#js:dates_and_times-iso8601 for more information):
 // "default_timezone" (string)
-func ISO8601(date interface{}, optArgs ...ISO8601Opts) RqlTerm {
+func ISO8601(date interface{}, optArgs ...ISO8601Opts) Term {
 
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
@@ -44,12 +44,12 @@ func ISO8601(date interface{}, optArgs ...ISO8601Opts) RqlTerm {
 // stays the same, the results returned by methods such as hours() will
 // change since they take the timezone into account. The timezone argument
 // has to be of the ISO 8601 format.
-func (t RqlTerm) InTimezone(args ...interface{}) RqlTerm {
+func (t Term) InTimezone(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "InTimezone", p.Term_IN_TIMEZONE, args, map[string]interface{}{})
 }
 
 // Returns the timezone of the time object
-func (t RqlTerm) Timezone(args ...interface{}) RqlTerm {
+func (t Term) Timezone(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Timezone", p.Term_TIMEZONE, args, map[string]interface{}{})
 }
 
@@ -67,7 +67,7 @@ func (o *DuringOpts) toMap() map[string]interface{} {
 //
 // Optional arguments (see http://www.rethinkdb.com/api/#js:dates_and_times-during for more information):
 // "left_bound" and "right_bound" ("open" for exclusive or "closed" for inclusive)
-func (t RqlTerm) During(startTime, endTime interface{}, optArgs ...DuringOpts) RqlTerm {
+func (t Term) During(startTime, endTime interface{}, optArgs ...DuringOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -77,30 +77,30 @@ func (t RqlTerm) During(startTime, endTime interface{}, optArgs ...DuringOpts) R
 
 // Return a new time object only based on the day, month and year
 // (ie. the same day at 00:00).
-func (t RqlTerm) Date(args ...interface{}) RqlTerm {
+func (t Term) Date(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Date", p.Term_DATE, args, map[string]interface{}{})
 }
 
 // Return the number of seconds elapsed since the beginning of the
 // day stored in the time object.
-func (t RqlTerm) TimeOfDay(args ...interface{}) RqlTerm {
+func (t Term) TimeOfDay(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "TimeOfDay", p.Term_TIME_OF_DAY, args, map[string]interface{}{})
 }
 
 // Return the year of a time object.
-func (t RqlTerm) Year(args ...interface{}) RqlTerm {
+func (t Term) Year(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Year", p.Term_YEAR, args, map[string]interface{}{})
 }
 
 // Return the month of a time object as a number between 1 and 12.
 // For your convenience, the terms r.January(), r.February() etc. are
 // defined and map to the appropriate integer.
-func (t RqlTerm) Month(args ...interface{}) RqlTerm {
+func (t Term) Month(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Month", p.Term_MONTH, args, map[string]interface{}{})
 }
 
 // Return the day of a time object as a number between 1 and 31.
-func (t RqlTerm) Day(args ...interface{}) RqlTerm {
+func (t Term) Day(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Day", p.Term_DAY, args, map[string]interface{}{})
 }
 
@@ -108,39 +108,39 @@ func (t RqlTerm) Day(args ...interface{}) RqlTerm {
 // 1 and 7 (following ISO 8601 standard). For your convenience,
 // the terms r.Monday(), r.Tuesday() etc. are defined and map to
 // the appropriate integer.
-func (t RqlTerm) DayOfWeek(args ...interface{}) RqlTerm {
+func (t Term) DayOfWeek(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "DayOfWeek", p.Term_DAY_OF_WEEK, args, map[string]interface{}{})
 }
 
 // Return the day of the year of a time object as a number between
 // 1 and 366 (following ISO 8601 standard).
-func (t RqlTerm) DayOfYear(args ...interface{}) RqlTerm {
+func (t Term) DayOfYear(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "DayOfYear", p.Term_DAY_OF_YEAR, args, map[string]interface{}{})
 }
 
 // Return the hour in a time object as a number between 0 and 23.
-func (t RqlTerm) Hours(args ...interface{}) RqlTerm {
+func (t Term) Hours(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Hours", p.Term_HOURS, args, map[string]interface{}{})
 }
 
 // Return the minute in a time object as a number between 0 and 59.
-func (t RqlTerm) Minutes(args ...interface{}) RqlTerm {
+func (t Term) Minutes(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Minutes", p.Term_MINUTES, args, map[string]interface{}{})
 }
 
 // Return the seconds in a time object as a number between 0 and
 // 59.999 (double precision).
-func (t RqlTerm) Seconds(args ...interface{}) RqlTerm {
+func (t Term) Seconds(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Seconds", p.Term_SECONDS, args, map[string]interface{}{})
 }
 
 // Convert a time object to its iso 8601 format.
-func (t RqlTerm) ToISO8601(args ...interface{}) RqlTerm {
+func (t Term) ToISO8601(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "ToISO8601", p.Term_TO_ISO8601, args, map[string]interface{}{})
 }
 
 // Convert a time object to its epoch time.
-func (t RqlTerm) ToEpochTime(args ...interface{}) RqlTerm {
+func (t Term) ToEpochTime(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "ToEpochTime", p.Term_TO_EPOCH_TIME, args, map[string]interface{}{})
 }
 

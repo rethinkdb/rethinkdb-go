@@ -7,7 +7,7 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-func printCarrots(t RqlTerm, frames []*p.Frame) string {
+func printCarrots(t Term, frames []*p.Frame) string {
 	var frame *p.Frame
 	if len(frames) > 1 {
 		frame, frames = frames[0], frames[1:]
@@ -17,7 +17,7 @@ func printCarrots(t RqlTerm, frames []*p.Frame) string {
 
 	for i, arg := range t.args {
 		if frame.GetPos() == int64(i) {
-			t.args[i] = RqlTerm{
+			t.args[i] = Term{
 				termType: p.Term_DATUM,
 				data:     printCarrots(arg, frames),
 			}
@@ -26,7 +26,7 @@ func printCarrots(t RqlTerm, frames []*p.Frame) string {
 
 	for k, arg := range t.optArgs {
 		if frame.GetOpt() == k {
-			t.optArgs[k] = RqlTerm{
+			t.optArgs[k] = Term{
 				termType: p.Term_DATUM,
 				data:     printCarrots(arg, frames),
 			}
@@ -49,7 +49,7 @@ func printCarrots(t RqlTerm, frames []*p.Frame) string {
 // ----------------------------------------------------------------------------
 type rqlResponseError struct {
 	response *p.Response
-	term     RqlTerm
+	term     Term
 }
 
 func (e rqlResponseError) Error() string {

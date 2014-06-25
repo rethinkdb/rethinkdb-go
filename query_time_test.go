@@ -68,7 +68,7 @@ func (s *RethinkSuite) TestTimeBetween(c *test.C) {
 		Time(1986, 11, 3, 12, 30, 15, "Z"),
 		Time(1986, 12, 3, 12, 30, 15, "Z"),
 	})
-	row, err := times.Filter(func(row RqlTerm) RqlTerm {
+	row, err := times.Filter(func(row Term) Term {
 		return row.During(Time(1986, 9, 3, 12, 30, 15, "Z"), Time(1986, 11, 3, 12, 30, 15, "Z"))
 	}).Count().RunRow(sess)
 	c.Assert(err, test.IsNil)

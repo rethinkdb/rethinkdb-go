@@ -64,7 +64,7 @@ func ExampleRqlTerm_GetAll_compound() {
 	r.Db("test").TableDrop("table").Run(sess)
 	r.Db("test").TableCreate("table").Run(sess)
 	r.Db("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
-	r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.RqlTerm) interface{} {
+	r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).Run(sess)
 	r.Db("test").Table("table").IndexWait().Run(sess)

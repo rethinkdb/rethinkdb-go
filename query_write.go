@@ -23,7 +23,7 @@ func (o *InsertOpts) toMap() map[string]interface{} {
 //
 //	table.Insert(map[string]interface{}{"name": "Joe", "email": "joe@example.com"}).RunWrite(sess)
 //	table.Insert([]interface{}{map[string]interface{}{"name": "Joe"}, map[string]interface{}{"name": "Paul"}}).RunWrite(sess)
-func (t RqlTerm) Insert(arg interface{}, optArgs ...InsertOpts) RqlTerm {
+func (t Term) Insert(arg interface{}, optArgs ...InsertOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -47,7 +47,7 @@ func (o *UpdateOpts) toMap() map[string]interface{} {
 // The optional argument return_vals will return the old and new values of the
 // row you're modifying when set to true (only valid for single-row updates).
 // The optional argument non_atomic lets you permit non-atomic updates.
-func (t RqlTerm) Update(arg interface{}, optArgs ...UpdateOpts) RqlTerm {
+func (t Term) Update(arg interface{}, optArgs ...UpdateOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -73,7 +73,7 @@ func (o *ReplaceOpts) toMap() map[string]interface{} {
 // the old and new values of the row you're modifying when set to true (only
 // valid for single-row replacements). The optional argument non_atomic lets
 // you permit non-atomic updates.
-func (t RqlTerm) Replace(arg interface{}, optArgs ...ReplaceOpts) RqlTerm {
+func (t Term) Replace(arg interface{}, optArgs ...ReplaceOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -94,7 +94,7 @@ func (o *DeleteOpts) toMap() map[string]interface{} {
 // will return the old value of the row you're deleting when set to true (only
 // valid for single-row deletes). The optional argument durability with value
 // 'hard' or 'soft' will override the table or query's default durability setting.
-func (t RqlTerm) Delete(optArgs ...DeleteOpts) RqlTerm {
+func (t Term) Delete(optArgs ...DeleteOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -106,6 +106,6 @@ func (t RqlTerm) Delete(optArgs ...DeleteOpts) RqlTerm {
 // Queries that specify soft durability (Durability: "soft") do not give such
 // guarantees, so sync can be used to ensure the state of these queries. A call
 // to sync does not return until all previous writes to the table are persisted.
-func (t RqlTerm) Sync(args ...interface{}) RqlTerm {
+func (t Term) Sync(args ...interface{}) Term {
 	return newRqlTermFromPrevVal(t, "Sync", p.Term_SYNC, args, map[string]interface{}{})
 }

@@ -52,7 +52,7 @@ type ResultRows struct {
 
 	session *Session
 	query   *p.Query
-	term    RqlTerm
+	term    Term
 	opts    map[string]interface{}
 
 	profile interface{}

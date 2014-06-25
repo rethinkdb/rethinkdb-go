@@ -13,7 +13,7 @@ import (
 )
 
 type Conn interface {
-	SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error)
+	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*ResultRows, error)
 	ReadResponse(s *Session, token int64) (*p.Response, error)
 	Close() error
 }
@@ -121,7 +121,7 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) 
 	}
 }
 
-func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error) {
+func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*ResultRows, error) {
 	var data []byte
 	var err error
 
@@ -247,7 +247,7 @@ func (c *Connection) Close() error {
 	return c.Conn.Close()
 }
 
-func checkErrorResponse(response *p.Response, t RqlTerm) error {
+func checkErrorResponse(response *p.Response, t Term) error {
 	switch response.GetType() {
 	case p.Response_CLIENT_ERROR:
 		return RqlClientError{rqlResponseError{response, t}}

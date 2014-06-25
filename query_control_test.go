@@ -216,7 +216,7 @@ func (s *RethinkSuite) TestControlDo(c *test.C) {
 		map[string]interface{}{"a": 1},
 		map[string]interface{}{"a": 2},
 		map[string]interface{}{"a": 3},
-	}, func(row RqlTerm) RqlTerm {
+	}, func(row Term) Term {
 		return row.Field("a")
 	})
 	r, err := query.Run(sess)
@@ -234,7 +234,7 @@ func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
 		map[string]interface{}{"a": 1},
 		map[string]interface{}{"a": 2},
 		map[string]interface{}{"a": 3},
-	}).Do(func(row RqlTerm) RqlTerm {
+	}).Do(func(row Term) Term {
 		return row.Field("a")
 	})
 	r, err := query.Run(sess)
@@ -280,7 +280,7 @@ func (s *RethinkSuite) TestControlBranchWithMapExpr(c *test.C) {
 
 func (s *RethinkSuite) TestControlDefault(c *test.C) {
 	var response []interface{}
-	query := Expr(defaultObjList).Map(func(row RqlTerm) RqlTerm {
+	query := Expr(defaultObjList).Map(func(row Term) Term {
 		return row.Field("a").Default(1)
 	})
 	r, err := query.Run(sess)

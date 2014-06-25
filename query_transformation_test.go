@@ -18,7 +18,7 @@ func (s *RethinkSuite) TestTransformationMapImplicit(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationMapFunc(c *test.C) {
-	query := Expr(arr).Map(func(row RqlTerm) RqlTerm {
+	query := Expr(arr).Map(func(row Term) Term {
 		return row.Add(1)
 	})
 
@@ -56,7 +56,7 @@ func (s *RethinkSuite) TestTransformationWithFields(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationConcatMap(c *test.C) {
-	query := Expr(objList).ConcatMap(func(row RqlTerm) RqlTerm {
+	query := Expr(objList).ConcatMap(func(row Term) Term {
 		return Expr([]interface{}{row.Field("num")})
 	})
 
@@ -166,7 +166,7 @@ func (s *RethinkSuite) TestTransformationOrderByMultiple(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationOrderByFunc(c *test.C) {
-	query := Expr(objList).OrderBy(func(row RqlTerm) RqlTerm {
+	query := Expr(objList).OrderBy(func(row Term) Term {
 		return row.Field("num").Add(row.Field("id"))
 	})
 

@@ -12,20 +12,19 @@ import (
 type OptArgs interface {
 	toMap() map[string]interface{}
 }
-type termsList []RqlTerm
-type termsObj map[string]RqlTerm
-type RqlTerm struct {
+type termsList []Term
+type termsObj map[string]Term
+type Term struct {
 	name     string
 	rootTerm bool
 	termType p.Term_TermType
 	data     interface{}
-	args     []RqlTerm
-	optArgs  map[string]RqlTerm
+	args     []Term
+	optArgs  map[string]Term
 }
-type Term RqlTerm
 
 // build takes the query tree and turns it into a protobuf term tree.
-func (t RqlTerm) build() *p.Term {
+func (t Term) build() *p.Term {
 	switch t.termType {
 	case p.Term_DATUM:
 		datum, err := constructDatum(t)
@@ -58,7 +57,7 @@ func (t RqlTerm) build() *p.Term {
 	}
 }
 
-func (t RqlTerm) compose(args []string, optArgs map[string]string) string {
+func (t Term) compose(args []string, optArgs map[string]string) string {
 	switch t.termType {
 	case p.Term_MAKE_ARRAY:
 		return fmt.Sprintf("[%s]", strings.Join(argsToStringSlice(t.args), ", "))
@@ -71,7 +70,7 @@ func (t RqlTerm) compose(args []string, optArgs map[string]string) string {
 			args = append(args, fmt.Sprintf("var_%d", v.data))
 		}
 
-		return fmt.Sprintf("func(%s r.RqlTerm) r.RqlTerm { return %s }",
+		return fmt.Sprintf("func(%s r.Term) r.Term { return %s }",
 			strings.Join(args, ", "),
 			t.args[1].String(),
 		)
@@ -97,7 +96,7 @@ func (t RqlTerm) compose(args []string, optArgs map[string]string) string {
 }
 
 // String returns a string representation of the query tree
-func (t RqlTerm) String() string {
+func (t Term) String() string {
 	switch t.termType {
 	case p.Term_MAKE_ARRAY:
 		return fmt.Sprintf("[%s]", strings.Join(argsToStringSlice(t.args), ", "))
@@ -110,7 +109,7 @@ func (t RqlTerm) String() string {
 			args = append(args, fmt.Sprintf("var_%d", v.data))
 		}
 
-		return fmt.Sprintf("func(%s r.RqlTerm) r.RqlTerm { return %s }",
+		return fmt.Sprintf("func(%s r.Term) r.Term { return %s }",
 			strings.Join(args, ", "),
 			t.args[1].String(),
 		)
@@ -176,7 +175,7 @@ func (o *RunOpts) toMap() map[string]interface{} {
 //		err := r.Scan(&doc)
 //		    // Do something with row
 //	}
-func (t RqlTerm) Run(s *Session, optArgs ...RunOpts) (*ResultRows, error) {
+func (t Term) Run(s *Session, optArgs ...RunOpts) (*ResultRows, error) {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -197,7 +196,7 @@ func (t RqlTerm) Run(s *Session, optArgs ...RunOpts) (*ResultRows, error) {
 //		// nothing was found
 //	}
 //	err = row.Scan(&doc)
-func (t RqlTerm) RunRow(s *Session, optArgs ...RunOpts) (*ResultRow, error) {
+func (t Term) RunRow(s *Session, optArgs ...RunOpts) (*ResultRow, error) {
 	rows, err := t.Run(s, optArgs...)
 	if err != nil {
 		return nil, err
@@ -218,7 +217,7 @@ func (t RqlTerm) RunRow(s *Session, optArgs ...RunOpts) (*ResultRow, error) {
 //	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess, r.RunOpts{
 //		NoReply: true,
 //	})
-func (t RqlTerm) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
+func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	var response WriteResponse
 	row, err := t.RunRow(s, optArgs...)
 	if err == nil {
@@ -229,7 +228,7 @@ func (t RqlTerm) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error)
 
 // Exec runs the query but does not return the result (It also automatically sets
 // the noreply option).
-func (t RqlTerm) Exec(s *Session, optArgs ...RunOpts) error {
+func (t Term) Exec(s *Session, optArgs ...RunOpts) error {
 	// Ensure that noreply is set to true
 	if len(optArgs) >= 1 {
 		optArgs[0].NoReply = true
