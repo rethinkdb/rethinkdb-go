@@ -110,27 +110,35 @@ func expr(value interface{}, depth int) RqlTerm {
 }
 
 // Create a JavaScript expression.
-func Js(js interface{}) RqlTerm {
-	return newRqlTerm("Js", p.Term_JAVASCRIPT, []interface{}{js}, map[string]interface{}{})
+func Js(jssrc interface{}) RqlTerm {
+	return newRqlTerm("Js", p.Term_JAVASCRIPT, []interface{}{jssrc}, map[string]interface{}{})
 }
 
 // Parse a JSON string on the server.
-func Json(json interface{}) RqlTerm {
-	return newRqlTerm("Json", p.Term_JSON, []interface{}{json}, map[string]interface{}{})
+func Json(args ...interface{}) RqlTerm {
+	return newRqlTerm("Json", p.Term_JSON, args, map[string]interface{}{})
 }
 
 // Throw a runtime error. If called with no arguments inside the second argument
 // to `default`, re-throw the current error.
-func Error(message interface{}) RqlTerm {
-	return newRqlTerm("Error", p.Term_ERROR, []interface{}{message}, map[string]interface{}{})
+func Error(args ...interface{}) RqlTerm {
+	return newRqlTerm("Error", p.Term_ERROR, args, map[string]interface{}{})
+}
+
+// Args is a special term usd to splice an array of arguments into another term.
+// This is useful when you want to call a varadic term such as GetAll with a set
+// of arguments provided at runtime.
+func Args(args ...interface{}) RqlTerm {
+	return newRqlTerm("Args", p.Term_ARGS, args, map[string]interface{}{})
 }
 
 // Evaluate the expr in the context of one or more value bindings. The type of
 // the result is the type of the value returned from expr.
-func (t RqlTerm) Do(f interface{}) RqlTerm {
+func (t RqlTerm) Do(args ...interface{}) RqlTerm {
 	newArgs := []interface{}{}
-	newArgs = append(newArgs, funcWrap(f))
+	newArgs = append(newArgs, funcWrap(args[len(args)-1]))
 	newArgs = append(newArgs, t)
+	newArgs = append(newArgs, args[:len(args)-1]...)
 
 	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
@@ -138,8 +146,6 @@ func (t RqlTerm) Do(f interface{}) RqlTerm {
 // Evaluate the expr in the context of one or more value bindings. The type of
 // the result is the type of the value returned from expr.
 func Do(args ...interface{}) RqlTerm {
-	enforceArgLength(1, -1, args)
-
 	newArgs := []interface{}{}
 	newArgs = append(newArgs, funcWrap(args[len(args)-1]))
 	newArgs = append(newArgs, args[:len(args)-1]...)
@@ -151,13 +157,13 @@ func Do(args ...interface{}) RqlTerm {
 // branch is effectively an if renamed due to language constraints.
 //
 // The type of the result is determined by the type of the branch that gets executed.
-func Branch(test, trueBranch, falseBranch interface{}) RqlTerm {
-	return newRqlTerm("Branch", p.Term_BRANCH, []interface{}{test, trueBranch, falseBranch}, map[string]interface{}{})
+func Branch(args ...interface{}) RqlTerm {
+	return newRqlTerm("Branch", p.Term_BRANCH, args, map[string]interface{}{})
 }
 
 // Loop over a sequence, evaluating the given write query for each element.
-func (t RqlTerm) ForEach(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Foreach", p.Term_FOREACH, []interface{}{funcWrap(f)}, map[string]interface{}{})
+func (t RqlTerm) ForEach(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Foreach", p.Term_FOREACH, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Handle non-existence errors. Tries to evaluate and return its first argument.
@@ -165,24 +171,24 @@ func (t RqlTerm) ForEach(f interface{}) RqlTerm {
 // its first argument returns null, returns its second argument. (Alternatively,
 // the second argument may be a function which will be called with either the
 // text of the non-existence error or null.)
-func (t RqlTerm) Default(value interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, []interface{}{value}, map[string]interface{}{})
+func (t RqlTerm) Default(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, args, map[string]interface{}{})
 }
 
 // Converts a value of one type into another.
 //
 // You can convert: a selection, sequence, or object into an ARRAY, an array of
 // pairs into an OBJECT, and any DATUM into a STRING.
-func (t RqlTerm) CoerceTo(typeName interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, []interface{}{typeName}, map[string]interface{}{})
+func (t RqlTerm) CoerceTo(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, args, map[string]interface{}{})
 }
 
 // Gets the type of a value.
-func (t RqlTerm) TypeOf() RqlTerm {
-	return newRqlTermFromPrevVal(t, "TypeOf", p.Term_TYPEOF, []interface{}{}, map[string]interface{}{})
+func (t RqlTerm) TypeOf(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "TypeOf", p.Term_TYPEOF, args, map[string]interface{}{})
 }
 
 // Get information about a RQL value.
-func (t RqlTerm) Info() RqlTerm {
-	return newRqlTermFromPrevVal(t, "Info", p.Term_INFO, []interface{}{}, map[string]interface{}{})
+func (t RqlTerm) Info(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Info", p.Term_INFO, args, map[string]interface{}{})
 }

@@ -263,7 +263,7 @@ func (s *RethinkSuite) TestManipulationDeleteAt(c *test.C) {
 }
 
 func (s *RethinkSuite) TestManipulationDeleteAtRange(c *test.C) {
-	query := Expr([]interface{}{1, 2, 3, 4}).DeleteAtRange(1, 3)
+	query := Expr([]interface{}{1, 2, 3, 4}).DeleteAt(1, 3)
 
 	var response []interface{}
 	r, err := query.Run(sess)

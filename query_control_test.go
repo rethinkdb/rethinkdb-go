@@ -1,6 +1,8 @@
 package gorethink
 
 import (
+	"time"
+
 	test "launchpad.net/gocheck"
 )
 
@@ -181,6 +183,17 @@ func (s *RethinkSuite) TestControlDoNothing(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
+}
+
+func (s *RethinkSuite) TestControlArgs(c *test.C) {
+	var response time.Time
+	query := Time(Args(Expr([]interface{}{2014, 7, 12, "Z"})))
+	r, err := query.RunRow(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.Scan(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response.Unix(), test.Equals, int64(1405123200))
 }
 
 func (s *RethinkSuite) TestControlDo(c *test.C) {

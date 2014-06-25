@@ -3,8 +3,10 @@ package gorethink
 import (
 	"fmt"
 	"math"
+	"reflect"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	"code.google.com/p/goprotobuf/proto"
@@ -20,8 +22,8 @@ func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optAr
 		name:     name,
 		rootTerm: true,
 		termType: termType,
-		args:     listToTermsList(args),
-		optArgs:  objToTermsObj(optArgs),
+		args:     convertTermList(args),
+		optArgs:  convertTermObj(optArgs),
 	}
 }
 
@@ -37,13 +39,124 @@ func newRqlTermFromPrevVal(prevVal RqlTerm, name string, termType p.Term_TermTyp
 		name:     name,
 		rootTerm: false,
 		termType: termType,
-		args:     listToTermsList(args),
-		optArgs:  objToTermsObj(optArgs),
+		args:     convertTermList(args),
+		optArgs:  convertTermObj(optArgs),
 	}
 }
 
+// Helper functions for creating internal RQL types
+
+// makeArray takes a slice of terms and produces a single MAKE_ARRAY term
+func makeArray(args termsList) RqlTerm {
+	return RqlTerm{
+		name:     "[...]",
+		termType: p.Term_MAKE_ARRAY,
+		args:     args,
+	}
+}
+
+// makeObject takes a map of terms and produces a single MAKE_OBJECT term
+func makeObject(args termsObj) RqlTerm {
+	// First all evaluate all fields in the map
+	temp := termsObj{}
+	for k, v := range args {
+		temp[k] = Expr(v)
+	}
+
+	return RqlTerm{
+		name:     "{...}",
+		termType: p.Term_MAKE_OBJ,
+		optArgs:  temp,
+	}
+}
+
+var nextVarId int64 = 0
+
+func makeFunc(f interface{}) RqlTerm {
+	value := reflect.ValueOf(f)
+	valueType := value.Type()
+
+	var argNums []interface{}
+	var args []reflect.Value
+	for i := 0; i < valueType.NumIn(); i++ {
+		// Get a slice of the VARs to use as the function arguments
+		args = append(args, reflect.ValueOf(newRqlTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{})))
+		argNums = append(argNums, nextVarId)
+		atomic.AddInt64(&nextVarId, 1)
+
+		// make sure all input arguments are of type RqlTerm
+		if valueType.In(i).String() != "gorethink.RqlTerm" {
+			panic("Function argument is not of type RqlTerm")
+		}
+	}
+
+	if valueType.NumOut() != 1 {
+		panic("Function does not have a single return value")
+	}
+
+	body := value.Call(args)[0].Interface()
+	argsArr := makeArray(convertTermList(argNums))
+
+	return newRqlTerm("func", p.Term_FUNC, []interface{}{argsArr, body}, map[string]interface{}{})
+}
+
+func funcWrap(value interface{}) RqlTerm {
+	val := Expr(value)
+
+	if implVarScan(val) {
+		return makeFunc(func(x RqlTerm) RqlTerm {
+			return val
+		})
+	} else {
+		return val
+	}
+}
+
+func funcWrapArgs(args []interface{}) []interface{} {
+	for i, arg := range args {
+		args[i] = funcWrap(arg)
+	}
+
+	return args
+}
+
+// implVarScan recursivly checks a value to see if it contains an
+// IMPLICIT_VAR term. If it does it returns true
+func implVarScan(value RqlTerm) bool {
+	if value.termType == p.Term_IMPLICIT_VAR {
+		return true
+	} else {
+		for _, v := range value.args {
+			if implVarScan(v) {
+				return true
+			}
+		}
+
+		for _, v := range value.optArgs {
+			if implVarScan(v) {
+				return true
+			}
+		}
+
+		return false
+	}
+}
+
+// Convert an opt args struct to a map.
+func optArgsToMap(optArgs OptArgs) map[string]interface{} {
+	data, err := encoding.Encode(optArgs)
+
+	if err == nil && data != nil {
+		if m, ok := data.(map[string]interface{}); ok {
+			return m
+		}
+	}
+
+	return map[string]interface{}{}
+}
+
 // Convert a list into a slice of terms
-func listToTermsList(l []interface{}) termsList {
+func convertTermList(l []interface{}) termsList {
 	terms := termsList{}
 	for _, v := range l {
 		terms = append(terms, Expr(v))
@@ -53,23 +166,13 @@ func listToTermsList(l []interface{}) termsList {
 }
 
 // Convert a map into a map of terms
-func objToTermsObj(o map[string]interface{}) termsObj {
+func convertTermObj(o map[string]interface{}) termsObj {
 	terms := termsObj{}
 	for k, v := range o {
 		terms[k] = Expr(v)
 	}
 
 	return terms
-}
-
-func enforceArgLength(min, max int, args []interface{}) {
-	if max == -1 {
-		max = len(args)
-	}
-
-	if len(args) < min || len(args) > max {
-		panic("Function has incorrect number of arguments")
-	}
 }
 
 func mergeArgs(args ...interface{}) []interface{} {
@@ -86,6 +189,8 @@ func mergeArgs(args ...interface{}) []interface{} {
 
 	return newArgs
 }
+
+// Pseudo-type helper functions
 
 func reqlTimeToNativeTime(timestamp float64, timezone string) (time.Time, error) {
 	sec, ms := math.Modf(timestamp)
@@ -173,16 +278,4 @@ func prefixLines(s string, prefix string) (result string) {
 
 func protobufToString(p proto.Message, indentLevel int) string {
 	return prefixLines(proto.MarshalTextString(p), strings.Repeat("    ", indentLevel))
-}
-
-func optArgsToMap(optArgs OptArgs) map[string]interface{} {
-	data, err := encoding.Encode(optArgs)
-
-	if err == nil && data != nil {
-		if m, ok := data.(map[string]interface{}); ok {
-			return m
-		}
-	}
-
-	return map[string]interface{}{}
 }

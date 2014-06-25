@@ -106,6 +106,6 @@ func (t RqlTerm) Delete(optArgs ...DeleteOpts) RqlTerm {
 // Queries that specify soft durability (Durability: "soft") do not give such
 // guarantees, so sync can be used to ensure the state of these queries. A call
 // to sync does not return until all previous writes to the table are persisted.
-func (t RqlTerm) Sync() RqlTerm {
-	return newRqlTermFromPrevVal(t, "Sync", p.Term_SYNC, []interface{}{}, map[string]interface{}{})
+func (t RqlTerm) Sync(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Sync", p.Term_SYNC, args, map[string]interface{}{})
 }

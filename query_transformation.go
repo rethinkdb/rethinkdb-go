@@ -5,22 +5,22 @@ import (
 )
 
 // Transform each element of the sequence by applying the given mapping function.
-func (t RqlTerm) Map(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Map", p.Term_MAP, []interface{}{funcWrap(f)}, map[string]interface{}{})
+func (t RqlTerm) Map(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Map", p.Term_MAP, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Takes a sequence of objects and a list of fields. If any objects in the
 // sequence don't have all of the specified fields, they're dropped from the
 // sequence. The remaining objects have the specified fields plucked out.
 // (This is identical to `HasFields` followed by `Pluck` on a sequence.)
-func (t RqlTerm) WithFields(selectors ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "WithFields", p.Term_WITH_FIELDS, selectors, map[string]interface{}{})
+func (t RqlTerm) WithFields(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "WithFields", p.Term_WITH_FIELDS, args, map[string]interface{}{})
 }
 
 // Flattens a sequence of arrays returned by the mapping function into a single
 // sequence.
-func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "ConcatMap", p.Term_CONCATMAP, []interface{}{funcWrap(f)}, map[string]interface{}{})
+func (t RqlTerm) ConcatMap(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "ConcatMap", p.Term_CONCATMAP, funcWrapArgs(args), map[string]interface{}{})
 }
 
 type OrderByOpts struct {
@@ -62,52 +62,53 @@ func (t RqlTerm) OrderBy(args ...interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "OrderBy", p.Term_ORDERBY, args, opts)
 }
 
-func Desc(arg interface{}) RqlTerm {
-	return newRqlTerm("Desc", p.Term_DESC, []interface{}{funcWrap(arg)}, map[string]interface{}{})
+func Desc(args ...interface{}) RqlTerm {
+	return newRqlTerm("Desc", p.Term_DESC, funcWrapArgs(args), map[string]interface{}{})
 }
 
-func Asc(arg interface{}) RqlTerm {
-	return newRqlTerm("Asc", p.Term_ASC, []interface{}{funcWrap(arg)}, map[string]interface{}{})
+func Asc(args ...interface{}) RqlTerm {
+	return newRqlTerm("Asc", p.Term_ASC, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Skip a number of elements from the head of the sequence.
-func (t RqlTerm) Skip(n interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Skip", p.Term_SKIP, []interface{}{n}, map[string]interface{}{})
+func (t RqlTerm) Skip(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Skip", p.Term_SKIP, args, map[string]interface{}{})
 }
 
 // End the sequence after the given number of elements.
-func (t RqlTerm) Limit(n interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Limit", p.Term_LIMIT, []interface{}{n}, map[string]interface{}{})
+func (t RqlTerm) Limit(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Limit", p.Term_LIMIT, args, map[string]interface{}{})
 }
 
+// TODO: Add optional arguments
 // Trim the sequence to within the bounds provided.
 func (t RqlTerm) Slice(lower, upper interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Slice", p.Term_SLICE, []interface{}{lower, upper}, map[string]interface{}{})
 }
 
 // Get the nth element of a sequence.
-func (t RqlTerm) Nth(n interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Nth", p.Term_NTH, []interface{}{n}, map[string]interface{}{})
+func (t RqlTerm) Nth(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Nth", p.Term_NTH, args, map[string]interface{}{})
 }
 
 // Get the indexes of an element in a sequence. If the argument is a predicate,
 // get the indexes of all elements matching it.
-func (t RqlTerm) IndexesOf(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "IndexesOf", p.Term_INDEXES_OF, []interface{}{funcWrap(arg)}, map[string]interface{}{})
+func (t RqlTerm) IndexesOf(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IndexesOf", p.Term_INDEXES_OF, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Test if a sequence is empty.
-func (t RqlTerm) IsEmpty() RqlTerm {
-	return newRqlTermFromPrevVal(t, "IsEmpty", p.Term_IS_EMPTY, []interface{}{}, map[string]interface{}{})
+func (t RqlTerm) IsEmpty(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "IsEmpty", p.Term_IS_EMPTY, args, map[string]interface{}{})
 }
 
 // Concatenate two sequences.
-func (t RqlTerm) Union(arg interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Union", p.Term_UNION, []interface{}{arg}, map[string]interface{}{})
+func (t RqlTerm) Union(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Union", p.Term_UNION, args, map[string]interface{}{})
 }
 
 // Select a given number of elements from a sequence with uniform random
 // distribution. Selection is done without replacement.
-func (t RqlTerm) Sample(n interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Sample", p.Term_SAMPLE, []interface{}{n}, map[string]interface{}{})
+func (t RqlTerm) Sample(args ...interface{}) RqlTerm {
+	return newRqlTermFromPrevVal(t, "Sample", p.Term_SAMPLE, args, map[string]interface{}{})
 }
