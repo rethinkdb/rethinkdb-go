@@ -120,7 +120,9 @@ func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
 	Db("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(sess)
 	Db("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(sess)
 
-	query := Db("test").Table("OrderByIndex").OrderBy(map[string]interface{}{"index": "test"})
+	query := Db("test").Table("OrderByIndex").OrderBy(OrderByOpts{
+		Index: "test",
+	})
 
 	var response []interface{}
 	r, err := query.Run(sess)

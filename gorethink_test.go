@@ -43,7 +43,6 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 	var err error
 	sess, err = Connect(ConnectOpts{
 		Address:   url,
-		AuthKey:   os.Getenv("RETHINKDB_AUTHKEY"),
 		MaxIdle:   3,
 		MaxActive: 3,
 		AuthKey:   authKey,
