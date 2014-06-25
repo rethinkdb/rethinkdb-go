@@ -23,6 +23,14 @@ func (t RqlTerm) ConcatMap(f interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "ConcatMap", p.Term_CONCATMAP, []interface{}{funcWrap(f)}, map[string]interface{}{})
 }
 
+type OrderByOpts struct {
+	Index interface{} `gorethink:"index,omitempty"`
+}
+
+func (o *OrderByOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Sort the sequence by document values of the given key(s).
 // To specify the index to use for ordering us a last argument in the following form:
 //
@@ -39,7 +47,7 @@ func (t RqlTerm) OrderBy(args ...interface{}) RqlTerm {
 
 	// Look for options map
 	if len(args) > 0 {
-		if possibleOpts, ok := args[len(args)-1].(map[string]interface{}); ok {
+		if possibleOpts, ok := args[len(args)-1].(OrderByOpts); ok {
 			opts = possibleOpts
 			args = args[:len(args)-1]
 		}
