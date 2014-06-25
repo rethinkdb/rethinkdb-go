@@ -144,63 +144,27 @@ func (t RqlTerm) ToEpochTime(args ...interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "ToEpochTime", p.Term_TO_EPOCH_TIME, args, map[string]interface{}{})
 }
 
-// Days
-func Monday() RqlTerm {
-	return newRqlTerm("Monday", p.Term_MONDAY, []interface{}{}, map[string]interface{}{})
-}
-func Tuesday() RqlTerm {
-	return newRqlTerm("Tuesday", p.Term_TUESDAY, []interface{}{}, map[string]interface{}{})
-}
-func Wednesday() RqlTerm {
-	return newRqlTerm("Wednesday", p.Term_WEDNESDAY, []interface{}{}, map[string]interface{}{})
-}
-func Thursday() RqlTerm {
-	return newRqlTerm("Thursday", p.Term_THURSDAY, []interface{}{}, map[string]interface{}{})
-}
-func Friday() RqlTerm {
-	return newRqlTerm("Friday", p.Term_FRIDAY, []interface{}{}, map[string]interface{}{})
-}
-func Saturday() RqlTerm {
-	return newRqlTerm("Saturday", p.Term_SATURDAY, []interface{}{}, map[string]interface{}{})
-}
-func Sunday() RqlTerm {
-	return newRqlTerm("Sunday", p.Term_SUNDAY, []interface{}{}, map[string]interface{}{})
-}
+var (
+	// Days
+	Monday    = newRqlTerm("Monday", p.Term_MONDAY, []interface{}{}, map[string]interface{}{})
+	Tuesday   = newRqlTerm("Tuesday", p.Term_TUESDAY, []interface{}{}, map[string]interface{}{})
+	Wednesday = newRqlTerm("Wednesday", p.Term_WEDNESDAY, []interface{}{}, map[string]interface{}{})
+	Thursday  = newRqlTerm("Thursday", p.Term_THURSDAY, []interface{}{}, map[string]interface{}{})
+	Friday    = newRqlTerm("Friday", p.Term_FRIDAY, []interface{}{}, map[string]interface{}{})
+	Saturday  = newRqlTerm("Saturday", p.Term_SATURDAY, []interface{}{}, map[string]interface{}{})
+	Sunday    = newRqlTerm("Sunday", p.Term_SUNDAY, []interface{}{}, map[string]interface{}{})
 
-// Months
-func January() RqlTerm {
-	return newRqlTerm("January", p.Term_JANUARY, []interface{}{}, map[string]interface{}{})
-}
-func February() RqlTerm {
-	return newRqlTerm("February", p.Term_FEBRUARY, []interface{}{}, map[string]interface{}{})
-}
-func March() RqlTerm {
-	return newRqlTerm("March", p.Term_MARCH, []interface{}{}, map[string]interface{}{})
-}
-func April() RqlTerm {
-	return newRqlTerm("April", p.Term_APRIL, []interface{}{}, map[string]interface{}{})
-}
-func May() RqlTerm {
-	return newRqlTerm("May", p.Term_MAY, []interface{}{}, map[string]interface{}{})
-}
-func June() RqlTerm {
-	return newRqlTerm("June", p.Term_JUNE, []interface{}{}, map[string]interface{}{})
-}
-func July() RqlTerm {
-	return newRqlTerm("July", p.Term_JULY, []interface{}{}, map[string]interface{}{})
-}
-func August() RqlTerm {
-	return newRqlTerm("August", p.Term_AUGUST, []interface{}{}, map[string]interface{}{})
-}
-func September() RqlTerm {
-	return newRqlTerm("September", p.Term_SEPTEMBER, []interface{}{}, map[string]interface{}{})
-}
-func October() RqlTerm {
-	return newRqlTerm("October", p.Term_OCTOBER, []interface{}{}, map[string]interface{}{})
-}
-func November() RqlTerm {
-	return newRqlTerm("November", p.Term_NOVEMBER, []interface{}{}, map[string]interface{}{})
-}
-func December() RqlTerm {
-	return newRqlTerm("December", p.Term_DECEMBER, []interface{}{}, map[string]interface{}{})
-}
+	// Months
+	January   = newRqlTerm("January", p.Term_JANUARY, []interface{}{}, map[string]interface{}{})
+	February  = newRqlTerm("February", p.Term_FEBRUARY, []interface{}{}, map[string]interface{}{})
+	March     = newRqlTerm("March", p.Term_MARCH, []interface{}{}, map[string]interface{}{})
+	April     = newRqlTerm("April", p.Term_APRIL, []interface{}{}, map[string]interface{}{})
+	May       = newRqlTerm("May", p.Term_MAY, []interface{}{}, map[string]interface{}{})
+	June      = newRqlTerm("June", p.Term_JUNE, []interface{}{}, map[string]interface{}{})
+	July      = newRqlTerm("July", p.Term_JULY, []interface{}{}, map[string]interface{}{})
+	August    = newRqlTerm("August", p.Term_AUGUST, []interface{}{}, map[string]interface{}{})
+	September = newRqlTerm("September", p.Term_SEPTEMBER, []interface{}{}, map[string]interface{}{})
+	October   = newRqlTerm("October", p.Term_OCTOBER, []interface{}{}, map[string]interface{}{})
+	November  = newRqlTerm("November", p.Term_NOVEMBER, []interface{}{}, map[string]interface{}{})
+	December  = newRqlTerm("December", p.Term_DECEMBER, []interface{}{}, map[string]interface{}{})
+)

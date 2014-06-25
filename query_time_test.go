@@ -1,8 +1,9 @@
 package gorethink
 
 import (
-	test "launchpad.net/gocheck"
 	"time"
+
+	test "launchpad.net/gocheck"
 )
 
 func (s *RethinkSuite) TestTimeTime(c *test.C) {
@@ -93,7 +94,7 @@ func (s *RethinkSuite) TestTimeYear(c *test.C) {
 func (s *RethinkSuite) TestTimeMonth(c *test.C) {
 	var response interface{}
 
-	row, err := Time(1986, 12, 3, 12, 30, 15, "Z").Month().Eq(December()).RunRow(sess)
+	row, err := Time(1986, 12, 3, 12, 30, 15, "Z").Month().Eq(December).RunRow(sess)
 	c.Assert(err, test.IsNil)
 
 	err = row.Scan(&response)
@@ -105,7 +106,7 @@ func (s *RethinkSuite) TestTimeMonth(c *test.C) {
 func (s *RethinkSuite) TestTimeDay(c *test.C) {
 	var response interface{}
 
-	row, err := Time(1986, 12, 3, 12, 30, 15, "Z").Day().Eq(Wednesday()).RunRow(sess)
+	row, err := Time(1986, 12, 3, 12, 30, 15, "Z").Day().Eq(Wednesday).RunRow(sess)
 	c.Assert(err, test.IsNil)
 
 	err = row.Scan(&response)
