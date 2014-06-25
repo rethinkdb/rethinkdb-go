@@ -11,7 +11,7 @@ import (
 )
 
 var sess *Session
-var debug = flag.Bool("test.debug", false, "debug: print query trees")
+var debug = flag.Bool("gorethink.debug", false, "print query trees")
 var url, db, authKey string
 
 func init() {

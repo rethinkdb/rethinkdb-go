@@ -91,67 +91,64 @@ func (r *ResultRows) Err() error {
 }
 
 // Next prepares the next row for reading. It returns true on success or false
-// if there are no more rows. Every call to scan must be preceeded by a call
+// if there are no more rows. Every call to scan must be preceded by a call
 // to next. If all rows in the buffer have been read and a partial sequence was
 // returned then Next will load more from the database
 func (r *ResultRows) Next() bool {
-	if r.closed {
-		return false
-	}
-
-	if r.err != nil {
-		return false
-	}
-
-	if !r.initialized {
-		r.initialized = true
-	}
-
-	// Attempt to load a row from the buffer
-	if len(r.buffer) > 0 {
-		r.current, r.buffer = r.buffer[0], r.buffer[1:]
-		return true
-	}
-
-	// Fetch new batch from the server
-	if len(r.responses) == 0 && !r.finished {
-		if err := r.session.continueQuery(r); err != nil {
-			r.err = err
-
+	for {
+		if r.closed || r.err != nil {
 			return false
 		}
-	}
 
-	// Check if we  are finished
-	if len(r.responses) == 0 && r.finished {
-		return false
-	}
+		if !r.initialized {
+			r.initialized = true
+		}
 
-	// If we have more batches in the response cache then load a new response
-	// into the buffer
-	if len(r.responses) > 0 {
-		v, err := deconstructDatums(r.responses[0].GetResponse(), r.opts)
-		if err != nil {
-			r.err = err
+		// Attempt to load a row from the buffer
+		if len(r.buffer) > 0 {
+			r.current, r.buffer = r.buffer[0], r.buffer[1:]
+			return true
+		}
 
+		// Fetch new batch from the server
+		if len(r.responses) == 0 && !r.finished {
+			if err := r.session.continueQuery(r); err != nil {
+				r.err = err
+
+				return false
+			}
+		}
+
+		// Check if we  are finished
+		if len(r.responses) == 0 && r.finished {
 			return false
 		}
-		r.buffer = v
-		r.responses = r.responses[1:]
+
+		// If we have more batches in the response cache then load a new response
+		// into the buffer
+		if len(r.responses) > 0 {
+			v, err := deconstructDatums(r.responses[0].GetResponse(), r.opts)
+			if err != nil {
+				r.err = err
+
+				return false
+			}
+			r.buffer = v
+			r.responses = r.responses[1:]
+		}
+
+		// Check the buffer again to make sure it is not empty
+		if len(r.buffer) > 0 {
+			r.current, r.buffer = r.buffer[0], r.buffer[1:]
+
+			return true
+		}
 	}
-
-	// Check the buffer again to make sure it is not empty
-	if len(r.buffer) > 0 {
-		r.current, r.buffer = r.buffer[0], r.buffer[1:]
-
-		return true
-	}
-
-	return false
 }
 
 func (r *ResultRows) extend(response *p.Response) {
-	r.finished = response.GetType() != p.Response_SUCCESS_PARTIAL
+	r.finished = response.GetType() != p.Response_SUCCESS_PARTIAL &&
+		response.GetType() != p.Response_SUCCESS_FEED
 	r.Lock()
 	r.responses = append(r.responses, response)
 	r.Unlock()

@@ -1,6 +1,8 @@
 package gorethink
 
 import (
+	"sync"
+
 	test "launchpad.net/gocheck"
 )
 
@@ -194,4 +196,53 @@ func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
+}
+
+func (s *RethinkSuite) TestTableChanges(c *test.C) {
+	Db("test").TableDrop("changes").Exec(sess)
+	Db("test").TableCreate("changes").Exec(sess)
+
+	var n int
+
+	rows, err := Db("test").Table("changes").Changes().Run(sess)
+	if err != nil {
+		c.Fatal(err.Error())
+	}
+
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	// Use goroutine to wait for changes. Prints the first 10 results
+	go func() {
+		for n < 10 && rows.Next() {
+			var response interface{}
+			err = rows.Scan(&response)
+			if err != nil {
+				c.Fatal(err.Error())
+			}
+
+			n++
+		}
+
+		if rows.Err() != nil {
+			c.Fatal(rows.Err())
+		}
+
+		wg.Done()
+	}()
+
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 6}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 7}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 8}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 9}).Exec(sess)
+	Db("test").Table("changes").Insert(map[string]interface{}{"n": 10}).Exec(sess)
+
+	wg.Wait()
+
+	c.Assert(n, test.Equals, 10)
 }
