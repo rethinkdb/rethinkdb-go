@@ -215,6 +215,19 @@ func (s *RethinkSuite) TestTransformationLimit(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationSlice(c *test.C) {
+	query := Expr(arr).Slice(4)
+
+	var response []interface{}
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.ScanAll(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{5, 6, 7, 8, 9})
+}
+
+func (s *RethinkSuite) TestTransformationSliceRight(c *test.C) {
 	query := Expr(arr).Slice(5, 6)
 
 	var response []interface{}
@@ -225,6 +238,32 @@ func (s *RethinkSuite) TestTransformationSlice(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{6})
+}
+
+func (s *RethinkSuite) TestTransformationSliceOpts(c *test.C) {
+	query := Expr(arr).Slice(4, SliceOpts{LeftBound: "open"})
+
+	var response []interface{}
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.ScanAll(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{6, 7, 8, 9})
+}
+
+func (s *RethinkSuite) TestTransformationSliceRightOpts(c *test.C) {
+	query := Expr(arr).Slice(5, 6, SliceOpts{RightBound: "closed"})
+
+	var response []interface{}
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.ScanAll(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{6, 7})
 }
 
 func (s *RethinkSuite) TestTransformationNth(c *test.C) {

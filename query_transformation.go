@@ -48,7 +48,7 @@ func (t RqlTerm) OrderBy(args ...interface{}) RqlTerm {
 	// Look for options map
 	if len(args) > 0 {
 		if possibleOpts, ok := args[len(args)-1].(OrderByOpts); ok {
-			opts = possibleOpts
+			opts = possibleOpts.toMap()
 			args = args[:len(args)-1]
 		}
 	}
@@ -80,10 +80,29 @@ func (t RqlTerm) Limit(args ...interface{}) RqlTerm {
 	return newRqlTermFromPrevVal(t, "Limit", p.Term_LIMIT, args, map[string]interface{}{})
 }
 
+type SliceOpts struct {
+	LeftBound  interface{} `gorethink:"left_bound,omitempty"`
+	RightBound interface{} `gorethink:"right_bound,omitempty"`
+}
+
+func (o *SliceOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // TODO: Add optional arguments
 // Trim the sequence to within the bounds provided.
-func (t RqlTerm) Slice(lower, upper interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Slice", p.Term_SLICE, []interface{}{lower, upper}, map[string]interface{}{})
+func (t RqlTerm) Slice(args ...interface{}) RqlTerm {
+	var opts = map[string]interface{}{}
+
+	// Look for options map
+	if len(args) > 0 {
+		if possibleOpts, ok := args[len(args)-1].(SliceOpts); ok {
+			opts = possibleOpts.toMap()
+			args = args[:len(args)-1]
+		}
+	}
+
+	return newRqlTermFromPrevVal(t, "Slice", p.Term_SLICE, args, opts)
 }
 
 // Get the nth element of a sequence.
