@@ -3,6 +3,7 @@ GoRethink - RethinkDB Driver for Go [![wercker status](https://app.wercker.com/s
 
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) made by [Daniel Cannon](http://github.com/dancannon) and based off of Christopher Hesse's [RethinkGo](https://github.com/christopherhesse/rethinkgo) driver.
 
+
 Current version: v0.3 (RethinkDB v1.13) 
 
 **Version 0.3 introduced some API changes, for more information check the [change log](CHANGELOG.md)**
@@ -71,32 +72,32 @@ To view full documentation for the query functions check the [GoDoc](http://godo
 
 Slice Expr Example
 ```go
-r.Expr([]interface{}{1, 2, 3, 4, 5}).RunRow(conn)
+r.Expr([]interface{}{1, 2, 3, 4, 5}).Run(session)
 ```
 Map Expr Example
 ```go
-r.Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).RunRow(conn)
+r.Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Run(session)
 ```
 Get Example
 ```go
-r.Db("database").Table("table").Get("GUID").RunRow(conn)
+r.Db("database").Table("table").Get("GUID").Run(session)
 ```
 Map Example (Func)
 ```go
-r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(func (row Term) Term {
+r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(func (row Term) interface{} {
     return row.Add(1)
-}).Run(conn)
+}).Run(session)
 ```
 Map Example (Implicit)
 ```go
-r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(r.Row.Add(1)).Run(conn)
+r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(r.Row.Add(1)).Run(session)
 ```
 Between (Optional Args) Example
 ```go
 r.Db("database").Table("table").Between(1, 10, r.BetweenOpts{
     Index: "num",
     RightBound: "closed",
-}).Run(conn)
+}).Run(session)
 ```
 
 
@@ -108,42 +109,35 @@ As shown above in the Between example optional arguments are passed to the funct
 
 Different result types are returned depending on what function is used to execute the query.
 
-- Run returns a ResultRows type which can be used to view
+- `Run` returns a cursor which can be used to view
 all rows returned.
-- RunRow returns a single row and can be used for queries such as Get where only a single row should be returned(or none).
-- RunWrite returns a ResultRow scanned into WriteResponse and should be used for queries such as Insert,Update,etc...
-- Exec sends a query to the server with the noreply flag set and returns immediately
-
-Both ResultRows and ResultRow have the function `Scan` which is used to bind a row to a variable.
+- `RunWrite` returns a WriteResponse and should be used for queries such as Insert,Update,etc...
+- `Exec` sends a query to the server with the noreply flag set and returns immediately
 
 Example:
 
 ```go
-row, err := Table("tablename").Get(key).RunRow(conn)
+res, err := Table("tablename").Get(key).Run(session)
 if err != nil {
-	// error
-}
-// Check if something was found
-if !row.IsNil() {
-	var response interface{}
-	err := row.Scan(&response)
+    // error
 }
 ```
 
-ResultRows also has the function `Next` which is used to iterate through a result set. If a partial sequence is returned by the server Next will automatically fetch the result of the sequence.
+Cursors have a number of methods available for accessing the query results
+
+- `Next` retrieves the next document from the result set, blocking if necessary.
+- `All` retrieves all documents from the result set into the provided slice.
+- `One` retrieves the first document from the result se.
 
 Example:
 
 ```go
-rows, err := Table("tablename").Run(conn)
-if err != nil {
-	// error
-}
-for rows.Next() {
-    var row interface{}
-    err := rows.Scan(&row)
-
+var row interface{}
+for res.Next(&result) {
     // Do something with row
+}
+if res.Err() != nil {
+    // error
 }
 ```
 
