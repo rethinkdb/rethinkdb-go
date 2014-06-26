@@ -129,7 +129,7 @@ Cursors have a number of methods available for accessing the query results
 - `All` retrieves all documents from the result set into the provided slice.
 - `One` retrieves the first document from the result se.
 
-Example:
+Examples:
 
 ```go
 var row interface{}
@@ -137,6 +137,25 @@ for res.Next(&result) {
     // Do something with row
 }
 if res.Err() != nil {
+    // error
+}
+```
+
+```go
+var rows []interface{}
+err := res.All(&rows)
+if err != nil {
+    // error
+}
+```
+
+```go
+var row interface{}
+err := res.One(&row)
+if err == r.ErrEmptyResult {
+    // row not found
+}
+if err != nil {
     // error
 }
 ```
