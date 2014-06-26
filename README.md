@@ -67,7 +67,7 @@ A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) in
 
 This library is based on the official drivers so the code on the [API](http://www.rethinkdb.com/api/) page should require very few changes to work.
 
-To view full documentation for the query functions check the [GoDoc](http://godoc.org/github.com/dancannon/gorethink#RqlTerm)
+To view full documentation for the query functions check the [GoDoc](http://godoc.org/github.com/dancannon/gorethink#Term)
 
 Slice Expr Example
 ```go
@@ -83,7 +83,7 @@ r.Db("database").Table("table").Get("GUID").RunRow(conn)
 ```
 Map Example (Func)
 ```go
-r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(func (row RqlTerm) RqlTerm {
+r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(func (row Term) Term {
     return row.Add(1)
 }).Run(conn)
 ```

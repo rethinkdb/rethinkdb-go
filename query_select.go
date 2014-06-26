@@ -5,8 +5,8 @@ import (
 )
 
 // Reference a database.
-func Db(args ...interface{}) RqlTerm {
-	return newRqlTerm("Db", p.Term_DB, args, map[string]interface{}{})
+func Db(args ...interface{}) Term {
+	return constructRootTerm("Db", p.Term_DB, args, map[string]interface{}{})
 }
 
 type TableOpts struct {
@@ -22,12 +22,12 @@ func (o *TableOpts) toMap() map[string]interface{} {
 //
 // Optional arguments (see http://www.rethinkdb.com/api/#js:selecting_data-table for more information):
 // "use_outdated" (boolean - defaults to false)
-func Table(name interface{}, optArgs ...TableOpts) RqlTerm {
+func Table(name interface{}, optArgs ...TableOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTerm("Table", p.Term_TABLE, []interface{}{name}, opts)
+	return constructRootTerm("Table", p.Term_TABLE, []interface{}{name}, opts)
 }
 
 // Select all documents in a table. This command can be chained with other
@@ -35,27 +35,27 @@ func Table(name interface{}, optArgs ...TableOpts) RqlTerm {
 //
 // Optional arguments (see http://www.rethinkdb.com/api/#js:selecting_data-table for more information):
 // "use_outdated" (boolean - defaults to false)
-func (t RqlTerm) Table(name interface{}, optArgs ...TableOpts) RqlTerm {
+func (t Term) Table(name interface{}, optArgs ...TableOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, []interface{}{name}, opts)
+	return constructMethodTerm(t, "Table", p.Term_TABLE, []interface{}{name}, opts)
 }
 
 // Get a document by primary key. If nothing was found, RethinkDB will return a nil value.
-func (t RqlTerm) Get(args ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "Get", p.Term_GET, args, map[string]interface{}{})
+func (t Term) Get(args ...interface{}) Term {
+	return constructMethodTerm(t, "Get", p.Term_GET, args, map[string]interface{}{})
 }
 
 // Get all documents where the given value matches the value of the primary index.
-func (t RqlTerm) GetAll(keys ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{})
+func (t Term) GetAll(keys ...interface{}) Term {
+	return constructMethodTerm(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{})
 }
 
 // Get all documents where the given value matches the value of the requested index.
-func (t RqlTerm) GetAllByIndex(index interface{}, keys ...interface{}) RqlTerm {
-	return newRqlTermFromPrevVal(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{"index": index})
+func (t Term) GetAllByIndex(index interface{}, keys ...interface{}) Term {
+	return constructMethodTerm(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{"index": index})
 }
 
 type BetweenOpts struct {
@@ -75,12 +75,12 @@ func (o *BetweenOpts) toMap() map[string]interface{} {
 // `right_bound` may be set to `open` or `closed` to indicate whether or not to
 // include that endpoint of the range (by default, `left_bound` is closed and
 // `right_bound` is open).
-func (t RqlTerm) Between(lowerKey, upperKey interface{}, optArgs ...BetweenOpts) RqlTerm {
+func (t Term) Between(lowerKey, upperKey interface{}, optArgs ...BetweenOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Between", p.Term_BETWEEN, []interface{}{lowerKey, upperKey}, opts)
+	return constructMethodTerm(t, "Between", p.Term_BETWEEN, []interface{}{lowerKey, upperKey}, opts)
 }
 
 type FilterOpts struct {
@@ -99,10 +99,10 @@ func (o *FilterOpts) toMap() map[string]interface{} {
 // and the default value can be changed by passing the optional argument `default`.
 // Setting this optional argument to `r.error()` will cause any non-existence
 // errors to abort the filter.
-func (t RqlTerm) Filter(f interface{}, optArgs ...FilterOpts) RqlTerm {
+func (t Term) Filter(f interface{}, optArgs ...FilterOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Filter", p.Term_FILTER, []interface{}{funcWrap(f)}, opts)
+	return constructMethodTerm(t, "Filter", p.Term_FILTER, []interface{}{funcWrap(f)}, opts)
 }

@@ -14,10 +14,10 @@ func (s *RethinkSuite) TestTableCreate(c *test.C) {
 	// Test database creation
 	query := Db("test").TableCreate("test")
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -33,10 +33,10 @@ func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
 		PrimaryKey: "it",
 	})
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -52,10 +52,10 @@ func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
 		Durability: "soft",
 	})
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -72,10 +72,10 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 		Durability: "soft",
 	})
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -90,10 +90,10 @@ func (s *RethinkSuite) TestTableList(c *test.C) {
 
 	// Try and find it in the list
 	success := false
-	row, err := Db("test").TableList().Run(sess)
+	res, err := Db("test").TableList().Run(sess)
 	c.Assert(err, test.IsNil)
 
-	row.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
@@ -115,10 +115,10 @@ func (s *RethinkSuite) TestTableDelete(c *test.C) {
 	// Test database creation
 	query := Db("test").TableDrop("test")
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
@@ -135,10 +135,10 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 		Multi: true,
 	})
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -148,7 +148,7 @@ func (s *RethinkSuite) TestTableCompoundIndexCreate(c *test.C) {
 	DbCreate("test").Exec(sess)
 	Db("test").TableDrop("TableCompound").Exec(sess)
 	Db("test").TableCreate("TableCompound").Exec(sess)
-	response, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row RqlTerm) interface{} {
+	response, err := Db("test").Table("TableCompound").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(sess)
 	c.Assert(err, test.IsNil)
@@ -163,10 +163,10 @@ func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 
 	// Try and find it in the list
 	success := false
-	row, err := Db("test").Table("test").IndexList().Run(sess)
+	res, err := Db("test").Table("test").IndexList().Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = row.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
@@ -189,10 +189,10 @@ func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 	// Test database creation
 	query := Db("test").Table("test").IndexDrop("test")
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
@@ -214,13 +214,8 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 
 	// Use goroutine to wait for changes. Prints the first 10 results
 	go func() {
-		for n < 10 && rows.Next() {
-			var response interface{}
-			err = rows.Scan(&response)
-			if err != nil {
-				c.Fatal(err.Error())
-			}
-
+		var response interface{}
+		for n < 10 && rows.Next(&response) {
 			n++
 		}
 

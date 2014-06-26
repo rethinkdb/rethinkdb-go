@@ -16,12 +16,12 @@ func (s *RethinkSuite) TestJoinInnerJoin(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
+	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b Term) Term {
 		return a.Field("id").Eq(b.Field("id"))
 	})
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(response, JsonEquals, []interface{}{
 		map[string]interface{}{
@@ -47,13 +47,13 @@ func (s *RethinkSuite) TestJoinInnerJoinZip(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
+	query := Db("test").Table("Join1").InnerJoin(Db("test").Table("Join2"), func(a, b Term) Term {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip()
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -74,13 +74,13 @@ func (s *RethinkSuite) TestJoinOuterJoinZip(c *test.C) {
 
 	// Test query
 	var response []interface{}
-	query := Db("test").Table("Join1").OuterJoin(Db("test").Table("Join2"), func(a, b RqlTerm) RqlTerm {
+	query := Db("test").Table("Join1").OuterJoin(Db("test").Table("Join2"), func(a, b Term) Term {
 		return a.Field("id").Eq(b.Field("id"))
 	}).Zip().OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -103,10 +103,10 @@ func (s *RethinkSuite) TestJoinEqJoinZip(c *test.C) {
 	// Test query
 	var response []interface{}
 	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join2")).Zip()
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 	c.Assert(response, JsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0},
 		map[string]interface{}{"title": "lmoe", "name": "joe", "id": 2},
@@ -134,10 +134,10 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 	query := Db("test").Table("Join1").EqJoin("id", Db("test").Table("Join3"), EqJoinOpts{
 		Index: "it",
 	}).Zip()
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 	c.Assert(response, JsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0, "it": 0},
 		map[string]interface{}{"title": "lmoe", "name": "joe", "id": 2, "it": 2},
@@ -167,15 +167,11 @@ func (s *RethinkSuite) TestOrderByJoinEq(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	// Test query
-	rows, err := tab.OrderBy("T").EqJoin("S", tab2).Run(sess)
+	var response []Map
+	res, err := tab.OrderBy("T").EqJoin("S", tab2).Run(sess)
 	c.Assert(err, test.IsNil)
 
-	var out []Map
-	for rows.Next() {
-		p := Map{}
-		err = rows.Scan(&p)
-		c.Assert(err, test.IsNil)
-		out = append(out, p)
-	}
-	c.Check(len(out), test.Equals, 4, test.Commentf("%v", out))
+	err = res.All(&response)
+	c.Assert(err, test.IsNil)
+	c.Check(len(response), test.Equals, 4, test.Commentf("%v", response))
 }

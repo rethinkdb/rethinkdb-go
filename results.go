@@ -1,223 +1,263 @@
 package gorethink
 
 import (
+	"errors"
 	"reflect"
 	"sync"
+	"time"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-// ResultRow contains the result of a RunRow query
-type ResultRow struct {
-	err  error
-	rows *ResultRows
-}
-
-func (r *ResultRow) Profile() interface{} {
-	return r.rows.Profile()
-}
-
-func (r *ResultRow) Err() error {
-	return r.err
-}
-
-// Scan copies the result from the matched row into the value pointed at by dest.
-// If more than one row is returned by the query then Scan returns the first and
-// ignores the rest. If no row is found then Scan returns an error.
+// Cursors are used to represent data returned from the database.
 //
-// RethinkDB returns an nil value on Get queries when nothing is found, and Scan
-// won't fail in this case.
-func (r *ResultRow) Scan(dest interface{}) error {
-	if r.err != nil {
-		return r.err
-	}
+// The code for this struct is based off of mgo's Iter and the official
+// python driver's cursor.
+type Cursor struct {
+	mu       sync.Mutex
+	gotReply sync.Cond
+	session  *Session
+	query    *p.Query
+	term     Term
+	opts     map[string]interface{}
 
-	return r.rows.Scan(dest)
-}
+	timeout  time.Duration
+	timedout bool
 
-// Tests if the result is nil.
-// RethinkDB returns an nil value on Get queries when nothing is found.
-func (r *ResultRow) IsNil() bool {
-	if r.err != nil {
-		return true
-	}
-	return r.rows.IsNil()
-}
-
-// ResultRows contains the result of a query. Its cursor starts before the first row
-// of the result set. Use Next to advance through the rows.
-type ResultRows struct {
-	sync.Mutex
-
-	session *Session
-	query   *p.Query
-	term    RqlTerm
-	opts    map[string]interface{}
-
-	profile interface{}
-
-	initialized bool
-	closed      bool
-	err         error
-
+	err                 error
 	outstandingRequests int
+	closed              bool
 	finished            bool
 	responses           []*p.Response
-	current             interface{}
+	profile             interface{}
 	buffer              []interface{}
 }
 
-func (r *ResultRows) Profile() interface{} {
-	return r.profile
+// Profile returns the information returned from the query profiler.
+func (c *Cursor) Profile() interface{} {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.profile
 }
 
-// Close closes the Rows, preventing further enumeration. If the end is
-// encountered, the Rows are closed automatically. Close is idempotent.
-func (r *ResultRows) Close() error {
-	var err error
+// Err returns nil if no errors happened during iteration, or the actual
+// error otherwise.
+func (c *Cursor) Err() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-	if !r.closed {
-		err = r.session.stopQuery(r)
-		r.closed = true
+	return c.err
+}
+
+// Close closes the cursor, preventing further enumeration. If the end is
+// encountered, the cursor is closed automatically. Close is idempotent.
+func (c *Cursor) Close() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if !c.closed && !c.finished {
+		err := c.session.stopQuery(c)
+		if err != nil && (c.err == nil || c.err == ErrEmptyResult) {
+			c.err = err
+		}
+		c.closed = true
 	}
 
-	return err
+	return c.err
 }
 
-// Err returns the error, if any, that was encountered during iteration.
-func (r *ResultRows) Err() error {
-	return r.err
+// Timeout returns true if Next returned false due to a timeout of
+// a tailable cursor. In those cases, Next may be called again to continue
+// the iteration at the previous cursor position.
+func (c *Cursor) Timeout() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return c.timedout
 }
 
-// Next prepares the next row for reading. It returns true on success or false
-// if there are no more rows. Every call to scan must be preceded by a call
-// to next. If all rows in the buffer have been read and a partial sequence was
-// returned then Next will load more from the database
-func (r *ResultRows) Next() bool {
+// Next retrieves the next document from the result set, blocking if necessary.
+// This method will also automatically retrieve another batch of documents from
+// the server when the current one is exhausted, or before that in background
+// if possible.
+//
+// Next returns true if a document was successfully unmarshalled onto result,
+// and false at the end of the result set or if an error happened.
+// When Next returns false, the Err method should be called to verify if
+// there was an error during iteration.
+func (c *Cursor) Next(result interface{}) bool {
+	c.mu.Lock()
+	c.timedout = false
+	timeout := time.Time{}
+
+	if c.closed {
+		c.mu.Unlock()
+
+		return false
+	}
+
+	// Load more data if needed
+	for c.err == nil && len(c.buffer) == 0 && !c.finished {
+		if c.timeout >= 0 {
+			if timeout.IsZero() {
+				timeout = time.Now().Add(c.timeout)
+			}
+			if time.Now().After(timeout) {
+				c.timedout = true
+				c.mu.Unlock()
+				return false
+			}
+		}
+
+		c.mu.Unlock()
+		c.getMore()
+		c.mu.Lock()
+
+		if c.err != nil {
+			break
+		}
+	}
+
+	if len(c.buffer) > 0 {
+		var data interface{}
+		data, c.buffer = c.buffer[0], c.buffer[1:]
+
+		c.mu.Unlock()
+		err := encoding.Decode(result, data)
+		if err != nil {
+			c.mu.Lock()
+			if c.err == nil {
+				c.err = err
+			}
+			c.mu.Unlock()
+
+			return false
+		}
+
+		return true
+	}
+
+	c.mu.Unlock()
+	return false
+}
+
+// All retrieves all documents from the result set into the provided slice
+// and closes the cursor.
+//
+// The result argument must necessarily be the address for a slice. The slice
+// may be nil or previously allocated.
+func (c *Cursor) All(result interface{}) error {
+	resultv := reflect.ValueOf(result)
+	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
+		panic("result argument must be a slice address")
+	}
+	slicev := resultv.Elem()
+	slicev = slicev.Slice(0, slicev.Cap())
+	elemt := slicev.Type().Elem()
+	i := 0
 	for {
-		if r.closed || r.err != nil {
-			return false
-		}
-
-		if !r.initialized {
-			r.initialized = true
-		}
-
-		// Attempt to load a row from the buffer
-		if len(r.buffer) > 0 {
-			r.current, r.buffer = r.buffer[0], r.buffer[1:]
-			return true
-		}
-
-		// Fetch new batch from the server
-		if len(r.responses) == 0 && !r.finished {
-			if err := r.session.continueQuery(r); err != nil {
-				r.err = err
-
-				return false
+		if slicev.Len() == i {
+			elemp := reflect.New(elemt)
+			if !c.Next(elemp.Interface()) {
+				break
+			}
+			slicev = reflect.Append(slicev, elemp.Elem())
+			slicev = slicev.Slice(0, slicev.Cap())
+		} else {
+			if !c.Next(slicev.Index(i).Addr().Interface()) {
+				break
 			}
 		}
-
-		// Check if we  are finished
-		if len(r.responses) == 0 && r.finished {
-			return false
-		}
-
-		// If we have more batches in the response cache then load a new response
-		// into the buffer
-		if len(r.responses) > 0 {
-			v, err := deconstructDatums(r.responses[0].GetResponse(), r.opts)
-			if err != nil {
-				r.err = err
-
-				return false
-			}
-			r.buffer = v
-			r.responses = r.responses[1:]
-		}
-
-		// Check the buffer again to make sure it is not empty
-		if len(r.buffer) > 0 {
-			r.current, r.buffer = r.buffer[0], r.buffer[1:]
-
-			return true
-		}
+		i++
 	}
+	resultv.Elem().Set(slicev.Slice(0, i))
+	return c.Close()
 }
 
-func (r *ResultRows) extend(response *p.Response) {
-	r.finished = response.GetType() != p.Response_SUCCESS_PARTIAL &&
-		response.GetType() != p.Response_SUCCESS_FEED
-	r.Lock()
-	r.responses = append(r.responses, response)
-	r.Unlock()
-}
-
-// Scan copies the result in the current row into the value pointed at by dest.
-//
-// If an argument is of type *interface{}, Scan copies the value provided by the
-// database without conversion.
-//
-// If the value is a struct then Scan traverses
-// the result recursively and attempts to match the keys returned by the database
-// to the name used by the structs field (either the struct field name or its
-// key).
-func (r *ResultRows) Scan(dest interface{}) error {
-	if r.err != nil {
-		return r.err
-	}
-	if r.initialized == false {
-		return RqlDriverError{"Scan called without calling Next"}
-	}
-
-	err := encoding.Decode(dest, r.current)
-	if err != nil {
+// All retrieves a single document from the result set into the provided
+// slice and closes the cursor.
+func (c *Cursor) One(result interface{}) error {
+	ok := c.Next(result)
+	if !ok {
+		err := c.Err()
+		if err == nil {
+			return ErrEmptyResult
+		}
 		return err
 	}
 
-	return nil
-}
-
-// ScanAll copies all the rows in the result buffer into the value pointed at by
-// dest.
-func (r *ResultRows) ScanAll(dest interface{}) error {
-	// Validate the data types
-	pval := reflect.ValueOf(dest)
-	if pval.Kind() != reflect.Ptr {
-		return RqlDriverError{"ScanAll must be passed a pointer"}
-	}
-
-	val := pval.Elem()
-	if val.Kind() != reflect.Slice {
-		return RqlDriverError{"ScanAll must be passed a pointer to a slice"}
-	}
-
-	elems := reflect.MakeSlice(val.Type(), 0, 0)
-
-	// Iterate through each row in the buffer and scan into an element of the slice
-	for r.Next() {
-		elem := reflect.New(val.Type().Elem())
-
-		err := r.Scan(elem.Interface())
-		if err != nil {
-			return err
-		}
-
-		elems = reflect.Append(elems, elem.Elem())
-	}
-
-	if r.err != nil {
-		return r.err
-	}
-
-	// Copy the value from the temporary slice to the destination
-	val.Set(elems)
-
-	return nil
+	return c.Close()
 }
 
 // Tests if the current row is nil.
-func (r *ResultRows) IsNil() bool {
-	return len(r.responses) == 0 && r.current == nil
+func (c *Cursor) IsNil() bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) > 0 && c.buffer[0] == nil)
+}
+
+func (c *Cursor) getMore() {
+	// Check if response is closed/finished
+	if len(c.responses) == 0 && c.closed {
+		c.err = errors.New("connection closed, cannot read cursor")
+		return
+	}
+	if len(c.responses) == 0 && c.finished {
+		return
+	}
+
+	// Otherwise fetch more results
+	if len(c.responses) == 0 && !c.finished {
+		if err := c.session.continueQuery(c); err != nil {
+			c.err = err
+			return
+		}
+	}
+	if len(c.responses) == 1 && !c.finished {
+		if err := c.session.asyncContinueQuery(c); err != nil {
+			c.err = err
+			return
+		}
+	}
+
+	// Load the new response into the buffer
+	if len(c.responses) > 0 {
+		var err error
+		c.buffer, err = deconstructDatums(c.responses[0].GetResponse(), c.opts)
+		if err != nil {
+			c.err = err
+
+			return
+		}
+		c.responses = c.responses[1:]
+	}
+}
+
+func (c *Cursor) extend(response *p.Response) {
+	c.mu.Lock()
+	c.finished = response.GetType() != p.Response_SUCCESS_PARTIAL &&
+		response.GetType() != p.Response_SUCCESS_FEED
+	c.responses = append(c.responses, response)
+
+	// Prefetch results if needed
+	if len(c.responses) == 1 && !c.finished {
+		if err := c.session.asyncContinueQuery(c); err != nil {
+			c.err = err
+			return
+		}
+	}
+
+	// Load the new response into the buffer
+	var err error
+	c.buffer, err = deconstructDatums(c.responses[0].GetResponse(), c.opts)
+	if err != nil {
+		c.err = err
+
+		return
+	}
+	c.responses = c.responses[1:]
+	c.mu.Unlock()
 }
