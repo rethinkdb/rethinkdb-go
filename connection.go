@@ -13,7 +13,7 @@ import (
 )
 
 type Conn interface {
-	SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error)
+	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error)
 	ReadResponse(s *Session, token int64) (*p.Response, error)
 	Close() error
 }
@@ -27,23 +27,33 @@ type Connection struct {
 	closed bool
 }
 
-// Reconnect closes the previous connection and attempts to connect again.
+// Dial closes the previous connection and attempts to connect again.
 func Dial(s *Session) (*Connection, error) {
 	conn, err := net.Dial("tcp", s.address)
 	if err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_2); err != nil {
+	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
+	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
-	// authorization key
+	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
 	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
-	if err := binary.Write(conn, binary.BigEndian, []byte(s.authkey)); err != nil {
+	// Send the auth key as an ASCII string
+	// If there is no auth key, skip this step
+	if s.authkey != "" {
+		if _, err := io.WriteString(conn, s.authkey); err != nil {
+			return nil, RqlConnectionError{err.Error()}
+		}
+	}
+
+	// Send the protocol type as a 4-byte little-endian-encoded integer
+	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_PROTOBUF); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
@@ -111,7 +121,7 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) 
 	}
 }
 
-func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error) {
+func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error) {
 	var data []byte
 	var err error
 
@@ -170,24 +180,26 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 		}
 	}
 
-	// De-construct datum and return the result
+	// De-construct datum and return a cursor
 	switch response.GetType() {
-	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE:
-		result := &ResultRows{
+	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE, p.Response_SUCCESS_FEED:
+		cursor := &Cursor{
 			session: s,
 			query:   q,
 			term:    t,
 			opts:    opts,
 			profile: profile,
+			timeout: -1,
 		}
+		cursor.gotReply.L = &cursor.mu
 
 		s.Lock()
-		s.cache[*q.Token] = result
+		s.cache[*q.Token] = cursor
 		s.Unlock()
 
-		result.extend(response)
+		cursor.extend(response)
 
-		return result, nil
+		return cursor, nil
 	case p.Response_SUCCESS_ATOM:
 		var value []interface{}
 		var err error
@@ -216,7 +228,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 			}
 		}
 
-		return &ResultRows{
+		cursor := &Cursor{
 			session:  s,
 			query:    q,
 			term:     t,
@@ -224,7 +236,11 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[strin
 			profile:  profile,
 			buffer:   value,
 			finished: true,
-		}, nil
+			timeout:  -1,
+		}
+		cursor.gotReply.L = &cursor.mu
+
+		return cursor, nil
 	case p.Response_WAIT_COMPLETE:
 		return nil, nil
 	default:
@@ -237,7 +253,7 @@ func (c *Connection) Close() error {
 	return c.Conn.Close()
 }
 
-func checkErrorResponse(response *p.Response, t RqlTerm) error {
+func checkErrorResponse(response *p.Response, t Term) error {
 	switch response.GetType() {
 	case p.Response_CLIENT_ERROR:
 		return RqlClientError{rqlResponseError{response, t}}

@@ -13,10 +13,10 @@ func (s *RethinkSuite) TestDbCreate(c *test.C) {
 	// Test database creation
 	query := DbCreate("test")
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
@@ -30,10 +30,10 @@ func (s *RethinkSuite) TestDbList(c *test.C) {
 
 	// Try and find it in the list
 	success := false
-	r, err := DbList().Run(sess)
+	res, err := DbList().Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.FitsTypeOf, []interface{}{})
@@ -56,10 +56,10 @@ func (s *RethinkSuite) TestDbDelete(c *test.C) {
 	// Test database creation
 	query := DbDrop("test")
 
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})

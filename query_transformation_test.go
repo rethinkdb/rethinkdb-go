@@ -8,25 +8,25 @@ func (s *RethinkSuite) TestTransformationMapImplicit(c *test.C) {
 	query := Expr(arr).Map(Row.Add(1))
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
 }
 
 func (s *RethinkSuite) TestTransformationMapFunc(c *test.C) {
-	query := Expr(arr).Map(func(row RqlTerm) RqlTerm {
+	query := Expr(arr).Map(func(row Term) Term {
 		return row.Add(1)
 	})
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
@@ -36,10 +36,10 @@ func (s *RethinkSuite) TestTransformationWithFields(c *test.C) {
 	query := Expr(objList).WithFields("id", "num").OrderBy("id")
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -56,15 +56,15 @@ func (s *RethinkSuite) TestTransformationWithFields(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationConcatMap(c *test.C) {
-	query := Expr(objList).ConcatMap(func(row RqlTerm) RqlTerm {
+	query := Expr(objList).ConcatMap(func(row Term) Term {
 		return Expr([]interface{}{row.Field("num")})
 	})
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{0, 5, 10, 0, 100, 15, 0, 50, 25})
@@ -74,10 +74,10 @@ func (s *RethinkSuite) TestTransformationOrderByDesc(c *test.C) {
 	query := Expr(noDupNumObjList).OrderBy(Desc("num"))
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -95,10 +95,10 @@ func (s *RethinkSuite) TestTransformationOrderByAsc(c *test.C) {
 	query := Expr(noDupNumObjList).OrderBy(Asc("num"))
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -120,13 +120,15 @@ func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
 	Db("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(sess)
 	Db("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(sess)
 
-	query := Db("test").Table("OrderByIndex").OrderBy(map[string]interface{}{"index": "test"})
+	query := Db("test").Table("OrderByIndex").OrderBy(OrderByOpts{
+		Index: "test",
+	})
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -144,10 +146,10 @@ func (s *RethinkSuite) TestTransformationOrderByMultiple(c *test.C) {
 	query := Expr(objList).OrderBy(Desc("num"), Asc("id"))
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -164,15 +166,15 @@ func (s *RethinkSuite) TestTransformationOrderByMultiple(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationOrderByFunc(c *test.C) {
-	query := Expr(objList).OrderBy(func(row RqlTerm) RqlTerm {
+	query := Expr(objList).OrderBy(func(row Term) Term {
 		return row.Field("num").Add(row.Field("id"))
 	})
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -192,10 +194,10 @@ func (s *RethinkSuite) TestTransformationSkip(c *test.C) {
 	query := Expr(arr).Skip(7)
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{8, 9})
@@ -205,36 +207,75 @@ func (s *RethinkSuite) TestTransformationLimit(c *test.C) {
 	query := Expr(arr).Limit(2)
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2})
 }
 
 func (s *RethinkSuite) TestTransformationSlice(c *test.C) {
+	query := Expr(arr).Slice(4)
+
+	var response []interface{}
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{5, 6, 7, 8, 9})
+}
+
+func (s *RethinkSuite) TestTransformationSliceRight(c *test.C) {
 	query := Expr(arr).Slice(5, 6)
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{6})
+}
+
+func (s *RethinkSuite) TestTransformationSliceOpts(c *test.C) {
+	query := Expr(arr).Slice(4, SliceOpts{LeftBound: "open"})
+
+	var response []interface{}
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{6, 7, 8, 9})
+}
+
+func (s *RethinkSuite) TestTransformationSliceRightOpts(c *test.C) {
+	query := Expr(arr).Slice(5, 6, SliceOpts{RightBound: "closed"})
+
+	var response []interface{}
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{6, 7})
 }
 
 func (s *RethinkSuite) TestTransformationNth(c *test.C) {
 	query := Expr(arr).Nth(2)
 
 	var response interface{}
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, 3)
@@ -244,10 +285,10 @@ func (s *RethinkSuite) TestTransformationIndexesOf(c *test.C) {
 	query := Expr(arr).IndexesOf(2)
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1})
@@ -257,10 +298,10 @@ func (s *RethinkSuite) TestTransformationIsEmpty(c *test.C) {
 	query := Expr([]interface{}{}).IsEmpty()
 
 	var response bool
-	r, err := query.RunRow(sess)
+	r, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = r.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, true)
@@ -270,10 +311,10 @@ func (s *RethinkSuite) TestTransformationUnion(c *test.C) {
 	query := Expr(arr).Union(arr)
 
 	var response []interface{}
-	r, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9})

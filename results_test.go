@@ -13,37 +13,37 @@ type attr struct {
 	Value interface{}
 }
 
-func (s *RethinkSuite) TestRowsScanLiteral(c *test.C) {
-	row, err := Expr(5).RunRow(sess)
+func (s *RethinkSuite) TestRowsLiteral(c *test.C) {
+	res, err := Expr(5).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response interface{}
-	err = row.Scan(&response)
+	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, 5)
 }
 
-func (s *RethinkSuite) TestRowsScanSlice(c *test.C) {
-	row, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(sess)
+func (s *RethinkSuite) TestRowsSlice(c *test.C) {
+	res, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response []interface{}
-	err = row.ScanAll(&response)
+	err = res.All(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
 func (s *RethinkSuite) TestRowsPartiallyNilSlice(c *test.C) {
-	row, err := Expr(map[string]interface{}{
+	res, err := Expr(map[string]interface{}{
 		"item": []interface{}{
 			map[string]interface{}{"num": 1},
 			nil,
 		},
-	}).RunRow(sess)
+	}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response map[string]interface{}
-	err = row.Scan(&response)
+	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{
 		"item": []interface{}{
@@ -53,15 +53,15 @@ func (s *RethinkSuite) TestRowsPartiallyNilSlice(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsScanMap(c *test.C) {
-	row, err := Expr(map[string]interface{}{
+func (s *RethinkSuite) TestRowsMap(c *test.C) {
+	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-	}).RunRow(sess)
+	}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response map[string]interface{}
-	err = row.Scan(&response)
+	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{
 		"id":   2,
@@ -69,15 +69,15 @@ func (s *RethinkSuite) TestRowsScanMap(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsScanMapIntoInterface(c *test.C) {
-	row, err := Expr(map[string]interface{}{
+func (s *RethinkSuite) TestRowsMapIntoInterface(c *test.C) {
+	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-	}).RunRow(sess)
+	}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response interface{}
-	err = row.Scan(&response)
+	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{
 		"id":   2,
@@ -85,19 +85,19 @@ func (s *RethinkSuite) TestRowsScanMapIntoInterface(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsScanMapNested(c *test.C) {
-	row, err := Expr(map[string]interface{}{
+func (s *RethinkSuite) TestRowsMapNested(c *test.C) {
+	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 		"attr": []interface{}{map[string]interface{}{
 			"name":  "attr 1",
 			"value": "value 1",
 		}},
-	}).RunRow(sess)
+	}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response interface{}
-	err = row.Scan(&response)
+	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{
 		"id":   2,
@@ -109,19 +109,19 @@ func (s *RethinkSuite) TestRowsScanMapNested(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsScanStruct(c *test.C) {
-	row, err := Expr(map[string]interface{}{
+func (s *RethinkSuite) TestRowsStruct(c *test.C) {
+	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 		"Attrs": []interface{}{map[string]interface{}{
 			"Name":  "attr 1",
 			"Value": "value 1",
 		}},
-	}).RunRow(sess)
+	}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response object
-	err = row.Scan(&response)
+	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.DeepEquals, object{
 		Id:   2,
@@ -134,21 +134,21 @@ func (s *RethinkSuite) TestRowsScanStruct(c *test.C) {
 }
 
 func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
-	row, err := Expr("a").RunRow(sess)
+	res, err := Expr("a").Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response string
-	err = row.Scan(&response)
+	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, "a")
 }
 
 func (s *RethinkSuite) TestRowsAtomArray(c *test.C) {
-	row, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
+	res, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response []int
-	err = row.ScanAll(&response)
+	err = res.All(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.DeepEquals, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0})
 }
@@ -156,33 +156,32 @@ func (s *RethinkSuite) TestRowsAtomArray(c *test.C) {
 func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	DbCreate("test").Exec(sess)
 	Db("test").TableCreate("test").Exec(sess)
-	row, err := Db("test").Table("test").Get("missing value").RunRow(sess)
+	res, err := Db("test").Table("test").Get("missing value").Run(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(row.IsNil(), test.Equals, true)
+	c.Assert(res.IsNil(), test.Equals, true)
 
-	row, err = Db("test").Table("test").Get("missing value").RunRow(sess)
+	res, err = Db("test").Table("test").Get("missing value").Run(sess)
 	c.Assert(err, test.IsNil)
 	var response interface{}
-	row.Scan(response)
-	c.Assert(row.IsNil(), test.Equals, true)
+	res.One(&response)
+	c.Assert(res.IsNil(), test.Equals, true)
 
-	rows, err := Db("test").Table("test").Get("missing value").Run(sess)
+	res, err = Db("test").Table("test").Get("missing value").Run(sess)
 	c.Assert(err, test.IsNil)
-	rows.Next()
-	c.Assert(rows.IsNil(), test.Equals, true)
+	c.Assert(res.IsNil(), test.Equals, true)
 
-	rows, err = Db("test").Table("test").GetAll("missing value", "another missing value").Run(sess)
+	res, err = Db("test").Table("test").GetAll("missing value", "another missing value").Run(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(rows.Next(), test.Equals, false)
+	c.Assert(res.Next(&response), test.Equals, false)
 
 	var obj object
 	obj.Name = "missing value"
-	row, err = Db("test").Table("test").Filter(obj).RunRow(sess)
+	res, err = Db("test").Table("test").Filter(obj).Run(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(row.IsNil(), test.Equals, true)
+	c.Assert(res.IsNil(), test.Equals, true)
 }
 
-func (s *RethinkSuite) TestRowsScanAll(c *test.C) {
+func (s *RethinkSuite) TestRowsAll(c *test.C) {
 	// Ensure table + database exist
 	DbCreate("test").Exec(sess)
 	Db("test").TableDrop("Table3").Exec(sess)
@@ -211,11 +210,11 @@ func (s *RethinkSuite) TestRowsScanAll(c *test.C) {
 
 	// Test query
 	query := Db("test").Table("Table3").OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
 	var response []object
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.HasLen, 2)
 	c.Assert(response, test.DeepEquals, []object{

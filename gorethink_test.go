@@ -11,22 +11,25 @@ import (
 )
 
 var sess *Session
-var debug = flag.Bool("test.debug", false, "debug: print query trees")
-var url, db string
+var debug = flag.Bool("gorethink.debug", false, "print query trees")
+var url, db, authKey string
 
 func init() {
 	flag.Parse()
 
 	// If the test is being run by wercker look for the rethink url
-	url = os.Getenv("WERCKER_RETHINKDB_URL")
+	url = os.Getenv("RETHINKDB_URL")
 	if url == "" {
 		url = "localhost:28015"
 	}
 
-	db = os.Getenv("WERCKER_RETHINKDB_DB")
+	db = os.Getenv("RETHINKDB_DB")
 	if db == "" {
 		db = "test"
 	}
+
+	// Needed for running tests for RethinkDB with a non-empty authkey
+	authKey = os.Getenv("RETHINKDB_AUTHKEY")
 }
 
 // Hook up gocheck into the gotest runner.
@@ -42,6 +45,7 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 		Address:   url,
 		MaxIdle:   3,
 		MaxActive: 3,
+		AuthKey:   authKey,
 	})
 	c.Assert(err, test.IsNil)
 }

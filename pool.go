@@ -205,7 +205,7 @@ func (c *pooledConnection) Close() (err error) {
 	return err
 }
 
-func (c *pooledConnection) SendQuery(s *Session, q *p.Query, t RqlTerm, opts map[string]interface{}, async bool) (*ResultRows, error) {
+func (c *pooledConnection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error) {
 	if err := c.get(); err != nil {
 		return nil, err
 	}

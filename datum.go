@@ -11,7 +11,7 @@ import (
 
 // Converts a query term to a datum. If the term cannot be converted to a datum
 // object then the function panics.
-func constructDatum(t RqlTerm) (*p.Term, error) {
+func constructDatum(t Term) (*p.Term, error) {
 	if t.data == nil {
 		return &p.Term{
 			Type: p.Term_DATUM.Enum(),

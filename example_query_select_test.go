@@ -7,7 +7,7 @@ import (
 	r "github.com/dancannon/gorethink"
 )
 
-func ExampleRqlTerm_Get() {
+func Example_Get() {
 	type Person struct {
 		Id        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
@@ -17,6 +17,7 @@ func ExampleRqlTerm_Get() {
 
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 
 	// Setup table
@@ -25,18 +26,18 @@ func ExampleRqlTerm_Get() {
 	r.Db("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
 
 	// Fetch the row from the database
-	row, err := r.Db("test").Table("table").Get("1").RunRow(sess)
+	res, err := r.Db("test").Table("table").Get("1").Run(sess)
 	if err != nil {
 		log.Fatalf("Error finding person: %s", err)
 	}
 
-	if row.IsNil() {
+	if res.IsNil() {
 		log.Fatalf("Person not found")
 	}
 
 	// Scan query result into the person variable
 	var person Person
-	err = row.Scan(&person)
+	err = res.One(&person)
 	if err != nil {
 		log.Fatalf("Error scanning database result: %s", err)
 	}
@@ -46,7 +47,7 @@ func ExampleRqlTerm_Get() {
 	// John Smith (M)
 }
 
-func ExampleRqlTerm_GetAll_compound() {
+func Example_GetAll_Compound() {
 	type Person struct {
 		Id        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
@@ -56,30 +57,36 @@ func ExampleRqlTerm_GetAll_compound() {
 
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 
 	// Setup table
 	r.Db("test").TableDrop("table").Run(sess)
 	r.Db("test").TableCreate("table").Run(sess)
 	r.Db("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
-	r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.RqlTerm) interface{} {
+	r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).Run(sess)
 	r.Db("test").Table("table").IndexWait().Run(sess)
 
 	// Fetch the row from the database
-	row, err := r.Db("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).RunRow(sess)
+	res, err := r.Db("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).Run(sess)
 	if err != nil {
 		log.Fatalf("Error finding person: %s", err)
 	}
 
-	if row.IsNil() {
+	if res.IsNil() {
 		log.Fatalf("Person not found")
 	}
 
 	// Scan query result into the person variable
 	var person Person
-	row.Scan(&person)
+	err = res.One(&person)
+	if err == r.ErrEmptyResult {
+		log.Fatalf("Person not found")
+	} else if err != nil {
+		log.Fatalf("Error scanning database result: %s", err)
+	}
 
 	fmt.Printf("%s %s (%s)", person.FirstName, person.LastName, person.Gender)
 

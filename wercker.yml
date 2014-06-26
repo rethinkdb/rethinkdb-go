@@ -1,7 +1,7 @@
 box: wercker/golang
 # Services
 services:
-    - mies/rethinkdb@0.1.7
+    - mies/rethinkdb@0.1.9
 # Build definition
 build:
     # The steps that will be executed on build
@@ -29,3 +29,8 @@ build:
           name: test
           code: |
             go test -test.v=true ./...
+      # - script:
+      #     name: test auth keys
+      #     code: |
+      #       sh -c "echo 'set auth test_key' | rethinkdb admin --join $$HOST$$:29015"
+      #       RETHINKDB_AUTHKEY=test_key go test -test.run="Test" -test.v=true -gocheck.f="TestConnectAuthKey"

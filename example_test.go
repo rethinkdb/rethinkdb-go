@@ -9,31 +9,35 @@ import (
 )
 
 var session *r.Session
-var url string
+var url, authKey string
 
 func init() {
 	// Needed for wercker. By default url is "localhost:28015"
-	url = os.Getenv("WERCKER_RETHINKDB_URL")
+	url = os.Getenv("RETHINKDB_URL")
 	if url == "" {
 		url = "localhost:28015"
 	}
+
+	// Needed for running tests for RethinkDB with a non-empty authkey
+	authKey = os.Getenv("RETHINKDB_AUTHKEY")
 }
 
 func Example() {
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
+		AuthKey: authKey,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	row, err := r.Expr("Hello World").RunRow(session)
+	res, err := r.Expr("Hello World").Run(session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
 	var response string
-	err = row.Scan(&response)
+	err = res.One(&response)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

@@ -23,10 +23,10 @@ func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 	}
 
 	query := Db("test").Table("test").Insert(o)
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response["inserted"], test.Equals, float64(1))
@@ -45,10 +45,10 @@ func (s *RethinkSuite) TestWriteInsertStructPointer(c *test.C) {
 	}
 
 	query := Db("test").Table("test").Insert(&o)
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response["inserted"], test.Equals, float64(1))
