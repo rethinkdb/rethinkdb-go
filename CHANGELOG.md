@@ -2,6 +2,16 @@
 
 ## v0.3 (RethinkDB v1.13) - 26 June 2014
 
+- Replaced `ResultRows`/`ResultRow` with `Cursor`, `Cursor` has the `Next`, `All` and `One` methods which stores the relevant value in the value pointed at by result. For more information check the examples.
+- Changed the time constants (Days and Months) to package globals instead of functions
+- Added the `Args` term and changed the arguments for many terms to `args ...interface{}` to allow argument splicing
+- Added the `Changes` term and support for the feed response type
+- Added the `Random` term
+- Added the `Http` term
+- The second argument for `Slice` is now optional
+- `EqJoin` now accepts a function as its first argument
+- `Nth` now returns a selection
+
 ## v0.2 (RethinkDB v1.12) - 13 April 2014
 
 * Changed `Connect` to use `ConnectOpts` instead of `map[string]interface{}`
