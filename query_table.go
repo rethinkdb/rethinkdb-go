@@ -29,7 +29,7 @@ func (t Term) TableCreate(name interface{}, optArgs ...TableCreateOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "TableCreate", p.Term_TABLE_CREATE, []interface{}{name}, opts)
+	return constructMethodTerm(t, "TableCreate", p.Term_TABLE_CREATE, []interface{}{name}, opts)
 }
 
 // Drop a table. The table and all its data will be deleted.
@@ -37,12 +37,12 @@ func (t Term) TableCreate(name interface{}, optArgs ...TableCreateOpts) Term {
 // If successful, the operation returns an object: {dropped: 1}. If the specified
 // table doesn't exist a RqlRuntimeError is thrown.
 func (t Term) TableDrop(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "TableDrop", p.Term_TABLE_DROP, args, map[string]interface{}{})
+	return constructMethodTerm(t, "TableDrop", p.Term_TABLE_DROP, args, map[string]interface{}{})
 }
 
 // List all table names in a database.
 func (t Term) TableList(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "TableList", p.Term_TABLE_LIST, args, map[string]interface{}{})
+	return constructMethodTerm(t, "TableList", p.Term_TABLE_LIST, args, map[string]interface{}{})
 }
 
 type IndexCreateOpts struct {
@@ -64,7 +64,7 @@ func (t Term) IndexCreate(name interface{}, optArgs ...IndexCreateOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name}, opts)
+	return constructMethodTerm(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name}, opts)
 }
 
 // Create a new secondary index on this table based on the value of the function
@@ -76,29 +76,29 @@ func (t Term) IndexCreateFunc(name, f interface{}, optArgs ...IndexCreateOpts) T
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name, funcWrap(f)}, opts)
+	return constructMethodTerm(t, "IndexCreate", p.Term_INDEX_CREATE, []interface{}{name, funcWrap(f)}, opts)
 }
 
 // Delete a previously created secondary index of this table.
 func (t Term) IndexDrop(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "IndexDrop", p.Term_INDEX_DROP, args, map[string]interface{}{})
+	return constructMethodTerm(t, "IndexDrop", p.Term_INDEX_DROP, args, map[string]interface{}{})
 }
 
 // List all the secondary indexes of this table.
 func (t Term) IndexList(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "IndexList", p.Term_INDEX_LIST, args, map[string]interface{}{})
+	return constructMethodTerm(t, "IndexList", p.Term_INDEX_LIST, args, map[string]interface{}{})
 }
 
 // Get the status of the specified indexes on this table, or the status of all
 // indexes on this table if no indexes are specified.
 func (t Term) IndexStatus(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "IndexStatus", p.Term_INDEX_STATUS, args, map[string]interface{}{})
+	return constructMethodTerm(t, "IndexStatus", p.Term_INDEX_STATUS, args, map[string]interface{}{})
 }
 
 // Wait for the specified indexes on this table to be ready, or for all indexes
 // on this table to be ready if no indexes are specified.
 func (t Term) IndexWait(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "IndexWait", p.Term_INDEX_WAIT, args, map[string]interface{}{})
+	return constructMethodTerm(t, "IndexWait", p.Term_INDEX_WAIT, args, map[string]interface{}{})
 }
 
 // Takes a table and returns an infinite stream of objects representing changes to that table.
@@ -106,5 +106,5 @@ func (t Term) IndexWait(args ...interface{}) Term {
 // {old_val:..., new_val:...} will be added to the stream. For an insert, old_val will be
 // null, and for a delete, new_val will be null.
 func (t Term) Changes() Term {
-	return newRqlTermFromPrevVal(t, "Changes", p.Term_CHANGES, []interface{}{}, map[string]interface{}{})
+	return constructMethodTerm(t, "Changes", p.Term_CHANGES, []interface{}{}, map[string]interface{}{})
 }

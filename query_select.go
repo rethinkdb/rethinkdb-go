@@ -6,7 +6,7 @@ import (
 
 // Reference a database.
 func Db(args ...interface{}) Term {
-	return newRqlTerm("Db", p.Term_DB, args, map[string]interface{}{})
+	return constructRootTerm("Db", p.Term_DB, args, map[string]interface{}{})
 }
 
 type TableOpts struct {
@@ -27,7 +27,7 @@ func Table(name interface{}, optArgs ...TableOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTerm("Table", p.Term_TABLE, []interface{}{name}, opts)
+	return constructRootTerm("Table", p.Term_TABLE, []interface{}{name}, opts)
 }
 
 // Select all documents in a table. This command can be chained with other
@@ -40,22 +40,22 @@ func (t Term) Table(name interface{}, optArgs ...TableOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Table", p.Term_TABLE, []interface{}{name}, opts)
+	return constructMethodTerm(t, "Table", p.Term_TABLE, []interface{}{name}, opts)
 }
 
 // Get a document by primary key. If nothing was found, RethinkDB will return a nil value.
 func (t Term) Get(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Get", p.Term_GET, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Get", p.Term_GET, args, map[string]interface{}{})
 }
 
 // Get all documents where the given value matches the value of the primary index.
 func (t Term) GetAll(keys ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{})
+	return constructMethodTerm(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{})
 }
 
 // Get all documents where the given value matches the value of the requested index.
 func (t Term) GetAllByIndex(index interface{}, keys ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{"index": index})
+	return constructMethodTerm(t, "GetAll", p.Term_GET_ALL, keys, map[string]interface{}{"index": index})
 }
 
 type BetweenOpts struct {
@@ -80,7 +80,7 @@ func (t Term) Between(lowerKey, upperKey interface{}, optArgs ...BetweenOpts) Te
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Between", p.Term_BETWEEN, []interface{}{lowerKey, upperKey}, opts)
+	return constructMethodTerm(t, "Between", p.Term_BETWEEN, []interface{}{lowerKey, upperKey}, opts)
 }
 
 type FilterOpts struct {
@@ -104,5 +104,5 @@ func (t Term) Filter(f interface{}, optArgs ...FilterOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Filter", p.Term_FILTER, []interface{}{funcWrap(f)}, opts)
+	return constructMethodTerm(t, "Filter", p.Term_FILTER, []interface{}{funcWrap(f)}, opts)
 }

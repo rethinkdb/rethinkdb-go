@@ -28,7 +28,7 @@ func (t Term) Insert(arg interface{}, optArgs ...InsertOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Insert", p.Term_INSERT, []interface{}{funcWrap(arg)}, opts)
+	return constructMethodTerm(t, "Insert", p.Term_INSERT, []interface{}{funcWrap(arg)}, opts)
 }
 
 type UpdateOpts struct {
@@ -52,7 +52,7 @@ func (t Term) Update(arg interface{}, optArgs ...UpdateOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Update", p.Term_UPDATE, []interface{}{funcWrap(arg)}, opts)
+	return constructMethodTerm(t, "Update", p.Term_UPDATE, []interface{}{funcWrap(arg)}, opts)
 }
 
 type ReplaceOpts struct {
@@ -78,7 +78,7 @@ func (t Term) Replace(arg interface{}, optArgs ...ReplaceOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Replace", p.Term_REPLACE, []interface{}{funcWrap(arg)}, opts)
+	return constructMethodTerm(t, "Replace", p.Term_REPLACE, []interface{}{funcWrap(arg)}, opts)
 }
 
 type DeleteOpts struct {
@@ -99,7 +99,7 @@ func (t Term) Delete(optArgs ...DeleteOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "Delete", p.Term_DELETE, []interface{}{}, opts)
+	return constructMethodTerm(t, "Delete", p.Term_DELETE, []interface{}{}, opts)
 }
 
 // Sync ensures that writes on a given table are written to permanent storage.
@@ -107,5 +107,5 @@ func (t Term) Delete(optArgs ...DeleteOpts) Term {
 // guarantees, so sync can be used to ensure the state of these queries. A call
 // to sync does not return until all previous writes to the table are persisted.
 func (t Term) Sync(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Sync", p.Term_SYNC, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Sync", p.Term_SYNC, args, map[string]interface{}{})
 }

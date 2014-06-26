@@ -31,13 +31,13 @@ func Example() {
 		log.Fatalln(err.Error())
 	}
 
-	row, err := r.Expr("Hello World").RunRow(session)
+	res, err := r.Expr("Hello World").Run(session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
 	var response string
-	err = row.Scan(&response)
+	err = res.One(&response)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

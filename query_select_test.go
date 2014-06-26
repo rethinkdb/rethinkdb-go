@@ -1,10 +1,6 @@
 package gorethink
 
-import (
-	"log"
-
-	test "launchpad.net/gocheck"
-)
+import test "launchpad.net/gocheck"
 
 func (s *RethinkSuite) TestSelectGet(c *test.C) {
 	// Ensure table + database exist
@@ -17,10 +13,10 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").Get(6)
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -38,10 +34,10 @@ func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
 	// Test query
 	var response []interface{}
 	query := Db("test").Table("Table1").GetAll(6).OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -61,10 +57,10 @@ func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
 	// Test query
 	var response []interface{}
 	query := Db("test").Table("Table1").GetAll(1, 2, 3).OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -86,10 +82,10 @@ func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table1").GetAllByIndex("num", 15).OrderBy("id")
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -107,10 +103,10 @@ func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 	// Test query
 	var response interface{}
 	query := Db("test").Table("Table2").GetAllByIndex("num", 15).OrderBy("id")
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
@@ -133,10 +129,10 @@ func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
 	// Test query
 	var response interface{}
 	query := Db("test").Table("TableCompound").GetAllByIndex("full_name", []interface{}{"John", "Smith"})
-	r, err := query.RunRow(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = r.Scan(&response)
+	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, map[string]interface{}{"id": 1, "first_name": "John", "last_name": "Smith", "gender": "M"})
@@ -153,10 +149,10 @@ func (s *RethinkSuite) TestSelectBetween(c *test.C) {
 	// Test query
 	var response []interface{}
 	query := Db("test").Table("Table1").Between(1, 3).OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -179,10 +175,10 @@ func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 	query := Db("test").Table("Table2").Between(10, 50, BetweenOpts{
 		Index: "num",
 	}).OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -207,10 +203,10 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 		Index:      "num",
 		RightBound: "closed",
 	}).OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -232,10 +228,10 @@ func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
 	// Test query
 	var response []interface{}
 	query := Db("test").Table("Table1").Filter(Row.Field("num").Ge(50)).OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -257,10 +253,10 @@ func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 	query := Db("test").Table("Table1").Filter(func(row Term) Term {
 		return row.Field("num").Ge(50)
 	}).OrderBy("id")
-	rows, err := query.Run(sess)
+	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
-	err = rows.ScanAll(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
@@ -286,29 +282,21 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 			})
 		}
 
-		Db("test").Table("TestMany").Insert(data).RunWrite(sess, RunOpts{
-			BatchConf: map[string]interface{}{"max_els": 5},
-		})
+		Db("test").Table("TestMany").Insert(data).Run(sess)
 	}
 
 	// Test query
-	query := Db("test").Table("TestMany")
-
-	rows, err := query.Run(sess)
+	res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
+		BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
+	})
 	c.Assert(err, test.IsNil)
 
 	var n int
-	for rows.Next() {
-		var v interface{}
-
-		err := rows.Scan(&v)
-		if err != nil {
-			log.Fatalln(err)
-		}
-
+	var response map[string]interface{}
+	for res.Next(&response) {
 		n++
 	}
 
-	c.Assert(rows.Err(), test.IsNil)
+	c.Assert(res.Err(), test.IsNil)
 	c.Assert(n, test.Equals, 100)
 }

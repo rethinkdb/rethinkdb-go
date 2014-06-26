@@ -175,36 +175,12 @@ func (o *RunOpts) toMap() map[string]interface{} {
 //		err := r.Scan(&doc)
 //		    // Do something with row
 //	}
-func (t Term) Run(s *Session, optArgs ...RunOpts) (*ResultRows, error) {
+func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
 	return s.startQuery(t, opts)
-}
-
-// Run runs a query using the given connection but unlike Run returns ResultRow.
-// This function should be used if your query only returns a single row.
-//
-//	row, err := query.RunRow(sess, r.RunOpts{
-//		UseOutdated: true,
-//	})
-//	if err != nil {
-//		// error
-//	}
-//	if row.IsNil() {
-//		// nothing was found
-//	}
-//	err = row.Scan(&doc)
-func (t Term) RunRow(s *Session, optArgs ...RunOpts) (*ResultRow, error) {
-	rows, err := t.Run(s, optArgs...)
-	if err != nil {
-		return nil, err
-	}
-
-	rows.Next()
-
-	return &ResultRow{rows: rows, err: err}, err
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
@@ -219,9 +195,9 @@ func (t Term) RunRow(s *Session, optArgs ...RunOpts) (*ResultRow, error) {
 //	})
 func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	var response WriteResponse
-	row, err := t.RunRow(s, optArgs...)
+	res, err := t.Run(s, optArgs...)
 	if err == nil {
-		err = row.Scan(&response)
+		err = res.One(&response)
 	}
 	return response, err
 }

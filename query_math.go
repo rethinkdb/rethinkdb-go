@@ -6,141 +6,141 @@ import (
 
 // Add sums two numbers or concatenates two arrays.
 func (t Term) Add(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Add", p.Term_ADD, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Add", p.Term_ADD, args, map[string]interface{}{})
 }
 
 // Add sums two numbers or concatenates two arrays.
 func Add(args ...interface{}) Term {
-	return newRqlTerm("Add", p.Term_ADD, args, map[string]interface{}{})
+	return constructRootTerm("Add", p.Term_ADD, args, map[string]interface{}{})
 }
 
 // Sub subtracts two numbers.
 func (t Term) Sub(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Sub", p.Term_SUB, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Sub", p.Term_SUB, args, map[string]interface{}{})
 }
 
 // Sub subtracts two numbers.
 func Sub(args ...interface{}) Term {
-	return newRqlTerm("Sub", p.Term_SUB, args, map[string]interface{}{})
+	return constructRootTerm("Sub", p.Term_SUB, args, map[string]interface{}{})
 }
 
 // Mul multiplies two numbers.
 func (t Term) Mul(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Mul", p.Term_MUL, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Mul", p.Term_MUL, args, map[string]interface{}{})
 }
 
 func Mul(args ...interface{}) Term {
-	return newRqlTerm("Mul", p.Term_MUL, args, map[string]interface{}{})
+	return constructRootTerm("Mul", p.Term_MUL, args, map[string]interface{}{})
 }
 
 // Div divides two numbers.
 func (t Term) Div(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Div", p.Term_DIV, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Div", p.Term_DIV, args, map[string]interface{}{})
 }
 
 // Div divides two numbers.
 func Div(args ...interface{}) Term {
-	return newRqlTerm("Div", p.Term_DIV, args, map[string]interface{}{})
+	return constructRootTerm("Div", p.Term_DIV, args, map[string]interface{}{})
 }
 
 // Mod divides two numbers and returns the remainder.
 func (t Term) Mod(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Mod", p.Term_MOD, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Mod", p.Term_MOD, args, map[string]interface{}{})
 }
 
 // Mod divides two numbers and returns the remainder.
 func Mod(args ...interface{}) Term {
-	return newRqlTerm("Mod", p.Term_MOD, args, map[string]interface{}{})
+	return constructRootTerm("Mod", p.Term_MOD, args, map[string]interface{}{})
 }
 
 // And performs a logical and on two values.
 func (t Term) And(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "And", p.Term_ALL, args, map[string]interface{}{})
+	return constructMethodTerm(t, "And", p.Term_ALL, args, map[string]interface{}{})
 }
 
 // And performs a logical and on two values.
 func And(args ...interface{}) Term {
-	return newRqlTerm("And", p.Term_ALL, args, map[string]interface{}{})
+	return constructRootTerm("And", p.Term_ALL, args, map[string]interface{}{})
 }
 
 // Or performs a logical or on two values.
 func (t Term) Or(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Or", p.Term_ANY, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Or", p.Term_ANY, args, map[string]interface{}{})
 }
 
 // Or performs a logical or on two values.
 func Or(args ...interface{}) Term {
-	return newRqlTerm("Or", p.Term_ANY, args, map[string]interface{}{})
+	return constructRootTerm("Or", p.Term_ANY, args, map[string]interface{}{})
 }
 
 // Eq returns true if two values are equal.
 func (t Term) Eq(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Eq", p.Term_EQ, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Eq", p.Term_EQ, args, map[string]interface{}{})
 }
 
 // Eq returns true if two values are equal.
 func Eq(args ...interface{}) Term {
-	return newRqlTerm("Eq", p.Term_EQ, args, map[string]interface{}{})
+	return constructRootTerm("Eq", p.Term_EQ, args, map[string]interface{}{})
 }
 
 // Ne returns true if two values are not equal.
 func (t Term) Ne(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Ne", p.Term_NE, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Ne", p.Term_NE, args, map[string]interface{}{})
 }
 
 // Ne returns true if two values are not equal.
 func Ne(args ...interface{}) Term {
-	return newRqlTerm("Ne", p.Term_NE, args, map[string]interface{}{})
+	return constructRootTerm("Ne", p.Term_NE, args, map[string]interface{}{})
 }
 
 // Gt returns true if the first value is greater than the second.
 func (t Term) Gt(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Gt", p.Term_GT, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Gt", p.Term_GT, args, map[string]interface{}{})
 }
 
 // Gt returns true if the first value is greater than the second.
 func Gt(args ...interface{}) Term {
-	return newRqlTerm("Gt", p.Term_GT, args, map[string]interface{}{})
+	return constructRootTerm("Gt", p.Term_GT, args, map[string]interface{}{})
 }
 
 // Ge returns true if the first value is greater than or equal to the second.
 func (t Term) Ge(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Ge", p.Term_GE, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Ge", p.Term_GE, args, map[string]interface{}{})
 }
 
 // Ge returns true if the first value is greater than or equal to the second.
 func Ge(args ...interface{}) Term {
-	return newRqlTerm("Ge", p.Term_GE, args, map[string]interface{}{})
+	return constructRootTerm("Ge", p.Term_GE, args, map[string]interface{}{})
 }
 
 // Lt returns true if the first value is less than the second.
 func (t Term) Lt(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Lt", p.Term_LT, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Lt", p.Term_LT, args, map[string]interface{}{})
 }
 
 // Lt returns true if the first value is less than the second.
 func Lt(args ...interface{}) Term {
-	return newRqlTerm("Lt", p.Term_LT, args, map[string]interface{}{})
+	return constructRootTerm("Lt", p.Term_LT, args, map[string]interface{}{})
 }
 
 // Le returns true if the first value is less than or equal to the second.
 func (t Term) Le(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Le", p.Term_LE, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Le", p.Term_LE, args, map[string]interface{}{})
 }
 
 // Le returns true if the first value is less than or equal to the second.
 func Le(args ...interface{}) Term {
-	return newRqlTerm("Le", p.Term_LE, args, map[string]interface{}{})
+	return constructRootTerm("Le", p.Term_LE, args, map[string]interface{}{})
 }
 
 // Not performs a logical not on a value.
 func (t Term) Not(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Not", p.Term_NOT, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Not", p.Term_NOT, args, map[string]interface{}{})
 }
 
 // Not performs a logical not on a value.
 func Not(args ...interface{}) Term {
-	return newRqlTerm("Not", p.Term_NOT, args, map[string]interface{}{})
+	return constructRootTerm("Not", p.Term_NOT, args, map[string]interface{}{})
 }
 
 type RandomOpts struct {
@@ -173,5 +173,5 @@ func (t Term) Random(args ...interface{}) Term {
 		}
 	}
 
-	return newRqlTermFromPrevVal(t, "Random", p.Term_RANDOM, args, opts)
+	return constructMethodTerm(t, "Random", p.Term_RANDOM, args, opts)
 }

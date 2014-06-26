@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 
 	p "github.com/dancannon/gorethink/ql2"
@@ -45,8 +46,11 @@ func printCarrots(t Term, frames []*p.Frame) string {
 	return b.String()
 }
 
+// Error constants
+var ErrEmptyResult = errors.New("The result does not contain any more rows")
+
 // Connection/Response errors
-// ----------------------------------------------------------------------------
+
 type rqlResponseError struct {
 	response *p.Response
 	term     Term

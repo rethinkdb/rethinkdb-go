@@ -16,8 +16,8 @@ import (
 
 // Helper functions for constructing terms
 
-// newRqlTerm is an alias for creating a new RqlTermue.
-func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) Term {
+// constructRootTerm is an alias for creating a new term.
+func constructRootTerm(name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) Term {
 	return Term{
 		name:     name,
 		rootTerm: true,
@@ -27,12 +27,10 @@ func newRqlTerm(name string, termType p.Term_TermType, args []interface{}, optAr
 	}
 }
 
-// newRqlTermFromPrevVal is an alias for creating a new Term. Unlike newRqlTerm
-// this function adds the previous expression in the tree to the argument list.
-// It is used when evalutating an expression like
-//
-// `r.Expr(1).Add(2).Mul(3)`
-func newRqlTermFromPrevVal(prevVal Term, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) Term {
+// constructMethodTerm is an alias for creating a new term. Unlike constructRootTerm
+// this function adds the previous expression in the tree to the argument list to
+// create a method term.
+func constructMethodTerm(prevVal Term, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) Term {
 	args = append([]interface{}{prevVal}, args...)
 
 	return Term{
@@ -80,7 +78,7 @@ func makeFunc(f interface{}) Term {
 	var args []reflect.Value
 	for i := 0; i < valueType.NumIn(); i++ {
 		// Get a slice of the VARs to use as the function arguments
-		args = append(args, reflect.ValueOf(newRqlTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{})))
+		args = append(args, reflect.ValueOf(constructRootTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{})))
 		argNums = append(argNums, nextVarId)
 		atomic.AddInt64(&nextVarId, 1)
 
@@ -97,7 +95,7 @@ func makeFunc(f interface{}) Term {
 	body := value.Call(args)[0].Interface()
 	argsArr := makeArray(convertTermList(argNums))
 
-	return newRqlTerm("func", p.Term_FUNC, []interface{}{argsArr, body}, map[string]interface{}{})
+	return constructRootTerm("func", p.Term_FUNC, []interface{}{argsArr, body}, map[string]interface{}{})
 }
 
 func funcWrap(value interface{}) Term {

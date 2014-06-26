@@ -24,7 +24,7 @@ type Session struct {
 
 	// Response cache, used for batched responses
 	sync.Mutex
-	cache map[int64]*ResultRows
+	cache map[int64]*Cursor
 
 	closed bool
 
@@ -33,7 +33,7 @@ type Session struct {
 
 func newSession(args map[string]interface{}) *Session {
 	s := &Session{
-		cache: map[int64]*ResultRows{},
+		cache: map[int64]*Cursor{},
 	}
 
 	if token, ok := args["token"]; ok {
@@ -213,8 +213,8 @@ func (s *Session) nextToken() int64 {
 }
 
 // startQuery creates a query from the term given and sends it to the server.
-// The result from the server is returned as ResultRows
-func (s *Session) startQuery(t Term, opts map[string]interface{}) (*ResultRows, error) {
+// The result from the server is returned as a cursor
+func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
 	token := s.nextToken()
 
 	// Build query tree
@@ -254,13 +254,13 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*ResultRows, 
 
 func (s *Session) handleBatchResponse(response *p.Response) {
 	s.Lock()
-	result := s.cache[response.GetToken()]
+	cursor := s.cache[response.GetToken()]
 	s.Unlock()
 
-	result.extend(response)
-	result.outstandingRequests--
+	cursor.extend(response)
+	cursor.outstandingRequests--
 
-	if response.GetType() != p.Response_SUCCESS_PARTIAL && result.outstandingRequests == 0 {
+	if response.GetType() != p.Response_SUCCESS_PARTIAL && cursor.outstandingRequests == 0 {
 		s.Lock()
 		delete(s.cache, response.GetToken())
 		s.Unlock()
@@ -269,9 +269,9 @@ func (s *Session) handleBatchResponse(response *p.Response) {
 
 // continueQuery continues a previously run query.
 // This is needed if a response is batched.
-func (s *Session) continueQuery(result *ResultRows) error {
+func (s *Session) continueQuery(cursor *Cursor) error {
 	s.Lock()
-	s.cache[result.query.GetToken()].outstandingRequests++
+	s.cache[cursor.query.GetToken()].outstandingRequests++
 	s.Unlock()
 
 	conn := s.pool.Get()
@@ -279,15 +279,15 @@ func (s *Session) continueQuery(result *ResultRows) error {
 
 	q := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
-		Token: result.query.Token,
+		Token: cursor.query.Token,
 	}
 
-	_, err := conn.SendQuery(s, q, result.term, result.opts, true)
+	_, err := conn.SendQuery(s, q, cursor.term, cursor.opts, true)
 	if err != nil {
 		return err
 	}
 
-	response, err := conn.ReadResponse(s, result.query.GetToken())
+	response, err := conn.ReadResponse(s, cursor.query.GetToken())
 	if err != nil {
 		return err
 	}
@@ -299,9 +299,9 @@ func (s *Session) continueQuery(result *ResultRows) error {
 
 // asyncContinueQuery asynchronously continues a previously run query.
 // This is needed if a response is batched.
-func (s *Session) asyncContinueQuery(result *ResultRows) error {
+func (s *Session) asyncContinueQuery(cursor *Cursor) error {
 	s.Lock()
-	s.cache[result.query.GetToken()].outstandingRequests++
+	s.cache[cursor.query.GetToken()].outstandingRequests++
 	s.Unlock()
 
 	conn := s.pool.Get()
@@ -309,10 +309,10 @@ func (s *Session) asyncContinueQuery(result *ResultRows) error {
 
 	q := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
-		Token: result.query.Token,
+		Token: cursor.query.Token,
 	}
 
-	_, err := conn.SendQuery(s, q, result.term, result.opts, true)
+	_, err := conn.SendQuery(s, q, cursor.term, cursor.opts, true)
 	if err != nil {
 		return err
 	}
@@ -321,21 +321,21 @@ func (s *Session) asyncContinueQuery(result *ResultRows) error {
 }
 
 // stopQuery sends closes a query by sending Query_STOP to the server.
-func (s *Session) stopQuery(result *ResultRows) error {
+func (s *Session) stopQuery(cursor *Cursor) error {
 	q := &p.Query{
 		Type:  p.Query_STOP.Enum(),
-		Token: result.query.Token,
+		Token: cursor.query.Token,
 	}
 
 	conn := s.pool.Get()
 	defer conn.Close()
 
-	_, err := conn.SendQuery(s, q, result.term, result.opts, false)
+	_, err := conn.SendQuery(s, q, cursor.term, cursor.opts, false)
 	if err != nil {
 		return err
 	}
 
-	response, err := conn.ReadResponse(s, result.query.GetToken())
+	response, err := conn.ReadResponse(s, cursor.query.GetToken())
 	if err != nil {
 		return err
 	}

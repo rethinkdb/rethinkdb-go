@@ -111,7 +111,7 @@ func expr(value interface{}, depth int) Term {
 
 // Create a JavaScript expression.
 func Js(jssrc interface{}) Term {
-	return newRqlTerm("Js", p.Term_JAVASCRIPT, []interface{}{jssrc}, map[string]interface{}{})
+	return constructRootTerm("Js", p.Term_JAVASCRIPT, []interface{}{jssrc}, map[string]interface{}{})
 }
 
 type HttpOpts struct {
@@ -144,25 +144,25 @@ func Http(url interface{}, optArgs ...HttpOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTerm("Http", p.Term_HTTP, []interface{}{url}, opts)
+	return constructRootTerm("Http", p.Term_HTTP, []interface{}{url}, opts)
 }
 
 // Parse a JSON string on the server.
 func Json(args ...interface{}) Term {
-	return newRqlTerm("Json", p.Term_JSON, args, map[string]interface{}{})
+	return constructRootTerm("Json", p.Term_JSON, args, map[string]interface{}{})
 }
 
 // Throw a runtime error. If called with no arguments inside the second argument
 // to `default`, re-throw the current error.
 func Error(args ...interface{}) Term {
-	return newRqlTerm("Error", p.Term_ERROR, args, map[string]interface{}{})
+	return constructRootTerm("Error", p.Term_ERROR, args, map[string]interface{}{})
 }
 
 // Args is a special term usd to splice an array of arguments into another term.
 // This is useful when you want to call a varadic term such as GetAll with a set
 // of arguments provided at runtime.
 func Args(args ...interface{}) Term {
-	return newRqlTerm("Args", p.Term_ARGS, args, map[string]interface{}{})
+	return constructRootTerm("Args", p.Term_ARGS, args, map[string]interface{}{})
 }
 
 // Evaluate the expr in the context of one or more value bindings. The type of
@@ -173,7 +173,7 @@ func (t Term) Do(args ...interface{}) Term {
 	newArgs = append(newArgs, t)
 	newArgs = append(newArgs, args[:len(args)-1]...)
 
-	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
+	return constructRootTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
 // Evaluate the expr in the context of one or more value bindings. The type of
@@ -183,7 +183,7 @@ func Do(args ...interface{}) Term {
 	newArgs = append(newArgs, funcWrap(args[len(args)-1]))
 	newArgs = append(newArgs, args[:len(args)-1]...)
 
-	return newRqlTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
+	return constructRootTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
 // Evaluate one of two control paths based on the value of an expression.
@@ -191,12 +191,12 @@ func Do(args ...interface{}) Term {
 //
 // The type of the result is determined by the type of the branch that gets executed.
 func Branch(args ...interface{}) Term {
-	return newRqlTerm("Branch", p.Term_BRANCH, args, map[string]interface{}{})
+	return constructRootTerm("Branch", p.Term_BRANCH, args, map[string]interface{}{})
 }
 
 // Loop over a sequence, evaluating the given write query for each element.
 func (t Term) ForEach(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Foreach", p.Term_FOREACH, funcWrapArgs(args), map[string]interface{}{})
+	return constructMethodTerm(t, "Foreach", p.Term_FOREACH, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Handle non-existence errors. Tries to evaluate and return its first argument.
@@ -205,7 +205,7 @@ func (t Term) ForEach(args ...interface{}) Term {
 // the second argument may be a function which will be called with either the
 // text of the non-existence error or null.)
 func (t Term) Default(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Default", p.Term_DEFAULT, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Default", p.Term_DEFAULT, args, map[string]interface{}{})
 }
 
 // Converts a value of one type into another.
@@ -213,15 +213,15 @@ func (t Term) Default(args ...interface{}) Term {
 // You can convert: a selection, sequence, or object into an ARRAY, an array of
 // pairs into an OBJECT, and any DATUM into a STRING.
 func (t Term) CoerceTo(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "CoerceTo", p.Term_COERCE_TO, args, map[string]interface{}{})
+	return constructMethodTerm(t, "CoerceTo", p.Term_COERCE_TO, args, map[string]interface{}{})
 }
 
 // Gets the type of a value.
 func (t Term) TypeOf(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "TypeOf", p.Term_TYPEOF, args, map[string]interface{}{})
+	return constructMethodTerm(t, "TypeOf", p.Term_TYPEOF, args, map[string]interface{}{})
 }
 
 // Get information about a RQL value.
 func (t Term) Info(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Info", p.Term_INFO, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Info", p.Term_INFO, args, map[string]interface{}{})
 }

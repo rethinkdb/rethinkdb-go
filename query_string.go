@@ -9,7 +9,7 @@ import (
 //
 //	Expr("id:0,name:mlucy,foo:bar").Match("name:(\\w+)").Field("groups").Nth(0).Field("str")
 func (t Term) Match(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Match", p.Term_MATCH, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Match", p.Term_MATCH, args, map[string]interface{}{})
 }
 
 // Splits a string into substrings. Splits on whitespace when called with no arguments.
@@ -21,15 +21,15 @@ func (t Term) Match(args ...interface{}) Term {
 // Mimics the behavior of Python's string.split in edge cases, except for splitting on the
 // empty string, which instead produces an array of single-character strings.
 func (t Term) Split(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Split", p.Term_SPLIT, funcWrapArgs(args), map[string]interface{}{})
+	return constructMethodTerm(t, "Split", p.Term_SPLIT, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Upcases a string.
 func (t Term) Upcase(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Upcase", p.Term_UPCASE, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Upcase", p.Term_UPCASE, args, map[string]interface{}{})
 }
 
 // Downcases a string.
 func (t Term) Downcase(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Downcase", p.Term_DOWNCASE, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Downcase", p.Term_DOWNCASE, args, map[string]interface{}{})
 }

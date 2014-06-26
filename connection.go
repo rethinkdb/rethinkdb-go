@@ -13,7 +13,7 @@ import (
 )
 
 type Conn interface {
-	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*ResultRows, error)
+	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error)
 	ReadResponse(s *Session, token int64) (*p.Response, error)
 	Close() error
 }
@@ -121,7 +121,7 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) 
 	}
 }
 
-func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*ResultRows, error) {
+func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error) {
 	var data []byte
 	var err error
 
@@ -180,24 +180,26 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 		}
 	}
 
-	// De-construct datum and return the result
+	// De-construct datum and return a cursor
 	switch response.GetType() {
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE, p.Response_SUCCESS_FEED:
-		result := &ResultRows{
+		cursor := &Cursor{
 			session: s,
 			query:   q,
 			term:    t,
 			opts:    opts,
 			profile: profile,
+			timeout: -1,
 		}
+		cursor.gotReply.L = &cursor.mu
 
 		s.Lock()
-		s.cache[*q.Token] = result
+		s.cache[*q.Token] = cursor
 		s.Unlock()
 
-		result.extend(response)
+		cursor.extend(response)
 
-		return result, nil
+		return cursor, nil
 	case p.Response_SUCCESS_ATOM:
 		var value []interface{}
 		var err error
@@ -226,7 +228,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			}
 		}
 
-		return &ResultRows{
+		cursor := &Cursor{
 			session:  s,
 			query:    q,
 			term:     t,
@@ -234,7 +236,11 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			profile:  profile,
 			buffer:   value,
 			finished: true,
-		}, nil
+			timeout:  -1,
+		}
+		cursor.gotReply.L = &cursor.mu
+
+		return cursor, nil
 	case p.Response_WAIT_COMPLETE:
 		return nil, nil
 	default:

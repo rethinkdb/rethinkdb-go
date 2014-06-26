@@ -7,7 +7,7 @@ import (
 	r "github.com/dancannon/gorethink"
 )
 
-func ExampleRqlTerm_TableCreate() {
+func Example_TableCreate() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
@@ -27,7 +27,7 @@ func ExampleRqlTerm_TableCreate() {
 	// 1 table created
 }
 
-func ExampleRqlTerm_IndexCreate() {
+func Example_IndexCreate() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
@@ -48,7 +48,7 @@ func ExampleRqlTerm_IndexCreate() {
 	// 1 index created
 }
 
-func ExampleRqlTerm_IndexCreate_compound() {
+func Example_IndexCreate_compound() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
 		AuthKey: authKey,

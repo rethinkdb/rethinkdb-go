@@ -15,11 +15,11 @@ func (s *RethinkSuite) TestSessionConnect(c *test.C) {
 	})
 	c.Assert(err, test.IsNil)
 
-	row, err := Expr("Hello World").RunRow(session)
+	row, err := Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 
 	var response string
-	err = row.Scan(&response)
+	err = row.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, "Hello World")
 }

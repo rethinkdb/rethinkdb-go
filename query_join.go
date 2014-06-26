@@ -10,13 +10,13 @@ import (
 // the predicate. When the predicate is satisfied, each matched pair of rows
 // of both sequences are combined into a result row.
 func (t Term) InnerJoin(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "InnerJoin", p.Term_INNER_JOIN, args, map[string]interface{}{})
+	return constructMethodTerm(t, "InnerJoin", p.Term_INNER_JOIN, args, map[string]interface{}{})
 }
 
 // Computes a left outer join by retaining each row in the left table even if no
 // match was found in the right table.
 func (t Term) OuterJoin(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "OuterJoin", p.Term_OUTER_JOIN, args, map[string]interface{}{})
+	return constructMethodTerm(t, "OuterJoin", p.Term_OUTER_JOIN, args, map[string]interface{}{})
 }
 
 type EqJoinOpts struct {
@@ -35,11 +35,11 @@ func (t Term) EqJoin(left, right interface{}, optArgs ...EqJoinOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return newRqlTermFromPrevVal(t, "EqJoin", p.Term_EQ_JOIN, []interface{}{funcWrap(left), right}, opts)
+	return constructMethodTerm(t, "EqJoin", p.Term_EQ_JOIN, []interface{}{funcWrap(left), right}, opts)
 }
 
 // Used to 'zip' up the result of a join by merging the 'right' fields into 'left'
 // fields of each member of the sequence.
 func (t Term) Zip(args ...interface{}) Term {
-	return newRqlTermFromPrevVal(t, "Zip", p.Term_ZIP, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Zip", p.Term_ZIP, args, map[string]interface{}{})
 }
