@@ -14,12 +14,12 @@ import (
 // The code for this struct is based off of mgo's Iter and the official
 // python driver's cursor.
 type Cursor struct {
-	mu       sync.Mutex
-	gotReply sync.Cond
-	session  *Session
-	query    *p.Query
-	term     Term
-	opts     map[string]interface{}
+	mu      sync.Mutex
+	session *Session
+	conn    *Connection
+	query   *p.Query
+	term    Term
+	opts    map[string]interface{}
 
 	err                 error
 	outstandingRequests int

@@ -258,7 +258,7 @@ func (s *Session) handleBatchResponse(response *p.Response) {
 	s.Unlock()
 
 	cursor.extend(response)
-	cursor.outstandingRequests--
+	cursor.outstandingRequests -= 1
 
 	if response.GetType() != p.Response_SUCCESS_PARTIAL && cursor.outstandingRequests == 0 {
 		s.Lock()
@@ -270,24 +270,12 @@ func (s *Session) handleBatchResponse(response *p.Response) {
 // continueQuery continues a previously run query.
 // This is needed if a response is batched.
 func (s *Session) continueQuery(cursor *Cursor) error {
-	s.Lock()
-	s.cache[cursor.query.GetToken()].outstandingRequests++
-	s.Unlock()
-
-	conn := s.pool.Get()
-	defer conn.Close()
-
-	q := &p.Query{
-		Type:  p.Query_CONTINUE.Enum(),
-		Token: cursor.query.Token,
-	}
-
-	_, err := conn.SendQuery(s, q, cursor.term, cursor.opts, true)
+	err := s.asyncContinueQuery(cursor)
 	if err != nil {
 		return err
 	}
 
-	response, err := conn.ReadResponse(s, cursor.query.GetToken())
+	response, err := cursor.conn.ReadResponse(s, cursor.query.GetToken())
 	if err != nil {
 		return err
 	}
@@ -305,15 +293,12 @@ func (s *Session) asyncContinueQuery(cursor *Cursor) error {
 	}
 	cursor.outstandingRequests = 1
 
-	conn := s.pool.Get()
-	defer conn.Close()
-
 	q := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
 		Token: cursor.query.Token,
 	}
 
-	_, err := conn.SendQuery(s, q, cursor.term, cursor.opts, true)
+	_, err := cursor.conn.SendQuery(s, q, cursor.term, cursor.opts, true)
 	if err != nil {
 		return err
 	}
@@ -332,15 +317,12 @@ func (s *Session) stopQuery(cursor *Cursor) error {
 		Token: cursor.query.Token,
 	}
 
-	conn := s.pool.Get()
-	defer conn.Close()
-
-	_, err := conn.SendQuery(s, q, cursor.term, cursor.opts, false)
+	_, err := cursor.conn.SendQuery(s, q, cursor.term, cursor.opts, false)
 	if err != nil {
 		return err
 	}
 
-	response, err := conn.ReadResponse(s, cursor.query.GetToken())
+	response, err := cursor.conn.ReadResponse(s, cursor.query.GetToken())
 	if err != nil {
 		return err
 	}
