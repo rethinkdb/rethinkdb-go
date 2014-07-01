@@ -300,9 +300,10 @@ func (s *Session) continueQuery(cursor *Cursor) error {
 // asyncContinueQuery asynchronously continues a previously run query.
 // This is needed if a response is batched.
 func (s *Session) asyncContinueQuery(cursor *Cursor) error {
-	s.Lock()
-	s.cache[cursor.query.GetToken()].outstandingRequests++
-	s.Unlock()
+	if cursor.outstandingRequests != 0 {
+		return nil
+	}
+	cursor.outstandingRequests = 1
 
 	conn := s.pool.Get()
 	defer conn.Close()
@@ -322,6 +323,10 @@ func (s *Session) asyncContinueQuery(cursor *Cursor) error {
 
 // stopQuery sends closes a query by sending Query_STOP to the server.
 func (s *Session) stopQuery(cursor *Cursor) error {
+	s.Lock()
+	s.cache[cursor.query.GetToken()].outstandingRequests += 1
+	s.Unlock()
+
 	q := &p.Query{
 		Type:  p.Query_STOP.Enum(),
 		Token: cursor.query.Token,

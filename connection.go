@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"log"
 	"net"
 	"time"
 
@@ -129,6 +130,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 	if s.closed {
 		return nil, RqlDriverError{"Connection is closed"}
 	}
+	log.Println(q.GetType(), "!?!")
 
 	// Set timeout
 	if s.timeout == 0 {
