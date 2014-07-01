@@ -260,7 +260,9 @@ func (s *Session) handleBatchResponse(response *p.Response) {
 	cursor.extend(response)
 	cursor.outstandingRequests -= 1
 
-	if response.GetType() != p.Response_SUCCESS_PARTIAL && cursor.outstandingRequests == 0 {
+	if response.GetType() != p.Response_SUCCESS_PARTIAL &&
+		response.GetType() != p.Response_SUCCESS_FEED &&
+		cursor.outstandingRequests == 0 {
 		s.Lock()
 		delete(s.cache, response.GetToken())
 		s.Unlock()
