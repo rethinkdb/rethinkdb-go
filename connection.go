@@ -185,13 +185,12 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE, p.Response_SUCCESS_FEED:
 		cursor := &Cursor{
 			session: s,
+			conn:    c,
 			query:   q,
 			term:    t,
 			opts:    opts,
 			profile: profile,
-			timeout: -1,
 		}
-		cursor.gotReply.L = &cursor.mu
 
 		s.Lock()
 		s.cache[*q.Token] = cursor
@@ -230,15 +229,14 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 
 		cursor := &Cursor{
 			session:  s,
+			conn:     c,
 			query:    q,
 			term:     t,
 			opts:     opts,
 			profile:  profile,
 			buffer:   value,
 			finished: true,
-			timeout:  -1,
 		}
-		cursor.gotReply.L = &cursor.mu
 
 		return cursor, nil
 	case p.Response_WAIT_COMPLETE:
