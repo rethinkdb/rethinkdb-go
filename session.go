@@ -258,15 +258,16 @@ func (s *Session) handleBatchResponse(response *p.Response) {
 	s.Unlock()
 
 	cursor.extend(response)
+
+	s.Lock()
 	cursor.outstandingRequests -= 1
 
 	if response.GetType() != p.Response_SUCCESS_PARTIAL &&
 		response.GetType() != p.Response_SUCCESS_FEED &&
 		cursor.outstandingRequests == 0 {
-		s.Lock()
 		delete(s.cache, response.GetToken())
-		s.Unlock()
 	}
+	s.Unlock()
 }
 
 // continueQuery continues a previously run query.
@@ -290,10 +291,14 @@ func (s *Session) continueQuery(cursor *Cursor) error {
 // asyncContinueQuery asynchronously continues a previously run query.
 // This is needed if a response is batched.
 func (s *Session) asyncContinueQuery(cursor *Cursor) error {
+	s.Lock()
 	if cursor.outstandingRequests != 0 {
+
+		s.Unlock()
 		return nil
 	}
 	cursor.outstandingRequests = 1
+	s.Unlock()
 
 	q := &p.Query{
 		Type:  p.Query_CONTINUE.Enum(),
