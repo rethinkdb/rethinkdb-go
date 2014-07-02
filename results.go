@@ -130,6 +130,11 @@ func (c *Cursor) Next(result interface{}) bool {
 		}
 	}
 
+	if c.err != nil {
+		c.mu.Unlock()
+		return false
+	}
+
 	var data interface{}
 	data, c.buffer = c.buffer[0], c.buffer[1:]
 
