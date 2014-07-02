@@ -112,9 +112,9 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) 
 
 		if response.GetToken() == token {
 			return response, nil
-		} else if _, ok := s.cache[response.GetToken()]; ok {
+		} else if cursor, ok := s.checkCache(token); ok {
 			// Handle batch response
-			s.handleBatchResponse(response)
+			s.handleBatchResponse(cursor, response)
 		} else {
 			return nil, RqlDriverError{"Unexpected response received"}
 		}
@@ -192,9 +192,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			profile: profile,
 		}
 
-		s.Lock()
-		s.cache[*q.Token] = cursor
-		s.Unlock()
+		s.setCache(*q.Token, cursor)
 
 		cursor.extend(response)
 
