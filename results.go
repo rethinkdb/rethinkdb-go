@@ -63,7 +63,12 @@ func (c *Cursor) Close() error {
 		c.closed = true
 	}
 
-	err := c.err
+	err := c.conn.Close()
+	if err != nil {
+		return err
+	}
+
+	err = c.err
 	c.mu.Unlock()
 
 	return err

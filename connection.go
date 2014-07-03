@@ -24,6 +24,7 @@ type Connection struct {
 	// embed the net.Conn type, so that we can effectively define new methods on
 	// it (interfaces do not allow that)
 	net.Conn
+	s *Session
 
 	sync.Mutex
 	closed bool
@@ -76,6 +77,7 @@ func Dial(s *Session) (*Connection, error) {
 	}
 
 	return &Connection{
+		s:    s,
 		Conn: conn,
 	}, nil
 }
@@ -157,6 +159,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 
 	// Return immediately if the noreply option was set
 	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		c.Close()
 		return nil, nil
 	} else if async {
 		return nil, nil
@@ -249,6 +252,15 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 }
 
 func (c *Connection) Close() error {
+	err := c.s.noreplyWaitQuery()
+	if err != nil {
+		return err
+	}
+
+	return c.CloseNoWait()
+}
+
+func (c *Connection) CloseNoWait() error {
 	c.Lock()
 	c.closed = true
 	c.Unlock()
