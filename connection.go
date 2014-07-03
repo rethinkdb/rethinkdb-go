@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"sync"
 	"time"
 
 	"code.google.com/p/goprotobuf/proto"
@@ -24,6 +25,7 @@ type Connection struct {
 	// it (interfaces do not allow that)
 	net.Conn
 
+	sync.Mutex
 	closed bool
 }
 
@@ -73,7 +75,9 @@ func Dial(s *Session) (*Connection, error) {
 		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
 
-	return &Connection{conn, false}, nil
+	return &Connection{
+		Conn: conn,
+	}, nil
 }
 
 func TestOnBorrow(c *Connection, t time.Time) error {
@@ -245,7 +249,10 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 }
 
 func (c *Connection) Close() error {
+	c.Lock()
 	c.closed = true
+	c.Unlock()
+
 	return c.Conn.Close()
 }
 

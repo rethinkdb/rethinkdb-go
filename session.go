@@ -246,8 +246,9 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, erro
 		GlobalOptargs: globalOpts,
 	}
 
+	// Get a connection from the pool, do not close yet as it
+	// might be needed later if a partial response is returned
 	conn := s.pool.Get()
-	defer conn.Close()
 
 	return conn.SendQuery(s, q, t, opts, false)
 }
