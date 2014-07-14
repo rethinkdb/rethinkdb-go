@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"sync"
 	"time"
 
 	"code.google.com/p/goprotobuf/proto"
@@ -23,7 +24,9 @@ type Connection struct {
 	// embed the net.Conn type, so that we can effectively define new methods on
 	// it (interfaces do not allow that)
 	net.Conn
+	s *Session
 
+	sync.Mutex
 	closed bool
 }
 
@@ -73,7 +76,10 @@ func Dial(s *Session) (*Connection, error) {
 		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
 
-	return &Connection{conn, false}, nil
+	return &Connection{
+		s:    s,
+		Conn: conn,
+	}, nil
 }
 
 func TestOnBorrow(c *Connection, t time.Time) error {
@@ -112,9 +118,9 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) 
 
 		if response.GetToken() == token {
 			return response, nil
-		} else if _, ok := s.cache[response.GetToken()]; ok {
+		} else if cursor, ok := s.checkCache(token); ok {
 			// Handle batch response
-			s.handleBatchResponse(response)
+			s.handleBatchResponse(cursor, response)
 		} else {
 			return nil, RqlDriverError{"Unexpected response received"}
 		}
@@ -153,6 +159,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 
 	// Return immediately if the noreply option was set
 	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		c.Close()
 		return nil, nil
 	} else if async {
 		return nil, nil
@@ -192,9 +199,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			profile: profile,
 		}
 
-		s.Lock()
-		s.cache[*q.Token] = cursor
-		s.Unlock()
+		s.setCache(*q.Token, cursor)
 
 		cursor.extend(response)
 
@@ -247,7 +252,19 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 }
 
 func (c *Connection) Close() error {
+	err := c.s.noreplyWaitQuery()
+	if err != nil {
+		return err
+	}
+
+	return c.CloseNoWait()
+}
+
+func (c *Connection) CloseNoWait() error {
+	c.Lock()
 	c.closed = true
+	c.Unlock()
+
 	return c.Conn.Close()
 }
 

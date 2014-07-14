@@ -51,17 +51,27 @@ func (c *Cursor) Err() error {
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
 	c.mu.Lock()
-	defer c.mu.Unlock()
 
 	if !c.closed && !c.finished {
+		c.mu.Unlock()
 		err := c.session.stopQuery(c)
+		c.mu.Lock()
+
 		if err != nil && (c.err == nil || c.err == ErrEmptyResult) {
 			c.err = err
 		}
 		c.closed = true
 	}
 
-	return c.err
+	err := c.conn.Close()
+	if err != nil {
+		return err
+	}
+
+	err = c.err
+	c.mu.Unlock()
+
+	return err
 }
 
 // Next retrieves the next document from the result set, blocking if necessary.
@@ -128,6 +138,11 @@ func (c *Cursor) Next(result interface{}) bool {
 		if len(c.buffer) > 0 {
 			break
 		}
+	}
+
+	if c.err != nil {
+		c.mu.Unlock()
+		return false
 	}
 
 	var data interface{}

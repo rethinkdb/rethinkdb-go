@@ -246,17 +246,14 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, erro
 		GlobalOptargs: globalOpts,
 	}
 
+	// Get a connection from the pool, do not close yet as it
+	// might be needed later if a partial response is returned
 	conn := s.pool.Get()
-	defer conn.Close()
 
 	return conn.SendQuery(s, q, t, opts, false)
 }
 
-func (s *Session) handleBatchResponse(response *p.Response) {
-	s.Lock()
-	cursor := s.cache[response.GetToken()]
-	s.Unlock()
-
+func (s *Session) handleBatchResponse(cursor *Cursor, response *p.Response) {
 	cursor.extend(response)
 
 	s.Lock()
@@ -283,7 +280,7 @@ func (s *Session) continueQuery(cursor *Cursor) error {
 		return err
 	}
 
-	s.handleBatchResponse(response)
+	s.handleBatchResponse(cursor, response)
 
 	return nil
 }
@@ -315,9 +312,9 @@ func (s *Session) asyncContinueQuery(cursor *Cursor) error {
 
 // stopQuery sends closes a query by sending Query_STOP to the server.
 func (s *Session) stopQuery(cursor *Cursor) error {
-	s.Lock()
-	s.cache[cursor.query.GetToken()].outstandingRequests += 1
-	s.Unlock()
+	cursor.mu.Lock()
+	cursor.outstandingRequests += 1
+	cursor.mu.Unlock()
 
 	q := &p.Query{
 		Type:  p.Query_STOP.Enum(),
@@ -334,7 +331,7 @@ func (s *Session) stopQuery(cursor *Cursor) error {
 		return err
 	}
 
-	s.handleBatchResponse(response)
+	s.handleBatchResponse(cursor, response)
 
 	return nil
 }
@@ -352,4 +349,19 @@ func (s *Session) noreplyWaitQuery() error {
 	_, err := conn.SendQuery(s, q, Term{}, map[string]interface{}{}, false)
 
 	return err
+}
+
+func (s *Session) checkCache(token int64) (*Cursor, bool) {
+	s.Lock()
+	defer s.Unlock()
+
+	cursor, ok := s.cache[token]
+	return cursor, ok
+}
+
+func (s *Session) setCache(token int64, cursor *Cursor) {
+	s.Lock()
+	defer s.Unlock()
+
+	s.cache[token] = cursor
 }

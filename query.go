@@ -202,18 +202,16 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	return response, err
 }
 
-// Exec runs the query but does not return the result (It also automatically sets
-// the noreply option).
+// Exec runs the query but does not return the result.
 func (t Term) Exec(s *Session, optArgs ...RunOpts) error {
-	// Ensure that noreply is set to true
-	if len(optArgs) >= 1 {
-		optArgs[0].NoReply = true
-	} else {
-		optArgs = append(optArgs, RunOpts{
-			NoReply: true,
-		})
+	res, err := t.Run(s, optArgs...)
+	if err != nil {
+		return err
+	}
+	err = res.Close()
+	if err != nil {
+		return err
 	}
 
-	_, err := t.Run(s, optArgs...)
-	return err
+	return nil
 }
