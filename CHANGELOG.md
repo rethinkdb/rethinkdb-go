@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.1 - 14 June 2014
+
+- Fixed "Token ## not in stream cache" error (#103)
+- Changed Exec to no longer use NoReply. It now waits for the server to respond.
+
 ## v0.3 (RethinkDB v1.13) - 26 June 2014
 
 - Replaced `ResultRows`/`ResultRow` with `Cursor`, `Cursor` has the `Next`, `All` and `One` methods which stores the relevant value in the value pointed at by result. For more information check the examples.
