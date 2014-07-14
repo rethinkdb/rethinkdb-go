@@ -4,7 +4,6 @@ import (
 	"errors"
 	"reflect"
 	"sync"
-	"time"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
@@ -15,15 +14,12 @@ import (
 // The code for this struct is based off of mgo's Iter and the official
 // python driver's cursor.
 type Cursor struct {
-	mu       sync.Mutex
-	gotReply sync.Cond
-	session  *Session
-	query    *p.Query
-	term     Term
-	opts     map[string]interface{}
-
-	timeout  time.Duration
-	timedout bool
+	mu      sync.Mutex
+	session *Session
+	conn    *Connection
+	query   *p.Query
+	term    Term
+	opts    map[string]interface{}
 
 	err                 error
 	outstandingRequests int
@@ -55,27 +51,27 @@ func (c *Cursor) Err() error {
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
 	c.mu.Lock()
-	defer c.mu.Unlock()
 
 	if !c.closed && !c.finished {
+		c.mu.Unlock()
 		err := c.session.stopQuery(c)
+		c.mu.Lock()
+
 		if err != nil && (c.err == nil || c.err == ErrEmptyResult) {
 			c.err = err
 		}
 		c.closed = true
 	}
 
-	return c.err
-}
+	err := c.conn.Close()
+	if err != nil {
+		return err
+	}
 
-// Timeout returns true if Next returned false due to a timeout of
-// a tailable cursor. In those cases, Next may be called again to continue
-// the iteration at the previous cursor position.
-func (c *Cursor) Timeout() bool {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	err = c.err
+	c.mu.Unlock()
 
-	return c.timedout
+	return err
 }
 
 // Next retrieves the next document from the result set, blocking if necessary.
@@ -89,58 +85,82 @@ func (c *Cursor) Timeout() bool {
 // there was an error during iteration.
 func (c *Cursor) Next(result interface{}) bool {
 	c.mu.Lock()
-	c.timedout = false
-	timeout := time.Time{}
 
-	if c.closed {
+	// Load more data if needed
+	for c.err == nil {
+		// Check if response is closed/finished
+		if len(c.buffer) == 0 && len(c.responses) == 0 && c.closed {
+			c.err = errors.New("connection closed, cannot read cursor")
+			c.mu.Unlock()
+			return false
+		}
+		if len(c.buffer) == 0 && len(c.responses) == 0 && c.finished {
+			c.mu.Unlock()
+			return false
+		}
+
+		// Start precomputing next batch
+		if len(c.responses) == 1 && !c.finished {
+			c.mu.Unlock()
+			if err := c.session.asyncContinueQuery(c); err != nil {
+				c.err = err
+				return false
+			}
+			c.mu.Lock()
+		}
+
+		// If the buffer is empty fetch more results
+		if len(c.buffer) == 0 {
+			if len(c.responses) == 0 && !c.finished {
+				c.mu.Unlock()
+				if err := c.session.continueQuery(c); err != nil {
+					c.err = err
+					return false
+				}
+				c.mu.Lock()
+			}
+
+			// Load the new response into the buffer
+			if len(c.responses) > 0 {
+				var err error
+				c.buffer, err = deconstructDatums(c.responses[0].GetResponse(), c.opts)
+				if err != nil {
+					c.err = err
+					c.mu.Unlock()
+					return false
+				}
+				c.responses = c.responses[1:]
+			}
+		}
+
+		// If the buffer is no longer empty then move on otherwise
+		// try again
+		if len(c.buffer) > 0 {
+			break
+		}
+	}
+
+	if c.err != nil {
+		c.mu.Unlock()
+		return false
+	}
+
+	var data interface{}
+	data, c.buffer = c.buffer[0], c.buffer[1:]
+
+	c.mu.Unlock()
+	err := encoding.Decode(result, data)
+	if err != nil {
+		c.mu.Lock()
+		if c.err == nil {
+			c.err = err
+		}
 		c.mu.Unlock()
 
 		return false
 	}
 
-	// Load more data if needed
-	for c.err == nil && len(c.buffer) == 0 && !c.finished {
-		if c.timeout >= 0 {
-			if timeout.IsZero() {
-				timeout = time.Now().Add(c.timeout)
-			}
-			if time.Now().After(timeout) {
-				c.timedout = true
-				c.mu.Unlock()
-				return false
-			}
-		}
-
-		c.mu.Unlock()
-		c.getMore()
-		c.mu.Lock()
-
-		if c.err != nil {
-			break
-		}
-	}
-
-	if len(c.buffer) > 0 {
-		var data interface{}
-		data, c.buffer = c.buffer[0], c.buffer[1:]
-
-		c.mu.Unlock()
-		err := encoding.Decode(result, data)
-		if err != nil {
-			c.mu.Lock()
-			if c.err == nil {
-				c.err = err
-			}
-			c.mu.Unlock()
-
-			return false
-		}
-
-		return true
-	}
-
-	c.mu.Unlock()
-	return false
+	return true
 }
 
 // All retrieves all documents from the result set into the provided slice
@@ -196,44 +216,7 @@ func (c *Cursor) IsNil() bool {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) > 0 && c.buffer[0] == nil)
-}
-
-func (c *Cursor) getMore() {
-	// Check if response is closed/finished
-	if len(c.responses) == 0 && c.closed {
-		c.err = errors.New("connection closed, cannot read cursor")
-		return
-	}
-	if len(c.responses) == 0 && c.finished {
-		return
-	}
-
-	// Otherwise fetch more results
-	if len(c.responses) == 0 && !c.finished {
-		if err := c.session.continueQuery(c); err != nil {
-			c.err = err
-			return
-		}
-	}
-	if len(c.responses) == 1 && !c.finished {
-		if err := c.session.asyncContinueQuery(c); err != nil {
-			c.err = err
-			return
-		}
-	}
-
-	// Load the new response into the buffer
-	if len(c.responses) > 0 {
-		var err error
-		c.buffer, err = deconstructDatums(c.responses[0].GetResponse(), c.opts)
-		if err != nil {
-			c.err = err
-
-			return
-		}
-		c.responses = c.responses[1:]
-	}
+	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
 }
 
 func (c *Cursor) extend(response *p.Response) {

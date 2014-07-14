@@ -1,6 +1,10 @@
 package gorethink
 
-import test "launchpad.net/gocheck"
+import (
+	"fmt"
+
+	test "launchpad.net/gocheck"
+)
 
 func (s *RethinkSuite) TestSelectGet(c *test.C) {
 	// Ensure table + database exist
@@ -299,4 +303,59 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 
 	c.Assert(res.Err(), test.IsNil)
 	c.Assert(n, test.Equals, 100)
+}
+
+func (s *RethinkSuite) TestSelectManyConcurrent(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	for i := 0; i < 1; i++ {
+		data := []interface{}{}
+
+		for j := 0; j < 100; j++ {
+			data = append(data, map[string]interface{}{
+				"i": i,
+				"j": j,
+			})
+		}
+
+		Db("test").Table("TestMany").Insert(data).Run(sess)
+	}
+
+	// Test queries concurrently
+	attempts := 1
+	waitChannel := make(chan error, attempts)
+
+	for i := 0; i < attempts; i++ {
+		go func(i int, c chan error) {
+			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
+				BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
+			})
+			if err != nil {
+				c <- err
+			}
+
+			var response []map[string]interface{}
+			err = res.All(&response)
+			if err != nil {
+				c <- err
+			}
+
+			if len(response) != 100 {
+				c <- fmt.Errorf("expected response length 100, received %d", len(response))
+			}
+
+			c <- nil
+		}(i, waitChannel)
+	}
+
+	for i := 0; i < attempts; i++ {
+		ret := <-waitChannel
+		if ret != nil {
+			c.Fatal("non-nil error returned (%s)", ret)
+		}
+	}
 }
