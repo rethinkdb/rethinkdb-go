@@ -212,7 +212,7 @@ func (c *pooledConnection) SendQuery(s *Session, q *p.Query, t Term, opts map[st
 	return c.c.SendQuery(s, q, t, opts, async)
 }
 
-func (c *pooledConnection) ReadResponse(s *Session, token int64) (*p.Response, error) {
+func (c *pooledConnection) ReadResponse(s *Session, token int64) (*Response, error) {
 	if err := c.get(); err != nil {
 		return nil, err
 	}

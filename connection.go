@@ -3,19 +3,27 @@ package gorethink
 import (
 	"bufio"
 	"encoding/binary"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net"
 	"sync"
 	"time"
 
-	"code.google.com/p/goprotobuf/proto"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+type Response struct {
+	Token     int64
+	Type      p.Response_ResponseType `json:"t"`
+	Responses []interface{}           `json:"r"`
+	Backtrace []interface{}           `json:"b"`
+	Profile   interface{}             `json:"p"`
+}
+
 type Conn interface {
 	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error)
-	ReadResponse(s *Session, token int64) (*p.Response, error)
+	ReadResponse(s *Session, token int64) (*Response, error)
 	Close() error
 }
 
@@ -56,7 +64,7 @@ func Dial(s *Session) (*Connection, error) {
 	}
 
 	// Send the protocol type as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_PROTOBUF); err != nil {
+	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
@@ -97,26 +105,38 @@ func TestOnBorrow(c *Connection, t time.Time) error {
 	return nil
 }
 
-func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) {
+func (c *Connection) ReadResponse(s *Session, token int64) (*Response, error) {
 	for {
-		var messageLength uint32
+		// Read the 8-byte token of the query the response corresponds to.
+		var responseToken int64
+		if err := binary.Read(c, binary.LittleEndian, &responseToken); err != nil {
+			c.Close()
+			return nil, RqlConnectionError{err.Error()}
+		}
+
+		// Read the length of the JSON-encoded response as a 4-byte
+		// little-endian-encoded integer.
+		var messageLength int64
 		if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
 			c.Close()
 			return nil, RqlConnectionError{err.Error()}
 		}
 
-		buffer := make([]byte, messageLength)
-		if _, err := io.ReadFull(c, buffer); err != nil {
+		// Read the JSON encoding of the Response itself.
+		b := make([]byte, messageLength)
+		if _, err := io.ReadFull(c, b); err != nil {
 			c.Close()
 			return nil, RqlDriverError{err.Error()}
 		}
 
-		response := &p.Response{}
-		if err := proto.Unmarshal(buffer, response); err != nil {
+		var response *Response
+		response.Token = responseToken
+		err := json.Unmarshal(b, &response)
+		if err != nil {
 			return nil, RqlDriverError{err.Error()}
 		}
 
-		if response.GetToken() == token {
+		if responseToken == token {
 			return response, nil
 		} else if cursor, ok := s.checkCache(token); ok {
 			// Handle batch response
@@ -128,8 +148,13 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*p.Response, error) 
 }
 
 func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error) {
-	var data []byte
 	var err error
+
+	// Build query
+	b, err := json.Marshal([]interface{}{q.GetType(), t, opts})
+	if err != nil {
+		return nil, RqlDriverError{"Error building query"}
+	}
 
 	// Ensure that the connection is not closed
 	if s.closed {
@@ -143,16 +168,21 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 		c.SetDeadline(time.Now().Add(s.timeout))
 	}
 
-	// Send query
-	if data, err = proto.Marshal(q); err != nil {
-		return nil, RqlDriverError{err.Error()}
-	}
-	if err = binary.Write(c, binary.LittleEndian, uint32(len(data))); err != nil {
+	// Send a unique 8-byte token
+	if err = binary.Write(c, binary.LittleEndian, q.GetToken()); err != nil {
 		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
-	if err = binary.Write(c, binary.BigEndian, data); err != nil {
+	// Send the length of the JSON-encoded query as a 4-byte
+	// little-endian-encoded integer.
+	if err = binary.Write(c, binary.LittleEndian, len(b)); err != nil {
+		c.Close()
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Send the JSON encoding of the query itself.
+	if err = binary.Write(c, binary.BigEndian, b); err != nil {
 		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
@@ -176,19 +206,8 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 		return nil, err
 	}
 
-	// De-construct the profile datum if it exists
-	var profile interface{}
-	if response.GetProfile() != nil {
-		var err error
-
-		profile, err = deconstructDatum(response.GetProfile(), opts)
-		if err != nil {
-			return nil, RqlDriverError{err.Error()}
-		}
-	}
-
 	// De-construct datum and return a cursor
-	switch response.GetType() {
+	switch response.Type {
 	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE, p.Response_SUCCESS_FEED:
 		cursor := &Cursor{
 			session: s,
@@ -196,7 +215,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			query:   q,
 			term:    t,
 			opts:    opts,
-			profile: profile,
+			profile: response.Profile,
 		}
 
 		s.setCache(*q.Token, cursor)
@@ -208,17 +227,15 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 		var value []interface{}
 		var err error
 
-		if len(response.GetResponse()) < 1 {
+		if len(response.Responses) < 1 {
 			value = []interface{}{}
-		} else if response.GetResponse()[0].GetType() == p.Datum_R_ARRAY {
-			value, err = deconstructDatums(response.GetResponse()[0].GetRArray(), opts)
-			if err != nil {
-				return nil, err
-			}
 		} else {
 			var v interface{}
 
-			v, err = deconstructDatum(response.GetResponse()[0], opts)
+			v, err = recursivelyConvertPseudotype(response.Responses[0], opts)
+			if err != nil {
+				return nil, err
+			}
 			if err != nil {
 				return nil, RqlDriverError{err.Error()}
 			}
@@ -238,7 +255,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			query:    q,
 			term:     t,
 			opts:     opts,
-			profile:  profile,
+			profile:  response.Profile,
 			buffer:   value,
 			finished: true,
 		}
@@ -247,7 +264,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 	case p.Response_WAIT_COMPLETE:
 		return nil, nil
 	default:
-		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", response.GetType())}
+		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", response.Type)}
 	}
 }
 
@@ -268,8 +285,8 @@ func (c *Connection) CloseNoWait() error {
 	return c.Conn.Close()
 }
 
-func checkErrorResponse(response *p.Response, t Term) error {
-	switch response.GetType() {
+func checkErrorResponse(response *Response, t Term) error {
+	switch response.Type {
 	case p.Response_CLIENT_ERROR:
 		return RqlClientError{rqlResponseError{response, t}}
 	case p.Response_COMPILE_ERROR:
