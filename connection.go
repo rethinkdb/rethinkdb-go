@@ -10,6 +10,8 @@ import (
 	"sync"
 	"time"
 
+	"gopkg.in/fatih/pool.v1"
+
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -39,55 +41,54 @@ type Connection struct {
 }
 
 // Dial closes the previous connection and attempts to connect again.
-func Dial(s *Session) (*Connection, error) {
-	conn, err := net.Dial("tcp", s.address)
-	if err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Send the auth key as an ASCII string
-	// If there is no auth key, skip this step
-	if s.authkey != "" {
-		if _, err := io.WriteString(conn, s.authkey); err != nil {
+func Dial(s *Session) pool.Factory {
+	return func() (net.Conn, error) {
+		conn, err := net.Dial("tcp", s.address)
+		if err != nil {
 			return nil, RqlConnectionError{err.Error()}
 		}
-	}
 
-	// Send the protocol type as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// read server response to authorization key (terminated by NUL)
-	reader := bufio.NewReader(conn)
-	line, err := reader.ReadBytes('\x00')
-	if err != nil {
-		if err == io.EOF {
-			return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
+		// Send the protocol version to the server as a 4-byte little-endian-encoded integer
+		if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
+			return nil, RqlConnectionError{err.Error()}
 		}
-		return nil, RqlDriverError{err.Error()}
-	}
-	// convert to string and remove trailing NUL byte
-	response := string(line[:len(line)-1])
-	if response != "SUCCESS" {
-		// we failed authorization or something else terrible happened
-		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
-	}
 
-	return &Connection{
-		s:    s,
-		Conn: conn,
-	}, nil
+		// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
+		if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
+			return nil, RqlConnectionError{err.Error()}
+		}
+
+		// Send the auth key as an ASCII string
+		// If there is no auth key, skip this step
+		if s.authkey != "" {
+			if _, err := io.WriteString(conn, s.authkey); err != nil {
+				return nil, RqlConnectionError{err.Error()}
+			}
+		}
+
+		// Send the protocol type as a 4-byte little-endian-encoded integer
+		if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
+			return nil, RqlConnectionError{err.Error()}
+		}
+
+		// read server response to authorization key (terminated by NUL)
+		reader := bufio.NewReader(conn)
+		line, err := reader.ReadBytes('\x00')
+		if err != nil {
+			if err == io.EOF {
+				return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
+			}
+			return nil, RqlDriverError{err.Error()}
+		}
+		// convert to string and remove trailing NUL byte
+		response := string(line[:len(line)-1])
+		if response != "SUCCESS" {
+			// we failed authorization or something else terrible happened
+			return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
+		}
+
+		return conn, nil
+	}
 }
 
 func TestOnBorrow(c *Connection, t time.Time) error {
