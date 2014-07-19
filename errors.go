@@ -52,14 +52,12 @@ var ErrEmptyResult = errors.New("The result does not contain any more rows")
 // Connection/Response errors
 
 type rqlResponseError struct {
-	response *p.Response
+	response *Response
 	term     Term
 }
 
 func (e rqlResponseError) Error() string {
-	message, _ := deconstructDatum(e.response.GetResponse()[0], map[string]interface{}{})
-
-	return fmt.Sprintf("gorethink: %s in: \n%s", message, e.term)
+	return fmt.Sprintf("gorethink: %s in: \n%s", e.response.Responses[0], e.term)
 }
 
 func (e rqlResponseError) String() string {

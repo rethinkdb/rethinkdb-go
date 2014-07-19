@@ -253,16 +253,16 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, erro
 	return conn.SendQuery(s, q, t, opts, false)
 }
 
-func (s *Session) handleBatchResponse(cursor *Cursor, response *p.Response) {
+func (s *Session) handleBatchResponse(cursor *Cursor, response *Response) {
 	cursor.extend(response)
 
 	s.Lock()
 	cursor.outstandingRequests -= 1
 
-	if response.GetType() != p.Response_SUCCESS_PARTIAL &&
-		response.GetType() != p.Response_SUCCESS_FEED &&
+	if response.Type != p.Response_SUCCESS_PARTIAL &&
+		response.Type != p.Response_SUCCESS_FEED &&
 		cursor.outstandingRequests == 0 {
-		delete(s.cache, response.GetToken())
+		delete(s.cache, response.Token)
 	}
 	s.Unlock()
 }
