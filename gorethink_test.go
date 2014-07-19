@@ -3,7 +3,9 @@ package gorethink
 import (
 	"encoding/json"
 	"flag"
+	"math/rand"
 	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -202,4 +204,150 @@ var str T = T{
 			"XE1", "XE2",
 		},
 	},
+}
+
+func (s *RethinkSuite) BenchmarkConcurrentNoReplyExpr(c *test.C) {
+	var wg sync.WaitGroup
+
+	for i := 0; i < c.N; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			// Test query
+			query := Expr(true)
+			err := query.Exec(sess, RunOpts{NoReply: true})
+			c.Assert(err, test.IsNil)
+		}()
+	}
+
+	wg.Wait()
+}
+
+func (s *RethinkSuite) BenchmarkConcurrentGet(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id": i,
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < c.N; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			n := rand.Intn(100)
+
+			// Test query
+			var response interface{}
+			query := Db("test").Table("TestMany").Get(n)
+			res, err := query.Run(sess)
+			c.Assert(err, test.IsNil)
+
+			err = res.One(&response)
+
+			c.Assert(err, test.IsNil)
+			c.Assert(response, JsonEquals, map[string]interface{}{"id": n})
+
+		}()
+	}
+
+	wg.Wait()
+}
+
+func (s *RethinkSuite) BenchmarkConcurrentSelectMany(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id": i,
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < c.N; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			// Test query
+			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
+				BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
+			})
+			c.Assert(err, test.IsNil)
+
+			var response []map[string]interface{}
+			err = res.All(&response)
+
+			c.Assert(err, test.IsNil)
+			c.Assert(response, test.HasLen, 100)
+		}()
+	}
+
+	wg.Wait()
+}
+
+func (s *RethinkSuite) BenchmarkConcurrentSelectManyStruct(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id":   i,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < c.N; i++ {
+		wg.Add(1)
+
+		go func() {
+			defer wg.Done()
+
+			// Test query
+			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
+				BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
+			})
+			c.Assert(err, test.IsNil)
+
+			var response []object
+			err = res.All(&response)
+
+			c.Assert(err, test.IsNil)
+			c.Assert(response, test.HasLen, 100)
+		}()
+	}
+
+	wg.Wait()
 }
