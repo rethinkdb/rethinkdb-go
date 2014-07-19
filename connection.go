@@ -158,10 +158,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 	}
 
 	// Return immediately if the noreply option was set
-	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
-		c.Close()
-		return nil, nil
-	} else if async {
+	if noreply, ok := opts["noreply"]; (ok && noreply.(bool)) || async {
 		return nil, nil
 	}
 

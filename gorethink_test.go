@@ -5,6 +5,7 @@ import (
 	"flag"
 	"math/rand"
 	"os"
+	"runtime"
 	"sync"
 	"testing"
 	"time"
@@ -206,23 +207,26 @@ var str T = T{
 	},
 }
 
-func (s *RethinkSuite) BenchmarkConcurrentNoReplyExpr(c *test.C) {
-	var wg sync.WaitGroup
-
+func (s *RethinkSuite) BenchmarkConcurrentExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
-		wg.Add(1)
+		doConcurrentTest(c, func() {
+			// Test query
+			query := Expr(true)
+			err := query.Exec(sess)
+			c.Assert(err, test.IsNil)
+		})
+	}
+}
 
-		go func() {
-			defer wg.Done()
-
+func (s *RethinkSuite) BenchmarkConcurrentNoReplyExpr(c *test.C) {
+	for i := 0; i < c.N; i++ {
+		doConcurrentTest(c, func() {
 			// Test query
 			query := Expr(true)
 			err := query.Exec(sess, RunOpts{NoReply: true})
 			c.Assert(err, test.IsNil)
-		}()
+		})
 	}
-
-	wg.Wait()
 }
 
 func (s *RethinkSuite) BenchmarkConcurrentGet(c *test.C) {
@@ -240,14 +244,8 @@ func (s *RethinkSuite) BenchmarkConcurrentGet(c *test.C) {
 	}
 	Db("test").Table("TestMany").Insert(data).Run(sess)
 
-	var wg sync.WaitGroup
-
 	for i := 0; i < c.N; i++ {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
+		doConcurrentTest(c, func() {
 			n := rand.Intn(100)
 
 			// Test query
@@ -260,11 +258,8 @@ func (s *RethinkSuite) BenchmarkConcurrentGet(c *test.C) {
 
 			c.Assert(err, test.IsNil)
 			c.Assert(response, JsonEquals, map[string]interface{}{"id": n})
-
-		}()
+		})
 	}
-
-	wg.Wait()
 }
 
 func (s *RethinkSuite) BenchmarkConcurrentSelectMany(c *test.C) {
@@ -282,18 +277,10 @@ func (s *RethinkSuite) BenchmarkConcurrentSelectMany(c *test.C) {
 	}
 	Db("test").Table("TestMany").Insert(data).Run(sess)
 
-	var wg sync.WaitGroup
-
 	for i := 0; i < c.N; i++ {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
+		doConcurrentTest(c, func() {
 			// Test query
-			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
-				BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
-			})
+			res, err := Db("test").Table("TestMany").Run(sess)
 			c.Assert(err, test.IsNil)
 
 			var response []map[string]interface{}
@@ -301,10 +288,8 @@ func (s *RethinkSuite) BenchmarkConcurrentSelectMany(c *test.C) {
 
 			c.Assert(err, test.IsNil)
 			c.Assert(response, test.HasLen, 100)
-		}()
+		})
 	}
-
-	wg.Wait()
 }
 
 func (s *RethinkSuite) BenchmarkConcurrentSelectManyStruct(c *test.C) {
@@ -327,18 +312,10 @@ func (s *RethinkSuite) BenchmarkConcurrentSelectManyStruct(c *test.C) {
 	}
 	Db("test").Table("TestMany").Insert(data).Run(sess)
 
-	var wg sync.WaitGroup
-
 	for i := 0; i < c.N; i++ {
-		wg.Add(1)
-
-		go func() {
-			defer wg.Done()
-
+		doConcurrentTest(c, func() {
 			// Test query
-			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
-				BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
-			})
+			res, err := Db("test").Table("TestMany").Run(sess)
 			c.Assert(err, test.IsNil)
 
 			var response []object
@@ -346,7 +323,38 @@ func (s *RethinkSuite) BenchmarkConcurrentSelectManyStruct(c *test.C) {
 
 			c.Assert(err, test.IsNil)
 			c.Assert(response, test.HasLen, 100)
+		})
+	}
+}
+
+func doConcurrentTest(c *test.C, ct func()) {
+	maxProcs, numReqs := 1, 150
+	if testing.Short() {
+		maxProcs, numReqs = 4, 50
+	}
+	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(maxProcs))
+
+	var wg sync.WaitGroup
+	wg.Add(numReqs)
+
+	reqs := make(chan bool)
+	defer close(reqs)
+
+	for i := 0; i < maxProcs*2; i++ {
+		go func() {
+			for _ = range reqs {
+				ct()
+				if c.Failed() {
+					wg.Done()
+					continue
+				}
+				wg.Done()
+			}
 		}()
+	}
+
+	for i := 0; i < numReqs; i++ {
+		reqs <- true
 	}
 
 	wg.Wait()
