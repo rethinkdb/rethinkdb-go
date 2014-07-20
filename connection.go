@@ -111,28 +111,26 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*Response, error) {
 		// Read the 8-byte token of the query the response corresponds to.
 		var responseToken int64
 		if err := binary.Read(c, binary.LittleEndian, &responseToken); err != nil {
-			c.Close()
 			return nil, RqlConnectionError{err.Error()}
 		}
 
 		// Read the length of the JSON-encoded response as a 4-byte
 		// little-endian-encoded integer.
-		var messageLength int64
+		var messageLength uint32
 		if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
-			c.Close()
 			return nil, RqlConnectionError{err.Error()}
 		}
 
 		// Read the JSON encoding of the Response itself.
 		b := make([]byte, messageLength)
 		if _, err := io.ReadFull(c, b); err != nil {
-			c.Close()
 			return nil, RqlDriverError{err.Error()}
 		}
 
-		var response *Response
+		// Decode the response
+		var response = new(Response)
 		response.Token = responseToken
-		err := json.Unmarshal(b, &response)
+		err := json.Unmarshal(b, response)
 		if err != nil {
 			return nil, RqlDriverError{err.Error()}
 		}
@@ -148,11 +146,11 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*Response, error) {
 	}
 }
 
-func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error) {
+func (c *Connection) SendQuery(s *Session, q Query, opts map[string]interface{}, async bool) (*Cursor, error) {
 	var err error
 
 	// Build query
-	b, err := json.Marshal([]interface{}{q.GetType(), t, opts})
+	b, err := json.Marshal(q.build())
 	if err != nil {
 		return nil, RqlDriverError{"Error building query"}
 	}
@@ -170,21 +168,19 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 	}
 
 	// Send a unique 8-byte token
-	if err = binary.Write(c, binary.LittleEndian, q.GetToken()); err != nil {
+	if err = binary.Write(c, binary.LittleEndian, q.Token); err != nil {
 		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Send the length of the JSON-encoded query as a 4-byte
 	// little-endian-encoded integer.
-	if err = binary.Write(c, binary.LittleEndian, len(b)); err != nil {
-		c.Close()
+	if err = binary.Write(c, binary.LittleEndian, uint32(len(b))); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Send the JSON encoding of the query itself.
 	if err = binary.Write(c, binary.BigEndian, b); err != nil {
-		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
@@ -197,12 +193,12 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 	}
 
 	// Get response
-	response, err := c.ReadResponse(s, *q.Token)
+	response, err := c.ReadResponse(s, q.Token)
 	if err != nil {
 		return nil, err
 	}
 
-	err = checkErrorResponse(response, t)
+	err = checkErrorResponse(response, q.Term)
 	if err != nil {
 		return nil, err
 	}
@@ -214,12 +210,12 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			session: s,
 			conn:    c,
 			query:   q,
-			term:    t,
+			term:    *q.Term,
 			opts:    opts,
 			profile: response.Profile,
 		}
 
-		s.setCache(*q.Token, cursor)
+		s.setCache(q.Token, cursor)
 
 		cursor.extend(response)
 
@@ -254,7 +250,7 @@ func (c *Connection) SendQuery(s *Session, q *p.Query, t Term, opts map[string]i
 			session:  s,
 			conn:     c,
 			query:    q,
-			term:     t,
+			term:     *q.Term,
 			opts:     opts,
 			profile:  response.Profile,
 			buffer:   value,
@@ -283,10 +279,10 @@ func (c *Connection) CloseNoWait() error {
 	c.closed = true
 	c.Unlock()
 
-	return c.Conn.Close()
+	return c.s.pool.Put(c.Conn)
 }
 
-func checkErrorResponse(response *Response, t Term) error {
+func checkErrorResponse(response *Response, t *Term) error {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
 		return RqlClientError{rqlResponseError{response, t}}

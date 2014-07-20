@@ -53,11 +53,11 @@ var ErrEmptyResult = errors.New("The result does not contain any more rows")
 
 type rqlResponseError struct {
 	response *Response
-	term     Term
+	term     *Term
 }
 
 func (e rqlResponseError) Error() string {
-	return fmt.Sprintf("gorethink: %s in: \n%s", e.response.Responses[0], e.term)
+	return fmt.Sprintf("gorethink: %s in: \n%s", e.response.Responses[0], e.term.String())
 }
 
 func (e rqlResponseError) String() string {

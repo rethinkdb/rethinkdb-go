@@ -7,9 +7,28 @@ import (
 
 	"gopkg.in/fatih/pool.v1"
 
-	"code.google.com/p/goprotobuf/proto"
 	p "github.com/dancannon/gorethink/ql2"
 )
+
+type Query struct {
+	Type       p.Query_QueryType
+	Token      int64
+	Term       *Term
+	GlobalOpts map[string]interface{}
+}
+
+func (q *Query) build() []interface{} {
+	res := []interface{}{q.Type}
+	if q.Term != nil {
+		res = append(res, q.Term.build())
+
+		if len(q.GlobalOpts) > 0 {
+			res = append(res, q.GlobalOpts)
+		}
+	}
+
+	return res
+}
 
 type Session struct {
 	token      int64
@@ -138,10 +157,7 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 	}
 
 	// Check the connection
-	conn, err := s.getConn()
-	if err == nil {
-		conn.Close()
-	}
+	_, err := s.getConn()
 
 	return err
 }
@@ -195,33 +211,23 @@ func (s *Session) nextToken() int64 {
 func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
 	token := s.nextToken()
 
-	// Build query tree
-	pt := t.build()
-
 	// Build global options
-	globalOpts := []*p.Query_AssocPair{}
+	globalOpts := map[string]interface{}{}
 	for k, v := range opts {
-		globalOpts = append(globalOpts, &p.Query_AssocPair{
-			Key: proto.String(k),
-			Val: Expr(v).build(),
-		})
+		globalOpts[k] = Expr(v).build()
 	}
 
 	// If no DB option was set default to the value set in the connection
 	if _, ok := opts["db"]; !ok {
-		globalOpts = append(globalOpts, &p.Query_AssocPair{
-			Key: proto.String("db"),
-			Val: Db(s.database).build(),
-		})
+		globalOpts["db"] = Db(s.database).build()
 	}
 
 	// Construct query
-	q := &p.Query{
-		AcceptsRJson:  proto.Bool(true),
-		Type:          p.Query_START.Enum(),
-		Token:         proto.Int64(token),
-		Query:         pt,
-		GlobalOptargs: globalOpts,
+	q := Query{
+		Type:       p.Query_START,
+		Token:      token,
+		Term:       &t,
+		GlobalOpts: globalOpts,
 	}
 
 	// Get a connection from the pool, do not close yet as it
@@ -231,7 +237,7 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, erro
 		return nil, err
 	}
 
-	return conn.SendQuery(s, q, t, opts, false)
+	return conn.SendQuery(s, q, opts, false)
 }
 
 func (s *Session) handleBatchResponse(cursor *Cursor, response *Response) {
@@ -256,7 +262,7 @@ func (s *Session) continueQuery(cursor *Cursor) error {
 		return err
 	}
 
-	response, err := cursor.conn.ReadResponse(s, cursor.query.GetToken())
+	response, err := cursor.conn.ReadResponse(s, cursor.query.Token)
 	if err != nil {
 		return err
 	}
@@ -278,12 +284,12 @@ func (s *Session) asyncContinueQuery(cursor *Cursor) error {
 	cursor.outstandingRequests = 1
 	s.Unlock()
 
-	q := &p.Query{
-		Type:  p.Query_CONTINUE.Enum(),
+	q := Query{
+		Type:  p.Query_CONTINUE,
 		Token: cursor.query.Token,
 	}
 
-	_, err := cursor.conn.SendQuery(s, q, cursor.term, cursor.opts, true)
+	_, err := cursor.conn.SendQuery(s, q, cursor.opts, true)
 	if err != nil {
 		return err
 	}
@@ -297,17 +303,18 @@ func (s *Session) stopQuery(cursor *Cursor) error {
 	cursor.outstandingRequests += 1
 	cursor.mu.Unlock()
 
-	q := &p.Query{
-		Type:  p.Query_STOP.Enum(),
+	q := Query{
+		Type:  p.Query_STOP,
 		Token: cursor.query.Token,
+		Term:  &cursor.term,
 	}
 
-	_, err := cursor.conn.SendQuery(s, q, cursor.term, cursor.opts, false)
+	_, err := cursor.conn.SendQuery(s, q, cursor.opts, false)
 	if err != nil {
 		return err
 	}
 
-	response, err := cursor.conn.ReadResponse(s, cursor.query.GetToken())
+	response, err := cursor.conn.ReadResponse(s, cursor.query.Token)
 	if err != nil {
 		return err
 	}
@@ -319,18 +326,18 @@ func (s *Session) stopQuery(cursor *Cursor) error {
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
 func (s *Session) noreplyWaitQuery() error {
-	q := &p.Query{
-		Type:  p.Query_NOREPLY_WAIT.Enum(),
-		Token: proto.Int64(s.nextToken()),
+	q := Query{
+		Type:  p.Query_NOREPLY_WAIT,
+		Token: s.nextToken(),
 	}
 
 	conn, err := s.getConn()
 	if err != nil {
 		return err
 	}
-	defer conn.Close()
+	defer conn.CloseNoWait()
 
-	_, err = conn.SendQuery(s, q, Term{}, map[string]interface{}{}, false)
+	_, err = conn.SendQuery(s, q, map[string]interface{}{}, false)
 
 	return err
 }

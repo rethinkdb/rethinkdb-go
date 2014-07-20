@@ -204,7 +204,7 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 
 	var n int
 
-	rows, err := Db("test").Table("changes").Changes().Run(sess)
+	res, err := Db("test").Table("changes").Changes().Run(sess)
 	if err != nil {
 		c.Fatal(err.Error())
 	}
@@ -215,12 +215,13 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	// Use goroutine to wait for changes. Prints the first 10 results
 	go func() {
 		var response interface{}
-		for n < 10 && rows.Next(&response) {
+		for n < 10 && res.Next(&response) {
+			// log.Println(response)
 			n++
 		}
 
-		if rows.Err() != nil {
-			c.Fatal(rows.Err())
+		if res.Err() != nil {
+			c.Fatal(res.Err())
 		}
 
 		wg.Done()
