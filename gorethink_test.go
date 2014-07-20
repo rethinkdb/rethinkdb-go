@@ -207,29 +207,25 @@ var str T = T{
 	},
 }
 
-func (s *RethinkSuite) BenchmarkConcurrentExpr(c *test.C) {
+func (s *RethinkSuite) BenchmarkExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
-		doConcurrentTest(c, func() {
-			// Test query
-			query := Expr(true)
-			err := query.Exec(sess)
-			c.Assert(err, test.IsNil)
-		})
+		// Test query
+		query := Expr(true)
+		err := query.Exec(sess)
+		c.Assert(err, test.IsNil)
 	}
 }
 
-func (s *RethinkSuite) BenchmarkConcurrentNoReplyExpr(c *test.C) {
+func (s *RethinkSuite) BenchmarkNoReplyExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
-		doConcurrentTest(c, func() {
-			// Test query
-			query := Expr(true)
-			err := query.Exec(sess, RunOpts{NoReply: true})
-			c.Assert(err, test.IsNil)
-		})
+		// Test query
+		query := Expr(true)
+		err := query.Exec(sess, RunOpts{NoReply: true})
+		c.Assert(err, test.IsNil)
 	}
 }
 
-func (s *RethinkSuite) BenchmarkConcurrentGet(c *test.C) {
+func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 	// Ensure table + database exist
 	DbCreate("test").RunWrite(sess)
 	Db("test").TableCreate("TestMany").RunWrite(sess)
@@ -245,54 +241,22 @@ func (s *RethinkSuite) BenchmarkConcurrentGet(c *test.C) {
 	Db("test").Table("TestMany").Insert(data).Run(sess)
 
 	for i := 0; i < c.N; i++ {
-		doConcurrentTest(c, func() {
-			n := rand.Intn(100)
+		n := rand.Intn(100)
 
-			// Test query
-			var response interface{}
-			query := Db("test").Table("TestMany").Get(n)
-			res, err := query.Run(sess)
-			c.Assert(err, test.IsNil)
+		// Test query
+		var response interface{}
+		query := Db("test").Table("TestMany").Get(n)
+		res, err := query.Run(sess)
+		c.Assert(err, test.IsNil)
 
-			err = res.One(&response)
+		err = res.One(&response)
 
-			c.Assert(err, test.IsNil)
-			c.Assert(response, JsonEquals, map[string]interface{}{"id": n})
-		})
+		c.Assert(err, test.IsNil)
+		c.Assert(response, JsonEquals, map[string]interface{}{"id": n})
 	}
 }
 
-func (s *RethinkSuite) BenchmarkConcurrentSelectMany(c *test.C) {
-	// Ensure table + database exist
-	DbCreate("test").RunWrite(sess)
-	Db("test").TableCreate("TestMany").RunWrite(sess)
-	Db("test").Table("TestMany").Delete().RunWrite(sess)
-
-	// Insert rows
-	data := []interface{}{}
-	for i := 0; i < 100; i++ {
-		data = append(data, map[string]interface{}{
-			"id": i,
-		})
-	}
-	Db("test").Table("TestMany").Insert(data).Run(sess)
-
-	for i := 0; i < c.N; i++ {
-		doConcurrentTest(c, func() {
-			// Test query
-			res, err := Db("test").Table("TestMany").Run(sess)
-			c.Assert(err, test.IsNil)
-
-			var response []map[string]interface{}
-			err = res.All(&response)
-
-			c.Assert(err, test.IsNil)
-			c.Assert(response, test.HasLen, 100)
-		})
-	}
-}
-
-func (s *RethinkSuite) BenchmarkConcurrentSelectManyStruct(c *test.C) {
+func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 	// Ensure table + database exist
 	DbCreate("test").RunWrite(sess)
 	Db("test").TableCreate("TestMany").RunWrite(sess)
@@ -313,17 +277,78 @@ func (s *RethinkSuite) BenchmarkConcurrentSelectManyStruct(c *test.C) {
 	Db("test").Table("TestMany").Insert(data).Run(sess)
 
 	for i := 0; i < c.N; i++ {
-		doConcurrentTest(c, func() {
-			// Test query
-			res, err := Db("test").Table("TestMany").Run(sess)
-			c.Assert(err, test.IsNil)
+		n := rand.Intn(100)
 
-			var response []object
-			err = res.All(&response)
+		// Test query
+		var resObj object
+		query := Db("test").Table("TestMany").Get(n)
+		res, err := query.Run(sess)
+		c.Assert(err, test.IsNil)
 
-			c.Assert(err, test.IsNil)
-			c.Assert(response, test.HasLen, 100)
+		err = res.One(&resObj)
+
+		c.Assert(err, test.IsNil)
+	}
+}
+
+func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id": i,
 		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	for i := 0; i < c.N; i++ {
+		// Test query
+		res, err := Db("test").Table("TestMany").Run(sess)
+		c.Assert(err, test.IsNil)
+
+		var response []map[string]interface{}
+		err = res.All(&response)
+
+		c.Assert(err, test.IsNil)
+		c.Assert(response, test.HasLen, 100)
+	}
+}
+
+func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id":   i,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	for i := 0; i < c.N; i++ {
+		// Test query
+		res, err := Db("test").Table("TestMany").Run(sess)
+		c.Assert(err, test.IsNil)
+
+		var response []object
+		err = res.All(&response)
+
+		c.Assert(err, test.IsNil)
+		c.Assert(response, test.HasLen, 100)
 	}
 }
 
