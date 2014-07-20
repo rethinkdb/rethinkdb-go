@@ -17,7 +17,7 @@ type Cursor struct {
 	mu      sync.Mutex
 	session *Session
 	conn    *Connection
-	query   *p.Query
+	query   Query
 	term    Term
 	opts    map[string]interface{}
 

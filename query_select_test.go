@@ -355,7 +355,7 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 	for i := 0; i < attempts; i++ {
 		ret := <-waitChannel
 		if ret != nil {
-			c.Fatal("non-nil error returned (%s)", ret)
+			c.Fatalf("non-nil error returned (%s)", ret)
 		}
 	}
 }

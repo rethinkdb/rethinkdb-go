@@ -5,7 +5,6 @@ import (
 	"strconv"
 	"strings"
 
-	"code.google.com/p/goprotobuf/proto"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -23,37 +22,25 @@ type Term struct {
 	optArgs  map[string]Term
 }
 
-// build takes the query tree and turns it into a protobuf term tree.
-func (t Term) build() *p.Term {
+// build takes the query tree and prepares it to be sent as a JSON
+// expression
+func (t Term) build() interface{} {
 	switch t.termType {
 	case p.Term_DATUM:
-		datum, err := constructDatum(t)
-		if err != nil {
-			panic(err)
-		}
-		return datum
+		return t.data
 	default:
-		args := []*p.Term{}
-		optArgs := []*p.Term_AssocPair{}
-		term := &p.Term{
-			Type: t.termType.Enum(),
-		}
+		args := []interface{}{}
+		optArgs := map[string]interface{}{}
 
 		for _, v := range t.args {
 			args = append(args, v.build())
 		}
 
 		for k, v := range t.optArgs {
-			optArgs = append(optArgs, &p.Term_AssocPair{
-				Key: proto.String(k),
-				Val: v.build(),
-			})
+			optArgs[k] = v.build()
 		}
 
-		term.Args = args
-		term.Optargs = optArgs
-
-		return term
+		return []interface{}{t.termType, args, optArgs}
 	}
 }
 
