@@ -34,7 +34,7 @@ func (o *OrderByOpts) toMap() map[string]interface{} {
 // Sort the sequence by document values of the given key(s).
 // To specify the index to use for ordering us a last argument in the following form:
 //
-//	map[string]interface{}{"index": "index-name"}
+//	OrderByOpts{Index: "index-name"}
 //
 // OrderBy defaults to ascending ordering. To explicitly specify the ordering,
 // wrap the attribute with either Asc or Desc.
