@@ -16,7 +16,7 @@ build:
           code: |
             cd $WERCKER_SOURCE_DIR
             go version
-            go get ./... && go get -u launchpad.net/gocheck && go test -i
+            go get ./... && go get -u gopkg.in/check.v1 && go test -i
 
       # Build the project
       - script:

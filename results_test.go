@@ -1,6 +1,6 @@
 package gorethink
 
-import test "launchpad.net/gocheck"
+import test "gopkg.in/check.v1"
 
 type object struct {
 	Id    int64  `gorethink:"id,omitempty"`
@@ -163,7 +163,8 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	res, err = Db("test").Table("test").Get("missing value").Run(sess)
 	c.Assert(err, test.IsNil)
 	var response interface{}
-	res.One(&response)
+	err = res.One(&response)
+	c.Assert(err, test.Equals, ErrEmptyResult)
 	c.Assert(res.IsNil(), test.Equals, true)
 
 	res, err = Db("test").Table("test").Get("missing value").Run(sess)

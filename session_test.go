@@ -3,7 +3,7 @@ package gorethink
 import (
 	"os"
 
-	test "launchpad.net/gocheck"
+	test "gopkg.in/check.v1"
 )
 
 func (s *RethinkSuite) TestSessionConnect(c *test.C) {
