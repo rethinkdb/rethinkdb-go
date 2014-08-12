@@ -15,7 +15,7 @@ func (s *RethinkSuite) TestControlExecNil(c *test.C) {
 
 	err = res.One(&response)
 
-	c.Assert(err, test.IsNil)
+	c.Assert(err, test.Equals, ErrEmptyResult)
 	c.Assert(response, test.Equals, nil)
 }
 
