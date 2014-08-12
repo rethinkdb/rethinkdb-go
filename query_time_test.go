@@ -3,7 +3,7 @@ package gorethink
 import (
 	"time"
 
-	test "launchpad.net/gocheck"
+	test "gopkg.in/check.v1"
 )
 
 func (s *RethinkSuite) TestTimeTime(c *test.C) {
