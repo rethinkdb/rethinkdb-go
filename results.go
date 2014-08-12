@@ -199,6 +199,9 @@ func (c *Cursor) All(result interface{}) error {
 // One retrieves a single document from the result set into the provided
 // slice and closes the cursor.
 func (c *Cursor) One(result interface{}) error {
+	if c.IsNil() {
+		return ErrEmptyResult
+	}
 	ok := c.Next(result)
 	if !ok {
 		err := c.Err()
