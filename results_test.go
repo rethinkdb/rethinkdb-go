@@ -1,6 +1,6 @@
 package gorethink
 
-import test "launchpad.net/gocheck"
+import test "gopkg.in/check.v1"
 
 type object struct {
 	Id    int64  `gorethink:"id,omitempty"`

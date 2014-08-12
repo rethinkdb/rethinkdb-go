@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	test "launchpad.net/gocheck"
+	test "gopkg.in/check.v1"
 )
 
 var sess *Session

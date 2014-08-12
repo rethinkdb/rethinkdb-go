@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	test "launchpad.net/gocheck"
+	test "gopkg.in/check.v1"
 )
 
 func (s *RethinkSuite) TestStringMatchSuccess(c *test.C) {

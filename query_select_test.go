@@ -3,7 +3,7 @@ package gorethink
 import (
 	"fmt"
 
-	test "launchpad.net/gocheck"
+	test "gopkg.in/check.v1"
 )
 
 func (s *RethinkSuite) TestSelectGet(c *test.C) {

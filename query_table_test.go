@@ -3,7 +3,7 @@ package gorethink
 import (
 	"sync"
 
-	test "launchpad.net/gocheck"
+	test "gopkg.in/check.v1"
 )
 
 func (s *RethinkSuite) TestTableCreate(c *test.C) {
