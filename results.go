@@ -196,7 +196,7 @@ func (c *Cursor) All(result interface{}) error {
 	return c.Close()
 }
 
-// All retrieves a single document from the result set into the provided
+// One retrieves a single document from the result set into the provided
 // slice and closes the cursor.
 func (c *Cursor) One(result interface{}) error {
 	ok := c.Next(result)
