@@ -196,19 +196,27 @@ func (c *Cursor) All(result interface{}) error {
 	return c.Close()
 }
 
-// All retrieves a single document from the result set into the provided
+// One retrieves a single document from the result set into the provided
 // slice and closes the cursor.
 func (c *Cursor) One(result interface{}) error {
-	ok := c.Next(result)
-	if !ok {
-		err := c.Err()
-		if err == nil {
-			return ErrEmptyResult
-		}
-		return err
+	if c.IsNil() {
+		return ErrEmptyResult
 	}
 
-	return c.Close()
+	var err error
+	ok := c.Next(result)
+	if !ok {
+		err = c.Err()
+		if err == nil {
+			err = ErrEmptyResult
+		}
+	}
+
+	if e := c.Close(); e != nil {
+		err = e
+	}
+
+	return err
 }
 
 // Tests if the current row is nil.

@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.2 - 17 Aug 2014
+
+- Fixed issue causing connections not to be closed correctly (#109)
+- Fixed issue causing terms in optional arguments to be encoded incorrectly (#114)
+
 ## v0.3.1 - 14 June 2014
 
 - Fixed "Token ## not in stream cache" error (#103)
