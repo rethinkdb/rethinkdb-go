@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"runtime"
 	"sort"
+	"time"
 )
 
 // Encode returns the encoded value of v.
@@ -45,6 +46,9 @@ func encode(v reflect.Value) (reflect.Value, error) {
 
 	// Special cases
 	// Time should not be encoded as it is handled by the Expr method
+	if v.Type() == reflect.TypeOf(time.Time{}) {
+		return v, nil
+	}
 	for _, hook := range encodeHooks {
 		success, ret, err := hook(v)
 		if err != nil {
