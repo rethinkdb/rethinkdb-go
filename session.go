@@ -338,8 +338,11 @@ func (s *Session) noreplyWaitQuery() error {
 	defer conn.CloseNoWait()
 
 	_, err = conn.SendQuery(s, q, map[string]interface{}{}, false)
+	if err != nil {
+		return err
+	}
 
-	return err
+	return nil
 }
 
 func (s *Session) getConn() (Connection, error) {

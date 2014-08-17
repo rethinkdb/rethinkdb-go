@@ -263,7 +263,7 @@ func (c *Connection) SendQuery(s *Session, q Query, opts map[string]interface{},
 }
 
 func (c *Connection) Close() error {
-	err := c.s.noreplyWaitQuery()
+	err := c.NoreplyWait()
 	if err != nil {
 		return err
 	}
@@ -277,6 +277,23 @@ func (c *Connection) CloseNoWait() error {
 	c.Unlock()
 
 	return c.s.pool.Put(c.Conn)
+}
+
+// noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
+// TODO: Removed duplicated functions in connection and session
+// for NoReplyWait
+func (c *Connection) NoreplyWait() error {
+	q := Query{
+		Type:  p.Query_NOREPLY_WAIT,
+		Token: c.s.nextToken(),
+	}
+
+	_, err := c.SendQuery(c.s, q, map[string]interface{}{}, false)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func checkErrorResponse(response *Response, t *Term) error {

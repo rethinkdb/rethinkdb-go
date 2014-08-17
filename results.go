@@ -202,16 +202,21 @@ func (c *Cursor) One(result interface{}) error {
 	if c.IsNil() {
 		return ErrEmptyResult
 	}
+
+	var err error
 	ok := c.Next(result)
 	if !ok {
-		err := c.Err()
+		err = c.Err()
 		if err == nil {
-			return ErrEmptyResult
+			err = ErrEmptyResult
 		}
-		return err
 	}
 
-	return c.Close()
+	if e := c.Close(); e != nil {
+		err = e
+	}
+
+	return err
 }
 
 // Tests if the current row is nil.
