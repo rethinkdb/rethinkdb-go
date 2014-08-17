@@ -142,6 +142,36 @@ func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestTransformationOrderByIndexAsc(c *test.C) {
+	Db("test").TableCreate("OrderByIndex").Exec(sess)
+	Db("test").Table("test").IndexDrop("OrderByIndex").Exec(sess)
+
+	// Test database creation
+	Db("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(sess)
+	Db("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(sess)
+
+	query := Db("test").Table("OrderByIndex").OrderBy(OrderByOpts{
+		Index: Asc("test"),
+	})
+
+	var response []interface{}
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, []interface{}{
+		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
+		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
+		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
+		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
+		map[string]interface{}{"num": 25, "id": 9, "g2": 3, "g1": 2},
+		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
+		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
+	})
+}
+
 func (s *RethinkSuite) TestTransformationOrderByMultiple(c *test.C) {
 	query := Expr(objList).OrderBy(Desc("num"), Asc("id"))
 
