@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"time"
 
-	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -73,7 +72,7 @@ func expr(value interface{}, depth int) Term {
 			return makeFunc(val)
 		}
 		if typ.Kind() == reflect.Struct {
-			data, err := encoding.Encode(val)
+			data, err := encode(val)
 
 			if err != nil || data == nil {
 				return Term{

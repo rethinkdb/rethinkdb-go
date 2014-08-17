@@ -142,7 +142,7 @@ func implVarScan(value Term) bool {
 
 // Convert an opt args struct to a map.
 func optArgsToMap(optArgs OptArgs) map[string]interface{} {
-	data, err := encoding.Encode(optArgs)
+	data, err := encode(optArgs)
 
 	if err == nil && data != nil {
 		if m, ok := data.(map[string]interface{}); ok {
@@ -276,4 +276,18 @@ func prefixLines(s string, prefix string) (result string) {
 
 func protobufToString(p proto.Message, indentLevel int) string {
 	return prefixLines(proto.MarshalTextString(p), strings.Repeat("    ", indentLevel))
+}
+
+func encode(v interface{}) (interface{}, error) {
+	encoding.RegisterEncodeHook(func(v reflect.Value) (success bool, ret reflect.Value, err error) {
+		if v.Type() == reflect.TypeOf(time.Time{}) {
+			return true, v, nil
+		} else if v.Type() == reflect.TypeOf(Term{}) {
+			return true, v, nil
+		} else {
+			return false, v, nil
+		}
+	})
+
+	return encoding.Encode(v)
 }
