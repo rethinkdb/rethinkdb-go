@@ -344,11 +344,18 @@ func (s *Session) noreplyWaitQuery() error {
 	}
 
 	conn := s.pool.Get()
-	defer conn.Close()
 
 	_, err := conn.SendQuery(s, q, Term{}, map[string]interface{}{}, false)
+	if err != nil {
+		return err
+	}
 
-	return err
+	err = conn.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *Session) checkCache(token int64) (*Cursor, bool) {
