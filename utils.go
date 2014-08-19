@@ -31,7 +31,12 @@ func constructRootTerm(name string, termType p.Term_TermType, args []interface{}
 // this function adds the previous expression in the tree to the argument list to
 // create a method term.
 func constructMethodTerm(prevVal Term, name string, termType p.Term_TermType, args []interface{}, optArgs map[string]interface{}) Term {
-	args = append([]interface{}{prevVal}, args...)
+
+	if len(args) > 0 && reflect.TypeOf(args[0]).Kind() == reflect.Slice {
+		args = append([]interface{}{prevVal}, args[0].([]interface{})...)
+	} else {
+		args = append([]interface{}{prevVal}, args...)
+	}
 
 	return Term{
 		name:     name,
