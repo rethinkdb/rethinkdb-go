@@ -108,11 +108,13 @@ type WriteResponse struct {
 }
 
 type RunOpts struct {
-	Db          interface{} `gorethink:"db,omitempty"`
-	Profile     interface{} `gorethink:"profile,omitempty"`
-	UseOutdated interface{} `gorethink:"use_outdated,omitempty"`
-	NoReply     interface{} `gorethink:"noreply,omitempty"`
-	TimeFormat  interface{} `gorethink:"time_format,omitempty"`
+	Db           interface{} `gorethink:"db,omitempty"`
+	Profile      interface{} `gorethink:"profile,omitempty"`
+	UseOutdated  interface{} `gorethink:"use_outdated,omitempty"`
+	NoReply      interface{} `gorethink:"noreply,omitempty"`
+	TimeFormat   interface{} `gorethink:"time_format,omitempty"`
+	GroupFormat  interface{} `gorethink:"group_format,omitempty"`
+	BinaryFormat interface{} `gorethink:"binary_format,omitempty"`
 
 	// Unsupported options
 
@@ -145,9 +147,6 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 // RunWrite runs a query using the given connection but unlike Run automatically
 // scans the result into a variable of type WriteResponse. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
-//
-// Optional arguments :
-// "db", "use_outdated" (defaults to false), "noreply" (defaults to false) and "time_format".
 //
 //	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess, r.RunOpts{
 //		NoReply: true,
