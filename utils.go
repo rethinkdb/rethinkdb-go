@@ -101,7 +101,7 @@ func makeFunc(f interface{}) Term {
 func funcWrap(value interface{}) Term {
 	val := Expr(value)
 
-	if implVarScan(val) {
+	if implVarScan(val) && val.termType != p.Term_ARGS {
 		return makeFunc(func(x Term) Term {
 			return val
 		})
