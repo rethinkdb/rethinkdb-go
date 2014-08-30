@@ -89,6 +89,22 @@ func (t Term) IndexList(args ...interface{}) Term {
 	return constructMethodTerm(t, "IndexList", p.Term_INDEX_LIST, args, map[string]interface{}{})
 }
 
+type IndexRenameOpts struct {
+	Overwrite interface{} `gorethink:"overwrite,omitempty"`
+}
+
+func (o *IndexRenameOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
+// IndexRename renames an existing secondary index on a table. If the optional
+// argument overwrite is specified as True, a previously existing index with the
+// new name will be deleted and the index will be renamed. If overwrite is False
+// (the default) an error will be raised if the new index name already exists.
+func (t Term) IndexRename(oldName, newName interface{}, optArgs ...IndexRenameOpts) Term {
+	return constructMethodTerm(t, "IndexRename", p.Term_INDEX_RENAME, []interface{}{oldName, newName}, map[string]interface{}{})
+}
+
 // Get the status of the specified indexes on this table, or the status of all
 // indexes on this table if no indexes are specified.
 func (t Term) IndexStatus(args ...interface{}) Term {
