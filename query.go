@@ -28,58 +28,27 @@ func (t Term) build() interface{} {
 	switch t.termType {
 	case p.Term_DATUM:
 		return t.data
-	default:
-		args := []interface{}{}
-		optArgs := map[string]interface{}{}
-
-		for _, v := range t.args {
-			args = append(args, v.build())
-		}
-
-		for k, v := range t.optArgs {
-			optArgs[k] = v.build()
-		}
-
-		return []interface{}{t.termType, args, optArgs}
-	}
-}
-
-func (t Term) compose(args []string, optArgs map[string]string) string {
-	switch t.termType {
-	case p.Term_MAKE_ARRAY:
-		return fmt.Sprintf("[%s]", strings.Join(argsToStringSlice(t.args), ", "))
-	case p.Term_MAKE_OBJ:
-		return fmt.Sprintf("{%s}", strings.Join(optArgsToStringSlice(t.optArgs), ", "))
-	case p.Term_FUNC:
-		// Get string representation of each argument
-		args := []string{}
-		for _, v := range t.args[0].args {
-			args = append(args, fmt.Sprintf("var_%d", v.data))
-		}
-
-		return fmt.Sprintf("func(%s r.Term) r.Term { return %s }",
-			strings.Join(args, ", "),
-			t.args[1].String(),
-		)
-	case p.Term_VAR:
-		return fmt.Sprintf("var_%s", t.args[0])
-	case p.Term_IMPLICIT_VAR:
-		return "r.Row"
-	case p.Term_DATUM:
-		switch v := t.data.(type) {
-		case string:
-			return strconv.Quote(v)
-		default:
-			return fmt.Sprintf("%v", v)
-		}
-
-	default:
-		if t.rootTerm {
-			return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
-		} else {
-			return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
+	case p.Term_BINARY:
+		if len(t.args) == 0 {
+			return map[string]interface{}{
+				"$reql_type$": "BINARY",
+				"data":        t.data,
+			}
 		}
 	}
+
+	args := []interface{}{}
+	optArgs := map[string]interface{}{}
+
+	for _, v := range t.args {
+		args = append(args, v.build())
+	}
+
+	for k, v := range t.optArgs {
+		optArgs[k] = v.build()
+	}
+
+	return []interface{}{t.termType, args, optArgs}
 }
 
 // String returns a string representation of the query tree
@@ -111,13 +80,16 @@ func (t Term) String() string {
 		default:
 			return fmt.Sprintf("%v", v)
 		}
-
-	default:
-		if t.rootTerm {
-			return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
-		} else {
-			return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
+	case p.Term_BINARY:
+		if len(t.args) == 0 {
+			return fmt.Sprintf("r.binary(<data>)")
 		}
+	}
+
+	if t.rootTerm {
+		return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
+	} else {
+		return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
 	}
 }
 

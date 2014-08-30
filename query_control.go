@@ -1,11 +1,18 @@
 package gorethink
 
 import (
+	"bytes"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"io/ioutil"
 	"reflect"
 	"time"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
+
+var byteSliceType = reflect.TypeOf([]byte(nil))
 
 // Expr converts any value to an expression.  Internally it uses the `json`
 // module to convert any literals, so any type annotations or methods understood
@@ -35,6 +42,16 @@ func expr(value interface{}, depth int) Term {
 		return val
 	case time.Time:
 		return EpochTime(val.Unix())
+	case io.Reader:
+		b, err := ioutil.ReadAll(val)
+		if err != nil {
+			panic(fmt.Sprintf("Error reading bytes from reader: %s", err.Error()))
+		}
+		return Binary(b)
+	case bytes.Buffer:
+		return Binary(val)
+	case []byte:
+		return Binary(val)
 	case []interface{}:
 		vals := []Term{}
 		for _, v := range val {
@@ -84,12 +101,17 @@ func expr(value interface{}, depth int) Term {
 			return expr(data, depth-1)
 		}
 		if typ.Kind() == reflect.Slice || typ.Kind() == reflect.Array {
-			vals := []Term{}
-			for i := 0; i < rval.Len(); i++ {
-				vals = append(vals, expr(rval.Index(i).Interface(), depth))
-			}
+			// Check if slice is a byte slice
+			if typ.Elem().Kind() == reflect.Uint8 {
+				return Binary(rval.Bytes())
+			} else {
+				vals := []Term{}
+				for i := 0; i < rval.Len(); i++ {
+					vals = append(vals, expr(rval.Index(i).Interface(), depth))
+				}
 
-			return makeArray(vals)
+				return makeArray(vals)
+			}
 		}
 		if typ.Kind() == reflect.Map {
 			vals := map[string]Term{}
@@ -162,6 +184,43 @@ func Error(args ...interface{}) Term {
 // of arguments provided at runtime.
 func Args(args ...interface{}) Term {
 	return constructRootTerm("Args", p.Term_ARGS, args, map[string]interface{}{})
+}
+
+// Binary encapsulates binary data within a query.
+func Binary(data interface{}) Term {
+	var b []byte
+
+	switch data := data.(type) {
+	case Term:
+		return constructRootTerm("Binary", p.Term_BINARY, []interface{}{data}, map[string]interface{}{})
+	case io.Reader:
+		var err error
+		b, err = ioutil.ReadAll(data)
+		if err != nil {
+			panic(fmt.Sprintf("Error reading bytes from reader: %s", err.Error()))
+		}
+		return Binary(b)
+	case bytes.Buffer:
+		b = data.Bytes()
+	case []byte:
+		b = data
+	default:
+		typ := reflect.TypeOf(data)
+		if (typ.Kind() == reflect.Slice || typ.Kind() == reflect.Array) &&
+			typ.Elem().Kind() == reflect.Uint8 {
+			return Binary(reflect.ValueOf(data).Bytes())
+		}
+		panic("Unsupported binary type")
+	}
+
+	return binaryTerm(base64.StdEncoding.EncodeToString(b))
+}
+
+func binaryTerm(data string) Term {
+	t := constructRootTerm("Binary", p.Term_BINARY, []interface{}{}, map[string]interface{}{})
+	t.data = data
+
+	return t
 }
 
 // Evaluate the expr in the context of one or more value bindings. The type of
