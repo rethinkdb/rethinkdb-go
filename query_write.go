@@ -8,7 +8,7 @@ type InsertOpts struct {
 	Durability    interface{} `gorethink:"durability,omitempty"`
 	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
 	CacheSize     interface{} `gorethink:"cache_size,omitempty"`
-	Upsert        interface{} `gorethink:"upsert,omitempty"`
+	Conflict      interface{} `gorethink:"conflict,omitempty"`
 }
 
 func (o *InsertOpts) toMap() map[string]interface{} {
@@ -19,7 +19,7 @@ func (o *InsertOpts) toMap() map[string]interface{} {
 // of documents. You may also pass the optional argument durability with value
 // 'hard' or 'soft', to override the table or query's default durability setting,
 // or the optional argument return_changes, which will return the value of the row
-// you're inserting (and the old value if you use upsert) when set to true.
+// you're inserting when set to true.
 //
 //	table.Insert(map[string]interface{}{"name": "Joe", "email": "joe@example.com"}).RunWrite(sess)
 //	table.Insert([]interface{}{map[string]interface{}{"name": "Joe"}, map[string]interface{}{"name": "Paul"}}).RunWrite(sess)
