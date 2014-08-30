@@ -17,7 +17,7 @@ type Cursor struct {
 	mu      sync.Mutex
 	session *Session
 	conn    *Connection
-	query   *p.Query
+	query   Query
 	term    Term
 	opts    map[string]interface{}
 
@@ -25,7 +25,7 @@ type Cursor struct {
 	outstandingRequests int
 	closed              bool
 	finished            bool
-	responses           []*p.Response
+	responses           []*Response
 	profile             interface{}
 	buffer              []interface{}
 }
@@ -123,7 +123,7 @@ func (c *Cursor) Next(result interface{}) bool {
 			// Load the new response into the buffer
 			if len(c.responses) > 0 {
 				var err error
-				c.buffer, err = deconstructDatums(c.responses[0].GetResponse(), c.opts)
+				c.buffer = c.responses[0].Responses
 				if err != nil {
 					c.err = err
 					c.mu.Unlock()
@@ -227,10 +227,10 @@ func (c *Cursor) IsNil() bool {
 	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
 }
 
-func (c *Cursor) extend(response *p.Response) {
+func (c *Cursor) extend(response *Response) {
 	c.mu.Lock()
-	c.finished = response.GetType() != p.Response_SUCCESS_PARTIAL &&
-		response.GetType() != p.Response_SUCCESS_FEED
+	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
+		response.Type != p.Response_SUCCESS_FEED
 	c.responses = append(c.responses, response)
 
 	// Prefetch results if needed
@@ -243,7 +243,7 @@ func (c *Cursor) extend(response *p.Response) {
 
 	// Load the new response into the buffer
 	var err error
-	c.buffer, err = deconstructDatums(c.responses[0].GetResponse(), c.opts)
+	c.buffer = c.responses[0].Responses
 	if err != nil {
 		c.err = err
 
