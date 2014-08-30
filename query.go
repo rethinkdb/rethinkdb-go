@@ -113,6 +113,7 @@ type RunOpts struct {
 	Profile      interface{} `gorethink:"profile,omitempty"`
 	UseOutdated  interface{} `gorethink:"use_outdated,omitempty"`
 	NoReply      interface{} `gorethink:"noreply,omitempty"`
+	ArrayLimit   interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat   interface{} `gorethink:"time_format,omitempty"`
 	GroupFormat  interface{} `gorethink:"group_format,omitempty"`
 	BinaryFormat interface{} `gorethink:"binary_format,omitempty"`
