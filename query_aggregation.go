@@ -13,9 +13,21 @@ func (t Term) Reduce(args ...interface{}) Term {
 	return constructMethodTerm(t, "Reduce", p.Term_REDUCE, funcWrapArgs(args), map[string]interface{}{})
 }
 
+type DistinctOpts struct {
+	Index interface{} `gorethink:"index,omitempty"`
+}
+
+func (o *DistinctOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Remove duplicate elements from the sequence.
-func (t Term) Distinct(args ...interface{}) Term {
-	return constructMethodTerm(t, "Distinct", p.Term_DISTINCT, args, map[string]interface{}{})
+func (t Term) Distinct(optArgs ...DistinctOpts) Term {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return constructMethodTerm(t, "Distinct", p.Term_DISTINCT, []interface{}, opts)
 }
 
 // Takes a stream and partitions it into multiple groups based on the
