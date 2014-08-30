@@ -27,7 +27,7 @@ func (t Term) Distinct(optArgs ...DistinctOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return constructMethodTerm(t, "Distinct", p.Term_DISTINCT, []interface{}, opts)
+	return constructMethodTerm(t, "Distinct", p.Term_DISTINCT, []interface{}{}, opts)
 }
 
 // Takes a stream and partitions it into multiple groups based on the
