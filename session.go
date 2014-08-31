@@ -347,13 +347,17 @@ func (s *Session) noreplyWaitQuery() error {
 
 	return nil
 }
-func (s *Session) getConn() (Connection, error) {
-	c, err := s.pool.Get()
-	if err != nil {
-		return Connection{}, err
+func (s *Session) getConn() (*Connection, error) {
+	if s.pool == nil {
+		return nil, pool.ErrClosed
 	}
 
-	return Connection{Conn: c, s: s}, nil
+	c, err := s.pool.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Connection{Conn: c, s: s}, nil
 }
 
 func (s *Session) checkCache(token int64) (*Cursor, bool) {
