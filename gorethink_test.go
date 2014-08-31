@@ -3,7 +3,10 @@ package gorethink
 import (
 	"encoding/json"
 	"flag"
+	"math/rand"
 	"os"
+	"runtime"
+	"sync"
 	"testing"
 	"time"
 
@@ -202,4 +205,182 @@ var str T = T{
 			"XE1", "XE2",
 		},
 	},
+}
+
+func (s *RethinkSuite) BenchmarkExpr(c *test.C) {
+	for i := 0; i < c.N; i++ {
+		// Test query
+		query := Expr(true)
+		err := query.Exec(sess)
+		c.Assert(err, test.IsNil)
+	}
+}
+
+func (s *RethinkSuite) BenchmarkNoReplyExpr(c *test.C) {
+	for i := 0; i < c.N; i++ {
+		// Test query
+		query := Expr(true)
+		err := query.Exec(sess, RunOpts{NoReply: true})
+		c.Assert(err, test.IsNil)
+	}
+}
+
+func (s *RethinkSuite) BenchmarkGet(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id": i,
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	for i := 0; i < c.N; i++ {
+		n := rand.Intn(100)
+
+		// Test query
+		var response interface{}
+		query := Db("test").Table("TestMany").Get(n)
+		res, err := query.Run(sess)
+		c.Assert(err, test.IsNil)
+
+		err = res.One(&response)
+
+		c.Assert(err, test.IsNil)
+		c.Assert(response, JsonEquals, map[string]interface{}{"id": n})
+	}
+}
+
+func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id":   i,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	for i := 0; i < c.N; i++ {
+		n := rand.Intn(100)
+
+		// Test query
+		var resObj object
+		query := Db("test").Table("TestMany").Get(n)
+		res, err := query.Run(sess)
+		c.Assert(err, test.IsNil)
+
+		err = res.One(&resObj)
+
+		c.Assert(err, test.IsNil)
+	}
+}
+
+func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id": i,
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	for i := 0; i < c.N; i++ {
+		// Test query
+		res, err := Db("test").Table("TestMany").Run(sess)
+		c.Assert(err, test.IsNil)
+
+		var response []map[string]interface{}
+		err = res.All(&response)
+
+		c.Assert(err, test.IsNil)
+		c.Assert(response, test.HasLen, 100)
+	}
+}
+
+func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
+
+	// Insert rows
+	data := []interface{}{}
+	for i := 0; i < 100; i++ {
+		data = append(data, map[string]interface{}{
+			"id":   i,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		})
+	}
+	Db("test").Table("TestMany").Insert(data).Run(sess)
+
+	for i := 0; i < c.N; i++ {
+		// Test query
+		res, err := Db("test").Table("TestMany").Run(sess)
+		c.Assert(err, test.IsNil)
+
+		var response []object
+		err = res.All(&response)
+
+		c.Assert(err, test.IsNil)
+		c.Assert(response, test.HasLen, 100)
+	}
+}
+
+func doConcurrentTest(c *test.C, ct func()) {
+	maxProcs, numReqs := 1, 150
+	if testing.Short() {
+		maxProcs, numReqs = 4, 50
+	}
+	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(maxProcs))
+
+	var wg sync.WaitGroup
+	wg.Add(numReqs)
+
+	reqs := make(chan bool)
+	defer close(reqs)
+
+	for i := 0; i < maxProcs*2; i++ {
+		go func() {
+			for _ = range reqs {
+				ct()
+				if c.Failed() {
+					wg.Done()
+					continue
+				}
+				wg.Done()
+			}
+		}()
+	}
+
+	for i := 0; i < numReqs; i++ {
+		reqs <- true
+	}
+
+	wg.Wait()
 }

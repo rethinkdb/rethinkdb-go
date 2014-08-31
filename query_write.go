@@ -5,10 +5,10 @@ import (
 )
 
 type InsertOpts struct {
-	Durability interface{} `gorethink:"durability,omitempty"`
-	ReturnVals interface{} `gorethink:"return_vals,omitempty"`
-	CacheSize  interface{} `gorethink:"cache_size,omitempty"`
-	Upsert     interface{} `gorethink:"upsert,omitempty"`
+	Durability    interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
+	CacheSize     interface{} `gorethink:"cache_size,omitempty"`
+	Conflict      interface{} `gorethink:"conflict,omitempty"`
 }
 
 func (o *InsertOpts) toMap() map[string]interface{} {
@@ -18,8 +18,8 @@ func (o *InsertOpts) toMap() map[string]interface{} {
 // Insert JSON documents into a table. Accepts a single JSON document or an array
 // of documents. You may also pass the optional argument durability with value
 // 'hard' or 'soft', to override the table or query's default durability setting,
-// or the optional argument return_vals, which will return the value of the row
-// you're inserting (and the old value if you use upsert) when set to true.
+// or the optional argument return_changes, which will return the value of the row
+// you're inserting when set to true.
 //
 //	table.Insert(map[string]interface{}{"name": "Joe", "email": "joe@example.com"}).RunWrite(sess)
 //	table.Insert([]interface{}{map[string]interface{}{"name": "Joe"}, map[string]interface{}{"name": "Paul"}}).RunWrite(sess)
@@ -32,9 +32,9 @@ func (t Term) Insert(arg interface{}, optArgs ...InsertOpts) Term {
 }
 
 type UpdateOpts struct {
-	Durability interface{} `gorethink:"durability,omitempty"`
-	ReturnVals interface{} `gorethink:"return_vals,omitempty"`
-	NotAtomic  interface{} `gorethink:"non_atomic,omitempty"`
+	Durability    interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
+	NotAtomic     interface{} `gorethink:"non_atomic,omitempty"`
 }
 
 func (o *UpdateOpts) toMap() map[string]interface{} {
@@ -44,7 +44,7 @@ func (o *UpdateOpts) toMap() map[string]interface{} {
 // Update JSON documents in a table. Accepts a JSON document, a RQL expression,
 // or a combination of the two. The optional argument durability with value
 // 'hard' or 'soft' will override the table or query's default durability setting.
-// The optional argument return_vals will return the old and new values of the
+// The optional argument return_changes will return the old and new values of the
 // row you're modifying when set to true (only valid for single-row updates).
 // The optional argument non_atomic lets you permit non-atomic updates.
 func (t Term) Update(arg interface{}, optArgs ...UpdateOpts) Term {
@@ -56,9 +56,9 @@ func (t Term) Update(arg interface{}, optArgs ...UpdateOpts) Term {
 }
 
 type ReplaceOpts struct {
-	Durability interface{} `gorethink:"durability,omitempty"`
-	ReturnVals interface{} `gorethink:"return_vals,omitempty"`
-	NotAtomic  interface{} `gorethink:"non_atomic,omitempty"`
+	Durability    interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
+	NotAtomic     interface{} `gorethink:"non_atomic,omitempty"`
 }
 
 func (o *ReplaceOpts) toMap() map[string]interface{} {
@@ -69,7 +69,7 @@ func (o *ReplaceOpts) toMap() map[string]interface{} {
 // and replaces the original document with the new one. The new document must
 // have the same primary key as the original document. The optional argument
 // durability with value 'hard' or 'soft' will override the table or query's
-// default durability setting. The optional argument return_vals will return
+// default durability setting. The optional argument return_changes will return
 // the old and new values of the row you're modifying when set to true (only
 // valid for single-row replacements). The optional argument non_atomic lets
 // you permit non-atomic updates.
@@ -82,15 +82,15 @@ func (t Term) Replace(arg interface{}, optArgs ...ReplaceOpts) Term {
 }
 
 type DeleteOpts struct {
-	Durability interface{} `gorethink:"durability,omitempty"`
-	ReturnVals interface{} `gorethink:"return_vals,omitempty"`
+	Durability    interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
 }
 
 func (o *DeleteOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
-// Delete one or more documents from a table. The optional argument return_vals
+// Delete one or more documents from a table. The optional argument return_changes
 // will return the old value of the row you're deleting when set to true (only
 // valid for single-row deletes). The optional argument durability with value
 // 'hard' or 'soft' will override the table or query's default durability setting.

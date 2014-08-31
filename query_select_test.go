@@ -305,7 +305,7 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 	c.Assert(n, test.Equals, 100)
 }
 
-func (s *RethinkSuite) TestSelectManyConcurrent(c *test.C) {
+func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 	// Ensure table + database exist
 	DbCreate("test").RunWrite(sess)
 	Db("test").TableCreate("TestMany").RunWrite(sess)
@@ -326,7 +326,7 @@ func (s *RethinkSuite) TestSelectManyConcurrent(c *test.C) {
 	}
 
 	// Test queries concurrently
-	attempts := 1
+	attempts := 10
 	waitChannel := make(chan error, attempts)
 
 	for i := 0; i < attempts; i++ {
@@ -355,7 +355,7 @@ func (s *RethinkSuite) TestSelectManyConcurrent(c *test.C) {
 	for i := 0; i < attempts; i++ {
 		ret := <-waitChannel
 		if ret != nil {
-			c.Fatal("non-nil error returned (%s)", ret)
+			c.Fatalf("non-nil error returned (%s)", ret)
 		}
 	}
 }

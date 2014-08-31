@@ -5,9 +5,30 @@ import (
 	"sync/atomic"
 	"time"
 
-	"code.google.com/p/goprotobuf/proto"
+	"gopkg.in/fatih/pool.v1"
+
 	p "github.com/dancannon/gorethink/ql2"
 )
+
+type Query struct {
+	Type       p.Query_QueryType
+	Token      int64
+	Term       *Term
+	GlobalOpts map[string]interface{}
+}
+
+func (q *Query) build() []interface{} {
+	res := []interface{}{q.Type}
+	if q.Term != nil {
+		res = append(res, q.Term.build())
+
+		if len(q.GlobalOpts) > 0 {
+			res = append(res, q.GlobalOpts)
+		}
+	}
+
+	return res
+}
 
 type Session struct {
 	token      int64
@@ -18,8 +39,8 @@ type Session struct {
 	timeFormat string
 
 	// Pool configuration options
-	maxIdle     int
-	maxActive   int
+	initialCap  int
+	maxCap      int
 	idleTimeout time.Duration
 
 	// Response cache, used for batched responses
@@ -28,7 +49,7 @@ type Session struct {
 
 	closed bool
 
-	pool *Pool
+	pool pool.Pool
 }
 
 func newSession(args map[string]interface{}) *Session {
@@ -53,15 +74,15 @@ func newSession(args map[string]interface{}) *Session {
 	}
 
 	// Pool configuration options
-	if maxIdle, ok := args["maxIdle"]; ok {
-		s.maxIdle = maxIdle.(int)
+	if initialCap, ok := args["initialCap"]; ok {
+		s.initialCap = initialCap.(int)
 	} else {
-		s.maxIdle = 1
+		s.initialCap = 5
 	}
-	if maxActive, ok := args["maxActive"]; ok {
-		s.maxActive = maxActive.(int)
+	if maxCap, ok := args["maxCap"]; ok {
+		s.maxCap = maxCap.(int)
 	} else {
-		s.maxActive = 0
+		s.maxCap = 30
 	}
 	if idleTimeout, ok := args["idleTimeout"]; ok {
 		s.idleTimeout = idleTimeout.(time.Duration)
@@ -127,19 +148,17 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 
 	s.closed = false
 	if s.pool == nil {
-		s.pool = &Pool{
-			Session:     s,
-			MaxIdle:     s.maxIdle,
-			MaxActive:   s.maxActive,
-			IdleTimeout: s.idleTimeout,
+		cp, err := pool.NewChannelPool(s.initialCap, s.maxCap, Dial(s))
+		s.pool = cp
+		if err != nil {
+			return err
 		}
+
+		s.pool = cp
 	}
 
 	// Check the connection
-	conn, err := s.pool.get()
-	if err == nil {
-		conn.Close()
-	}
+	_, err := s.getConn()
 
 	return err
 }
@@ -156,13 +175,12 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 		}
 	}
 
-	var err error
 	if s.pool != nil {
-		err = s.pool.Close()
+		s.pool.Close()
 	}
 	s.closed = true
 
-	return err
+	return nil
 }
 
 // noreplyWait ensures that previous queries with the noreply flag have been
@@ -183,29 +201,6 @@ func (s *Session) SetTimeout(timeout time.Duration) {
 	s.timeout = timeout
 }
 
-// SetMaxIdleConns sets the maximum number of connections in the idle
-// connection pool.
-//
-// If MaxOpenConns is greater than 0 but less than the new MaxIdleConns
-// then the new MaxIdleConns will be reduced to match the MaxOpenConns limit
-//
-// If n <= 0, no idle connections are retained.
-func (s *Session) SetMaxIdleConns(n int) {
-	s.pool.MaxIdle = n
-}
-
-// SetMaxOpenConns sets the maximum number of open connections to the database.
-//
-// If MaxIdleConns is greater than 0 and the new MaxOpenConns is less than
-// MaxIdleConns, then MaxIdleConns will be reduced to match the new
-// MaxOpenConns limit
-//
-// If n <= 0, then there is no limit on the number of open connections.
-// The default is 0 (unlimited).
-func (s *Session) SetMaxOpenConns(n int) {
-	s.pool.MaxActive = n
-}
-
 // getToken generates the next query token, used to number requests and match
 // responses with requests.
 func (s *Session) nextToken() int64 {
@@ -217,52 +212,45 @@ func (s *Session) nextToken() int64 {
 func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
 	token := s.nextToken()
 
-	// Build query tree
-	pt := t.build()
-
 	// Build global options
-	globalOpts := []*p.Query_AssocPair{}
+	globalOpts := map[string]interface{}{}
 	for k, v := range opts {
-		globalOpts = append(globalOpts, &p.Query_AssocPair{
-			Key: proto.String(k),
-			Val: Expr(v).build(),
-		})
+		globalOpts[k] = Expr(v).build()
 	}
 
 	// If no DB option was set default to the value set in the connection
 	if _, ok := opts["db"]; !ok {
-		globalOpts = append(globalOpts, &p.Query_AssocPair{
-			Key: proto.String("db"),
-			Val: Db(s.database).build(),
-		})
+		globalOpts["db"] = Db(s.database).build()
 	}
 
 	// Construct query
-	q := &p.Query{
-		AcceptsRJson:  proto.Bool(true),
-		Type:          p.Query_START.Enum(),
-		Token:         proto.Int64(token),
-		Query:         pt,
-		GlobalOptargs: globalOpts,
+	q := Query{
+		Type:       p.Query_START,
+		Token:      token,
+		Term:       &t,
+		GlobalOpts: globalOpts,
 	}
 
 	// Get a connection from the pool, do not close yet as it
 	// might be needed later if a partial response is returned
-	conn := s.pool.Get()
+	conn, err := s.getConn()
+	if err != nil {
+		return nil, err
+	}
 
-	return conn.SendQuery(s, q, t, opts, false)
+	return conn.SendQuery(s, q, opts, false)
 }
 
-func (s *Session) handleBatchResponse(cursor *Cursor, response *p.Response) {
+func (s *Session) handleBatchResponse(cursor *Cursor, response *Response) {
 	cursor.extend(response)
 
 	s.Lock()
 	cursor.outstandingRequests -= 1
 
-	if response.GetType() != p.Response_SUCCESS_PARTIAL &&
-		response.GetType() != p.Response_SUCCESS_FEED &&
+	if response.Type != p.Response_SUCCESS_PARTIAL &&
+		response.Type != p.Response_SUCCESS_FEED &&
 		cursor.outstandingRequests == 0 {
-		delete(s.cache, response.GetToken())
+		delete(s.cache, response.Token)
 	}
 	s.Unlock()
 }
@@ -275,7 +263,7 @@ func (s *Session) continueQuery(cursor *Cursor) error {
 		return err
 	}
 
-	response, err := cursor.conn.ReadResponse(s, cursor.query.GetToken())
+	response, err := cursor.conn.ReadResponse(s, cursor.query.Token)
 	if err != nil {
 		return err
 	}
@@ -297,12 +285,12 @@ func (s *Session) asyncContinueQuery(cursor *Cursor) error {
 	cursor.outstandingRequests = 1
 	s.Unlock()
 
-	q := &p.Query{
-		Type:  p.Query_CONTINUE.Enum(),
+	q := Query{
+		Type:  p.Query_CONTINUE,
 		Token: cursor.query.Token,
 	}
 
-	_, err := cursor.conn.SendQuery(s, q, cursor.term, cursor.opts, true)
+	_, err := cursor.conn.SendQuery(s, q, cursor.opts, true)
 	if err != nil {
 		return err
 	}
@@ -316,17 +304,18 @@ func (s *Session) stopQuery(cursor *Cursor) error {
 	cursor.outstandingRequests += 1
 	cursor.mu.Unlock()
 
-	q := &p.Query{
-		Type:  p.Query_STOP.Enum(),
+	q := Query{
+		Type:  p.Query_STOP,
 		Token: cursor.query.Token,
+		Term:  &cursor.term,
 	}
 
-	_, err := cursor.conn.SendQuery(s, q, cursor.term, cursor.opts, false)
+	_, err := cursor.conn.SendQuery(s, q, cursor.opts, false)
 	if err != nil {
 		return err
 	}
 
-	response, err := cursor.conn.ReadResponse(s, cursor.query.GetToken())
+	response, err := cursor.conn.ReadResponse(s, cursor.query.Token)
 	if err != nil {
 		return err
 	}
@@ -338,17 +327,18 @@ func (s *Session) stopQuery(cursor *Cursor) error {
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
 func (s *Session) noreplyWaitQuery() error {
-	q := &p.Query{
-		Type:  p.Query_NOREPLY_WAIT.Enum(),
-		Token: proto.Int64(s.nextToken()),
+	q := Query{
+		Type:  p.Query_NOREPLY_WAIT,
+		Token: s.nextToken(),
 	}
 
-	conn := s.pool.Get()
-
-	_, err := conn.SendQuery(s, q, Term{}, map[string]interface{}{}, false)
+	conn, err := s.getConn()
 	if err != nil {
 		return err
 	}
+	defer conn.CloseNoWait()
+
+	_, err = conn.SendQuery(s, q, map[string]interface{}{}, false)
 
 	err = conn.Close()
 	if err != nil {
@@ -356,6 +346,18 @@ func (s *Session) noreplyWaitQuery() error {
 	}
 
 	return nil
+}
+func (s *Session) getConn() (*Connection, error) {
+	if s.pool == nil {
+		return nil, pool.ErrClosed
+	}
+
+	c, err := s.pool.Get()
+	if err != nil {
+		return nil, err
+	}
+
+	return &Connection{Conn: c, s: s}, nil
 }
 
 func (s *Session) checkCache(token int64) (*Cursor, bool) {

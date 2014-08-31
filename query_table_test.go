@@ -198,13 +198,27 @@ func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
 }
 
+func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
+	Db("test").Table("test").IndexCreate("test").Exec(sess)
+
+	// Test index rename
+	query := Db("test").Table("test").IndexRename("test", "test2")
+
+	res, err := query.RunWrite(sess)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(res.Renamed, JsonEquals, 1)
+}
+
 func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	Db("test").TableDrop("changes").Exec(sess)
 	Db("test").TableCreate("changes").Exec(sess)
 
 	var n int
 
-	rows, err := Db("test").Table("changes").Changes().Run(sess)
+	res, err := Db("test").Table("changes").Changes().Run(sess)
 	if err != nil {
 		c.Fatal(err.Error())
 	}
@@ -215,12 +229,13 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	// Use goroutine to wait for changes. Prints the first 10 results
 	go func() {
 		var response interface{}
-		for n < 10 && rows.Next(&response) {
+		for n < 10 && res.Next(&response) {
+			// log.Println(response)
 			n++
 		}
 
-		if rows.Err() != nil {
-			c.Fatal(rows.Err())
+		if res.Err() != nil {
+			c.Fatal(res.Err())
 		}
 
 		wg.Done()
