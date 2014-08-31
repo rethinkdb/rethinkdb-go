@@ -164,14 +164,18 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 
 // Exec runs the query but does not return the result.
 func (t Term) Exec(s *Session, optArgs ...RunOpts) error {
-	res, err := t.Run(s, optArgs...)
+	_, err := t.Run(s, optArgs...)
 	if err != nil {
 		return err
 	}
-	err = res.Close()
-	if err != nil {
-		return err
-	}
+	// if res == nil {
+	// 	return nil
+	// }
+
+	// err = res.Close()
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

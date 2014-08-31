@@ -154,6 +154,7 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 			return err
 		}
 
+		s.pool = cp
 	}
 
 	// Check the connection
@@ -346,7 +347,6 @@ func (s *Session) noreplyWaitQuery() error {
 
 	return nil
 }
-
 func (s *Session) getConn() (Connection, error) {
 	c, err := s.pool.Get()
 	if err != nil {
