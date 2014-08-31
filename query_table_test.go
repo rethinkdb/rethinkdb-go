@@ -198,6 +198,20 @@ func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
 }
 
+func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
+	Db("test").Table("test").IndexCreate("test").Exec(sess)
+
+	// Test index rename
+	query := Db("test").Table("test").IndexRename("test", "test2")
+
+	res, err := query.RunWrite(sess)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(res.Renamed, JsonEquals, 1)
+}
+
 func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	Db("test").TableDrop("changes").Exec(sess)
 	Db("test").TableCreate("changes").Exec(sess)

@@ -1,10 +1,7 @@
 package gorethink
 
 import (
-	"fmt"
-	"math"
 	"reflect"
-	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -186,50 +183,6 @@ func mergeArgs(args ...interface{}) []interface{} {
 	}
 
 	return newArgs
-}
-
-// Pseudo-type helper functions
-
-func reqlTimeToNativeTime(timestamp float64, timezone string) (time.Time, error) {
-	sec, ms := math.Modf(timestamp)
-
-	t := time.Unix(int64(sec), int64(ms*1000*1000*1000))
-
-	// Caclulate the timezone
-	if timezone != "" {
-		hours, err := strconv.Atoi(timezone[1:3])
-		if err != nil {
-			return time.Time{}, err
-		}
-		minutes, err := strconv.Atoi(timezone[4:6])
-		if err != nil {
-			return time.Time{}, err
-		}
-		tzOffset := ((hours * 60) + minutes) * 60
-		if timezone[:1] == "-" {
-			tzOffset = 0 - tzOffset
-		}
-
-		t = t.In(time.FixedZone(timezone, tzOffset))
-	}
-
-	return t, nil
-}
-
-func reqlGroupedDataToObj(obj map[string]interface{}) (interface{}, error) {
-	if data, ok := obj["data"]; ok {
-		ret := []interface{}{}
-		for _, v := range data.([]interface{}) {
-			v := v.([]interface{})
-			ret = append(ret, map[string]interface{}{
-				"group":     v[0],
-				"reduction": v[1],
-			})
-		}
-		return ret, nil
-	} else {
-		return nil, fmt.Errorf("pseudo-type GROUPED_DATA object %v does not have the expected field \"data\"", obj)
-	}
 }
 
 // Helper functions for debugging
