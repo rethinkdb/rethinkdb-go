@@ -19,6 +19,9 @@ func Example_Get() {
 		Address: url,
 		AuthKey: authKey,
 	})
+	if err != nil {
+		log.Fatalf("Error connecting to DB: %s", err)
+	}
 
 	// Setup table
 	r.Db("test").TableDrop("table").Run(sess)
@@ -59,6 +62,9 @@ func Example_GetAll_Compound() {
 		Address: url,
 		AuthKey: authKey,
 	})
+	if err != nil {
+		log.Fatalf("Error connecting to DB: %s", err)
+	}
 
 	// Setup table
 	r.Db("test").TableDrop("table").Run(sess)
