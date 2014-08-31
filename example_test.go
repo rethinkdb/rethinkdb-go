@@ -28,7 +28,7 @@ func Example() {
 		AuthKey: authKey,
 	})
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatalf("Error connecting to DB: %s", err)
 	}
 
 	res, err := r.Expr("Hello World").Run(session)

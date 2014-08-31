@@ -12,6 +12,9 @@ func Example_TableCreate() {
 		Address: url,
 		AuthKey: authKey,
 	})
+	if err != nil {
+		log.Fatalf("Error connecting to DB: %s", err)
+	}
 
 	// Setup database
 	r.Db("test").TableDrop("table").Run(sess)
@@ -32,6 +35,9 @@ func Example_IndexCreate() {
 		Address: url,
 		AuthKey: authKey,
 	})
+	if err != nil {
+		log.Fatalf("Error connecting to DB: %s", err)
+	}
 
 	// Setup database
 	r.Db("test").TableDrop("table").Run(sess)
@@ -53,6 +59,9 @@ func Example_IndexCreate_compound() {
 		Address: url,
 		AuthKey: authKey,
 	})
+	if err != nil {
+		log.Fatalf("Error connecting to DB: %s", err)
+	}
 
 	// Setup database
 	r.Db("test").TableDrop("table").Run(sess)
