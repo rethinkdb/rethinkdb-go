@@ -1,5 +1,24 @@
 # Changelog
 
+## v0.4.0 - 13 Aug 2014
+
+- Updated the driver to support RethinkDB v1.14 (#116)
+- Added the Binary data type
+- Added the Binary command which takes a `[]byte`, `io.Reader` or `bytes.Buffer{}` as an argument.
+- Added the `BinaryFormat` optional argument to `RunOpts` 
+- Added the `GroupFormat` optional argument to `RunOpts` 
+- Added the `ArrayLimit` optional argument to `RunOpts` 
+- Renamed the `ReturnVals` optional argument to `ReturnChanges` 
+- Renamed the `Upsert` optional argument to `Conflict` 
+- Added the `IndexRename` command
+- Updated `Distinct` to now take the `Index` optional argument (using `DistinctOpts`)
+
+### Internal Changes
+
+- Updated to use the new JSON protocol
+- Switched the connection pool code to use github.com/fatih/pool
+- Added some benchmarks
+
 ## v0.3.2 - 17 Aug 2014
 
 - Fixed issue causing connections not to be closed correctly (#109)
