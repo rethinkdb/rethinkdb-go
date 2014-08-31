@@ -1,7 +1,7 @@
 box: wercker/golang
 # Services
 services:
-    - dancannon/rethinkdb@1.14
+    - dancannon/rethinkdb@0.1.14
 # Build definition
 build:
     # The steps that will be executed on build
