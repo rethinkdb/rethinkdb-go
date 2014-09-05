@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.1 - 5 Sept 2014
+
+- Fixed bug causing Pseudotypes to not be decoded properly (#117)
+- Updated github.com/fatih/pool to v2 (#118)
+
 ## v0.4.0 - 13 Aug 2014
 
 - Updated the driver to support RethinkDB v1.14 (#116)

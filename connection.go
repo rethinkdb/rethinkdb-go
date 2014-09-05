@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"gopkg.in/fatih/pool.v1"
+	"gopkg.in/fatih/pool.v2"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -37,7 +37,6 @@ type Connection struct {
 	s *Session
 
 	sync.Mutex
-	closed bool
 }
 
 // Dial closes the previous connection and attempts to connect again.
@@ -155,11 +154,6 @@ func (c *Connection) SendQuery(s *Session, q Query, opts map[string]interface{},
 		return nil, RqlDriverError{"Error building query"}
 	}
 
-	// Ensure that the connection is not closed
-	if s.closed {
-		return nil, RqlDriverError{"Connection is closed"}
-	}
-
 	// Set timeout
 	if s.timeout == 0 {
 		c.SetDeadline(time.Time{})
@@ -268,15 +262,7 @@ func (c *Connection) Close() error {
 		return err
 	}
 
-	return c.CloseNoWait()
-}
-
-func (c *Connection) CloseNoWait() error {
-	c.Lock()
-	c.closed = true
-	c.Unlock()
-
-	return c.s.pool.Put(c.Conn)
+	return c.Conn.Close()
 }
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.

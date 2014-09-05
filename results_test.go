@@ -1,6 +1,10 @@
 package gorethink
 
-import test "gopkg.in/check.v1"
+import (
+	"time"
+
+	test "gopkg.in/check.v1"
+)
 
 type object struct {
 	Id    int64  `gorethink:"id,omitempty"`
@@ -131,6 +135,23 @@ func (s *RethinkSuite) TestRowsStruct(c *test.C) {
 			Value: "value 1",
 		}},
 	})
+}
+
+func (s *RethinkSuite) TestRowsStructPseudoTypes(c *test.C) {
+	t := time.Now()
+
+	res, err := Expr(map[string]interface{}{
+		"T": time.Unix(t.Unix(), 0).In(time.UTC),
+		"B": []byte("hello"),
+	}).Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var response PseudoTypes
+	err = res.One(&response)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(response.T.Equal(time.Unix(t.Unix(), 0)), test.Equals, true)
+	c.Assert(response.B, JsonEquals, []byte("hello"))
 }
 
 func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
