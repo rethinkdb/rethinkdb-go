@@ -5,7 +5,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gopkg.in/fatih/pool.v1"
+	"gopkg.in/fatih/pool.v2"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -336,7 +336,7 @@ func (s *Session) noreplyWaitQuery() error {
 	if err != nil {
 		return err
 	}
-	defer conn.CloseNoWait()
+	defer conn.Conn.Close()
 
 	_, err = conn.SendQuery(s, q, map[string]interface{}{}, false)
 

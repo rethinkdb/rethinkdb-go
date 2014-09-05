@@ -171,6 +171,11 @@ type Y struct {
 	YD TMap
 }
 
+type PseudoTypes struct {
+	T time.Time
+	B []byte
+}
+
 var str T = T{
 	A: "A",
 	B: 1,

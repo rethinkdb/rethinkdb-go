@@ -148,8 +148,15 @@ func (c *Cursor) Next(result interface{}) bool {
 	var data interface{}
 	data, c.buffer = c.buffer[0], c.buffer[1:]
 
+	data, err := recursivelyConvertPseudotype(data, c.opts)
+	if err != nil {
+		c.err = err
+		c.mu.Unlock()
+		return false
+	}
+
 	c.mu.Unlock()
-	err := encoding.Decode(result, data)
+	err = encoding.Decode(result, data)
 	if err != nil {
 		c.mu.Lock()
 		if c.err == nil {
