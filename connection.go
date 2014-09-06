@@ -163,7 +163,6 @@ func (c *Connection) SendQuery(s *Session, q Query, opts map[string]interface{},
 
 	// Send a unique 8-byte token
 	if err = binary.Write(c, binary.LittleEndian, q.Token); err != nil {
-		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
@@ -266,8 +265,6 @@ func (c *Connection) Close() error {
 }
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
-// TODO: Removed duplicated functions in connection and session
-// for NoReplyWait
 func (c *Connection) NoreplyWait() error {
 	q := Query{
 		Type:  p.Query_NOREPLY_WAIT,
@@ -282,8 +279,30 @@ func (c *Connection) NoreplyWait() error {
 	return nil
 }
 
+<<<<<<< Updated upstream
 func checkErrorResponse(response *Response, t *Term) error {
 	switch response.Type {
+=======
+// noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
+// TODO: Removed duplicated functions in connection and session
+// for NoReplyWait
+func (c *Connection) NoreplyWait() error {
+	q := &p.Query{
+		Type:  p.Query_NOREPLY_WAIT.Enum(),
+		Token: proto.Int64(c.s.nextToken()),
+	}
+
+	_, err := c.SendQuery(c.s, q, Term{}, map[string]interface{}{}, false)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func checkErrorResponse(response *p.Response, t Term) error {
+	switch response.GetType() {
+>>>>>>> Stashed changes
 	case p.Response_CLIENT_ERROR:
 		return RqlClientError{rqlResponseError{response, t}}
 	case p.Response_COMPILE_ERROR:

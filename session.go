@@ -327,24 +327,25 @@ func (s *Session) stopQuery(cursor *Cursor) error {
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
 func (s *Session) noreplyWaitQuery() error {
-	q := Query{
-		Type:  p.Query_NOREPLY_WAIT,
-		Token: s.nextToken(),
-	}
-
 	conn, err := s.getConn()
 	if err != nil {
 		return err
 	}
-	defer conn.Conn.Close()
 
-	_, err = conn.SendQuery(s, q, map[string]interface{}{}, false)
-
-	err = conn.Close()
+	q := Query{
+		Type:  p.Query_NOREPLY_WAIT,
+		Token: s.nextToken(),
+	}
+	cur, err := conn.SendQuery(s, q, map[string]interface{}{}, false)
+	if err != nil {
+		return err
+	}
+	err = cur.Close()
 	if err != nil {
 		return err
 	}
 
+<<<<<<< Updated upstream
 	return nil
 }
 func (s *Session) getConn() (*Connection, error) {
@@ -358,6 +359,21 @@ func (s *Session) getConn() (*Connection, error) {
 	}
 
 	return &Connection{Conn: c, s: s}, nil
+=======
+	conn := s.pool.Get()
+
+	_, err := conn.SendQuery(s, q, Term{}, map[string]interface{}{}, false)
+	if err != nil {
+		return err
+	}
+
+	err = conn.Close()
+	if err != nil {
+		return err
+	}
+
+	return nil
+>>>>>>> Stashed changes
 }
 
 func (s *Session) checkCache(token int64) (*Cursor, bool) {
