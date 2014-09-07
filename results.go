@@ -206,16 +206,11 @@ func (c *Cursor) All(result interface{}) error {
 // One retrieves a single document from the result set into the provided
 // slice and closes the cursor.
 func (c *Cursor) One(result interface{}) error {
-<<<<<<< Updated upstream
 	if c.IsNil() {
 		return ErrEmptyResult
 	}
 
 	var err error
-=======
-	var err error
-
->>>>>>> Stashed changes
 	ok := c.Next(result)
 	if !ok {
 		err = c.Err()

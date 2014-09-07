@@ -345,9 +345,9 @@ func (s *Session) noreplyWaitQuery() error {
 		return err
 	}
 
-<<<<<<< Updated upstream
 	return nil
 }
+
 func (s *Session) getConn() (*Connection, error) {
 	if s.pool == nil {
 		return nil, pool.ErrClosed
@@ -359,21 +359,6 @@ func (s *Session) getConn() (*Connection, error) {
 	}
 
 	return &Connection{Conn: c, s: s}, nil
-=======
-	conn := s.pool.Get()
-
-	_, err := conn.SendQuery(s, q, Term{}, map[string]interface{}{}, false)
-	if err != nil {
-		return err
-	}
-
-	err = conn.Close()
-	if err != nil {
-		return err
-	}
-
-	return nil
->>>>>>> Stashed changes
 }
 
 func (s *Session) checkCache(token int64) (*Cursor, bool) {
