@@ -102,10 +102,14 @@ type WriteResponse struct {
 	Replaced      int
 	Renamed       int
 	Deleted       int
-	GeneratedKeys []string    `gorethink:"generated_keys"`
-	FirstError    string      `gorethink:"first_error"` // populated if Errors > 0
-	NewValue      interface{} `gorethink:"new_val"`
-	OldValue      interface{} `gorethink:"old_val"`
+	GeneratedKeys []string `gorethink:"generated_keys"`
+	FirstError    string   `gorethink:"first_error"` // populated if Errors > 0
+	Changes       []WriteChanges
+}
+
+type WriteChanges struct {
+	NewValue interface{} `gorethink:"new_val"`
+	OldValue interface{} `gorethink:"old_val"`
 }
 
 type RunOpts struct {
