@@ -163,7 +163,6 @@ func (c *Connection) SendQuery(s *Session, q Query, opts map[string]interface{},
 
 	// Send a unique 8-byte token
 	if err = binary.Write(c, binary.LittleEndian, q.Token); err != nil {
-		c.Close()
 		return nil, RqlConnectionError{err.Error()}
 	}
 
@@ -266,8 +265,6 @@ func (c *Connection) Close() error {
 }
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
-// TODO: Removed duplicated functions in connection and session
-// for NoReplyWait
 func (c *Connection) NoreplyWait() error {
 	q := Query{
 		Type:  p.Query_NOREPLY_WAIT,

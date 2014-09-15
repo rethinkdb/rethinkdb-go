@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.4.2 - 6 Sept 2014
+
+- Fixed issue causing `Close` to start an infinite loop
+- Tidied up connection closing logic
+
 ## v0.4.1 - 5 Sept 2014
 
 - Fixed bug causing Pseudotypes to not be decoded properly (#117)

@@ -10,6 +10,17 @@ func (s *RethinkSuite) TestWriteInsert(c *test.C) {
 	c.Assert(err, test.IsNil)
 }
 
+func (s *RethinkSuite) TestWriteInsertChanges(c *test.C) {
+	query := Db("test").Table("test").Insert([]interface{}{
+		map[string]interface{}{"num": 1},
+		map[string]interface{}{"num": 2},
+	}, InsertOpts{ReturnChanges: true})
+	res, err := query.RunWrite(sess)
+	c.Assert(err, test.IsNil)
+	c.Assert(res.Inserted, test.Equals, 2)
+	c.Assert(len(res.Changes), test.Equals, 2)
+}
+
 func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 	var response map[string]interface{}
 	o := object{
