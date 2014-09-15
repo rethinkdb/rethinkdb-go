@@ -137,10 +137,10 @@ func (o *RunOpts) toMap() map[string]interface{} {
 //	if err != nil {
 //		// error
 //	}
-//	for rows.Next() {
-//		doc := MyDocumentType{}
-//		err := r.Scan(&doc)
-//		    // Do something with row
+//
+//  var doc MyDocumentType
+//	for rows.Next(&doc) {
+//      // Do something with document
 //	}
 func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 	opts := map[string]interface{}{}
