@@ -102,10 +102,14 @@ type WriteResponse struct {
 	Replaced      int
 	Renamed       int
 	Deleted       int
-	GeneratedKeys []string    `gorethink:"generated_keys"`
-	FirstError    string      `gorethink:"first_error"` // populated if Errors > 0
-	NewValue      interface{} `gorethink:"new_val"`
-	OldValue      interface{} `gorethink:"old_val"`
+	GeneratedKeys []string `gorethink:"generated_keys"`
+	FirstError    string   `gorethink:"first_error"` // populated if Errors > 0
+	Changes       []WriteChanges
+}
+
+type WriteChanges struct {
+	NewValue interface{} `gorethink:"new_val"`
+	OldValue interface{} `gorethink:"old_val"`
 }
 
 type RunOpts struct {
@@ -133,10 +137,10 @@ func (o *RunOpts) toMap() map[string]interface{} {
 //	if err != nil {
 //		// error
 //	}
-//	for rows.Next() {
-//		doc := MyDocumentType{}
-//		err := r.Scan(&doc)
-//		    // Do something with row
+//
+//  var doc MyDocumentType
+//	for rows.Next(&doc) {
+//      // Do something with document
 //	}
 func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 	opts := map[string]interface{}{}
@@ -164,18 +168,18 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 
 // Exec runs the query but does not return the result.
 func (t Term) Exec(s *Session, optArgs ...RunOpts) error {
-	_, err := t.Run(s, optArgs...)
+	res, err := t.Run(s, optArgs...)
 	if err != nil {
 		return err
 	}
-	// if res == nil {
-	// 	return nil
-	// }
+	if res == nil {
+		return nil
+	}
 
-	// err = res.Close()
-	// if err != nil {
-	// 	return err
-	// }
+	err = res.Close()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
