@@ -231,15 +231,22 @@ func protobufToString(p proto.Message, indentLevel int) string {
 	return prefixLines(proto.MarshalTextString(p), strings.Repeat("    ", indentLevel))
 }
 
+var timeType = reflect.TypeOf(time.Time{})
+var termType = reflect.TypeOf(Term{})
+
 func encode(v interface{}) (interface{}, error) {
+	if _, ok := v.(Term); ok {
+		return v, nil
+	}
+
 	encoding.RegisterEncodeHook(func(v reflect.Value) (success bool, ret reflect.Value, err error) {
-		if v.Type() == reflect.TypeOf(time.Time{}) {
-			return true, v, nil
-		} else if v.Type() == reflect.TypeOf(Term{}) {
-			return true, v, nil
-		} else {
-			return false, v, nil
+		if v.Kind() == reflect.Struct {
+			if v.Type().ConvertibleTo(timeType) || v.Type().ConvertibleTo(termType) {
+				return true, v, nil
+			}
 		}
+
+		return false, v, nil
 	})
 
 	return encoding.Encode(v)

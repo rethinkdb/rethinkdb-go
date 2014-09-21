@@ -4,7 +4,6 @@ import (
 	"image"
 	"reflect"
 	"testing"
-	"time"
 )
 
 var encodeExpected = map[string]interface{}{
@@ -108,9 +107,6 @@ type Optionals struct {
 
 	Mr map[string]interface{} `gorethink:"mr"`
 	Mo map[string]interface{} `gorethink:",omitempty"`
-
-	Tr time.Time `gorethink:"tr"`
-	To time.Time `gorethink:",omitempty"`
 }
 
 var optionalsExpected = map[string]interface{}{
@@ -118,7 +114,6 @@ var optionalsExpected = map[string]interface{}{
 	"omitempty": 0,
 	"slr":       []interface{}(nil),
 	"mr":        map[string]interface{}{},
-	"tr":        time.Time{},
 }
 
 func TestOmitEmpty(t *testing.T) {
@@ -126,7 +121,6 @@ func TestOmitEmpty(t *testing.T) {
 	o.Sw = "something"
 	o.Mr = map[string]interface{}{}
 	o.Mo = map[string]interface{}{}
-	o.Tr = time.Time{}
 
 	got, err := Encode(&o)
 	if err != nil {
