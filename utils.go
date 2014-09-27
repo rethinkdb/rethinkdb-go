@@ -6,8 +6,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"code.google.com/p/goprotobuf/proto"
 	"github.com/dancannon/gorethink/encoding"
+
+	"code.google.com/p/goprotobuf/proto"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -234,20 +235,15 @@ func protobufToString(p proto.Message, indentLevel int) string {
 var timeType = reflect.TypeOf(time.Time{})
 var termType = reflect.TypeOf(Term{})
 
-func encode(v interface{}) (interface{}, error) {
-	if _, ok := v.(Term); ok {
-		return v, nil
+func encode(data interface{}) (interface{}, error) {
+	if _, ok := data.(Term); ok {
+		return data, nil
 	}
 
-	encoding.RegisterEncodeHook(func(v reflect.Value) (success bool, ret reflect.Value, err error) {
-		if v.Kind() == reflect.Struct {
-			if v.Type().ConvertibleTo(timeType) || v.Type().ConvertibleTo(termType) {
-				return true, v, nil
-			}
-		}
+	v, err := encoding.Encode(data)
+	if err != nil {
+		return nil, err
+	}
 
-		return false, v, nil
-	})
-
-	return encoding.Encode(v)
+	return v, nil
 }

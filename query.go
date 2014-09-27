@@ -121,9 +121,9 @@ type RunOpts struct {
 	TimeFormat   interface{} `gorethink:"time_format,omitempty"`
 	GroupFormat  interface{} `gorethink:"group_format,omitempty"`
 	BinaryFormat interface{} `gorethink:"binary_format,omitempty"`
+	EncodeExpr   interface{} `gorethink:"encode_expr,omitempty"`
 
 	// Unsupported options
-
 	BatchConf interface{} `gorethink:"batch_conf,omitempty"`
 }
 
