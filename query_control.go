@@ -104,14 +104,13 @@ func expr(value interface{}, depth int) Term {
 			// Check if slice is a byte slice
 			if typ.Elem().Kind() == reflect.Uint8 {
 				return Binary(rval.Bytes())
-			} else {
-				vals := []Term{}
-				for i := 0; i < rval.Len(); i++ {
-					vals = append(vals, expr(rval.Index(i).Interface(), depth))
-				}
-
-				return makeArray(vals)
 			}
+			vals := []Term{}
+			for i := 0; i < rval.Len(); i++ {
+				vals = append(vals, expr(rval.Index(i).Interface(), depth))
+			}
+
+			return makeArray(vals)
 		}
 		if typ.Kind() == reflect.Map {
 			vals := map[string]Term{}

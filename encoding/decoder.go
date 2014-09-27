@@ -331,7 +331,7 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 
 	for _, key := range sv.MapKeys() {
 		var subdv reflect.Value
-		var subsv reflect.Value = sv.MapIndex(key)
+		var subsv = sv.MapIndex(key)
 
 		skey := key.Interface().(string)
 

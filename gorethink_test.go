@@ -176,7 +176,7 @@ type PseudoTypes struct {
 	B []byte
 }
 
-var str T = T{
+var str = T{
 	A: "A",
 	B: 1,
 	C: 1,

@@ -141,9 +141,8 @@ func reqlGroupedDataToObj(obj map[string]interface{}) (interface{}, error) {
 			})
 		}
 		return ret, nil
-	} else {
-		return nil, fmt.Errorf("pseudo-type GROUPED_DATA object %v does not have the expected field \"data\"", obj)
 	}
+	return nil, fmt.Errorf("pseudo-type GROUPED_DATA object %v does not have the expected field \"data\"", obj)
 }
 
 func reqlBinaryToNativeBytes(obj map[string]interface{}) (interface{}, error) {
@@ -155,10 +154,8 @@ func reqlBinaryToNativeBytes(obj map[string]interface{}) (interface{}, error) {
 			}
 
 			return b, nil
-		} else {
-			return nil, fmt.Errorf("pseudo-type BINARY object %v field \"data\" is not valid", obj)
 		}
-	} else {
-		return nil, fmt.Errorf("pseudo-type BINARY object %v does not have the expected field \"data\"", obj)
+		return nil, fmt.Errorf("pseudo-type BINARY object %v field \"data\" is not valid", obj)
 	}
+	return nil, fmt.Errorf("pseudo-type BINARY object %v does not have the expected field \"data\"", obj)
 }
