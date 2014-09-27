@@ -28,6 +28,12 @@ func (t Term) build() interface{} {
 	switch t.termType {
 	case p.Term_DATUM:
 		return t.data
+	case p.Term_MAKE_OBJ:
+		res := map[string]interface{}{}
+		for k, v := range t.optArgs {
+			res[k] = v.build()
+		}
+		return res
 	case p.Term_BINARY:
 		if len(t.args) == 0 {
 			return map[string]interface{}{
