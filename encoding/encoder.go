@@ -97,7 +97,7 @@ func encode(v reflect.Value) (reflect.Value, error) {
 			return reflect.Zero(reflect.TypeOf(map[string]interface{}{})), nil
 		}
 
-		var sv = v.MapKeys()
+		var sv stringValues = v.MapKeys()
 		sort.Sort(sv)
 		for _, k := range sv {
 			ev, err := encode(v.MapIndex(k))
