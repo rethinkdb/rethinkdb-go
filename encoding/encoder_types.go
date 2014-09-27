@@ -308,9 +308,9 @@ func timePseudoTypeEncoder(v reflect.Value) interface{} {
 	t := v.Interface().(time.Time)
 
 	return map[string]interface{}{
-		"$REQL_TYPE": "TIME",
-		"timestamp":  t.Unix(),
-		"timezone":   "+00:00",
+		"$reql_type$": "TIME",
+		"epoch_time":  t.Unix(),
+		"timezone":    "+00:00",
 	}
 }
 
@@ -325,7 +325,7 @@ func encodeByteSlice(v reflect.Value) interface{} {
 	base64.StdEncoding.Encode(dst, b)
 
 	return map[string]interface{}{
-		"$REQL_TYPE": "BINARY",
-		"data":       dst,
+		"$reql_type$": "BINARY",
+		"data":        dst,
 	}
 }
