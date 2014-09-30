@@ -169,8 +169,8 @@ func (s *RethinkSuite) TestAggregationGroupAvg(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, JsonEquals, []interface{}{
-		map[string]interface{}{"reduction": 15, "group": 1},
-		map[string]interface{}{"group": 2, "reduction": 130},
+		map[string]interface{}{"group": 1, "reduction": 5},
+		map[string]interface{}{"group": 2, "reduction": 32.5},
 		map[string]interface{}{"group": 3, "reduction": 10},
 		map[string]interface{}{"group": 4, "reduction": 50},
 	})
