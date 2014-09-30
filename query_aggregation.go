@@ -82,7 +82,7 @@ func (t Term) Sum(args ...interface{}) Term {
 // element of the sequence and averages the results, skipping elements of the
 // sequence where that function returns null or a non-existence error.
 func (t Term) Avg(args ...interface{}) Term {
-	return constructMethodTerm(t, "Sum", p.Term_SUM, funcWrapArgs(args), map[string]interface{}{})
+	return constructMethodTerm(t, "Avg", p.Term_AVG, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Finds the minimum of a sequence. If called with a field name, finds the element
