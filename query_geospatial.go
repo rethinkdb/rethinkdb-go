@@ -148,8 +148,8 @@ func Line(args ...interface{}) Term {
 // Point constructs a geometry object of type Point. The point is specified by
 // two floating point numbers, the longitude (−180 to 180) and latitude
 // (−90 to 90) of the point on a perfect sphere.
-func Point(lat, lon interface{}) Term {
-	return constructRootTerm("Point", p.Term_POINT, []interface{}{lat, lon}, map[string]interface{}{})
+func Point(lon, lat interface{}) Term {
+	return constructRootTerm("Point", p.Term_POINT, []interface{}{lon, lat}, map[string]interface{}{})
 }
 
 // Polygon constructs a geometry object of type Polygon. The Polygon can be

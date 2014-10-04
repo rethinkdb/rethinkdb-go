@@ -291,7 +291,9 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 
 	// Test query
 	res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
-		BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
+		BatchConf: BatchOpts{
+			MaxBatchRows: 1,
+		},
 	})
 	c.Assert(err, test.IsNil)
 
@@ -332,7 +334,9 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 	for i := 0; i < attempts; i++ {
 		go func(i int, c chan error) {
 			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
-				BatchConf: map[string]interface{}{"max_els": 5, "max_size": 20},
+				BatchConf: BatchOpts{
+					MaxBatchRows: 1,
+				},
 			})
 			if err != nil {
 				c <- err
