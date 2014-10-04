@@ -258,3 +258,64 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 		},
 	})
 }
+
+func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
+	// Test query
+	query := Expr([]interface{}{
+		map[string]interface{}{
+			"A": "a",
+		},
+		map[string]interface{}{
+			"B": 1,
+		},
+		map[string]interface{}{
+			"A": "a",
+		},
+		map[string]interface{}{
+			"B": 1,
+		},
+		map[string]interface{}{
+			"A": "a",
+			"B": 1,
+		},
+	})
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var i int
+	var result SimpleT
+	for res.Next(&result) {
+		switch i {
+		case 0:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "a",
+				B: 0,
+			})
+		case 1:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "",
+				B: 1,
+			})
+		case 2:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "a",
+				B: 0,
+			})
+		case 3:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "",
+				B: 1,
+			})
+		case 4:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "a",
+				B: 1,
+			})
+		default:
+			c.Fatalf("Unexpected number of results")
+		}
+
+		i++
+	}
+	c.Assert(res.Err(), test.IsNil)
+}

@@ -33,6 +33,7 @@ func Decode(dst interface{}, src interface{}) (err error) {
 	if dv.Kind() != reflect.Ptr || dv.IsNil() {
 		return &InvalidDecodeError{reflect.TypeOf(dst)}
 	}
+
 	s := &decodeState{}
 	decode(s, dv, sv)
 
@@ -52,6 +53,11 @@ func (d *decodeState) saveError(err error) {
 
 // decodeInterface decodes the source value into the destination value
 func decode(s *decodeState, dv, sv reflect.Value) {
+	if dv.IsValid() {
+		val := indirect(dv, false)
+		val.Set(reflect.Zero(val.Type()))
+	}
+
 	if dv.IsValid() && sv.IsValid() {
 		// Ensure that the source value has the correct type of parsing
 		if sv.Kind() == reflect.Interface {

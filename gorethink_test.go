@@ -155,6 +155,11 @@ type T struct {
 	F X
 }
 
+type SimpleT struct {
+	A string
+	B int
+}
+
 type X struct {
 	XA int
 	XB string
