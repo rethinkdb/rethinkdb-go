@@ -9,6 +9,21 @@ import (
 	"fmt"
 )
 
+// Pseudo-Type structs
+type Geometry struct {
+	Type  string
+	Point Point
+	Line  Line
+	Lines Lines
+}
+
+type Point LatLon
+type Line []Point
+type Lines []Line
+type LatLon struct {
+	Lat, Lon float64
+}
+
 func convertPseudotype(obj map[string]interface{}, opts map[string]interface{}) (interface{}, error) {
 	if reqlType, ok := obj["$reql_type$"]; ok {
 		if reqlType == "TIME" {
@@ -63,6 +78,23 @@ func convertPseudotype(obj map[string]interface{}, opts map[string]interface{}) 
 				return obj, nil
 			} else {
 				return nil, fmt.Errorf("Unknown binary_format run option \"%s\".", reqlType)
+			}
+		} else if reqlType == "GEOMETRY" {
+			geometryFormat := "native"
+			if opt, ok := opts["geometry_format"]; ok {
+				if sopt, ok := opt.(string); ok {
+					geometryFormat = sopt
+				} else {
+					return nil, fmt.Errorf("Invalid geometry_format run option \"%s\".", opt)
+				}
+			}
+
+			if geometryFormat == "native" {
+				return reqlGeometryToNativeGeometry(obj)
+			} else if geometryFormat == "raw" {
+				return obj, nil
+			} else {
+				return nil, fmt.Errorf("Unknown geometry_format run option \"%s\".", reqlType)
 			}
 		} else {
 			return obj, nil
@@ -161,4 +193,97 @@ func reqlBinaryToNativeBytes(obj map[string]interface{}) (interface{}, error) {
 	} else {
 		return nil, fmt.Errorf("pseudo-type BINARY object %v does not have the expected field \"data\"", obj)
 	}
+}
+
+func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, error) {
+	if typ, ok := obj["type"]; !ok {
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v does not have the expected field \"type\"", obj)
+	} else if typ, ok := typ.(string); !ok {
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field \"type\" is not valid", obj)
+	} else if coords, ok := obj["coordinates"]; !ok {
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v does not have the expected field \"coordinates\"", obj)
+	} else if typ == "Point" {
+		if point, err := unmarshalPoint(coords); err != nil {
+			return nil, err
+		} else {
+			return Geometry{
+				Type:  "Point",
+				Point: point,
+			}, nil
+		}
+	} else if typ == "LineString" {
+		if line, err := unmarshalLineString(coords); err != nil {
+			return nil, err
+		} else {
+			return Geometry{
+				Type: "LineString",
+				Line: line,
+			}, nil
+		}
+	} else if typ == "Polygon" {
+		if lines, err := unmarshalPolygon(coords); err != nil {
+			return nil, err
+		} else {
+			return Geometry{
+				Type:  "Polygon",
+				Lines: lines,
+			}, nil
+		}
+	} else {
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field has unknown type %s", typ)
+	}
+}
+
+func unmarshalPoint(v interface{}) (Point, error) {
+	coords, ok := v.([]interface{})
+	if !ok {
+		return Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
+	}
+	if len(coords) != 2 {
+		return Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
+	}
+	lat, ok := coords[0].(float64)
+	if !ok {
+		return Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
+	}
+	lon, ok := coords[1].(float64)
+	if !ok {
+		return Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
+	}
+
+	return Point{lat, lon}, nil
+}
+
+func unmarshalLineString(v interface{}) (Line, error) {
+	points, ok := v.([]interface{})
+	if !ok {
+		return Line{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
+	}
+
+	var err error
+	line := make(Line, len(points))
+	for i, coords := range points {
+		line[i], err = unmarshalPoint(coords)
+		if err != nil {
+			return Line{}, err
+		}
+	}
+	return line, nil
+}
+
+func unmarshalPolygon(v interface{}) (Lines, error) {
+	lines, ok := v.([]interface{})
+	if !ok {
+		return Lines{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
+	}
+
+	var err error
+	polygon := make(Lines, len(lines))
+	for i, line := range lines {
+		polygon[i], err = unmarshalLineString(line)
+		if err != nil {
+			return Lines{}, err
+		}
+	}
+	return polygon, nil
 }
