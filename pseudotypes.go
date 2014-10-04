@@ -190,7 +190,7 @@ func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, erro
 	} else if coords, ok := obj["coordinates"]; !ok {
 		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v does not have the expected field \"coordinates\"", obj)
 	} else if typ == "Point" {
-		if point, err := unmarshalPoint(coords); err != nil {
+		if point, err := types.UnmarshalPoint(coords); err != nil {
 			return nil, err
 		} else {
 			return types.Geometry{
@@ -199,7 +199,7 @@ func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, erro
 			}, nil
 		}
 	} else if typ == "LineString" {
-		if line, err := unmarshalLineString(coords); err != nil {
+		if line, err := types.UnmarshalLineString(coords); err != nil {
 			return nil, err
 		} else {
 			return types.Geometry{
@@ -208,7 +208,7 @@ func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, erro
 			}, nil
 		}
 	} else if typ == "Polygon" {
-		if lines, err := unmarshalPolygon(coords); err != nil {
+		if lines, err := types.UnmarshalPolygon(coords); err != nil {
 			return nil, err
 		} else {
 			return types.Geometry{
@@ -219,58 +219,4 @@ func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, erro
 	} else {
 		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field has unknown type %s", typ)
 	}
-}
-
-func unmarshalPoint(v interface{}) (types.Point, error) {
-	coords, ok := v.([]interface{})
-	if !ok {
-		return types.Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
-	}
-	if len(coords) != 2 {
-		return types.Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
-	}
-	lat, ok := coords[0].(float64)
-	if !ok {
-		return types.Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
-	}
-	lon, ok := coords[1].(float64)
-	if !ok {
-		return types.Point{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
-	}
-
-	return types.Point{lat, lon}, nil
-}
-
-func unmarshalLineString(v interface{}) (types.Line, error) {
-	points, ok := v.([]interface{})
-	if !ok {
-		return types.Line{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
-	}
-
-	var err error
-	line := make(types.Line, len(points))
-	for i, coords := range points {
-		line[i], err = unmarshalPoint(coords)
-		if err != nil {
-			return types.Line{}, err
-		}
-	}
-	return line, nil
-}
-
-func unmarshalPolygon(v interface{}) (types.Lines, error) {
-	lines, ok := v.([]interface{})
-	if !ok {
-		return types.Lines{}, fmt.Errorf("pseudo-type GEOMETRY object %v field \"coordinates\" is not valid", v)
-	}
-
-	var err error
-	polygon := make(types.Lines, len(lines))
-	for i, line := range lines {
-		polygon[i], err = unmarshalLineString(line)
-		if err != nil {
-			return types.Lines{}, err
-		}
-	}
-	return polygon, nil
 }
