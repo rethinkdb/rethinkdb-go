@@ -2,7 +2,6 @@ package gorethink
 
 import (
 	"bytes"
-	"strings"
 	"testing"
 	"time"
 
@@ -243,34 +242,10 @@ func (s *RethinkSuite) TestControlBinaryByteArrayAlias(c *test.C) {
 	c.Assert(bytes.Equal(response, []byte("Hello World")), test.Equals, true)
 }
 
-func (s *RethinkSuite) TestControlBinaryReader(c *test.C) {
-	var response []byte
-
-	query := Binary(strings.NewReader("Hello World"))
-	res, err := query.Run(sess)
-	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-	c.Assert(err, test.IsNil)
-	c.Assert(bytes.Equal(response, []byte("Hello World")), test.Equals, true)
-}
-
 func (s *RethinkSuite) TestControlBinaryExpr(c *test.C) {
 	var response []byte
 
 	query := Expr([]byte("Hello World"))
-	res, err := query.Run(sess)
-	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-	c.Assert(err, test.IsNil)
-	c.Assert(bytes.Equal(response, []byte("Hello World")), test.Equals, true)
-}
-
-func (s *RethinkSuite) TestControlBinaryExprReader(c *test.C) {
-	var response []byte
-
-	query := Expr(strings.NewReader("Hello World"))
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 

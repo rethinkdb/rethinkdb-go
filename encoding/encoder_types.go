@@ -67,6 +67,10 @@ func invalidValueEncoder(v reflect.Value) interface{} {
 	return nil
 }
 
+func doNothingEncoder(v reflect.Value) interface{} {
+	return v.Interface()
+}
+
 func marshalerEncoder(v reflect.Value) interface{} {
 	if v.Kind() == reflect.Ptr && v.IsNil() {
 		return nil

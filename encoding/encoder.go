@@ -59,12 +59,10 @@ func typeEncoder(t reflect.Type) encoderFunc {
 
 	// To deal with recursive types, populate the map with an
 	// indirect func before we build it. This type waits on the
-	// real func (f) to be ready and then calls it.  This indirect
+	// real func (f) to
+	//  be ready and then calls it.  This indirect
 	// func is only used for recursive types.
 	encoderCache.Lock()
-	if encoderCache.m == nil {
-		encoderCache.m = make(map[reflect.Type]encoderFunc)
-	}
 	var wg sync.WaitGroup
 	wg.Add(1)
 	encoderCache.m[t] = func(v reflect.Value) interface{} {
@@ -81,4 +79,11 @@ func typeEncoder(t reflect.Type) encoderFunc {
 	encoderCache.m[t] = f
 	encoderCache.Unlock()
 	return f
+}
+
+// IgnoreType causes the encoder to ignore a type when encoding
+func IgnoreType(t reflect.Type) {
+	encoderCache.RLock()
+	encoderCache.m[t] = doNothingEncoder
+	encoderCache.RUnlock()
 }

@@ -1,8 +1,6 @@
 package gorethink
 
-import (
-	p "github.com/dancannon/gorethink/ql2"
-)
+import p "github.com/dancannon/gorethink/ql2"
 
 // Transform each element of the sequence by applying the given mapping function.
 func (t Term) Map(args ...interface{}) Term {

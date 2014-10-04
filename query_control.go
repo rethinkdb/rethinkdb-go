@@ -36,31 +36,15 @@ func expr(val interface{}, depth int) Term {
 	switch val := val.(type) {
 	case Term:
 		return val
-	case []byte:
-		return Binary(val)
-	case []interface{}:
-		vals := []Term{}
-		for _, v := range val {
-			vals = append(vals, expr(v, depth))
-		}
-
-		return makeArray(vals)
-	case map[string]interface{}:
-		vals := map[string]Term{}
-		for k, v := range val {
-			vals[k] = expr(v, depth)
-		}
-
-		return makeObject(vals)
 	default:
 		// Use reflection to check for other types
 		valType := reflect.TypeOf(val)
 		valValue := reflect.ValueOf(val)
 
-		if valType.Kind() == reflect.Func {
+		switch valType.Kind() {
+		case reflect.Func:
 			return makeFunc(val)
-		}
-		if valType.Kind() == reflect.Struct {
+		case reflect.Struct, reflect.Ptr:
 			data, err := encode(val)
 
 			if err != nil || data == nil {
@@ -71,8 +55,8 @@ func expr(val interface{}, depth int) Term {
 			}
 
 			return expr(data, depth-1)
-		}
-		if valType.Kind() == reflect.Slice || valType.Kind() == reflect.Array {
+
+		case reflect.Slice, reflect.Array:
 			// Check if slice is a byte slice
 			if valType.Elem().Kind() == reflect.Uint8 {
 				return Binary(valValue.Bytes())
@@ -84,20 +68,18 @@ func expr(val interface{}, depth int) Term {
 
 				return makeArray(vals)
 			}
-		}
-		if valType.Kind() == reflect.Map {
+		case reflect.Map:
 			vals := map[string]Term{}
 			for _, k := range valValue.MapKeys() {
 				vals[k.String()] = expr(valValue.MapIndex(k).Interface(), depth)
 			}
 
 			return makeObject(vals)
-		}
-
-		// If no other match was found then return a datum value
-		return Term{
-			termType: p.Term_DATUM,
-			data:     val,
+		default:
+			return Term{
+				termType: p.Term_DATUM,
+				data:     val,
+			}
 		}
 	}
 }
