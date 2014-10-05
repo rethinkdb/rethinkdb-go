@@ -65,7 +65,7 @@ func makeObject(args termsObj) Term {
 	}
 }
 
-var nextVarId int64 = 0
+var nextVarId int64
 
 func makeFunc(f interface{}) Term {
 	value := reflect.ValueOf(f)
@@ -102,9 +102,8 @@ func funcWrap(value interface{}) Term {
 		return makeFunc(func(x Term) Term {
 			return val
 		})
-	} else {
-		return val
 	}
+	return val
 }
 
 func funcWrapArgs(args []interface{}) []interface{} {
@@ -120,21 +119,20 @@ func funcWrapArgs(args []interface{}) []interface{} {
 func implVarScan(value Term) bool {
 	if value.termType == p.Term_IMPLICIT_VAR {
 		return true
-	} else {
-		for _, v := range value.args {
-			if implVarScan(v) {
-				return true
-			}
-		}
-
-		for _, v := range value.optArgs {
-			if implVarScan(v) {
-				return true
-			}
-		}
-
-		return false
 	}
+	for _, v := range value.args {
+		if implVarScan(v) {
+			return true
+		}
+	}
+
+	for _, v := range value.optArgs {
+		if implVarScan(v) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Convert an opt args struct to a map.

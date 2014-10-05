@@ -29,7 +29,7 @@ var encodeExpected = map[string]interface{}{
 
 func TestEncode(t *testing.T) {
 	// Top is defined in decoder_test.go
-	var in Top = Top{
+	var in = Top{
 		Level0: 1,
 		Embed0: Embed0{
 			Level1b: 2,
