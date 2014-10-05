@@ -17,7 +17,7 @@ type attr struct {
 	Value interface{}
 }
 
-func (s *RethinkSuite) TestRowsLiteral(c *test.C) {
+func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
 	res, err := Expr(5).Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -27,7 +27,7 @@ func (s *RethinkSuite) TestRowsLiteral(c *test.C) {
 	c.Assert(response, JsonEquals, 5)
 }
 
-func (s *RethinkSuite) TestRowsSlice(c *test.C) {
+func (s *RethinkSuite) TestCursorSlice(c *test.C) {
 	res, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -37,7 +37,7 @@ func (s *RethinkSuite) TestRowsSlice(c *test.C) {
 	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
-func (s *RethinkSuite) TestRowsPartiallyNilSlice(c *test.C) {
+func (s *RethinkSuite) TestCursorPartiallyNilSlice(c *test.C) {
 	res, err := Expr(map[string]interface{}{
 		"item": []interface{}{
 			map[string]interface{}{"num": 1},
@@ -57,7 +57,7 @@ func (s *RethinkSuite) TestRowsPartiallyNilSlice(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsMap(c *test.C) {
+func (s *RethinkSuite) TestCursorMap(c *test.C) {
 	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
@@ -73,7 +73,7 @@ func (s *RethinkSuite) TestRowsMap(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsMapIntoInterface(c *test.C) {
+func (s *RethinkSuite) TestCursorMapIntoInterface(c *test.C) {
 	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
@@ -89,7 +89,7 @@ func (s *RethinkSuite) TestRowsMapIntoInterface(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsMapNested(c *test.C) {
+func (s *RethinkSuite) TestCursorMapNested(c *test.C) {
 	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
@@ -113,7 +113,7 @@ func (s *RethinkSuite) TestRowsMapNested(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsStruct(c *test.C) {
+func (s *RethinkSuite) TestCursorStruct(c *test.C) {
 	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
@@ -137,7 +137,7 @@ func (s *RethinkSuite) TestRowsStruct(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestRowsStructPseudoTypes(c *test.C) {
+func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 	t := time.Now()
 
 	res, err := Expr(map[string]interface{}{
@@ -154,7 +154,7 @@ func (s *RethinkSuite) TestRowsStructPseudoTypes(c *test.C) {
 	c.Assert(response.B, JsonEquals, []byte("hello"))
 }
 
-func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
+func (s *RethinkSuite) TestCursorAtomString(c *test.C) {
 	res, err := Expr("a").Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -164,7 +164,7 @@ func (s *RethinkSuite) TestRowsAtomString(c *test.C) {
 	c.Assert(response, test.Equals, "a")
 }
 
-func (s *RethinkSuite) TestRowsAtomArray(c *test.C) {
+func (s *RethinkSuite) TestCursorAtomArray(c *test.C) {
 	res, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -203,7 +203,7 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	c.Assert(res.IsNil(), test.Equals, true)
 }
 
-func (s *RethinkSuite) TestRowsAll(c *test.C) {
+func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	// Ensure table + database exist
 	DbCreate("test").Exec(sess)
 	Db("test").TableDrop("Table3").Exec(sess)
@@ -257,4 +257,65 @@ func (s *RethinkSuite) TestRowsAll(c *test.C) {
 			}},
 		},
 	})
+}
+
+func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
+	// Test query
+	query := Expr([]interface{}{
+		map[string]interface{}{
+			"A": "a",
+		},
+		map[string]interface{}{
+			"B": 1,
+		},
+		map[string]interface{}{
+			"A": "a",
+		},
+		map[string]interface{}{
+			"B": 1,
+		},
+		map[string]interface{}{
+			"A": "a",
+			"B": 1,
+		},
+	})
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var i int
+	var result SimpleT
+	for res.Next(&result) {
+		switch i {
+		case 0:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "a",
+				B: 0,
+			})
+		case 1:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "",
+				B: 1,
+			})
+		case 2:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "a",
+				B: 0,
+			})
+		case 3:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "",
+				B: 1,
+			})
+		case 4:
+			c.Assert(result, test.DeepEquals, SimpleT{
+				A: "a",
+				B: 1,
+			})
+		default:
+			c.Fatalf("Unexpected number of results")
+		}
+
+		i++
+	}
+	c.Assert(res.Err(), test.IsNil)
 }
