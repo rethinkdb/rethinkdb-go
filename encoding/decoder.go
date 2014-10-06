@@ -1,11 +1,13 @@
-// This code is based on encoding/json and gorilla/schema
+// // This code is based on encoding/json and gorilla/schema
 
 package encoding
 
 import (
 
 	// "errors"
+	"errors"
 	"reflect"
+	"runtime"
 	// "runtime"
 	"strconv"
 	"strings"
@@ -14,44 +16,36 @@ import (
 // Decode decodes map[string]interface{} into a struct. The first parameter
 // must be a pointer.
 func Decode(dst interface{}, src interface{}) (err error) {
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		if _, ok := r.(runtime.Error); ok {
-	// 			panic(r)
-	// 		}
-	// 		if v, ok := r.(string); ok {
-	// 			err = errors.New(v)
-	// 		} else {
-	// 			err = r.(error)
-	// 		}
-	// 	}
-	// }()
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(runtime.Error); ok {
+				panic(r)
+			}
+			if v, ok := r.(string); ok {
+				err = errors.New(v)
+			} else {
+				err = r.(error)
+			}
+		}
+	}()
 
 	dv := reflect.ValueOf(dst)
 	sv := reflect.ValueOf(src)
-
 	if dv.Kind() != reflect.Ptr || dv.IsNil() {
 		return &InvalidDecodeError{reflect.TypeOf(dst)}
 	}
-	s := &decodeState{}
-	decode(s, dv, sv)
 
-	return s.savedError
+	decode(dv, sv)
+	return nil
 }
 
-type decodeState struct {
-	savedError error
-}
-
-// saveError saves the first err it is called with.
-func (d *decodeState) saveError(err error) {
-	if d.savedError == nil {
-		d.savedError = err
+// decode decodes the source value into the destination value
+func decode(dv, sv reflect.Value) {
+	if dv.IsValid() {
+		val := indirect(dv, false)
+		val.Set(reflect.Zero(val.Type()))
 	}
-}
 
-// decodeInterface decodes the source value into the destination value
-func decode(s *decodeState, dv, sv reflect.Value) {
 	if dv.IsValid() && sv.IsValid() {
 		// Ensure that the source value has the correct type of parsing
 		if sv.Kind() == reflect.Interface {
@@ -60,11 +54,11 @@ func decode(s *decodeState, dv, sv reflect.Value) {
 
 		switch sv.Kind() {
 		default:
-			decodeLiteral(s, dv, sv)
+			decodeLiteral(dv, sv)
 		case reflect.Slice, reflect.Array:
-			decodeArray(s, dv, sv)
+			decodeArray(dv, sv)
 		case reflect.Map:
-			decodeObject(s, dv, sv)
+			decodeObject(dv, sv)
 		case reflect.Struct:
 			dv = indirect(dv, false)
 			dv.Set(sv)
@@ -74,7 +68,7 @@ func decode(s *decodeState, dv, sv reflect.Value) {
 
 // decodeLiteral decodes the source value into the destination value. This function
 // is used to decode literal values.
-func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
+func decodeLiteral(dv reflect.Value, sv reflect.Value) {
 	dv = indirect(dv, true)
 
 	// Special case for if sv is nil:
@@ -94,7 +88,7 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	case bool:
 		switch dv.Kind() {
 		default:
-			s.saveError(&DecodeTypeError{"bool", dv.Type()})
+			panic(&DecodeTypeError{"bool", dv.Type()})
 			return
 		case reflect.Bool:
 			dv.SetBool(value)
@@ -104,7 +98,7 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 			if dv.NumMethod() == 0 {
 				dv.Set(reflect.ValueOf(value))
 			} else {
-				s.saveError(&DecodeTypeError{"bool", dv.Type()})
+				panic(&DecodeTypeError{"bool", dv.Type()})
 				return
 			}
 		}
@@ -112,35 +106,35 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	case string:
 		switch dv.Kind() {
 		default:
-			s.saveError(&DecodeTypeError{"string", dv.Type()})
+			panic(&DecodeTypeError{"string", dv.Type()})
 			return
 		case reflect.String:
 			dv.SetString(value)
 		case reflect.Bool:
 			b, err := strconv.ParseBool(value)
 			if err != nil {
-				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				panic(&DecodeTypeError{"string", dv.Type()})
 				return
 			}
 			dv.SetBool(b)
 		case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 			n, err := strconv.ParseInt(value, 10, 64)
 			if err != nil || dv.OverflowInt(n) {
-				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				panic(&DecodeTypeError{"string", dv.Type()})
 				return
 			}
 			dv.SetInt(n)
 		case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 			n, err := strconv.ParseUint(value, 10, 64)
 			if err != nil || dv.OverflowUint(n) {
-				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				panic(&DecodeTypeError{"string", dv.Type()})
 				return
 			}
 			dv.SetUint(n)
 		case reflect.Float32, reflect.Float64:
 			n, err := strconv.ParseFloat(value, 64)
 			if err != nil || dv.OverflowFloat(n) {
-				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				panic(&DecodeTypeError{"string", dv.Type()})
 				return
 			}
 			dv.SetFloat(n)
@@ -148,7 +142,7 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 			if dv.NumMethod() == 0 {
 				dv.Set(reflect.ValueOf(string(value)))
 			} else {
-				s.saveError(&DecodeTypeError{"string", dv.Type()})
+				panic(&DecodeTypeError{"string", dv.Type()})
 				return
 			}
 		}
@@ -156,11 +150,11 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	case int, int8, int16, int32, int64:
 		switch dv.Kind() {
 		default:
-			s.saveError(&DecodeTypeError{"int", dv.Type()})
+			panic(&DecodeTypeError{"int", dv.Type()})
 			return
 		case reflect.Interface:
 			if dv.NumMethod() != 0 {
-				s.saveError(&DecodeTypeError{"int", dv.Type()})
+				panic(&DecodeTypeError{"int", dv.Type()})
 				return
 			}
 			dv.Set(reflect.ValueOf(value))
@@ -177,11 +171,11 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	case uint, uint8, uint16, uint32, uint64:
 		switch dv.Kind() {
 		default:
-			s.saveError(&DecodeTypeError{"uint", dv.Type()})
+			panic(&DecodeTypeError{"uint", dv.Type()})
 			return
 		case reflect.Interface:
 			if dv.NumMethod() != 0 {
-				s.saveError(&DecodeTypeError{"uint", dv.Type()})
+				panic(&DecodeTypeError{"uint", dv.Type()})
 				return
 			}
 			dv.Set(reflect.ValueOf(value))
@@ -198,11 +192,11 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	case float32, float64:
 		switch dv.Kind() {
 		default:
-			s.saveError(&DecodeTypeError{"float", dv.Type()})
+			panic(&DecodeTypeError{"float", dv.Type()})
 			return
 		case reflect.Interface:
 			if dv.NumMethod() != 0 {
-				s.saveError(&DecodeTypeError{"float", dv.Type()})
+				panic(&DecodeTypeError{"float", dv.Type()})
 				return
 			}
 			dv.Set(reflect.ValueOf(value))
@@ -217,7 +211,7 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 			dv.SetString(strconv.FormatFloat(float64(reflect.ValueOf(value).Float()), 'g', -1, 64))
 		}
 	default:
-		s.saveError(&DecodeTypeError{sv.Type().String(), dv.Type()})
+		panic(&DecodeTypeError{sv.Type().String(), dv.Type()})
 		return
 	}
 
@@ -226,7 +220,7 @@ func decodeLiteral(s *decodeState, dv reflect.Value, sv reflect.Value) {
 
 // decodeArray decodes the source value into the destination value. This function
 // is used when the source value is a slice or array.
-func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
+func decodeArray(dv reflect.Value, sv reflect.Value) {
 	dv = indirect(dv, false)
 	dt := dv.Type()
 
@@ -235,14 +229,14 @@ func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 	case reflect.Interface:
 		if dv.NumMethod() == 0 {
 			// Decoding into nil interface?  Switch to non-reflect code.
-			dv.Set(reflect.ValueOf(decodeArrayInterface(s, sv)))
+			dv.Set(reflect.ValueOf(decodeArrayInterface(sv)))
 
 			return
 		}
 		// Otherwise it's invalid.
 		fallthrough
 	default:
-		s.saveError(&DecodeTypeError{"array", dv.Type()})
+		panic(&DecodeTypeError{"array", dv.Type()})
 		return
 	case reflect.Array:
 	case reflect.Slice:
@@ -275,10 +269,10 @@ func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 
 		if i < dv.Len() {
 			// Decode into element.
-			decode(s, dv.Index(i), sv.Index(i))
+			decode(dv.Index(i), sv.Index(i))
 		} else {
 			// Ran out of fixed array: skip.
-			decode(s, reflect.Value{}, sv.Index(i))
+			decode(reflect.Value{}, sv.Index(i))
 		}
 
 		i++
@@ -300,13 +294,13 @@ func decodeArray(s *decodeState, dv reflect.Value, sv reflect.Value) {
 
 // decodeObject decodes the source value into the destination value. This function
 // is used when the source value is a map or struct.
-func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error) {
+func decodeObject(dv reflect.Value, sv reflect.Value) (err error) {
 	dv = indirect(dv, false)
 	dt := dv.Type()
 
 	// Decoding into nil interface?  Switch to non-reflect code.
 	if dv.Kind() == reflect.Interface && dv.NumMethod() == 0 {
-		dv.Set(reflect.ValueOf(decodeObjectInterface(s, sv)))
+		dv.Set(reflect.ValueOf(decodeObjectInterface(sv)))
 		return nil
 	}
 
@@ -315,7 +309,7 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 	case reflect.Map:
 		// map must have string kind
 		if dt.Key().Kind() != reflect.String {
-			s.saveError(&DecodeTypeError{"object", dv.Type()})
+			panic(&DecodeTypeError{"object", dv.Type()})
 			break
 		}
 		if dv.IsNil() {
@@ -323,7 +317,7 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 		}
 	case reflect.Struct:
 	default:
-		s.saveError(&DecodeTypeError{"object", dv.Type()})
+		panic(&DecodeTypeError{"object", dv.Type()})
 		return
 	}
 
@@ -345,7 +339,7 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 			subdv = mapElem
 		} else {
 			var f *field
-			fields := cachedTypeFields(dv)
+			fields := cachedTypeFields(dv.Type())
 			for i := range fields {
 				ff := &fields[i]
 				if ff.name == skey {
@@ -370,7 +364,7 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 			}
 		}
 
-		decode(s, subdv, subsv)
+		decode(subdv, subsv)
 
 		if dv.Kind() == reflect.Map {
 			kv := reflect.ValueOf(skey)
@@ -385,7 +379,7 @@ func decodeObject(s *decodeState, dv reflect.Value, sv reflect.Value) (err error
 // less reflection
 
 // decodeInterface decodes the source value into interface{}
-func decodeInterface(s *decodeState, sv reflect.Value) interface{} {
+func decodeInterface(sv reflect.Value) interface{} {
 	// Ensure that the source value has the correct type of parsing
 	if sv.Kind() == reflect.Interface {
 		sv = reflect.ValueOf(sv.Interface())
@@ -393,34 +387,34 @@ func decodeInterface(s *decodeState, sv reflect.Value) interface{} {
 
 	switch sv.Kind() {
 	case reflect.Slice, reflect.Array:
-		return decodeArrayInterface(s, sv)
+		return decodeArrayInterface(sv)
 	case reflect.Map:
-		return decodeObjectInterface(s, sv)
+		return decodeObjectInterface(sv)
 	default:
-		return decodeLiteralInterface(s, sv)
+		return decodeLiteralInterface(sv)
 	}
 }
 
 // decodeArrayInterface decodes the source value into []interface{}
-func decodeArrayInterface(s *decodeState, sv reflect.Value) []interface{} {
+func decodeArrayInterface(sv reflect.Value) []interface{} {
 	arr := []interface{}{}
 	for i := 0; i < sv.Len(); i++ {
-		arr = append(arr, decodeInterface(s, sv.Index(i)))
+		arr = append(arr, decodeInterface(sv.Index(i)))
 	}
 	return arr
 }
 
 // decodeObjectInterface decodes the source value into map[string]interface{}
-func decodeObjectInterface(s *decodeState, sv reflect.Value) map[string]interface{} {
+func decodeObjectInterface(sv reflect.Value) map[string]interface{} {
 	m := map[string]interface{}{}
 	for _, key := range sv.MapKeys() {
-		m[key.Interface().(string)] = decodeInterface(s, sv.MapIndex(key))
+		m[key.Interface().(string)] = decodeInterface(sv.MapIndex(key))
 	}
 	return m
 }
 
 // decodeLiteralInterface returns the interface of the source value
-func decodeLiteralInterface(s *decodeState, sv reflect.Value) interface{} {
+func decodeLiteralInterface(sv reflect.Value) interface{} {
 	if !sv.IsValid() {
 		return nil
 	}

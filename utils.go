@@ -6,8 +6,9 @@ import (
 	"sync/atomic"
 	"time"
 
-	"code.google.com/p/goprotobuf/proto"
 	"github.com/dancannon/gorethink/encoding"
+
+	"code.google.com/p/goprotobuf/proto"
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -53,7 +54,7 @@ func makeArray(args termsList) Term {
 // makeObject takes a map of terms and produces a single MAKE_OBJECT term
 func makeObject(args termsObj) Term {
 	// First all evaluate all fields in the map
-	temp := termsObj{}
+	temp := make(termsObj)
 	for k, v := range args {
 		temp[k] = Expr(v)
 	}
@@ -65,18 +66,18 @@ func makeObject(args termsObj) Term {
 	}
 }
 
-var nextVarId int64 = 0
+var nextVarId int64
 
 func makeFunc(f interface{}) Term {
 	value := reflect.ValueOf(f)
 	valueType := value.Type()
 
-	var argNums []interface{}
-	var args []reflect.Value
+	var argNums = make([]interface{}, valueType.NumIn())
+	var args = make([]reflect.Value, valueType.NumIn())
 	for i := 0; i < valueType.NumIn(); i++ {
 		// Get a slice of the VARs to use as the function arguments
-		args = append(args, reflect.ValueOf(constructRootTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{})))
-		argNums = append(argNums, nextVarId)
+		args[i] = reflect.ValueOf(constructRootTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{}))
+		argNums[i] = nextVarId
 		atomic.AddInt64(&nextVarId, 1)
 
 		// make sure all input arguments are of type Term
@@ -102,9 +103,8 @@ func funcWrap(value interface{}) Term {
 		return makeFunc(func(x Term) Term {
 			return val
 		})
-	} else {
-		return val
 	}
+	return val
 }
 
 func funcWrapArgs(args []interface{}) []interface{} {
@@ -120,21 +120,20 @@ func funcWrapArgs(args []interface{}) []interface{} {
 func implVarScan(value Term) bool {
 	if value.termType == p.Term_IMPLICIT_VAR {
 		return true
-	} else {
-		for _, v := range value.args {
-			if implVarScan(v) {
-				return true
-			}
-		}
-
-		for _, v := range value.optArgs {
-			if implVarScan(v) {
-				return true
-			}
-		}
-
-		return false
 	}
+	for _, v := range value.args {
+		if implVarScan(v) {
+			return true
+		}
+	}
+
+	for _, v := range value.optArgs {
+		if implVarScan(v) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Convert an opt args struct to a map.
@@ -152,9 +151,9 @@ func optArgsToMap(optArgs OptArgs) map[string]interface{} {
 
 // Convert a list into a slice of terms
 func convertTermList(l []interface{}) termsList {
-	terms := termsList{}
-	for _, v := range l {
-		terms = append(terms, Expr(v))
+	terms := make(termsList, len(l))
+	for i, v := range l {
+		terms[i] = Expr(v)
 	}
 
 	return terms
@@ -188,33 +187,38 @@ func mergeArgs(args ...interface{}) []interface{} {
 // Helper functions for debugging
 
 func allArgsToStringSlice(args termsList, optArgs termsObj) []string {
-	allArgs := []string{}
+	allArgs := make([]string, len(args)+len(optArgs))
+	i := 0
 
 	for _, v := range args {
-		allArgs = append(allArgs, v.String())
+		allArgs[i] = v.String()
+		i++
 	}
 	for k, v := range optArgs {
-		allArgs = append(allArgs, k+"="+v.String())
+		allArgs[i] = k + "=" + v.String()
+		i++
 	}
 
 	return allArgs
 }
 
 func argsToStringSlice(args termsList) []string {
-	allArgs := []string{}
+	allArgs := make([]string, len(args))
 
-	for _, v := range args {
-		allArgs = append(allArgs, v.String())
+	for i, v := range args {
+		allArgs[i] = v.String()
 	}
 
 	return allArgs
 }
 
 func optArgsToStringSlice(optArgs termsObj) []string {
-	allArgs := []string{}
+	allArgs := make([]string, len(optArgs))
+	i := 0
 
 	for k, v := range optArgs {
-		allArgs = append(allArgs, k+"="+v.String())
+		allArgs[i] = k + "=" + v.String()
+		i++
 	}
 
 	return allArgs
@@ -231,16 +235,18 @@ func protobufToString(p proto.Message, indentLevel int) string {
 	return prefixLines(proto.MarshalTextString(p), strings.Repeat("    ", indentLevel))
 }
 
-func encode(v interface{}) (interface{}, error) {
-	encoding.RegisterEncodeHook(func(v reflect.Value) (success bool, ret reflect.Value, err error) {
-		if v.Type() == reflect.TypeOf(time.Time{}) {
-			return true, v, nil
-		} else if v.Type() == reflect.TypeOf(Term{}) {
-			return true, v, nil
-		} else {
-			return false, v, nil
-		}
-	})
+var timeType = reflect.TypeOf(time.Time{})
+var termType = reflect.TypeOf(Term{})
 
-	return encoding.Encode(v)
+func encode(data interface{}) (interface{}, error) {
+	if _, ok := data.(Term); ok {
+		return data, nil
+	}
+
+	v, err := encoding.Encode(data)
+	if err != nil {
+		return nil, err
+	}
+
+	return v, nil
 }

@@ -2,14 +2,18 @@ package encoding
 
 import "reflect"
 
-type EncodeHook func(src reflect.Value) (success bool, ret reflect.Value, err error)
-
-var encodeHooks []EncodeHook
-
-func init() {
-	encodeHooks = []EncodeHook{}
+// Marshaler is the interface implemented by objects that
+// can marshal themselves into a valid RQL psuedo-type.
+type Marshaler interface {
+	MarshalRQL() (interface{}, error)
 }
 
-func RegisterEncodeHook(hook EncodeHook) {
-	encodeHooks = append(encodeHooks, hook)
+// Unmarshaler is the interface implemented by objects
+// that can unmarshal a psuedo-type object of themselves.
+type Unmarshaler interface {
+	UnmarshalRQL(interface{}) error
+}
+
+func init() {
+	encoderCache.m = make(map[reflect.Type]encoderFunc)
 }

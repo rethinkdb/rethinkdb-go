@@ -1,8 +1,6 @@
 package gorethink
 
-import (
-	p "github.com/dancannon/gorethink/ql2"
-)
+import p "github.com/dancannon/gorethink/ql2"
 
 type InsertOpts struct {
 	Durability    interface{} `gorethink:"durability,omitempty"`
@@ -28,7 +26,7 @@ func (t Term) Insert(arg interface{}, optArgs ...InsertOpts) Term {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return constructMethodTerm(t, "Insert", p.Term_INSERT, []interface{}{funcWrap(arg)}, opts)
+	return constructMethodTerm(t, "Insert", p.Term_INSERT, []interface{}{Expr(arg)}, opts)
 }
 
 type UpdateOpts struct {

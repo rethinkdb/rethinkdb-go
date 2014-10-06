@@ -1,13 +1,9 @@
 package gorethink
 
 import (
-	"bytes"
 	"encoding/base64"
-	"fmt"
-	"io"
-	"io/ioutil"
+
 	"reflect"
-	"time"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -21,74 +17,34 @@ var byteSliceType = reflect.TypeOf([]byte(nil))
 //
 // If you want to call expression methods on an object that is not yet an
 // expression, this is the function you want.
-func Expr(value interface{}) Term {
-	return expr(value, 20)
+func Expr(val interface{}) Term {
+	return expr(val, 20)
 }
 
-func expr(value interface{}, depth int) Term {
+func expr(val interface{}, depth int) Term {
 	if depth <= 0 {
 		panic("Maximum nesting depth limit exceeded")
 	}
 
-	if value == nil {
+	if val == nil {
 		return Term{
 			termType: p.Term_DATUM,
 			data:     nil,
 		}
 	}
 
-	switch val := value.(type) {
+	switch val := val.(type) {
 	case Term:
 		return val
-	case time.Time:
-		return EpochTime(val.Unix())
-	case io.Reader:
-		b, err := ioutil.ReadAll(val)
-		if err != nil {
-			panic(fmt.Sprintf("Error reading bytes from reader: %s", err.Error()))
-		}
-		return Binary(b)
-	case bytes.Buffer:
-		return Binary(val)
-	case []byte:
-		return Binary(val)
-	case []interface{}:
-		vals := []Term{}
-		for _, v := range val {
-			vals = append(vals, expr(v, depth))
-		}
-
-		return makeArray(vals)
-	case map[string]interface{}:
-		vals := map[string]Term{}
-		for k, v := range val {
-			vals[k] = expr(v, depth)
-		}
-
-		return makeObject(vals)
 	default:
 		// Use reflection to check for other types
-		typ := reflect.TypeOf(val)
-		rval := reflect.ValueOf(val)
+		valType := reflect.TypeOf(val)
+		valValue := reflect.ValueOf(val)
 
-		if typ.Kind() == reflect.Ptr || typ.Kind() == reflect.Interface {
-			v := reflect.ValueOf(val)
-
-			if v.IsNil() {
-				return Term{
-					termType: p.Term_DATUM,
-					data:     nil,
-				}
-			}
-
-			val = v.Elem().Interface()
-			typ = reflect.TypeOf(val)
-		}
-
-		if typ.Kind() == reflect.Func {
+		switch valType.Kind() {
+		case reflect.Func:
 			return makeFunc(val)
-		}
-		if typ.Kind() == reflect.Struct {
+		case reflect.Struct, reflect.Ptr:
 			data, err := encode(val)
 
 			if err != nil || data == nil {
@@ -99,33 +55,31 @@ func expr(value interface{}, depth int) Term {
 			}
 
 			return expr(data, depth-1)
-		}
-		if typ.Kind() == reflect.Slice || typ.Kind() == reflect.Array {
+
+		case reflect.Slice, reflect.Array:
 			// Check if slice is a byte slice
-			if typ.Elem().Kind() == reflect.Uint8 {
-				return Binary(rval.Bytes())
+			if valType.Elem().Kind() == reflect.Uint8 {
+				return Binary(valValue.Bytes())
 			} else {
 				vals := []Term{}
-				for i := 0; i < rval.Len(); i++ {
-					vals = append(vals, expr(rval.Index(i).Interface(), depth))
+				for i := 0; i < valValue.Len(); i++ {
+					vals = append(vals, expr(valValue.Index(i).Interface(), depth))
 				}
 
 				return makeArray(vals)
 			}
-		}
-		if typ.Kind() == reflect.Map {
+		case reflect.Map:
 			vals := map[string]Term{}
-			for _, k := range rval.MapKeys() {
-				vals[k.String()] = expr(rval.MapIndex(k).Interface(), depth)
+			for _, k := range valValue.MapKeys() {
+				vals[k.String()] = expr(valValue.MapIndex(k).Interface(), depth)
 			}
 
 			return makeObject(vals)
-		}
-
-		// If no other match was found then return a datum value
-		return Term{
-			termType: p.Term_DATUM,
-			data:     val,
+		default:
+			return Term{
+				termType: p.Term_DATUM,
+				data:     val,
+			}
 		}
 	}
 }
@@ -193,15 +147,6 @@ func Binary(data interface{}) Term {
 	switch data := data.(type) {
 	case Term:
 		return constructRootTerm("Binary", p.Term_BINARY, []interface{}{data}, map[string]interface{}{})
-	case io.Reader:
-		var err error
-		b, err = ioutil.ReadAll(data)
-		if err != nil {
-			panic(fmt.Sprintf("Error reading bytes from reader: %s", err.Error()))
-		}
-		return Binary(b)
-	case bytes.Buffer:
-		b = data.Bytes()
 	case []byte:
 		b = data
 	default:
@@ -282,4 +227,9 @@ func (t Term) TypeOf(args ...interface{}) Term {
 // Get information about a RQL value.
 func (t Term) Info(args ...interface{}) Term {
 	return constructMethodTerm(t, "Info", p.Term_INFO, args, map[string]interface{}{})
+}
+
+// UUID returns a UUID (universally unique identifier), a string that can be used as a unique ID.
+func UUID(args ...interface{}) Term {
+	return constructRootTerm("UUID", p.Term_UUID, []interface{}{}, map[string]interface{}{})
 }

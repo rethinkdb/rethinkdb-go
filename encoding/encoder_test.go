@@ -4,32 +4,31 @@ import (
 	"image"
 	"reflect"
 	"testing"
-	"time"
 )
 
 var encodeExpected = map[string]interface{}{
-	"Level0":  1,
-	"Level1b": 2,
-	"Level1c": 3,
-	"Level1a": 5,
-	"LEVEL1B": 6,
+	"Level0":  int64(1),
+	"Level1b": int64(2),
+	"Level1c": int64(3),
+	"Level1a": int64(5),
+	"LEVEL1B": int64(6),
 	"e": map[string]interface{}{
-		"Level1a": 8,
-		"Level1b": 9,
-		"Level1c": 10,
-		"Level1d": 11,
-		"x":       12,
+		"Level1a": int64(8),
+		"Level1b": int64(9),
+		"Level1c": int64(10),
+		"Level1d": int64(11),
+		"x":       int64(12),
 	},
-	"Loop1": 13,
-	"Loop2": 14,
-	"X":     15,
-	"Y":     16,
-	"Z":     17,
+	"Loop1": int64(13),
+	"Loop2": int64(14),
+	"X":     int64(15),
+	"Y":     int64(16),
+	"Z":     int64(17),
 }
 
 func TestEncode(t *testing.T) {
 	// Top is defined in decoder_test.go
-	var in Top = Top{
+	var in = Top{
 		Level0: 1,
 		Embed0: Embed0{
 			Level1b: 2,
@@ -67,34 +66,6 @@ func TestEncode(t *testing.T) {
 	}
 }
 
-type FieldMappable struct {
-	Str string
-	Int int
-}
-
-func (f FieldMappable) FieldMap() map[string]string {
-	return map[string]string{
-		"Str": "str",
-		"Int": "int",
-	}
-}
-
-func TestFieldMapper(t *testing.T) {
-	var in = FieldMappable{"string", 123}
-	var out = map[string]interface{}{
-		"str": "string",
-		"int": 123,
-	}
-
-	got, err := Encode(&in)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !reflect.DeepEqual(got, out) {
-		t.Errorf(" got: %v\nwant: %v\n", got, out)
-	}
-}
-
 type Optionals struct {
 	Sr string `gorethink:"sr"`
 	So string `gorethink:"so,omitempty"`
@@ -108,17 +79,13 @@ type Optionals struct {
 
 	Mr map[string]interface{} `gorethink:"mr"`
 	Mo map[string]interface{} `gorethink:",omitempty"`
-
-	Tr time.Time `gorethink:"tr"`
-	To time.Time `gorethink:",omitempty"`
 }
 
 var optionalsExpected = map[string]interface{}{
 	"sr":        "",
-	"omitempty": 0,
-	"slr":       []interface{}(nil),
+	"omitempty": int64(0),
+	"slr":       []interface{}{},
 	"mr":        map[string]interface{}{},
-	"tr":        time.Time{},
 }
 
 func TestOmitEmpty(t *testing.T) {
@@ -126,7 +93,6 @@ func TestOmitEmpty(t *testing.T) {
 	o.Sw = "something"
 	o.Mr = map[string]interface{}{}
 	o.Mo = map[string]interface{}{}
-	o.Tr = time.Time{}
 
 	got, err := Encode(&o)
 	if err != nil {
@@ -146,7 +112,7 @@ type MyStruct struct {
 func TestAnonymousNonstruct(t *testing.T) {
 	var i IntType = 11
 	a := MyStruct{i}
-	var want = map[string]interface{}{"IntType": IntType(11)}
+	var want = map[string]interface{}{"IntType": int64(11)}
 
 	got, err := Encode(a)
 	if err != nil {
@@ -199,7 +165,7 @@ func TestEmbeddedBug(t *testing.T) {
 	if err != nil {
 		t.Fatal("Encode:", err)
 	}
-	want = map[string]interface{}{"A": 23}
+	want = map[string]interface{}{"A": int64(23)}
 	if !reflect.DeepEqual(got, want) {
 		t.Fatalf("Encode: got %v want %v", got, want)
 	}

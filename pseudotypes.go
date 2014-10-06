@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/dancannon/gorethink/types"
+
 	"fmt"
 )
 
@@ -63,6 +65,23 @@ func convertPseudotype(obj map[string]interface{}, opts map[string]interface{}) 
 				return obj, nil
 			} else {
 				return nil, fmt.Errorf("Unknown binary_format run option \"%s\".", reqlType)
+			}
+		} else if reqlType == "GEOMETRY" {
+			geometryFormat := "native"
+			if opt, ok := opts["geometry_format"]; ok {
+				if sopt, ok := opt.(string); ok {
+					geometryFormat = sopt
+				} else {
+					return nil, fmt.Errorf("Invalid geometry_format run option \"%s\".", opt)
+				}
+			}
+
+			if geometryFormat == "native" {
+				return reqlGeometryToNativeGeometry(obj)
+			} else if geometryFormat == "raw" {
+				return obj, nil
+			} else {
+				return nil, fmt.Errorf("Unknown geometry_format run option \"%s\".", reqlType)
 			}
 		} else {
 			return obj, nil
@@ -141,9 +160,8 @@ func reqlGroupedDataToObj(obj map[string]interface{}) (interface{}, error) {
 			})
 		}
 		return ret, nil
-	} else {
-		return nil, fmt.Errorf("pseudo-type GROUPED_DATA object %v does not have the expected field \"data\"", obj)
 	}
+	return nil, fmt.Errorf("pseudo-type GROUPED_DATA object %v does not have the expected field \"data\"", obj)
 }
 
 func reqlBinaryToNativeBytes(obj map[string]interface{}) (interface{}, error) {
@@ -155,10 +173,47 @@ func reqlBinaryToNativeBytes(obj map[string]interface{}) (interface{}, error) {
 			}
 
 			return b, nil
+		}
+		return nil, fmt.Errorf("pseudo-type BINARY object %v field \"data\" is not valid", obj)
+	}
+	return nil, fmt.Errorf("pseudo-type BINARY object %v does not have the expected field \"data\"", obj)
+}
+
+func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, error) {
+	if typ, ok := obj["type"]; !ok {
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v does not have the expected field \"type\"", obj)
+	} else if typ, ok := typ.(string); !ok {
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field \"type\" is not valid", obj)
+	} else if coords, ok := obj["coordinates"]; !ok {
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v does not have the expected field \"coordinates\"", obj)
+	} else if typ == "Point" {
+		if point, err := types.UnmarshalPoint(coords); err != nil {
+			return nil, err
 		} else {
-			return nil, fmt.Errorf("pseudo-type BINARY object %v field \"data\" is not valid", obj)
+			return types.Geometry{
+				Type:  "Point",
+				Point: point,
+			}, nil
+		}
+	} else if typ == "LineString" {
+		if line, err := types.UnmarshalLineString(coords); err != nil {
+			return nil, err
+		} else {
+			return types.Geometry{
+				Type: "LineString",
+				Line: line,
+			}, nil
+		}
+	} else if typ == "Polygon" {
+		if lines, err := types.UnmarshalPolygon(coords); err != nil {
+			return nil, err
+		} else {
+			return types.Geometry{
+				Type:  "Polygon",
+				Lines: lines,
+			}, nil
 		}
 	} else {
-		return nil, fmt.Errorf("pseudo-type BINARY object %v does not have the expected field \"data\"", obj)
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field has unknown type %s", typ)
 	}
 }

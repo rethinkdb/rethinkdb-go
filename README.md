@@ -4,7 +4,7 @@ GoRethink - RethinkDB Driver for Go [![wercker status](https://app.wercker.com/s
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) made by [Daniel Cannon](http://github.com/dancannon) and based off of Christopher Hesse's [RethinkGo](https://github.com/christopherhesse/rethinkgo) driver.
 
 
-Current version: v0.4.1 (RethinkDB v1.14) 
+Current version: v0.5.0 (RethinkDB v1.15.1) 
 
 **Version 0.3 introduced some API changes, for more information check the [change log](CHANGELOG.md)**
 

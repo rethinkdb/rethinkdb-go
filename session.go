@@ -21,10 +21,10 @@ func (q *Query) build() []interface{} {
 	res := []interface{}{q.Type}
 	if q.Term != nil {
 		res = append(res, q.Term.build())
+	}
 
-		if len(q.GlobalOpts) > 0 {
-			res = append(res, q.GlobalOpts)
-		}
+	if len(q.GlobalOpts) > 0 {
+		res = append(res, q.GlobalOpts)
 	}
 
 	return res
@@ -245,7 +245,7 @@ func (s *Session) handleBatchResponse(cursor *Cursor, response *Response) {
 	cursor.extend(response)
 
 	s.Lock()
-	cursor.outstandingRequests -= 1
+	cursor.outstandingRequests--
 
 	if response.Type != p.Response_SUCCESS_PARTIAL &&
 		response.Type != p.Response_SUCCESS_FEED &&
@@ -301,7 +301,7 @@ func (s *Session) asyncContinueQuery(cursor *Cursor) error {
 // stopQuery sends closes a query by sending Query_STOP to the server.
 func (s *Session) stopQuery(cursor *Cursor) error {
 	cursor.mu.Lock()
-	cursor.outstandingRequests += 1
+	cursor.outstandingRequests++
 	cursor.mu.Unlock()
 
 	q := Query{

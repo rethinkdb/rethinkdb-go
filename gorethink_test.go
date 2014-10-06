@@ -155,6 +155,11 @@ type T struct {
 	F X
 }
 
+type SimpleT struct {
+	A string
+	B int
+}
+
 type X struct {
 	XA int
 	XB string
@@ -176,7 +181,7 @@ type PseudoTypes struct {
 	B []byte
 }
 
-var str T = T{
+var str = T{
 	A: "A",
 	B: 1,
 	C: 1,

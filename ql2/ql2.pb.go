@@ -302,6 +302,8 @@ const (
 	Term_VAR Term_TermType = 10
 	// Takes some javascript code and executes it.
 	Term_JAVASCRIPT Term_TermType = 11
+	// STRING {timeout: !NUMBER} -> Function(*)
+	Term_UUID Term_TermType = 169
 	// Takes an HTTP URL and gets it.  If the get succeeds and
 	//  returns valid JSON, it is converted into a DATUM
 	Term_HTTP Term_TermType = 153
@@ -409,7 +411,9 @@ const (
 	// Take the union of multiple sequences (preserves duplicate elements! (use distinct)).
 	Term_UNION Term_TermType = 44
 	// Get the Nth element of a sequence.
-	Term_NTH        Term_TermType = 45
+	Term_NTH Term_TermType = 45
+	// do NTH or GET_FIELD depending on target object
+	Term_BRACKET    Term_TermType = 170
 	Term_INNER_JOIN Term_TermType = 48
 	Term_OUTER_JOIN Term_TermType = 49
 	// An inner-join that does an equality comparison on two attributes.
@@ -642,7 +646,20 @@ const (
 	Term_CHANGES Term_TermType = 152
 	Term_ARGS    Term_TermType = 154
 	// BINARY is client-only at the moment, it is not supported on the server
-	Term_BINARY Term_TermType = 155
+	Term_BINARY           Term_TermType = 155
+	Term_GEOJSON          Term_TermType = 157
+	Term_TO_GEOJSON       Term_TermType = 158
+	Term_POINT            Term_TermType = 159
+	Term_LINE             Term_TermType = 160
+	Term_POLYGON          Term_TermType = 161
+	Term_DISTANCE         Term_TermType = 162
+	Term_INTERSECTS       Term_TermType = 163
+	Term_INCLUDES         Term_TermType = 164
+	Term_CIRCLE           Term_TermType = 165
+	Term_GET_INTERSECTING Term_TermType = 166
+	Term_FILL             Term_TermType = 167
+	Term_GET_NEAREST      Term_TermType = 168
+	Term_POLYGON_SUB      Term_TermType = 171
 )
 
 var Term_TermType_name = map[int32]string{
@@ -651,6 +668,7 @@ var Term_TermType_name = map[int32]string{
 	3:   "MAKE_OBJ",
 	10:  "VAR",
 	11:  "JAVASCRIPT",
+	169: "UUID",
 	153: "HTTP",
 	12:  "ERROR",
 	13:  "IMPLICIT_VAR",
@@ -701,6 +719,7 @@ var Term_TermType_name = map[int32]string{
 	86:  "IS_EMPTY",
 	44:  "UNION",
 	45:  "NTH",
+	170: "BRACKET",
 	48:  "INNER_JOIN",
 	49:  "OUTER_JOIN",
 	50:  "EQ_JOIN",
@@ -793,6 +812,19 @@ var Term_TermType_name = map[int32]string{
 	152: "CHANGES",
 	154: "ARGS",
 	155: "BINARY",
+	157: "GEOJSON",
+	158: "TO_GEOJSON",
+	159: "POINT",
+	160: "LINE",
+	161: "POLYGON",
+	162: "DISTANCE",
+	163: "INTERSECTS",
+	164: "INCLUDES",
+	165: "CIRCLE",
+	166: "GET_INTERSECTING",
+	167: "FILL",
+	168: "GET_NEAREST",
+	171: "POLYGON_SUB",
 }
 var Term_TermType_value = map[string]int32{
 	"DATUM":            1,
@@ -800,6 +832,7 @@ var Term_TermType_value = map[string]int32{
 	"MAKE_OBJ":         3,
 	"VAR":              10,
 	"JAVASCRIPT":       11,
+	"UUID":             169,
 	"HTTP":             153,
 	"ERROR":            12,
 	"IMPLICIT_VAR":     13,
@@ -850,6 +883,7 @@ var Term_TermType_value = map[string]int32{
 	"IS_EMPTY":         86,
 	"UNION":            44,
 	"NTH":              45,
+	"BRACKET":          170,
 	"INNER_JOIN":       48,
 	"OUTER_JOIN":       49,
 	"EQ_JOIN":          50,
@@ -942,6 +976,19 @@ var Term_TermType_value = map[string]int32{
 	"CHANGES":          152,
 	"ARGS":             154,
 	"BINARY":           155,
+	"GEOJSON":          157,
+	"TO_GEOJSON":       158,
+	"POINT":            159,
+	"LINE":             160,
+	"POLYGON":          161,
+	"DISTANCE":         162,
+	"INTERSECTS":       163,
+	"INCLUDES":         164,
+	"CIRCLE":           165,
+	"GET_INTERSECTING": 166,
+	"FILL":             167,
+	"GET_NEAREST":      168,
+	"POLYGON_SUB":      171,
 }
 
 func (x Term_TermType) Enum() *Term_TermType {
