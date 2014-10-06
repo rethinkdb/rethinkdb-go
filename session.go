@@ -21,10 +21,10 @@ func (q *Query) build() []interface{} {
 	res := []interface{}{q.Type}
 	if q.Term != nil {
 		res = append(res, q.Term.build())
+	}
 
-		if len(q.GlobalOpts) > 0 {
-			res = append(res, q.GlobalOpts)
-		}
+	if len(q.GlobalOpts) > 0 {
+		res = append(res, q.GlobalOpts)
 	}
 
 	return res

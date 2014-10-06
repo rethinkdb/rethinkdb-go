@@ -28,6 +28,12 @@ func (t Term) build() interface{} {
 	switch t.termType {
 	case p.Term_DATUM:
 		return t.data
+	case p.Term_MAKE_OBJ:
+		res := map[string]interface{}{}
+		for k, v := range t.optArgs {
+			res[k] = v.build()
+		}
+		return res
 	case p.Term_BINARY:
 		if len(t.args) == 0 {
 			return map[string]interface{}{
@@ -120,9 +126,9 @@ type RunOpts struct {
 	TimeFormat   interface{} `gorethink:"time_format,omitempty"`
 	GroupFormat  interface{} `gorethink:"group_format,omitempty"`
 	BinaryFormat interface{} `gorethink:"binary_format,omitempty"`
+	EncodeExpr   interface{} `gorethink:"encode_expr,omitempty"`
 
 	// Unsupported options
-
 	BatchConf interface{} `gorethink:"batch_conf,omitempty"`
 }
 

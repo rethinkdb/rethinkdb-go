@@ -145,13 +145,13 @@ var decodeTests = []decodeTest{
 	{in: float64(2.0), ptr: new(interface{}), out: float64(2.0)},
 	{in: string("2"), ptr: new(interface{}), out: string("2")},
 	{in: "a\u1234", ptr: new(string), out: "a\u1234"},
-	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{Y: 4}, err: &DecodeTypeError{"array", reflect.TypeOf("")}},
+	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{}, err: &DecodeTypeError{"array", reflect.TypeOf("")}},
 	{in: map[string]interface{}{"x": 1}, ptr: new(tx), out: tx{}},
 	{in: map[string]interface{}{"F1": float64(1), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: float64(1), F2: int32(2), F3: string("3")}},
 	{in: map[string]interface{}{"F1": string("1"), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: string("1"), F2: int32(2), F3: string("3")}},
 	{
-		in:  map[string]interface{}{"k1": 1, "k2": "s", "k3": []interface{}{1, 2.0, 3e-3}, "k4": map[string]interface{}{"kk1": "s", "kk2": 2}},
-		out: map[string]interface{}{"k1": 1, "k2": "s", "k3": []interface{}{1, 2.0, 3e-3}, "k4": map[string]interface{}{"kk1": "s", "kk2": 2}},
+		in:  map[string]interface{}{"k1": int64(1), "k2": "s", "k3": []interface{}{int64(1), 2.0, 3e-3}, "k4": map[string]interface{}{"kk1": "s", "kk2": int64(2)}},
+		out: map[string]interface{}{"k1": int64(1), "k2": "s", "k3": []interface{}{int64(1), 2.0, 3e-3}, "k4": map[string]interface{}{"kk1": "s", "kk2": int64(2)}},
 		ptr: new(interface{}),
 	},
 
@@ -252,8 +252,7 @@ func TestDecode(t *testing.T) {
 		if err := Decode(v.Interface(), tt.in); !reflect.DeepEqual(err, tt.err) {
 			t.Errorf("#%d: got error %v want %v", i, err, tt.err)
 			continue
-		}
-		if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
+		} else if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
 			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
 		}
