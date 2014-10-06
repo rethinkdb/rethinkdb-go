@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.5.0 - 6 Oct 2014
+
+- Added geospatial terms (`Circle`, `Distance`, `Fill`, `Geojson`, `ToGeojson`, `GetIntersecting`, `GetNearest`, `Includes`, `Intersects`, `Line`, `Point`, `Polygon`, `PolygonSub`)
+- Added `UUID` term for generating unique IDs
+- Added `AtIndex` term, combines `Nth` and `GetField`
+- Added the `Geometry` type, see the types package
+- Updated the `BatchConf` field in `RunOpts`, now uses the `BatchOpts` type
+
+### Internal Changes
+- Fixed encoding performance issues, greatly improves writes/second
+- Updated `Next` to zero the destination value every time it is called.
+
 ## v0.4.2 - 6 Sept 2014
 
 - Fixed issue causing `Close` to start an infinite loop
