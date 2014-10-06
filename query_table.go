@@ -47,6 +47,7 @@ func (t Term) TableList(args ...interface{}) Term {
 
 type IndexCreateOpts struct {
 	Multi interface{} `gorethink:"multi,omitempty"`
+	Geo   interface{} `gorethink:"geo,omitempty"`
 }
 
 func (o *IndexCreateOpts) toMap() map[string]interface{} {

@@ -228,3 +228,8 @@ func (t Term) TypeOf(args ...interface{}) Term {
 func (t Term) Info(args ...interface{}) Term {
 	return constructMethodTerm(t, "Info", p.Term_INFO, args, map[string]interface{}{})
 }
+
+// UUID returns a UUID (universally unique identifier), a string that can be used as a unique ID.
+func UUID(args ...interface{}) Term {
+	return constructRootTerm("UUID", p.Term_UUID, []interface{}{}, map[string]interface{}{})
+}

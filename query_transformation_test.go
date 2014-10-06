@@ -311,6 +311,39 @@ func (s *RethinkSuite) TestTransformationNth(c *test.C) {
 	c.Assert(response, JsonEquals, 3)
 }
 
+func (s *RethinkSuite) TestTransformationAtIndexNth(c *test.C) {
+	query := Expr([]interface{}{1}).AtIndex(Expr(0))
+
+	var response interface{}
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, 1)
+}
+
+func (s *RethinkSuite) TestTransformationAtIndexField(c *test.C) {
+	query := Expr(map[string]interface{}{"foo": 1}).AtIndex(Expr("foo"))
+
+	var response interface{}
+	r, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, 1)
+}
+
+func (s *RethinkSuite) TestTransformationAtIndexArrayField(c *test.C) {
+	query := Expr([]interface{}{1}).AtIndex(Expr("foo"))
+
+	_, err := query.Run(sess)
+	c.Assert(err, test.NotNil)
+}
+
 func (s *RethinkSuite) TestTransformationIndexesOf(c *test.C) {
 	query := Expr(arr).IndexesOf(2)
 

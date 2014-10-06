@@ -118,18 +118,24 @@ type WriteChanges struct {
 }
 
 type RunOpts struct {
-	Db           interface{} `gorethink:"db,omitempty"`
-	Profile      interface{} `gorethink:"profile,omitempty"`
-	UseOutdated  interface{} `gorethink:"use_outdated,omitempty"`
-	NoReply      interface{} `gorethink:"noreply,omitempty"`
-	ArrayLimit   interface{} `gorethink:"array_limit,omitempty"`
-	TimeFormat   interface{} `gorethink:"time_format,omitempty"`
-	GroupFormat  interface{} `gorethink:"group_format,omitempty"`
-	BinaryFormat interface{} `gorethink:"binary_format,omitempty"`
-	EncodeExpr   interface{} `gorethink:"encode_expr,omitempty"`
+	Db             interface{} `gorethink:"db,omitempty"`
+	Profile        interface{} `gorethink:"profile,omitempty"`
+	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"`
+	NoReply        interface{} `gorethink:"noreply,omitempty"`
+	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
+	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
+	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
+	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
+	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
+	BatchConf      BatchOpts   `gorethink:"batch_conf,omitempty"`
+}
 
-	// Unsupported options
-	BatchConf interface{} `gorethink:"batch_conf,omitempty"`
+type BatchOpts struct {
+	MinBatchRows              interface{} `gorethink:"min_batch_rows,omitempty"`
+	MaxBatchRows              interface{} `gorethink:"max_batch_rows,omitempty"`
+	MaxBatchBytes             interface{} `gorethink:"max_batch_bytes,omitempty"`
+	MaxBatchSeconds           interface{} `gorethink:"max_batch_seconds,omitempty"`
+	FirstBatchScaledownFactor interface{} `gorethink:"first_batch_scaledown_factor,omitempty"`
 }
 
 func (o *RunOpts) toMap() map[string]interface{} {

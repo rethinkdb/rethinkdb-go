@@ -7,13 +7,16 @@ import (
 	"reflect"
 	"strconv"
 	"time"
+
+	"github.com/dancannon/gorethink/types"
 )
 
 var (
 	marshalerType     = reflect.TypeOf(new(Marshaler)).Elem()
 	textMarshalerType = reflect.TypeOf(new(encoding.TextMarshaler)).Elem()
 
-	timeType = reflect.TypeOf(new(time.Time)).Elem()
+	timeType     = reflect.TypeOf(new(time.Time)).Elem()
+	geometryType = reflect.TypeOf(new(types.Geometry)).Elem()
 )
 
 // newTypeEncoder constructs an encoderFunc for a type.
@@ -31,6 +34,8 @@ func newTypeEncoder(t reflect.Type, allowAddr bool) encoderFunc {
 	switch t {
 	case timeType:
 		return timePseudoTypeEncoder
+	case geometryType:
+		return geometryPseudoTypeEncoder
 	}
 
 	switch t.Kind() {
@@ -315,6 +320,27 @@ func timePseudoTypeEncoder(v reflect.Value) interface{} {
 		"$reql_type$": "TIME",
 		"epoch_time":  t.Unix(),
 		"timezone":    "+00:00",
+	}
+}
+
+// Encode a time.Time value to the TIME RQL type
+func geometryPseudoTypeEncoder(v reflect.Value) interface{} {
+	g := v.Interface().(types.Geometry)
+
+	var coords interface{}
+	switch g.Type {
+	case "Point":
+		coords = g.Point.Marshal()
+	case "LineString":
+		coords = g.Line.Marshal()
+	case "Polygon":
+		coords = g.Lines.Marshal()
+	}
+
+	return map[string]interface{}{
+		"$reql_type$": "GEOMETRY",
+		"type":        g.Type,
+		"coordinates": coords,
 	}
 }
 
