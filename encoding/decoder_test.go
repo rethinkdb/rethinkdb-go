@@ -249,10 +249,16 @@ func TestDecode(t *testing.T) {
 		// v = new(right-type)
 		v := reflect.New(reflect.TypeOf(tt.ptr).Elem())
 
-		if err := Decode(v.Interface(), tt.in); !reflect.DeepEqual(err, tt.err) {
-			t.Errorf("#%d: got error %v want %v", i, err, tt.err)
+		err := Decode(v.Interface(), tt.in)
+		if tt.err != nil {
+			if !reflect.DeepEqual(err, tt.err) {
+				t.Errorf("#%d: got error %v want %v", i, err, tt.err)
+			}
+
 			continue
-		} else if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
+		}
+
+		if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
 			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
 		}
