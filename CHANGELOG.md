@@ -7,6 +7,7 @@
 - Added `AtIndex` term, combines `Nth` and `GetField`
 - Added the `Geometry` type, see the types package
 - Updated the `BatchConf` field in `RunOpts`, now uses the `BatchOpts` type
+- Removed support for the `FieldMapper` interface
 
 ### Internal Changes
 - Fixed encoding performance issues, greatly improves writes/second
