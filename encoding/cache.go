@@ -131,7 +131,6 @@ func typeFields(t reflect.Type) []field {
 						index:     index,
 						typ:       ft,
 						omitEmpty: opts.Contains("omitempty"),
-						quoted:    opts.Contains("string"),
 					}))
 					if count[f.typ] > 1 {
 						// If there were multiple instances, add a second,

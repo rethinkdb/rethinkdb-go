@@ -278,27 +278,6 @@ func TestDecode(t *testing.T) {
 	}
 }
 
-// Test that the empty string doesn't panic decoding when ,string is specified
-// Issue 3450
-func TestEmptyString(t *testing.T) {
-	type T2 struct {
-		Number1 int `gorethink:",string"`
-		Number2 int `gorethink:",string"`
-	}
-	data := map[string]interface{}{
-		"Number1": "1",
-		"Number2": "",
-	}
-	var t2 T2
-	err := Decode(&t2, data)
-	if err == nil {
-		t.Fatal("Decode: did not return error")
-	}
-	if t2.Number1 != 1 {
-		t.Fatal("Decode: did not set Number1")
-	}
-}
-
 func TestStringKind(t *testing.T) {
 	type aMap map[string]int
 
