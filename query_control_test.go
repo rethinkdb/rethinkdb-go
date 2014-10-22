@@ -278,6 +278,20 @@ func (s *RethinkSuite) TestControlBinaryTerm(c *test.C) {
 	c.Assert(bytes.Equal(response, []byte("Hello World")), test.Equals, true)
 }
 
+func (s *RethinkSuite) TestControlBinaryElemTerm(c *test.C) {
+	var response map[string]interface{}
+
+	query := Expr(map[string]interface{}{
+		"bytes": []byte("Hello World"),
+	})
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(bytes.Equal(response["bytes"].([]byte), []byte("Hello World")), test.Equals, true)
+}
+
 func (s *RethinkSuite) TestControlDo(c *test.C) {
 	var response []interface{}
 	query := Do([]interface{}{

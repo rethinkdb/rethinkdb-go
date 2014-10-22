@@ -356,6 +356,6 @@ func encodeByteSlice(v reflect.Value) interface{} {
 
 	return map[string]interface{}{
 		"$reql_type$": "BINARY",
-		"data":        dst,
+		"data":        string(dst),
 	}
 }

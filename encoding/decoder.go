@@ -8,10 +8,13 @@ import (
 	"errors"
 	"reflect"
 	"runtime"
+
 	// "runtime"
 	"strconv"
 	"strings"
 )
+
+var byteSliceType = reflect.TypeOf([]byte(nil))
 
 // Decode decodes map[string]interface{} into a struct. The first parameter
 // must be a pointer.
@@ -240,11 +243,12 @@ func decodeArray(dv reflect.Value, sv reflect.Value) {
 		return
 	case reflect.Array:
 	case reflect.Slice:
-		break
-	}
+		if sv.Type() == byteSliceType {
+			dv.SetBytes(sv.Bytes())
+			return
+		}
 
-	if dv.Kind() == reflect.Slice {
-		dv.Set(reflect.MakeSlice(dt, 0, 0))
+		break
 	}
 
 	// Iterate through the slice/array and decode each element before adding it
@@ -396,7 +400,11 @@ func decodeInterface(sv reflect.Value) interface{} {
 }
 
 // decodeArrayInterface decodes the source value into []interface{}
-func decodeArrayInterface(sv reflect.Value) []interface{} {
+func decodeArrayInterface(sv reflect.Value) interface{} {
+	if sv.Type() == byteSliceType {
+		return sv.Bytes()
+	}
+
 	arr := []interface{}{}
 	for i := 0; i < sv.Len(); i++ {
 		arr = append(arr, decodeInterface(sv.Index(i)))
@@ -405,7 +413,7 @@ func decodeArrayInterface(sv reflect.Value) []interface{} {
 }
 
 // decodeObjectInterface decodes the source value into map[string]interface{}
-func decodeObjectInterface(sv reflect.Value) map[string]interface{} {
+func decodeObjectInterface(sv reflect.Value) interface{} {
 	m := map[string]interface{}{}
 	for _, key := range sv.MapKeys() {
 		m[key.Interface().(string)] = decodeInterface(sv.MapIndex(key))

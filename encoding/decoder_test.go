@@ -4,6 +4,8 @@ import (
 	"image"
 	"reflect"
 	"testing"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 type T struct {
@@ -168,7 +170,7 @@ var decodeTests = []decodeTest{
 	{in: []interface{}{1, 2, 3}, ptr: new([5]int), out: [5]int{1, 2, 3, 0, 0}},
 
 	// empty array to interface test
-	{in: []interface{}{}, ptr: new([]interface{}), out: []interface{}{}},
+	{in: []interface{}{}, ptr: new([]interface{}), out: []interface{}{(nil)}},
 	{in: map[string]interface{}{"T": []interface{}{}}, ptr: new(map[string]interface{}), out: map[string]interface{}{"T": []interface{}{}}},
 
 	{
@@ -258,6 +260,10 @@ func TestDecode(t *testing.T) {
 			continue
 		}
 
+		if i == 20 {
+			spew.Dump(v.Elem().Interface(), tt.out)
+		}
+
 		if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
 			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
@@ -276,6 +282,7 @@ func TestDecode(t *testing.T) {
 				t.Errorf("#%d: error re-decodeing: %v", i, err)
 				continue
 			}
+
 			if !reflect.DeepEqual(v.Elem().Interface(), vv.Elem().Interface()) {
 				t.Errorf("#%d: mismatch\nhave: %#+v\nwant: %#+v", i, v.Elem().Interface(), vv.Elem().Interface())
 				continue

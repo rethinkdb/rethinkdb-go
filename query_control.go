@@ -59,7 +59,16 @@ func expr(val interface{}, depth int) Term {
 		case reflect.Slice, reflect.Array:
 			// Check if slice is a byte slice
 			if valType.Elem().Kind() == reflect.Uint8 {
-				return Binary(valValue.Bytes())
+				data, err := encode(val)
+
+				if err != nil || data == nil {
+					return Term{
+						termType: p.Term_DATUM,
+						data:     nil,
+					}
+				}
+
+				return expr(data, depth-1)
 			} else {
 				vals := []Term{}
 				for i := 0; i < valValue.Len(); i++ {

@@ -1,6 +1,8 @@
 package gorethink
 
-import p "github.com/dancannon/gorethink/ql2"
+import (
+	p "github.com/dancannon/gorethink/ql2"
+)
 
 type InsertOpts struct {
 	Durability    interface{} `gorethink:"durability,omitempty"`
