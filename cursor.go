@@ -9,17 +9,31 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+func newCursor(session *Session, conn *Connection, token int64, term *Term, opts map[string]interface{}) *Cursor {
+	cursor := &Cursor{
+		session: session,
+		conn:    conn,
+		token:   token,
+		term:    term,
+		opts:    opts,
+	}
+	cursor.gotResponse.L = &cursor.mu
+
+	return cursor
+}
+
 // Cursors are used to represent data returned from the database.
 //
 // The code for this struct is based off of mgo's Iter and the official
 // python driver's cursor.
 type Cursor struct {
-	mu      sync.Mutex
-	session *Session
-	conn    *Connection
-	query   Query
-	term    Term
-	opts    map[string]interface{}
+	gotResponse sync.Cond
+	mu          sync.Mutex
+	session     *Session
+	conn        *Connection
+	token       int64
+	term        *Term
+	opts        map[string]interface{}
 
 	err                 error
 	outstandingRequests int
@@ -63,12 +77,7 @@ func (c *Cursor) Close() error {
 		c.closed = true
 	}
 
-	err := c.conn.Close()
-	if err != nil {
-		return err
-	}
-
-	err = c.err
+	err := c.err
 	c.mu.Unlock()
 
 	return err
@@ -234,28 +243,32 @@ func (c *Cursor) IsNil() bool {
 	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
 }
 
+// extend adds the content of another response.
 func (c *Cursor) extend(response *Response) {
 	c.mu.Lock()
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
 		response.Type != p.Response_SUCCESS_FEED
 	c.responses = append(c.responses, response)
+	c.outstandingRequests -= 1
 
 	// Prefetch results if needed
 	if len(c.responses) == 1 && !c.finished {
-		if err := c.session.asyncContinueQuery(c); err != nil {
+		conn := c.conn
+		token := c.token
+
+		c.mu.Unlock()
+		err := conn.AsyncContinueQuery(token)
+		c.mu.Lock()
+
+		if err != nil {
 			c.err = err
 			return
 		}
 	}
 
 	// Load the new response into the buffer
-	var err error
 	c.buffer = c.responses[0].Responses
-	if err != nil {
-		c.err = err
 
-		return
-	}
 	c.responses = c.responses[1:]
 	c.mu.Unlock()
 }

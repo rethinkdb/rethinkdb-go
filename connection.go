@@ -4,16 +4,20 @@ import (
 	"bufio"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"gopkg.in/fatih/pool.v2"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
+
+type responseFunc func(error, *Response, *Cursor)
 
 type Response struct {
 	Token     int64
@@ -24,19 +28,23 @@ type Response struct {
 }
 
 type Conn interface {
-	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}, async bool) (*Cursor, error)
+	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}) (*Cursor, error)
 	ReadResponse(s *Session, token int64) (*Response, error)
 	Close() error
 }
 
 // connection is a connection to a rethinkdb database
 type Connection struct {
-	// embed the net.Conn type, so that we can effectively define new methods on
-	// it (interfaces do not allow that)
-	net.Conn
-	s *Session
-
 	sync.Mutex
+	conn    net.Conn
+	session *Session
+	token   int64
+	closed  bool
+
+	responseFuncs map[int64]responseFunc
+	termCache     map[int64]*Term
+	optionCache   map[int64]map[string]interface{}
+	cursorCache   map[int64]*Cursor
 }
 
 // Dial closes the previous connection and attempts to connect again.
@@ -90,40 +98,442 @@ func Dial(s *Session) pool.Factory {
 	}
 }
 
-func TestOnBorrow(c *Connection, t time.Time) error {
-	c.SetReadDeadline(t)
+func newConnection(s *Session, c net.Conn) *Connection {
+	conn := &Connection{
+		conn:    c,
+		session: s,
 
-	data := make([]byte, 1)
-	if _, err := c.Read(data); err != nil {
-		e, ok := err.(net.Error)
-		if err != nil && !(ok && e.Timeout()) {
+		responseFuncs: make(map[int64]responseFunc),
+		termCache:     make(map[int64]*Term),
+		optionCache:   make(map[int64]map[string]interface{}),
+		cursorCache:   make(map[int64]*Cursor),
+	}
+
+	go conn.readLoop()
+
+	return conn
+}
+
+func (c *Connection) StartQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
+	token := c.nextToken()
+
+	// Build global options
+	globalOpts := map[string]interface{}{}
+	for k, v := range opts {
+		globalOpts[k] = Expr(v).build()
+	}
+
+	// If no DB option was set default to the value set in the connection
+	if _, ok := opts["db"]; !ok {
+		globalOpts["db"] = Db(c.session.database).build()
+	}
+
+	// Construct query
+	q := Query{
+		Type:       p.Query_START,
+		Token:      token,
+		Term:       &t,
+		GlobalOpts: globalOpts,
+	}
+
+	_, cursor, err := c.SendQuery(q, map[string]interface{}{})
+	return cursor, err
+}
+
+func (c *Connection) ContinueQuery(token int64) error {
+	q := Query{
+		Type:  p.Query_CONTINUE,
+		Token: token,
+	}
+
+	_, _, err := c.SendQuery(q, map[string]interface{}{})
+	return err
+}
+
+func (c *Connection) AsyncContinueQuery(token int64) error {
+	q := Query{
+		Type:  p.Query_CONTINUE,
+		Token: token,
+	}
+
+	// Send query and wait for response
+	return c.sendQuery(q, map[string]interface{}{}, func(err error, _ *Response, cursor *Cursor) {
+		if cursor != nil {
+			cursor.mu.Lock()
+			if err != nil {
+				cursor.err = err
+			}
+			cursor.mu.Unlock()
+		}
+	})
+}
+
+func (c *Connection) StopQuery(token int64) error {
+	q := Query{
+		Type:  p.Query_STOP,
+		Token: token,
+	}
+
+	_, _, err := c.SendQuery(q, map[string]interface{}{})
+	return err
+}
+
+func (c *Connection) NoReplyWait() error {
+	q := Query{
+		Type:  p.Query_NOREPLY_WAIT,
+		Token: c.nextToken(),
+	}
+
+	_, _, err := c.SendQuery(q, map[string]interface{}{})
+	return err
+}
+
+func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (response *Response, cursor *Cursor, err error) {
+	var wait, change sync.Mutex
+	var done bool
+
+	var rErr error
+	var rResponse *Response
+	var rCursor *Cursor
+
+	wait.Lock()
+	sendErr := c.sendQuery(q, map[string]interface{}{}, func(err error, response *Response, cursor *Cursor) {
+		change.Lock()
+		if !done {
+			done = true
+			rErr = err
+			rResponse = response
+			rCursor = cursor
+
+			if cursor != nil {
+				cursor.mu.Lock()
+				if err != nil {
+					cursor.err = err
+				}
+				cursor.mu.Unlock()
+			}
+		}
+		change.Unlock()
+		wait.Unlock()
+	})
+	if sendErr != nil {
+		return nil, nil, sendErr
+	}
+	wait.Lock()
+	change.Lock()
+	response = rResponse
+	cursor = rCursor
+	err = rErr
+	change.Unlock()
+
+	return response, cursor, err
+}
+
+func (c *Connection) sendQuery(q Query, opts map[string]interface{}, cb responseFunc) error {
+	//c.Lock()
+	closed := c.closed
+	//c.Unlock()
+
+	if closed {
+		err := errors.New("connection closed")
+		cb(err, nil, nil)
+		return err
+	}
+	// Build query
+	b, err := json.Marshal(q.build())
+	if err != nil {
+		err := RqlDriverError{"Error building query"}
+		cb(err, nil, nil)
+		return err
+	}
+
+	//c.Lock()
+
+	// Set timeout
+	if c.session.timeout == 0 {
+		c.conn.SetDeadline(time.Time{})
+	} else {
+		c.conn.SetDeadline(time.Now().Add(c.session.timeout))
+	}
+
+	// Setup response handler/query caches
+	fmt.Printf("send: %p, %d\n", c, q.Token)
+	c.termCache[q.Token] = q.Term
+	c.optionCache[q.Token] = opts
+	c.responseFuncs[q.Token] = cb
+
+	// Send a unique 8-byte token
+	if err = binary.Write(c.conn, binary.LittleEndian, q.Token); err != nil {
+		//c.Unlock()
+		err := RqlConnectionError{err.Error()}
+		cb(err, nil, nil)
+		return err
+	}
+
+	// Send the length of the JSON-encoded query as a 4-byte
+	// little-endian-encoded integer.
+	if err = binary.Write(c.conn, binary.LittleEndian, uint32(len(b))); err != nil {
+		//c.Unlock()
+		err := RqlConnectionError{err.Error()}
+		cb(err, nil, nil)
+		return err
+	}
+
+	// Send the JSON encoding of the query itself.
+	if err = binary.Write(c.conn, binary.BigEndian, b); err != nil {
+		//c.Unlock()
+		err := RqlConnectionError{err.Error()}
+		cb(err, nil, nil)
+		return err
+	}
+
+	//c.Unlock()
+
+	// Return immediately if the noreply option was set
+	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		c.Close()
+
+		return nil
+	}
+
+	return nil
+}
+
+func (c *Connection) kill(err error) error {
+	fmt.Println(err)
+	if !c.closed {
+		if err := c.Close(); err != nil {
 			return err
 		}
 	}
 
-	c.SetReadDeadline(time.Time{})
+	return err
+}
+
+func (c *Connection) Close() error {
+	if !c.closed {
+		fmt.Println("closing")
+		err := c.conn.Close()
+		fmt.Println("closed")
+
+		return err
+	}
+
 	return nil
 }
 
-func (c *Connection) ReadResponse(s *Session, token int64) (*Response, error) {
+// getToken generates the next query token, used to number requests and match
+// responses with requests.
+func (c *Connection) nextToken() int64 {
+	return atomic.AddInt64(&c.session.token, 1)
+}
+
+func (c *Connection) processResponse(response *Response) {
+	//c.Lock()
+	t := c.termCache[response.Token]
+	fmt.Printf("recv: %p, %d, %v\n", c, response.Token, c.responseFuncs)
+	//c.Unlock()
+
+	switch response.Type {
+	case p.Response_CLIENT_ERROR:
+		c.processErrorResponse(response, RqlClientError{rqlResponseError{response, t}})
+	case p.Response_COMPILE_ERROR:
+		c.processErrorResponse(response, RqlCompileError{rqlResponseError{response, t}})
+	case p.Response_RUNTIME_ERROR:
+		c.processErrorResponse(response, RqlRuntimeError{rqlResponseError{response, t}})
+	case p.Response_SUCCESS_ATOM:
+		c.processAtomResponse(response)
+	case p.Response_SUCCESS_FEED:
+		c.processFeedResponse(response)
+	case p.Response_SUCCESS_PARTIAL:
+		c.processPartialResponse(response)
+	case p.Response_SUCCESS_SEQUENCE:
+		c.processSequenceResponse(response)
+	case p.Response_WAIT_COMPLETE:
+		c.processWaitResponse(response)
+	default:
+		panic(RqlDriverError{"Unexpected response type"})
+	}
+}
+
+func (c *Connection) processErrorResponse(response *Response, err error) {
+	c.Close()
+
+	//c.Lock()
+	cb, ok := c.responseFuncs[response.Token]
+	cursor := c.cursorCache[response.Token]
+	//c.Unlock()
+	if ok {
+		cb(err, response, cursor)
+	}
+
+	//c.Lock()
+	delete(c.responseFuncs, response.Token)
+	delete(c.termCache, response.Token)
+	delete(c.optionCache, response.Token)
+	delete(c.cursorCache, response.Token)
+	//c.Unlock()
+}
+
+func (c *Connection) processAtomResponse(response *Response) {
+	c.Close()
+
+	// Create cursor
+	var value []interface{}
+	if len(response.Responses) < 1 {
+		value = []interface{}{}
+	} else {
+		var v = response.Responses[0]
+		if sv, ok := v.([]interface{}); ok {
+			value = sv
+		} else if v == nil {
+			value = []interface{}{nil}
+		} else {
+			value = []interface{}{v}
+		}
+	}
+
+	//c.Lock()
+	t := c.termCache[response.Token]
+	opts := c.optionCache[response.Token]
+	//c.Unlock()
+
+	cursor := newCursor(c.session, c, response.Token, t, opts)
+	cursor.profile = response.Profile
+	cursor.buffer = value
+	cursor.finished = true
+
+	// Return response
+	//c.Lock()
+	cb, ok := c.responseFuncs[response.Token]
+	//c.Unlock()
+	if ok {
+		go cb(nil, response, cursor)
+	}
+
+	//c.Lock()
+	delete(c.responseFuncs, response.Token)
+	delete(c.termCache, response.Token)
+	delete(c.optionCache, response.Token)
+	//c.Unlock()
+}
+
+func (c *Connection) processFeedResponse(response *Response) {
+	//c.Lock()
+	cb, ok := c.responseFuncs[response.Token]
+	if ok {
+		delete(c.responseFuncs, response.Token)
+
+		var cursor *Cursor
+		if _, ok := c.cursorCache[response.Token]; !ok {
+			// Create a new cursor if needed
+			cursor = newCursor(c.session, c, response.Token, c.termCache[response.Token], c.optionCache[response.Token])
+			cursor.profile = response.Profile
+			c.cursorCache[response.Token] = cursor
+		} else {
+			cursor = c.cursorCache[response.Token]
+		}
+		//c.Unlock()
+
+		cursor.extend(response)
+		cb(nil, response, cursor)
+	}
+}
+
+func (c *Connection) processPartialResponse(response *Response) {
+	//c.Lock()
+	cb, ok := c.responseFuncs[response.Token]
+	if ok {
+		delete(c.responseFuncs, response.Token)
+
+		var cursor *Cursor
+		if _, ok := c.cursorCache[response.Token]; !ok {
+			// Create a new cursor if needed
+			cursor = newCursor(c.session, c, response.Token, c.termCache[response.Token], c.optionCache[response.Token])
+			cursor.profile = response.Profile
+			c.cursorCache[response.Token] = cursor
+		} else {
+			cursor = c.cursorCache[response.Token]
+		}
+		//c.Unlock()
+
+		cursor.extend(response)
+		cb(nil, response, cursor)
+	}
+}
+
+func (c *Connection) processSequenceResponse(response *Response) {
+	c.Close()
+
+	//c.Lock()
+	cb, ok := c.responseFuncs[response.Token]
+	if ok {
+		delete(c.responseFuncs, response.Token)
+
+		var cursor *Cursor
+		if _, ok := c.cursorCache[response.Token]; !ok {
+			// Create a new cursor if needed
+			cursor = newCursor(c.session, c, response.Token, c.termCache[response.Token], c.optionCache[response.Token])
+			cursor.profile = response.Profile
+			c.cursorCache[response.Token] = cursor
+		} else {
+			cursor = c.cursorCache[response.Token]
+		}
+		//c.Unlock()
+
+		cursor.extend(response)
+		cb(nil, response, cursor)
+
+		//c.Lock()
+	}
+
+	delete(c.responseFuncs, response.Token)
+	delete(c.termCache, response.Token)
+	delete(c.optionCache, response.Token)
+	delete(c.cursorCache, response.Token)
+	//c.Unlock()
+}
+
+func (c *Connection) processWaitResponse(response *Response) {
+	c.Close()
+
+	//c.Lock()
+	cb, ok := c.responseFuncs[response.Token]
+	//c.Unlock()
+	if ok {
+		cb(nil, response, nil)
+	}
+
+	//c.Lock()
+	delete(c.responseFuncs, response.Token)
+	delete(c.termCache, response.Token)
+	delete(c.optionCache, response.Token)
+	delete(c.cursorCache, response.Token)
+	//c.Unlock()
+}
+
+func (c *Connection) readLoop() {
 	for {
 		// Read the 8-byte token of the query the response corresponds to.
 		var responseToken int64
-		if err := binary.Read(c, binary.LittleEndian, &responseToken); err != nil {
-			return nil, RqlConnectionError{err.Error()}
+		if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
+			c.kill(RqlConnectionError{err.Error()})
+			return
 		}
 
 		// Read the length of the JSON-encoded response as a 4-byte
 		// little-endian-encoded integer.
 		var messageLength uint32
-		if err := binary.Read(c, binary.LittleEndian, &messageLength); err != nil {
-			return nil, RqlConnectionError{err.Error()}
+		if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
+			c.kill(RqlConnectionError{err.Error()})
+			return
 		}
 
 		// Read the JSON encoding of the Response itself.
 		b := make([]byte, messageLength)
-		if _, err := io.ReadFull(c, b); err != nil {
-			return nil, RqlDriverError{err.Error()}
+		if _, err := io.ReadFull(c.conn, b); err != nil {
+			c.kill(RqlConnectionError{err.Error()})
+			return
 		}
 
 		// Decode the response
@@ -131,163 +541,15 @@ func (c *Connection) ReadResponse(s *Session, token int64) (*Response, error) {
 		response.Token = responseToken
 		err := json.Unmarshal(b, response)
 		if err != nil {
-			return nil, RqlDriverError{err.Error()}
-		}
-
-		if responseToken == token {
-			return response, nil
-		} else if cursor, ok := s.checkCache(token); ok {
-			// Handle batch response
-			s.handleBatchResponse(cursor, response)
-		} else {
-			return nil, RqlDriverError{"Unexpected response received"}
-		}
-	}
-}
-
-func (c *Connection) SendQuery(s *Session, q Query, opts map[string]interface{}, async bool) (*Cursor, error) {
-	var err error
-
-	// Build query
-	b, err := json.Marshal(q.build())
-	if err != nil {
-		return nil, RqlDriverError{"Error building query"}
-	}
-
-	// Set timeout
-	if s.timeout == 0 {
-		c.SetDeadline(time.Time{})
-	} else {
-		c.SetDeadline(time.Now().Add(s.timeout))
-	}
-
-	// Send a unique 8-byte token
-	if err = binary.Write(c, binary.LittleEndian, q.Token); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Send the length of the JSON-encoded query as a 4-byte
-	// little-endian-encoded integer.
-	if err = binary.Write(c, binary.LittleEndian, uint32(len(b))); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Send the JSON encoding of the query itself.
-	if err = binary.Write(c, binary.BigEndian, b); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Return immediately if the noreply option was set
-	if noreply, ok := opts["noreply"]; (ok && noreply.(bool)) || async {
-		return nil, nil
-	}
-
-	// Get response
-	response, err := c.ReadResponse(s, q.Token)
-	if err != nil {
-		return nil, err
-	}
-
-	err = checkErrorResponse(response, q.Term)
-	if err != nil {
-		return nil, err
-	}
-
-	// De-construct datum and return a cursor
-	switch response.Type {
-	case p.Response_SUCCESS_PARTIAL, p.Response_SUCCESS_SEQUENCE, p.Response_SUCCESS_FEED:
-		cursor := &Cursor{
-			session: s,
-			conn:    c,
-			query:   q,
-			term:    *q.Term,
-			opts:    opts,
-			profile: response.Profile,
-		}
-
-		s.setCache(q.Token, cursor)
-
-		cursor.extend(response)
-
-		return cursor, nil
-	case p.Response_SUCCESS_ATOM:
-		var value []interface{}
-		var err error
-
-		if len(response.Responses) < 1 {
-			value = []interface{}{}
-		} else {
-			var v interface{}
-
-			v, err = recursivelyConvertPseudotype(response.Responses[0], opts)
-			if err != nil {
-				return nil, err
+			//c.Lock()
+			cb, ok := c.responseFuncs[responseToken]
+			//c.Unlock()
+			if ok {
+				cb(err, nil, nil)
 			}
-			if err != nil {
-				return nil, RqlDriverError{err.Error()}
-			}
-
-			if sv, ok := v.([]interface{}); ok {
-				value = sv
-			} else if v == nil {
-				value = []interface{}{nil}
-			} else {
-				value = []interface{}{v}
-			}
+			continue
 		}
 
-		cursor := &Cursor{
-			session:  s,
-			conn:     c,
-			query:    q,
-			term:     *q.Term,
-			opts:     opts,
-			profile:  response.Profile,
-			buffer:   value,
-			finished: true,
-		}
-
-		return cursor, nil
-	case p.Response_WAIT_COMPLETE:
-		return nil, nil
-	default:
-		return nil, RqlDriverError{fmt.Sprintf("Unexpected response type received: %s", response.Type)}
+		c.processResponse(response)
 	}
-}
-
-func (c *Connection) Close() error {
-	err := c.NoreplyWait()
-	if err != nil {
-		return err
-	}
-
-	return c.Conn.Close()
-}
-
-// noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
-func (c *Connection) NoreplyWait() error {
-	q := Query{
-		Type:  p.Query_NOREPLY_WAIT,
-		Token: c.s.nextToken(),
-	}
-
-	_, err := c.SendQuery(c.s, q, map[string]interface{}{}, false)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func checkErrorResponse(response *Response, t *Term) error {
-	switch response.Type {
-	case p.Response_CLIENT_ERROR:
-		return RqlClientError{rqlResponseError{response, t}}
-	case p.Response_COMPILE_ERROR:
-		return RqlCompileError{rqlResponseError{response, t}}
-	case p.Response_RUNTIME_ERROR:
-		return RqlRuntimeError{rqlResponseError{response, t}}
-	}
-
-	return nil
 }

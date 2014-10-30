@@ -1,8 +1,8 @@
 package gorethink
 
 import (
+	"fmt"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"gopkg.in/fatih/pool.v2"
@@ -31,7 +31,6 @@ func (q *Query) build() []interface{} {
 }
 
 type Session struct {
-	token      int64
 	address    string
 	database   string
 	timeout    time.Duration
@@ -43,23 +42,17 @@ type Session struct {
 	maxCap      int
 	idleTimeout time.Duration
 
+	token int64
+
 	// Response cache, used for batched responses
 	sync.Mutex
-	cache map[int64]*Cursor
-
 	closed bool
-
-	pool pool.Pool
+	pool   pool.Pool
 }
 
 func newSession(args map[string]interface{}) *Session {
-	s := &Session{
-		cache: map[int64]*Cursor{},
-	}
+	s := &Session{}
 
-	if token, ok := args["token"]; ok {
-		s.token = token.(int64)
-	}
 	if address, ok := args["address"]; ok {
 		s.address = address.(string)
 	}
@@ -74,17 +67,17 @@ func newSession(args map[string]interface{}) *Session {
 	}
 
 	// Pool configuration options
-	if initialCap, ok := args["initialCap"]; ok {
-		s.initialCap = initialCap.(int)
+	if initialCap, ok := args["initial_cap"]; ok {
+		s.initialCap = int(initialCap.(int64))
 	} else {
 		s.initialCap = 5
 	}
-	if maxCap, ok := args["maxCap"]; ok {
-		s.maxCap = maxCap.(int)
+	if maxCap, ok := args["max_cap"]; ok {
+		s.maxCap = int(maxCap.(int64))
 	} else {
 		s.maxCap = 30
 	}
-	if idleTimeout, ok := args["idleTimeout"]; ok {
+	if idleTimeout, ok := args["idle_timeout"]; ok {
 		s.idleTimeout = idleTimeout.(time.Duration)
 	} else {
 		s.idleTimeout = 10 * time.Second
@@ -94,13 +87,12 @@ func newSession(args map[string]interface{}) *Session {
 }
 
 type ConnectOpts struct {
-	Token       int64         `gorethink:"token,omitempty"`
 	Address     string        `gorethink:"address,omitempty"`
 	Database    string        `gorethink:"database,omitempty"`
 	Timeout     time.Duration `gorethink:"timeout,omitempty"`
 	AuthKey     string        `gorethink:"authkey,omitempty"`
-	MaxIdle     int           `gorethink:"max_idle,omitempty"`
-	MaxActive   int           `gorethink:"max_active,omitempty"`
+	InitialCap  int           `gorethink:"initial_cap,omitempty"`
+	MaxCap      int           `gorethink:"max_cap,omitempty"`
 	IdleTimeout time.Duration `gorethink:"idle_timeout,omitempty"`
 }
 
@@ -110,7 +102,7 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 
 // Connect creates a new database session.
 //
-// Supported arguments include token, address, database, timeout, authkey,
+// Supported arguments include address, database, timeout, authkey,
 // and timeFormat. Pool options include maxIdle, maxActive and idleTimeout.
 //
 // By default maxIdle and maxActive are set to 1: passing values greater
@@ -201,128 +193,68 @@ func (s *Session) SetTimeout(timeout time.Duration) {
 	s.timeout = timeout
 }
 
-// getToken generates the next query token, used to number requests and match
-// responses with requests.
-func (s *Session) nextToken() int64 {
-	return atomic.AddInt64(&s.token, 1)
-}
-
 // startQuery creates a query from the term given and sends it to the server.
 // The result from the server is returned as a cursor
 func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
-	token := s.nextToken()
-
-	// Build global options
-	globalOpts := map[string]interface{}{}
-	for k, v := range opts {
-		globalOpts[k] = Expr(v).build()
-	}
-
-	// If no DB option was set default to the value set in the connection
-	if _, ok := opts["db"]; !ok {
-		globalOpts["db"] = Db(s.database).build()
-	}
-
-	// Construct query
-	q := Query{
-		Type:       p.Query_START,
-		Token:      token,
-		Term:       &t,
-		GlobalOpts: globalOpts,
-	}
-
-	// Get a connection from the pool, do not close yet as it
-	// might be needed later if a partial response is returned
+	fmt.Println("start query")
 	conn, err := s.getConn()
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("start query - got conn")
+	cur, err := conn.StartQuery(t, opts)
+	fmt.Println("fin query")
 
-	return conn.SendQuery(s, q, opts, false)
+	return cur, err
 }
 
-func (s *Session) handleBatchResponse(cursor *Cursor, response *Response) {
-	cursor.extend(response)
+// func (s *Session) handleBatchResponse(cursor *Cursor, response *Response) {
+// 	cursor.extend(response)
 
-	s.Lock()
-	cursor.outstandingRequests--
+// 	s.Lock()
+// cursor.outstandingRequests--
 
-	if response.Type != p.Response_SUCCESS_PARTIAL &&
-		response.Type != p.Response_SUCCESS_FEED &&
-		cursor.outstandingRequests == 0 {
-		delete(s.cache, response.Token)
-	}
-	s.Unlock()
-}
+// if response.Type != p.Response_SUCCESS_PARTIAL &&
+// 	response.Type != p.Response_SUCCESS_FEED &&
+// 	cursor.outstandingRequests == 0 {
+// 	delete(s.cache, response.Token)
+// }
+// 	s.Unlock()
+// }
 
 // continueQuery continues a previously run query.
 // This is needed if a response is batched.
 func (s *Session) continueQuery(cursor *Cursor) error {
-	err := s.asyncContinueQuery(cursor)
-	if err != nil {
-		return err
-	}
+	cursor.mu.Lock()
+	conn := cursor.conn
+	cursor.mu.Unlock()
 
-	response, err := cursor.conn.ReadResponse(s, cursor.query.Token)
-	if err != nil {
-		return err
-	}
-
-	s.handleBatchResponse(cursor, response)
-
-	return nil
+	return conn.ContinueQuery(cursor.token)
 }
 
 // asyncContinueQuery asynchronously continues a previously run query.
 // This is needed if a response is batched.
 func (s *Session) asyncContinueQuery(cursor *Cursor) error {
-	s.Lock()
+	cursor.mu.Lock()
 	if cursor.outstandingRequests != 0 {
-
-		s.Unlock()
+		cursor.mu.Unlock()
 		return nil
 	}
 	cursor.outstandingRequests = 1
-	s.Unlock()
+	conn := cursor.conn
+	cursor.mu.Unlock()
 
-	q := Query{
-		Type:  p.Query_CONTINUE,
-		Token: cursor.query.Token,
-	}
-
-	_, err := cursor.conn.SendQuery(s, q, cursor.opts, true)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return conn.AsyncContinueQuery(cursor.token)
 }
 
 // stopQuery sends closes a query by sending Query_STOP to the server.
 func (s *Session) stopQuery(cursor *Cursor) error {
 	cursor.mu.Lock()
 	cursor.outstandingRequests++
+	conn := cursor.conn
 	cursor.mu.Unlock()
 
-	q := Query{
-		Type:  p.Query_STOP,
-		Token: cursor.query.Token,
-		Term:  &cursor.term,
-	}
-
-	_, err := cursor.conn.SendQuery(s, q, cursor.opts, false)
-	if err != nil {
-		return err
-	}
-
-	response, err := cursor.conn.ReadResponse(s, cursor.query.Token)
-	if err != nil {
-		return err
-	}
-
-	s.handleBatchResponse(cursor, response)
-
-	return nil
+	return conn.StopQuery(cursor.token)
 }
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
@@ -332,20 +264,7 @@ func (s *Session) noreplyWaitQuery() error {
 		return err
 	}
 
-	q := Query{
-		Type:  p.Query_NOREPLY_WAIT,
-		Token: s.nextToken(),
-	}
-	cur, err := conn.SendQuery(s, q, map[string]interface{}{}, false)
-	if err != nil {
-		return err
-	}
-	err = cur.Close()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return conn.NoReplyWait()
 }
 
 func (s *Session) getConn() (*Connection, error) {
@@ -358,20 +277,5 @@ func (s *Session) getConn() (*Connection, error) {
 		return nil, err
 	}
 
-	return &Connection{Conn: c, s: s}, nil
-}
-
-func (s *Session) checkCache(token int64) (*Cursor, bool) {
-	s.Lock()
-	defer s.Unlock()
-
-	cursor, ok := s.cache[token]
-	return cursor, ok
-}
-
-func (s *Session) setCache(token int64, cursor *Cursor) {
-	s.Lock()
-	defer s.Unlock()
-
-	s.cache[token] = cursor
+	return newConnection(s, c), nil
 }

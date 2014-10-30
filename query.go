@@ -187,10 +187,10 @@ func (t Term) Exec(s *Session, optArgs ...RunOpts) error {
 		return nil
 	}
 
-	err = res.Close()
-	if err != nil {
-		return err
-	}
+	// err = res.Close()
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
