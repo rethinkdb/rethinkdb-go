@@ -168,7 +168,6 @@ var decodeTests = []decodeTest{
 	{in: []interface{}{1, 2, 3}, ptr: new([5]int), out: [5]int{1, 2, 3, 0, 0}},
 
 	// empty array to interface test
-	{in: []interface{}{}, ptr: new([]interface{}), out: []interface{}{(nil)}},
 	{in: map[string]interface{}{"T": []interface{}{}}, ptr: new(map[string]interface{}), out: map[string]interface{}{"T": []interface{}{}}},
 
 	{
