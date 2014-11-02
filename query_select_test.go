@@ -308,24 +308,24 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 }
 
 func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
-	// Ensure table + database exist
-	DbCreate("test").RunWrite(sess)
-	Db("test").TableCreate("TestMany").RunWrite(sess)
-	Db("test").Table("TestMany").Delete().RunWrite(sess)
+	// // Ensure table + database exist
+	// DbCreate("test").RunWrite(sess)
+	// Db("test").TableCreate("TestMany").RunWrite(sess)
+	// Db("test").Table("TestMany").Delete().RunWrite(sess)
 
-	// Insert rows
-	for i := 0; i < 1; i++ {
-		data := []interface{}{}
+	// // Insert rows
+	// for i := 0; i < 1; i++ {
+	// 	data := []interface{}{}
 
-		for j := 0; j < 100; j++ {
-			data = append(data, map[string]interface{}{
-				"i": i,
-				"j": j,
-			})
-		}
+	// 	for j := 0; j < 100; j++ {
+	// 		data = append(data, map[string]interface{}{
+	// 			"i": i,
+	// 			"j": j,
+	// 		})
+	// 	}
 
-		Db("test").Table("TestMany").Insert(data).Run(sess)
-	}
+	// 	Db("test").Table("TestMany").Insert(data).Run(sess)
+	// }
 
 	// Test queries concurrently
 	attempts := 10
@@ -333,6 +333,7 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 
 	for i := 0; i < attempts; i++ {
 		go func(i int, c chan error) {
+
 			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
 				BatchConf: BatchOpts{
 					MaxBatchRows: 1,
@@ -340,16 +341,19 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 			})
 			if err != nil {
 				c <- err
+				return
 			}
 
-			var response []map[string]interface{}
+			var response []interface{}
 			err = res.All(&response)
 			if err != nil {
 				c <- err
+				return
 			}
 
 			if len(response) != 100 {
 				c <- fmt.Errorf("expected response length 100, received %d", len(response))
+				return
 			}
 
 			c <- nil

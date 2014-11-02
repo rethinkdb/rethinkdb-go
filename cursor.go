@@ -35,13 +35,15 @@ type Cursor struct {
 	term        *Term
 	opts        map[string]interface{}
 
-	err                 error
 	outstandingRequests int
-	closed              bool
-	finished            bool
-	responses           []*Response
-	profile             interface{}
-	buffer              []interface{}
+	wg                  sync.WaitGroup
+
+	err       error
+	closed    bool
+	finished  bool
+	responses []*Response
+	profile   interface{}
+	buffer    []interface{}
 }
 
 // Profile returns the information returned from the query profiler.

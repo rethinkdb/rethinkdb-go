@@ -257,7 +257,6 @@ func (c *Connection) sendQuery(q Query, opts map[string]interface{}, cb response
 	}
 
 	// Setup response handler/query caches
-	fmt.Printf("send: %p, %d\n", c, q.Token)
 	c.termCache[q.Token] = q.Term
 	c.optionCache[q.Token] = opts
 	c.responseFuncs[q.Token] = cb
@@ -300,7 +299,6 @@ func (c *Connection) sendQuery(q Query, opts map[string]interface{}, cb response
 }
 
 func (c *Connection) kill(err error) error {
-	fmt.Println(err)
 	if !c.closed {
 		if err := c.Close(); err != nil {
 			return err
@@ -312,9 +310,7 @@ func (c *Connection) kill(err error) error {
 
 func (c *Connection) Close() error {
 	if !c.closed {
-		fmt.Println("closing")
 		err := c.conn.Close()
-		fmt.Println("closed")
 
 		return err
 	}
@@ -331,7 +327,6 @@ func (c *Connection) nextToken() int64 {
 func (c *Connection) processResponse(response *Response) {
 	//c.Lock()
 	t := c.termCache[response.Token]
-	fmt.Printf("recv: %p, %d, %v\n", c, response.Token, c.responseFuncs)
 	//c.Unlock()
 
 	switch response.Type {

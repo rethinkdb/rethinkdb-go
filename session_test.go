@@ -8,10 +8,8 @@ import (
 
 func (s *RethinkSuite) TestSessionConnect(c *test.C) {
 	session, err := Connect(ConnectOpts{
-		Address:   url,
-		AuthKey:   os.Getenv("RETHINKDB_AUTHKEY"),
-		MaxIdle:   3,
-		MaxActive: 3,
+		Address: url,
+		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
 	})
 	c.Assert(err, test.IsNil)
 
@@ -27,9 +25,7 @@ func (s *RethinkSuite) TestSessionConnect(c *test.C) {
 func (s *RethinkSuite) TestSessionConnectError(c *test.C) {
 	var err error
 	_, err = Connect(ConnectOpts{
-		Address:   "nonexistanturl",
-		MaxIdle:   3,
-		MaxActive: 3,
+		Address: "nonexistanturl",
 	})
 	c.Assert(err, test.NotNil)
 }
