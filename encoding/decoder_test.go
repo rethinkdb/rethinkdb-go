@@ -3,9 +3,7 @@ package encoding
 import (
 	"image"
 	"reflect"
-	"testing"
-
-	"github.com/davecgh/go-spew/spew"
+	"testing"gi
 )
 
 type T struct {
@@ -258,10 +256,6 @@ func TestDecode(t *testing.T) {
 			}
 
 			continue
-		}
-
-		if i == 20 {
-			spew.Dump(v.Elem().Interface(), tt.out)
 		}
 
 		if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
