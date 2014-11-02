@@ -3,7 +3,7 @@ package encoding
 import (
 	"image"
 	"reflect"
-	"testing"gi
+	"testing"
 )
 
 type T struct {
