@@ -17,7 +17,6 @@ func newCursor(session *Session, conn *Connection, token int64, term *Term, opts
 		term:    term,
 		opts:    opts,
 	}
-	cursor.gotResponse.L = &cursor.mu
 
 	return cursor
 }
@@ -27,23 +26,21 @@ func newCursor(session *Session, conn *Connection, token int64, term *Term, opts
 // The code for this struct is based off of mgo's Iter and the official
 // python driver's cursor.
 type Cursor struct {
-	gotResponse sync.Cond
-	mu          sync.Mutex
-	session     *Session
-	conn        *Connection
-	token       int64
-	term        *Term
-	opts        map[string]interface{}
+	mu      sync.Mutex
+	session *Session
+	conn    *Connection
+	token   int64
+	query   Query
+	term    *Term
+	opts    map[string]interface{}
 
+	err                 error
 	outstandingRequests int
-	wg                  sync.WaitGroup
-
-	err       error
-	closed    bool
-	finished  bool
-	responses []*Response
-	profile   interface{}
-	buffer    []interface{}
+	closed              bool
+	finished            bool
+	responses           []*Response
+	profile             interface{}
+	buffer              []interface{}
 }
 
 // Profile returns the information returned from the query profiler.
@@ -79,7 +76,12 @@ func (c *Cursor) Close() error {
 		c.closed = true
 	}
 
-	err := c.err
+	err := c.conn.Close()
+	if err != nil {
+		return err
+	}
+
+	err = c.err
 	c.mu.Unlock()
 
 	return err
@@ -245,32 +247,28 @@ func (c *Cursor) IsNil() bool {
 	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
 }
 
-// extend adds the content of another response.
 func (c *Cursor) extend(response *Response) {
 	c.mu.Lock()
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
 		response.Type != p.Response_SUCCESS_FEED
 	c.responses = append(c.responses, response)
-	c.outstandingRequests -= 1
 
 	// Prefetch results if needed
 	if len(c.responses) == 1 && !c.finished {
-		conn := c.conn
-		token := c.token
-
-		c.mu.Unlock()
-		err := conn.AsyncContinueQuery(token)
-		c.mu.Lock()
-
-		if err != nil {
+		if err := c.session.asyncContinueQuery(c); err != nil {
 			c.err = err
 			return
 		}
 	}
 
 	// Load the new response into the buffer
+	var err error
 	c.buffer = c.responses[0].Responses
+	if err != nil {
+		c.err = err
 
+		return
+	}
 	c.responses = c.responses[1:]
 	c.mu.Unlock()
 }

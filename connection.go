@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/binary"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -12,12 +11,21 @@ import (
 	"sync/atomic"
 	"time"
 
-	"gopkg.in/fatih/pool.v2"
-
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-type responseFunc func(error, *Response, *Cursor)
+type connRequest struct {
+	Active int32
+
+	Query    Query
+	Options  map[string]interface{}
+	Response chan connResponse
+}
+
+type connResponse struct {
+	Response *Response
+	Error    error
+}
 
 type Response struct {
 	Token     int64
@@ -38,75 +46,72 @@ type Connection struct {
 	sync.Mutex
 	conn    net.Conn
 	session *Session
-	token   int64
-	closed  bool
+	pool    ConnectionPool
 
-	responseFuncs map[int64]responseFunc
-	termCache     map[int64]*Term
-	optionCache   map[int64]map[string]interface{}
-	cursorCache   map[int64]*Cursor
+	token       int64
+	closed      bool
+	outstanding int64
+	cursors     map[int64]*Cursor
+	requests    map[int64]connRequest
 }
 
 // Dial closes the previous connection and attempts to connect again.
-func Dial(s *Session) pool.Factory {
-	return func() (net.Conn, error) {
-		conn, err := net.Dial("tcp", s.address)
-		if err != nil {
-			return nil, RqlConnectionError{err.Error()}
-		}
-
-		// Send the protocol version to the server as a 4-byte little-endian-encoded integer
-		if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
-			return nil, RqlConnectionError{err.Error()}
-		}
-
-		// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
-		if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
-			return nil, RqlConnectionError{err.Error()}
-		}
-
-		// Send the auth key as an ASCII string
-		// If there is no auth key, skip this step
-		if s.authkey != "" {
-			if _, err := io.WriteString(conn, s.authkey); err != nil {
-				return nil, RqlConnectionError{err.Error()}
-			}
-		}
-
-		// Send the protocol type as a 4-byte little-endian-encoded integer
-		if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
-			return nil, RqlConnectionError{err.Error()}
-		}
-
-		// read server response to authorization key (terminated by NUL)
-		reader := bufio.NewReader(conn)
-		line, err := reader.ReadBytes('\x00')
-		if err != nil {
-			if err == io.EOF {
-				return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
-			}
-			return nil, RqlDriverError{err.Error()}
-		}
-		// convert to string and remove trailing NUL byte
-		response := string(line[:len(line)-1])
-		if response != "SUCCESS" {
-			// we failed authorization or something else terrible happened
-			return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
-		}
-
-		return conn, nil
+func Dial(s *Session) (net.Conn, error) {
+	conn, err := net.Dial("tcp", s.address)
+	if err != nil {
+		return nil, RqlConnectionError{err.Error()}
 	}
+
+	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
+	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
+	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Send the auth key as an ASCII string
+	// If there is no auth key, skip this step
+	if s.authkey != "" {
+		if _, err := io.WriteString(conn, s.authkey); err != nil {
+			return nil, RqlConnectionError{err.Error()}
+		}
+	}
+
+	// Send the protocol type as a 4-byte little-endian-encoded integer
+	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// read server response to authorization key (terminated by NUL)
+	reader := bufio.NewReader(conn)
+	line, err := reader.ReadBytes('\x00')
+	if err != nil {
+		if err == io.EOF {
+			return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
+		}
+		return nil, RqlDriverError{err.Error()}
+	}
+	// convert to string and remove trailing NUL byte
+	response := string(line[:len(line)-1])
+	if response != "SUCCESS" {
+		// we failed authorization or something else terrible happened
+		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
+	}
+
+	return conn, nil
 }
 
-func newConnection(s *Session, c net.Conn) *Connection {
+func newConnection(s *Session, c net.Conn, p ConnectionPool) *Connection {
 	conn := &Connection{
 		conn:    c,
 		session: s,
+		pool:    p,
 
-		responseFuncs: make(map[int64]responseFunc),
-		termCache:     make(map[int64]*Term),
-		optionCache:   make(map[int64]map[string]interface{}),
-		cursorCache:   make(map[int64]*Cursor),
+		cursors:  make(map[int64]*Cursor),
+		requests: make(map[int64]connRequest),
 	}
 
 	go conn.readLoop()
@@ -136,7 +141,7 @@ func (c *Connection) StartQuery(t Term, opts map[string]interface{}) (*Cursor, e
 		GlobalOpts: globalOpts,
 	}
 
-	_, cursor, err := c.SendQuery(q, map[string]interface{}{})
+	_, cursor, err := c.AsyncSendQuery(q, map[string]interface{}{})
 	return cursor, err
 }
 
@@ -146,7 +151,7 @@ func (c *Connection) ContinueQuery(token int64) error {
 		Token: token,
 	}
 
-	_, _, err := c.SendQuery(q, map[string]interface{}{})
+	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
 	return err
 }
 
@@ -157,15 +162,8 @@ func (c *Connection) AsyncContinueQuery(token int64) error {
 	}
 
 	// Send query and wait for response
-	return c.sendQuery(q, map[string]interface{}{}, func(err error, _ *Response, cursor *Cursor) {
-		if cursor != nil {
-			cursor.mu.Lock()
-			if err != nil {
-				cursor.err = err
-			}
-			cursor.mu.Unlock()
-		}
-	})
+	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
+	return err
 }
 
 func (c *Connection) StopQuery(token int64) error {
@@ -174,7 +172,7 @@ func (c *Connection) StopQuery(token int64) error {
 		Token: token,
 	}
 
-	_, _, err := c.SendQuery(q, map[string]interface{}{})
+	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
 	return err
 }
 
@@ -184,133 +182,118 @@ func (c *Connection) NoReplyWait() error {
 		Token: c.nextToken(),
 	}
 
-	_, _, err := c.SendQuery(q, map[string]interface{}{})
+	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
 	return err
 }
 
-func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (response *Response, cursor *Cursor, err error) {
-	var wait, change sync.Mutex
-	var done bool
-
-	var rErr error
-	var rResponse *Response
-	var rCursor *Cursor
-
-	wait.Lock()
-	sendErr := c.sendQuery(q, map[string]interface{}{}, func(err error, response *Response, cursor *Cursor) {
-		change.Lock()
-		if !done {
-			done = true
-			rErr = err
-			rResponse = response
-			rCursor = cursor
-
-			if cursor != nil {
-				cursor.mu.Lock()
-				if err != nil {
-					cursor.err = err
-				}
-				cursor.mu.Unlock()
-			}
-		}
-		change.Unlock()
-		wait.Unlock()
-	})
-	if sendErr != nil {
-		return nil, nil, sendErr
+func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
+	request := connRequest{
+		Query:   q,
+		Options: opts,
 	}
-	wait.Lock()
-	change.Lock()
-	response = rResponse
-	cursor = rCursor
-	err = rErr
-	change.Unlock()
 
-	return response, cursor, err
+	fmt.Printf("Sending query %d\n", q.Token)
+	c.sendQuery(request)
+	fmt.Println("Sent query")
+
+	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		c.Close()
+		return nil, nil, nil
+	}
+
+	response, err := c.read()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return c.processResponse(request, response)
 }
 
-func (c *Connection) sendQuery(q Query, opts map[string]interface{}, cb responseFunc) error {
-	//c.Lock()
+func (c *Connection) AsyncSendQuery(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
+	request := connRequest{
+		Query:   q,
+		Options: opts,
+	}
+	request.Response = make(chan connResponse, 1)
+	atomic.AddInt64(&c.outstanding, 1)
+	atomic.StoreInt32(&request.Active, 1)
+
+	c.Lock()
+	c.requests[q.Token] = request
+	c.Unlock()
+
+	fmt.Printf("Sending query %d\n", q.Token)
+	c.sendQuery(request)
+	fmt.Printf("sent via %p\n", c)
+
+	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		c.Close()
+		return nil, nil, nil
+	}
+
+	reply := <-request.Response
+	if reply.Error != nil {
+		return nil, nil, reply.Error
+	}
+
+	return c.processResponse(request, reply.Response)
+}
+
+func (c *Connection) sendQuery(request connRequest) error {
+	c.Lock()
 	closed := c.closed
-	//c.Unlock()
+	c.Unlock()
+
+	c.session.Lock()
+	timeout := c.session.timeout
+	c.session.Unlock()
 
 	if closed {
-		err := errors.New("connection closed")
-		cb(err, nil, nil)
-		return err
+		return ErrConnectionClosed
 	}
 	// Build query
-	b, err := json.Marshal(q.build())
+	b, err := json.Marshal(request.Query.build())
 	if err != nil {
-		err := RqlDriverError{"Error building query"}
-		cb(err, nil, nil)
-		return err
+		return RqlDriverError{"Error building query"}
 	}
-
-	//c.Lock()
 
 	// Set timeout
-	if c.session.timeout == 0 {
+	if timeout == 0 {
 		c.conn.SetDeadline(time.Time{})
 	} else {
-		c.conn.SetDeadline(time.Now().Add(c.session.timeout))
+		c.conn.SetDeadline(time.Now().Add(timeout))
 	}
 
-	// Setup response handler/query caches
-	c.termCache[q.Token] = q.Term
-	c.optionCache[q.Token] = opts
-	c.responseFuncs[q.Token] = cb
-
 	// Send a unique 8-byte token
-	if err = binary.Write(c.conn, binary.LittleEndian, q.Token); err != nil {
-		//c.Unlock()
-		err := RqlConnectionError{err.Error()}
-		cb(err, nil, nil)
-		return err
+	if err = binary.Write(c.conn, binary.LittleEndian, request.Query.Token); err != nil {
+		return RqlConnectionError{err.Error()}
 	}
 
 	// Send the length of the JSON-encoded query as a 4-byte
 	// little-endian-encoded integer.
 	if err = binary.Write(c.conn, binary.LittleEndian, uint32(len(b))); err != nil {
-		//c.Unlock()
-		err := RqlConnectionError{err.Error()}
-		cb(err, nil, nil)
-		return err
+		return RqlConnectionError{err.Error()}
 	}
 
 	// Send the JSON encoding of the query itself.
 	if err = binary.Write(c.conn, binary.BigEndian, b); err != nil {
-		//c.Unlock()
-		err := RqlConnectionError{err.Error()}
-		cb(err, nil, nil)
-		return err
-	}
-
-	//c.Unlock()
-
-	// Return immediately if the noreply option was set
-	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
-		c.Close()
-
-		return nil
+		return RqlConnectionError{err.Error()}
 	}
 
 	return nil
 }
 
-func (c *Connection) kill(err error) error {
-	if !c.closed {
-		if err := c.Close(); err != nil {
-			return err
-		}
-	}
-
-	return err
-}
-
 func (c *Connection) Close() error {
-	if !c.closed {
+	c.Lock()
+	closed := c.closed
+	c.Unlock()
+
+	if !closed {
 		err := c.conn.Close()
+
+		c.Lock()
+		c.closed = true
+		c.Unlock()
 
 		return err
 	}
@@ -324,53 +307,43 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.session.token, 1)
 }
 
-func (c *Connection) processResponse(response *Response) {
-	//c.Lock()
-	t := c.termCache[response.Token]
-	//c.Unlock()
-
+func (c *Connection) processResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
-		c.processErrorResponse(response, RqlClientError{rqlResponseError{response, t}})
+		return c.processErrorResponse(request, response, RqlClientError{rqlResponseError{response, request.Query.Term}})
 	case p.Response_COMPILE_ERROR:
-		c.processErrorResponse(response, RqlCompileError{rqlResponseError{response, t}})
+		return c.processErrorResponse(request, response, RqlCompileError{rqlResponseError{response, request.Query.Term}})
 	case p.Response_RUNTIME_ERROR:
-		c.processErrorResponse(response, RqlRuntimeError{rqlResponseError{response, t}})
+		return c.processErrorResponse(request, response, RqlRuntimeError{rqlResponseError{response, request.Query.Term}})
 	case p.Response_SUCCESS_ATOM:
-		c.processAtomResponse(response)
+		return c.processAtomResponse(request, response)
 	case p.Response_SUCCESS_FEED:
-		c.processFeedResponse(response)
+		return c.processFeedResponse(request, response)
 	case p.Response_SUCCESS_PARTIAL:
-		c.processPartialResponse(response)
+		return c.processPartialResponse(request, response)
 	case p.Response_SUCCESS_SEQUENCE:
-		c.processSequenceResponse(response)
+		return c.processSequenceResponse(request, response)
 	case p.Response_WAIT_COMPLETE:
-		c.processWaitResponse(response)
+		return c.processWaitResponse(request, response)
 	default:
-		panic(RqlDriverError{"Unexpected response type"})
+		return nil, nil, RqlDriverError{"Unexpected response type"}
 	}
 }
 
-func (c *Connection) processErrorResponse(response *Response, err error) {
+func (c *Connection) processErrorResponse(request connRequest, response *Response, err error) (*Response, *Cursor, error) {
 	c.Close()
 
-	//c.Lock()
-	cb, ok := c.responseFuncs[response.Token]
-	cursor := c.cursorCache[response.Token]
-	//c.Unlock()
-	if ok {
-		cb(err, response, cursor)
-	}
+	c.Lock()
+	cursor := c.cursors[response.Token]
 
-	//c.Lock()
-	delete(c.responseFuncs, response.Token)
-	delete(c.termCache, response.Token)
-	delete(c.optionCache, response.Token)
-	delete(c.cursorCache, response.Token)
-	//c.Unlock()
+	delete(c.requests, response.Token)
+	delete(c.cursors, response.Token)
+	c.Unlock()
+
+	return response, cursor, err
 }
 
-func (c *Connection) processAtomResponse(response *Response) {
+func (c *Connection) processAtomResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
 	c.Close()
 
 	// Create cursor
@@ -388,163 +361,175 @@ func (c *Connection) processAtomResponse(response *Response) {
 		}
 	}
 
-	//c.Lock()
-	t := c.termCache[response.Token]
-	opts := c.optionCache[response.Token]
-	//c.Unlock()
-
-	cursor := newCursor(c.session, c, response.Token, t, opts)
+	cursor := newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
 	cursor.profile = response.Profile
 	cursor.buffer = value
 	cursor.finished = true
 
-	// Return response
-	//c.Lock()
-	cb, ok := c.responseFuncs[response.Token]
-	//c.Unlock()
-	if ok {
-		go cb(nil, response, cursor)
-	}
+	c.Lock()
+	delete(c.requests, response.Token)
+	c.Unlock()
 
-	//c.Lock()
-	delete(c.responseFuncs, response.Token)
-	delete(c.termCache, response.Token)
-	delete(c.optionCache, response.Token)
-	//c.Unlock()
+	return response, cursor, nil
 }
 
-func (c *Connection) processFeedResponse(response *Response) {
-	//c.Lock()
-	cb, ok := c.responseFuncs[response.Token]
-	if ok {
-		delete(c.responseFuncs, response.Token)
-
-		var cursor *Cursor
-		if _, ok := c.cursorCache[response.Token]; !ok {
-			// Create a new cursor if needed
-			cursor = newCursor(c.session, c, response.Token, c.termCache[response.Token], c.optionCache[response.Token])
-			cursor.profile = response.Profile
-			c.cursorCache[response.Token] = cursor
-		} else {
-			cursor = c.cursorCache[response.Token]
-		}
-		//c.Unlock()
-
-		cursor.extend(response)
-		cb(nil, response, cursor)
+func (c *Connection) processFeedResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+	var cursor *Cursor
+	if _, ok := c.cursors[response.Token]; !ok {
+		// Create a new cursor if needed
+		cursor = newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
+		cursor.profile = response.Profile
+		c.cursors[response.Token] = cursor
+	} else {
+		cursor = c.cursors[response.Token]
 	}
+
+	c.Lock()
+	delete(c.requests, response.Token)
+	c.Unlock()
+
+	cursor.extend(response)
+
+	return response, cursor, nil
 }
 
-func (c *Connection) processPartialResponse(response *Response) {
-	//c.Lock()
-	cb, ok := c.responseFuncs[response.Token]
-	if ok {
-		delete(c.responseFuncs, response.Token)
+func (c *Connection) processPartialResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+	c.Lock()
+	cursor, ok := c.cursors[response.Token]
+	c.Unlock()
 
-		var cursor *Cursor
-		if _, ok := c.cursorCache[response.Token]; !ok {
-			// Create a new cursor if needed
-			cursor = newCursor(c.session, c, response.Token, c.termCache[response.Token], c.optionCache[response.Token])
-			cursor.profile = response.Profile
-			c.cursorCache[response.Token] = cursor
-		} else {
-			cursor = c.cursorCache[response.Token]
-		}
-		//c.Unlock()
+	if !ok {
+		// Create a new cursor if needed
+		cursor = newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
+		cursor.profile = response.Profile
 
-		cursor.extend(response)
-		cb(nil, response, cursor)
+		c.Lock()
+		c.cursors[response.Token] = cursor
+		c.Unlock()
 	}
+
+	c.Lock()
+	delete(c.requests, response.Token)
+	c.Unlock()
+
+	cursor.extend(response)
+	return response, cursor, nil
 }
 
-func (c *Connection) processSequenceResponse(response *Response) {
+func (c *Connection) processSequenceResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
 	c.Close()
 
-	//c.Lock()
-	cb, ok := c.responseFuncs[response.Token]
-	if ok {
-		delete(c.responseFuncs, response.Token)
+	c.Lock()
+	cursor, ok := c.cursors[response.Token]
+	c.Unlock()
 
-		var cursor *Cursor
-		if _, ok := c.cursorCache[response.Token]; !ok {
-			// Create a new cursor if needed
-			cursor = newCursor(c.session, c, response.Token, c.termCache[response.Token], c.optionCache[response.Token])
-			cursor.profile = response.Profile
-			c.cursorCache[response.Token] = cursor
-		} else {
-			cursor = c.cursorCache[response.Token]
-		}
-		//c.Unlock()
+	if !ok {
+		// Create a new cursor if needed
+		cursor = newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
+		cursor.profile = response.Profile
 
-		cursor.extend(response)
-		cb(nil, response, cursor)
-
-		//c.Lock()
+		c.Lock()
+		c.cursors[response.Token] = cursor
+		c.Unlock()
 	}
 
-	delete(c.responseFuncs, response.Token)
-	delete(c.termCache, response.Token)
-	delete(c.optionCache, response.Token)
-	delete(c.cursorCache, response.Token)
-	//c.Unlock()
+	c.Lock()
+	delete(c.requests, response.Token)
+	delete(c.cursors, response.Token)
+	c.Unlock()
+
+	cursor.extend(response)
+
+	return response, cursor, nil
 }
 
-func (c *Connection) processWaitResponse(response *Response) {
+func (c *Connection) processWaitResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
 	c.Close()
 
-	//c.Lock()
-	cb, ok := c.responseFuncs[response.Token]
-	//c.Unlock()
-	if ok {
-		cb(nil, response, nil)
-	}
+	c.Lock()
+	delete(c.requests, response.Token)
+	delete(c.cursors, response.Token)
+	c.Unlock()
 
-	//c.Lock()
-	delete(c.responseFuncs, response.Token)
-	delete(c.termCache, response.Token)
-	delete(c.optionCache, response.Token)
-	delete(c.cursorCache, response.Token)
-	//c.Unlock()
+	return response, nil, nil
 }
 
 func (c *Connection) readLoop() {
+	var response *Response
+	var err error
+
 	for {
-		// Read the 8-byte token of the query the response corresponds to.
-		var responseToken int64
-		if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
-			c.kill(RqlConnectionError{err.Error()})
-			return
-		}
-
-		// Read the length of the JSON-encoded response as a 4-byte
-		// little-endian-encoded integer.
-		var messageLength uint32
-		if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
-			c.kill(RqlConnectionError{err.Error()})
-			return
-		}
-
-		// Read the JSON encoding of the Response itself.
-		b := make([]byte, messageLength)
-		if _, err := io.ReadFull(c.conn, b); err != nil {
-			c.kill(RqlConnectionError{err.Error()})
-			return
-		}
-
-		// Decode the response
-		var response = new(Response)
-		response.Token = responseToken
-		err := json.Unmarshal(b, response)
+		response, err = c.read()
 		if err != nil {
-			//c.Lock()
-			cb, ok := c.responseFuncs[responseToken]
-			//c.Unlock()
-			if ok {
-				cb(err, nil, nil)
+			// Close connection if RqlConnectionError was returned
+			if _, ok := err.(RqlConnectionError); ok {
+				break
 			}
+		}
+
+		// Process response
+		c.Lock()
+		request, ok := c.requests[response.Token]
+		c.Unlock()
+
+		// If the cached request could not be found skip processing
+		if !ok {
+			fmt.Printf("Could not find request %d\n", response.Token)
 			continue
 		}
 
-		c.processResponse(response)
+		// If the cached request is not active skip processing
+		if !atomic.CompareAndSwapInt32(&request.Active, 1, 0) {
+			fmt.Println("Request not active")
+			continue
+		}
+		atomic.AddInt64(&c.outstanding, -1)
+		request.Response <- connResponse{response, err}
 	}
+
+	c.Close()
+
+	c.Lock()
+	requests := c.requests
+	c.Unlock()
+	for _, request := range requests {
+		if atomic.LoadInt32(&request.Active) == 1 {
+			request.Response <- connResponse{
+				Response: response,
+				Error:    err,
+			}
+		}
+	}
+
+	c.pool.HandleError(c, err, true)
+}
+
+func (c *Connection) read() (*Response, error) {
+	// Read the 8-byte token of the query the response corresponds to.
+	var responseToken int64
+	if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Read the length of the JSON-encoded response as a 4-byte
+	// little-endian-encoded integer.
+	var messageLength uint32
+	if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Read the JSON encoding of the Response itself.
+	b := make([]byte, messageLength)
+	if _, err := io.ReadFull(c.conn, b); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Decode the response
+	var response = new(Response)
+	if err := json.Unmarshal(b, response); err != nil {
+		return nil, RqlDriverError{err.Error()}
+	}
+	response.Token = responseToken
+
+	return response, nil
 }

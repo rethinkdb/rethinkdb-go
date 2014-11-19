@@ -5,8 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"gopkg.in/fatih/pool.v2"
-
 	p "github.com/dancannon/gorethink/ql2"
 )
 
@@ -47,7 +45,8 @@ type Session struct {
 	// Response cache, used for batched responses
 	sync.Mutex
 	closed bool
-	pool   pool.Pool
+
+	pool ConnectionPool
 }
 
 func newSession(args map[string]interface{}) *Session {
@@ -140,13 +139,7 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 
 	s.closed = false
 	if s.pool == nil {
-		cp, err := pool.NewChannelPool(s.initialCap, s.maxCap, Dial(s))
-		s.pool = cp
-		if err != nil {
-			return err
-		}
-
-		s.pool = cp
+		s.pool = NewSimplePool(s)
 	}
 
 	// Check the connection
@@ -196,14 +189,12 @@ func (s *Session) SetTimeout(timeout time.Duration) {
 // startQuery creates a query from the term given and sends it to the server.
 // The result from the server is returned as a cursor
 func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
-	fmt.Println("start query")
 	conn, err := s.getConn()
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("start query - got conn")
+
 	cur, err := conn.StartQuery(t, opts)
-	fmt.Println("fin query")
 
 	return cur, err
 }
@@ -267,15 +258,8 @@ func (s *Session) noreplyWaitQuery() error {
 	return conn.NoReplyWait()
 }
 
+var tmpConn *Connection
+
 func (s *Session) getConn() (*Connection, error) {
-	if s.pool == nil {
-		return nil, pool.ErrClosed
-	}
-
-	c, err := s.pool.Get()
-	if err != nil {
-		return nil, err
-	}
-
-	return newConnection(s, c), nil
+	return s.pool.Get(), nil
 }
