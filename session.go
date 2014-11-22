@@ -64,8 +64,8 @@ func newSession(args map[string]interface{}) *Session {
 	}
 
 	// Pool configuration options
-	if maxCap, ok := args["maxCap"]; ok {
-		s.maxCap = maxCap.(int)
+	if maxCap, ok := args["max_active"]; ok {
+		s.maxCap = int(maxCap.(int64))
 	} else {
 		s.maxCap = 30
 	}
