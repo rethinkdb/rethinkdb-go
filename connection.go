@@ -141,7 +141,7 @@ func (c *Connection) StartQuery(t Term, opts map[string]interface{}) (*Cursor, e
 		GlobalOpts: globalOpts,
 	}
 
-	_, cursor, err := c.AsyncSendQuery(q, map[string]interface{}{})
+	_, cursor, err := c.SendQuery(q, opts)
 	return cursor, err
 }
 
@@ -151,18 +151,7 @@ func (c *Connection) ContinueQuery(token int64) error {
 		Token: token,
 	}
 
-	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
-	return err
-}
-
-func (c *Connection) AsyncContinueQuery(token int64) error {
-	q := Query{
-		Type:  p.Query_CONTINUE,
-		Token: token,
-	}
-
-	// Send query and wait for response
-	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
+	_, _, err := c.SendQuery(q, map[string]interface{}{})
 	return err
 }
 
@@ -172,7 +161,7 @@ func (c *Connection) StopQuery(token int64) error {
 		Token: token,
 	}
 
-	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
+	_, _, err := c.SendQuery(q, map[string]interface{}{})
 	return err
 }
 
@@ -182,34 +171,11 @@ func (c *Connection) NoReplyWait() error {
 		Token: c.nextToken(),
 	}
 
-	_, _, err := c.AsyncSendQuery(q, map[string]interface{}{})
+	_, _, err := c.SendQuery(q, map[string]interface{}{})
 	return err
 }
 
 func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
-	request := connRequest{
-		Query:   q,
-		Options: opts,
-	}
-
-	fmt.Printf("Sending query %d\n", q.Token)
-	c.sendQuery(request)
-	fmt.Println("Sent query")
-
-	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
-		c.Close()
-		return nil, nil, nil
-	}
-
-	response, err := c.read()
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return c.processResponse(request, response)
-}
-
-func (c *Connection) AsyncSendQuery(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
 	request := connRequest{
 		Query:   q,
 		Options: opts,
@@ -222,12 +188,10 @@ func (c *Connection) AsyncSendQuery(q Query, opts map[string]interface{}) (*Resp
 	c.requests[q.Token] = request
 	c.Unlock()
 
-	fmt.Printf("Sending query %d\n", q.Token)
 	c.sendQuery(request)
-	fmt.Printf("sent via %p\n", c)
 
 	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
-		c.Close()
+		// c.Close()
 		return nil, nil, nil
 	}
 
@@ -237,6 +201,24 @@ func (c *Connection) AsyncSendQuery(q Query, opts map[string]interface{}) (*Resp
 	}
 
 	return c.processResponse(request, reply.Response)
+}
+
+func (c *Connection) AsyncSendQuery(q Query, opts map[string]interface{}) (connRequest, error) {
+	request := connRequest{
+		Query:   q,
+		Options: opts,
+	}
+	request.Response = make(chan connResponse, 1)
+	atomic.AddInt64(&c.outstanding, 1)
+	atomic.StoreInt32(&request.Active, 1)
+
+	c.Lock()
+	c.requests[q.Token] = request
+	c.Unlock()
+
+	c.sendQuery(request)
+
+	return request, nil
 }
 
 func (c *Connection) sendQuery(request connRequest) error {
@@ -304,7 +286,7 @@ func (c *Connection) Close() error {
 // getToken generates the next query token, used to number requests and match
 // responses with requests.
 func (c *Connection) nextToken() int64 {
-	return atomic.AddInt64(&c.session.token, 1)
+	return atomic.AddInt64(&c.token, 1)
 }
 
 func (c *Connection) processResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
@@ -331,7 +313,7 @@ func (c *Connection) processResponse(request connRequest, response *Response) (*
 }
 
 func (c *Connection) processErrorResponse(request connRequest, response *Response, err error) (*Response, *Cursor, error) {
-	c.Close()
+	// c.Close()
 
 	c.Lock()
 	cursor := c.cursors[response.Token]
@@ -344,14 +326,18 @@ func (c *Connection) processErrorResponse(request connRequest, response *Respons
 }
 
 func (c *Connection) processAtomResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
-	c.Close()
+	// c.Close()
 
 	// Create cursor
 	var value []interface{}
-	if len(response.Responses) < 1 {
+	if len(response.Responses) == 0 {
 		value = []interface{}{}
 	} else {
-		var v = response.Responses[0]
+		v, err := recursivelyConvertPseudotype(response.Responses[0], request.Options)
+		if err != nil {
+			return nil, nil, err
+		}
+
 		if sv, ok := v.([]interface{}); ok {
 			value = sv
 		} else if v == nil {
@@ -417,7 +403,7 @@ func (c *Connection) processPartialResponse(request connRequest, response *Respo
 }
 
 func (c *Connection) processSequenceResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
-	c.Close()
+	// c.Close()
 
 	c.Lock()
 	cursor, ok := c.cursors[response.Token]
@@ -444,7 +430,7 @@ func (c *Connection) processSequenceResponse(request connRequest, response *Resp
 }
 
 func (c *Connection) processWaitResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
-	c.Close()
+	// c.Close()
 
 	c.Lock()
 	delete(c.requests, response.Token)
@@ -461,10 +447,7 @@ func (c *Connection) readLoop() {
 	for {
 		response, err = c.read()
 		if err != nil {
-			// Close connection if RqlConnectionError was returned
-			if _, ok := err.(RqlConnectionError); ok {
-				break
-			}
+			break
 		}
 
 		// Process response

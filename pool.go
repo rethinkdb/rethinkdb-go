@@ -1,7 +1,6 @@
 package gorethink
 
 import (
-	"log"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -24,9 +23,8 @@ type SimplePool struct {
 	s        *Session
 	connPool *RoundRobin
 	conns    map[*Connection]struct{}
-	keyspace string
 
-	// protects hostpool, connPoll, conns, quit
+	// protects connPoll, conns, quit
 	mu sync.Mutex
 
 	cFillingPool chan int
@@ -58,7 +56,6 @@ func NewSimplePool(s *Session) ConnectionPool {
 func (c *SimplePool) connect() error {
 	conn, err := Dial(c.s)
 	if err != nil {
-		log.Printf("connect: failed to connect to %q: %v", c.s.address, err)
 		return err
 	}
 
@@ -228,6 +225,9 @@ func (r *RoundRobin) Get() *Connection {
 	}
 	r.mu.RUnlock()
 	if conn == nil {
+		return nil
+	}
+	if conn.closed {
 		return nil
 	}
 	return conn

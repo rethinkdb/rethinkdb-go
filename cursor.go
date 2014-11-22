@@ -76,12 +76,12 @@ func (c *Cursor) Close() error {
 		c.closed = true
 	}
 
-	err := c.conn.Close()
-	if err != nil {
-		return err
-	}
+	// err := c.conn.Close()
+	// if err != nil {
+	// 	return err
+	// }
 
-	err = c.err
+	err := c.err
 	c.mu.Unlock()
 
 	return err
@@ -110,16 +110,6 @@ func (c *Cursor) Next(result interface{}) bool {
 		if len(c.buffer) == 0 && len(c.responses) == 0 && c.finished {
 			c.mu.Unlock()
 			return false
-		}
-
-		// Start precomputing next batch
-		if len(c.responses) == 1 && !c.finished {
-			c.mu.Unlock()
-			if err := c.session.asyncContinueQuery(c); err != nil {
-				c.err = err
-				return false
-			}
-			c.mu.Lock()
 		}
 
 		// If the buffer is empty fetch more results
@@ -161,15 +151,8 @@ func (c *Cursor) Next(result interface{}) bool {
 	var data interface{}
 	data, c.buffer = c.buffer[0], c.buffer[1:]
 
-	data, err := recursivelyConvertPseudotype(data, c.opts)
-	if err != nil {
-		c.err = err
-		c.mu.Unlock()
-		return false
-	}
-
 	c.mu.Unlock()
-	err = encoding.Decode(result, data)
+	err := encoding.Decode(result, data)
 	if err != nil {
 		c.mu.Lock()
 		if c.err == nil {
@@ -213,7 +196,8 @@ func (c *Cursor) All(result interface{}) error {
 		i++
 	}
 	resultv.Elem().Set(slicev.Slice(0, i))
-	return c.Close()
+	// return c.Close()
+	return nil
 }
 
 // One retrieves a single document from the result set into the provided
@@ -232,9 +216,9 @@ func (c *Cursor) One(result interface{}) error {
 		}
 	}
 
-	if e := c.Close(); e != nil {
-		err = e
-	}
+	// if e := c.Close(); e != nil {
+	// 	err = e
+	// }
 
 	return err
 }
@@ -247,19 +231,17 @@ func (c *Cursor) IsNil() bool {
 	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
 }
 
+func (c *Cursor) handleError(err error) {
+	c.mu.Lock()
+	c.err = err
+	c.mu.Unlock()
+}
+
 func (c *Cursor) extend(response *Response) {
 	c.mu.Lock()
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
 		response.Type != p.Response_SUCCESS_FEED
 	c.responses = append(c.responses, response)
-
-	// Prefetch results if needed
-	if len(c.responses) == 1 && !c.finished {
-		if err := c.session.asyncContinueQuery(c); err != nil {
-			c.err = err
-			return
-		}
-	}
 
 	// Load the new response into the buffer
 	var err error

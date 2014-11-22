@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	ErrNoConnections    = errors.New("gorethink: no connections were made when creating the session")
 	ErrConnectionClosed = errors.New("gorethink: the connection is closed")
 )
 

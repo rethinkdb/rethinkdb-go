@@ -36,9 +36,7 @@ type Session struct {
 	timeFormat string
 
 	// Pool configuration options
-	initialCap  int
-	maxCap      int
-	idleTimeout time.Duration
+	maxCap int
 
 	token int64
 
@@ -66,20 +64,10 @@ func newSession(args map[string]interface{}) *Session {
 	}
 
 	// Pool configuration options
-	if initialCap, ok := args["initial_cap"]; ok {
-		s.initialCap = int(initialCap.(int64))
-	} else {
-		s.initialCap = 5
-	}
-	if maxCap, ok := args["max_cap"]; ok {
-		s.maxCap = int(maxCap.(int64))
+	if maxCap, ok := args["maxCap"]; ok {
+		s.maxCap = maxCap.(int)
 	} else {
 		s.maxCap = 30
-	}
-	if idleTimeout, ok := args["idle_timeout"]; ok {
-		s.idleTimeout = idleTimeout.(time.Duration)
-	} else {
-		s.idleTimeout = 10 * time.Second
 	}
 
 	return s
@@ -137,15 +125,22 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 		return err
 	}
 
-	s.closed = false
-	if s.pool == nil {
+	if s.pool != nil {
 		s.pool = NewSimplePool(s)
 	}
+	if s.pool == nil {
 
-	// Check the connection
-	_, err := s.getConn()
+		s.closed = false
+		s.pool = NewSimplePool(s)
 
-	return err
+		// See if there are any connections in the pool
+		if s.pool.Size() == 0 {
+			s.pool.Close()
+			return ErrNoConnections
+		}
+	}
+
+	return nil
 }
 
 // Close closes the session
@@ -163,6 +158,7 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	if s.pool != nil {
 		s.pool.Close()
 	}
+	s.pool = nil
 	s.closed = true
 
 	return nil
@@ -199,20 +195,6 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, erro
 	return cur, err
 }
 
-// func (s *Session) handleBatchResponse(cursor *Cursor, response *Response) {
-// 	cursor.extend(response)
-
-// 	s.Lock()
-// cursor.outstandingRequests--
-
-// if response.Type != p.Response_SUCCESS_PARTIAL &&
-// 	response.Type != p.Response_SUCCESS_FEED &&
-// 	cursor.outstandingRequests == 0 {
-// 	delete(s.cache, response.Token)
-// }
-// 	s.Unlock()
-// }
-
 // continueQuery continues a previously run query.
 // This is needed if a response is batched.
 func (s *Session) continueQuery(cursor *Cursor) error {
@@ -221,21 +203,6 @@ func (s *Session) continueQuery(cursor *Cursor) error {
 	cursor.mu.Unlock()
 
 	return conn.ContinueQuery(cursor.token)
-}
-
-// asyncContinueQuery asynchronously continues a previously run query.
-// This is needed if a response is batched.
-func (s *Session) asyncContinueQuery(cursor *Cursor) error {
-	cursor.mu.Lock()
-	if cursor.outstandingRequests != 0 {
-		cursor.mu.Unlock()
-		return nil
-	}
-	cursor.outstandingRequests = 1
-	conn := cursor.conn
-	cursor.mu.Unlock()
-
-	return conn.AsyncContinueQuery(cursor.token)
 }
 
 // stopQuery sends closes a query by sending Query_STOP to the server.
@@ -258,8 +225,11 @@ func (s *Session) noreplyWaitQuery() error {
 	return conn.NoReplyWait()
 }
 
-var tmpConn *Connection
-
 func (s *Session) getConn() (*Connection, error) {
+	conn := s.pool.Get()
+	if conn == nil {
+		return nil, RqlConnectionError{"No connections available"}
+	}
+
 	return s.pool.Get(), nil
 }
