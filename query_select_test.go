@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"fmt"
+	"testing"
 
 	test "gopkg.in/check.v1"
 )
@@ -308,27 +309,31 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 }
 
 func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
-	// // Ensure table + database exist
-	// DbCreate("test").RunWrite(sess)
-	// Db("test").TableCreate("TestMany").RunWrite(sess)
-	// Db("test").Table("TestMany").Delete().RunWrite(sess)
+	if testing.Short() {
+		c.Skip("Skipping long test")
+	}
 
-	// // Insert rows
-	// for i := 0; i < 1; i++ {
-	// 	data := []interface{}{}
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableCreate("TestMany").RunWrite(sess)
+	Db("test").Table("TestMany").Delete().RunWrite(sess)
 
-	// 	for j := 0; j < 100; j++ {
-	// 		data = append(data, map[string]interface{}{
-	// 			"i": i,
-	// 			"j": j,
-	// 		})
-	// 	}
+	// Insert rows
+	for i := 0; i < 100; i++ {
+		data := []interface{}{}
 
-	// 	Db("test").Table("TestMany").Insert(data).Run(sess)
-	// }
+		for j := 0; j < 100; j++ {
+			data = append(data, map[string]interface{}{
+				"i": i,
+				"j": j,
+			})
+		}
+
+		Db("test").Table("TestMany").Insert(data).Run(sess)
+	}
 
 	// Test queries concurrently
-	attempts := 10
+	attempts := 1
 	waitChannel := make(chan error, attempts)
 
 	for i := 0; i < attempts; i++ {
@@ -351,8 +356,8 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 				return
 			}
 
-			if len(response) != 100 {
-				c <- fmt.Errorf("expected response length 100, received %d", len(response))
+			if len(response) != 10000 {
+				c <- fmt.Errorf("expected response length 10000, received %d", len(response))
 				return
 			}
 

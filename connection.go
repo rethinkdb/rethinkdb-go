@@ -191,7 +191,6 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 	c.sendQuery(request)
 
 	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
-		// c.Close()
 		return nil, nil, nil
 	}
 
@@ -201,24 +200,6 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 	}
 
 	return c.processResponse(request, reply.Response)
-}
-
-func (c *Connection) AsyncSendQuery(q Query, opts map[string]interface{}) (connRequest, error) {
-	request := connRequest{
-		Query:   q,
-		Options: opts,
-	}
-	request.Response = make(chan connResponse, 1)
-	atomic.AddInt64(&c.outstanding, 1)
-	atomic.StoreInt32(&request.Active, 1)
-
-	c.Lock()
-	c.requests[q.Token] = request
-	c.Unlock()
-
-	c.sendQuery(request)
-
-	return request, nil
 }
 
 func (c *Connection) sendQuery(request connRequest) error {
@@ -265,7 +246,28 @@ func (c *Connection) sendQuery(request connRequest) error {
 	return nil
 }
 
+// Close closes the underlying net.Conn. It also removes the connection
+// from the connection pool
 func (c *Connection) Close() error {
+	c.Lock()
+	closed := c.closed
+	c.Unlock()
+
+	if !closed {
+		err := c.conn.Close()
+
+		c.Lock()
+		c.closed = true
+		c.Unlock()
+
+		return err
+	}
+
+	return nil
+}
+
+// Return returns the connection to the connection pool
+func (c *Connection) Return() error {
 	c.Lock()
 	closed := c.closed
 	c.Unlock()
@@ -318,8 +320,8 @@ func (c *Connection) processErrorResponse(request connRequest, response *Respons
 	c.Lock()
 	cursor := c.cursors[response.Token]
 
-	delete(c.requests, response.Token)
-	delete(c.cursors, response.Token)
+	// delete(c.requests, response.Token)
+	// delete(c.cursors, response.Token)
 	c.Unlock()
 
 	return response, cursor, err
@@ -353,7 +355,7 @@ func (c *Connection) processAtomResponse(request connRequest, response *Response
 	cursor.finished = true
 
 	c.Lock()
-	delete(c.requests, response.Token)
+	// delete(c.requests, response.Token)
 	c.Unlock()
 
 	return response, cursor, nil
@@ -371,7 +373,7 @@ func (c *Connection) processFeedResponse(request connRequest, response *Response
 	}
 
 	c.Lock()
-	delete(c.requests, response.Token)
+	// delete(c.requests, response.Token)
 	c.Unlock()
 
 	cursor.extend(response)
@@ -395,7 +397,7 @@ func (c *Connection) processPartialResponse(request connRequest, response *Respo
 	}
 
 	c.Lock()
-	delete(c.requests, response.Token)
+	// delete(c.requests, response.Token)
 	c.Unlock()
 
 	cursor.extend(response)
@@ -420,8 +422,8 @@ func (c *Connection) processSequenceResponse(request connRequest, response *Resp
 	}
 
 	c.Lock()
-	delete(c.requests, response.Token)
-	delete(c.cursors, response.Token)
+	// delete(c.requests, response.Token)
+	// delete(c.cursors, response.Token)
 	c.Unlock()
 
 	cursor.extend(response)
@@ -433,8 +435,8 @@ func (c *Connection) processWaitResponse(request connRequest, response *Response
 	// c.Close()
 
 	c.Lock()
-	delete(c.requests, response.Token)
-	delete(c.cursors, response.Token)
+	// delete(c.requests, response.Token)
+	// delete(c.cursors, response.Token)
 	c.Unlock()
 
 	return response, nil, nil
@@ -457,13 +459,11 @@ func (c *Connection) readLoop() {
 
 		// If the cached request could not be found skip processing
 		if !ok {
-			fmt.Printf("Could not find request %d\n", response.Token)
 			continue
 		}
 
 		// If the cached request is not active skip processing
 		if !atomic.CompareAndSwapInt32(&request.Active, 1, 0) {
-			fmt.Println("Request not active")
 			continue
 		}
 		atomic.AddInt64(&c.outstanding, -1)

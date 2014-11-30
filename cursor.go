@@ -4,6 +4,7 @@ import (
 	"errors"
 	"reflect"
 	"sync"
+	"sync/atomic"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
@@ -26,7 +27,6 @@ func newCursor(session *Session, conn *Connection, token int64, term *Term, opts
 // The code for this struct is based off of mgo's Iter and the official
 // python driver's cursor.
 type Cursor struct {
-	mu      sync.Mutex
 	session *Session
 	conn    *Connection
 	token   int64
@@ -34,19 +34,20 @@ type Cursor struct {
 	term    *Term
 	opts    map[string]interface{}
 
-	err                 error
-	outstandingRequests int
-	closed              bool
-	finished            bool
-	responses           []*Response
-	profile             interface{}
-	buffer              []interface{}
+	sync.Mutex
+	err       error
+	fetching  int32
+	closed    bool
+	finished  bool
+	responses []*Response
+	profile   interface{}
+	buffer    []interface{}
 }
 
 // Profile returns the information returned from the query profiler.
 func (c *Cursor) Profile() interface{} {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	return c.profile
 }
@@ -54,8 +55,8 @@ func (c *Cursor) Profile() interface{} {
 // Err returns nil if no errors happened during iteration, or the actual
 // error otherwise.
 func (c *Cursor) Err() error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	return c.err
 }
@@ -63,12 +64,11 @@ func (c *Cursor) Err() error {
 // Close closes the cursor, preventing further enumeration. If the end is
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
-	c.mu.Lock()
+	c.Lock()
 
+	// Stop any unfinished queries
 	if !c.closed && !c.finished {
-		c.mu.Unlock()
-		err := c.session.stopQuery(c)
-		c.mu.Lock()
+		err := c.conn.StopQuery(c.token)
 
 		if err != nil && (c.err == nil || c.err == ErrEmptyResult) {
 			c.err = err
@@ -76,13 +76,14 @@ func (c *Cursor) Close() error {
 		c.closed = true
 	}
 
+	// Return connection to pool
 	// err := c.conn.Close()
 	// if err != nil {
 	// 	return err
 	// }
 
 	err := c.err
-	c.mu.Unlock()
+	c.Unlock()
 
 	return err
 }
@@ -97,42 +98,53 @@ func (c *Cursor) Close() error {
 // When Next returns false, the Err method should be called to verify if
 // there was an error during iteration.
 func (c *Cursor) Next(result interface{}) bool {
-	c.mu.Lock()
+	ok, data := c.loadNext()
+	if !ok {
+		return false
+	}
+
+	if c.handleError(encoding.Decode(result, data)) != nil {
+		return false
+	}
+
+	return true
+}
+
+func (c *Cursor) loadNext() (bool, interface{}) {
+	c.Lock()
+	defer c.Unlock()
 
 	// Load more data if needed
 	for c.err == nil {
 		// Check if response is closed/finished
 		if len(c.buffer) == 0 && len(c.responses) == 0 && c.closed {
 			c.err = errors.New("connection closed, cannot read cursor")
-			c.mu.Unlock()
-			return false
+			return false, nil
 		}
 		if len(c.buffer) == 0 && len(c.responses) == 0 && c.finished {
-			c.mu.Unlock()
-			return false
+			return false, nil
+		}
+
+		// Asynchronously loading next batch if possible
+		if len(c.responses) == 1 && !c.finished {
+			c.fetchMore(false)
 		}
 
 		// If the buffer is empty fetch more results
 		if len(c.buffer) == 0 {
 			if len(c.responses) == 0 && !c.finished {
-				c.mu.Unlock()
-				if err := c.session.continueQuery(c); err != nil {
-					c.err = err
-					return false
+				c.Unlock()
+				err := c.fetchMore(true)
+				c.Lock()
+
+				if err != nil {
+					return false, nil
 				}
-				c.mu.Lock()
 			}
 
 			// Load the new response into the buffer
 			if len(c.responses) > 0 {
-				var err error
-				c.buffer = c.responses[0].Responses
-				if err != nil {
-					c.err = err
-					c.mu.Unlock()
-					return false
-				}
-				c.responses = c.responses[1:]
+				c.buffer, c.responses = c.responses[0].Responses, c.responses[1:]
 			}
 		}
 
@@ -144,26 +156,13 @@ func (c *Cursor) Next(result interface{}) bool {
 	}
 
 	if c.err != nil {
-		c.mu.Unlock()
-		return false
+		return false, nil
 	}
 
 	var data interface{}
 	data, c.buffer = c.buffer[0], c.buffer[1:]
 
-	c.mu.Unlock()
-	err := encoding.Decode(result, data)
-	if err != nil {
-		c.mu.Lock()
-		if c.err == nil {
-			c.err = err
-		}
-		c.mu.Unlock()
-
-		return false
-	}
-
-	return true
+	return true, data
 }
 
 // All retrieves all documents from the result set into the provided slice
@@ -225,32 +224,62 @@ func (c *Cursor) One(result interface{}) error {
 
 // Tests if the current row is nil.
 func (c *Cursor) IsNil() bool {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
 }
 
-func (c *Cursor) handleError(err error) {
-	c.mu.Lock()
-	c.err = err
-	c.mu.Unlock()
+func (c *Cursor) handleError(err error) error {
+	c.Lock()
+	defer c.Unlock()
+
+	if c.err != nil {
+		c.err = err
+	}
+
+	return err
+}
+
+func (c *Cursor) fetchMore(wait bool) error {
+	var err error
+
+	if atomic.CompareAndSwapInt32(&c.fetching, 0, 1) {
+		var wg sync.WaitGroup
+
+		wg.Add(1)
+
+		go func() {
+			c.Lock()
+			token := c.token
+			conn := c.conn
+			c.Unlock()
+
+			err = conn.ContinueQuery(token)
+			c.handleError(err)
+
+			wg.Done()
+		}()
+
+		if wait {
+			wg.Wait()
+		}
+	}
+
+	return err
 }
 
 func (c *Cursor) extend(response *Response) {
-	c.mu.Lock()
-	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
-		response.Type != p.Response_SUCCESS_FEED
+	c.Lock()
+	defer c.Unlock()
+
 	c.responses = append(c.responses, response)
+	c.buffer, c.responses = c.responses[0].Responses, c.responses[1:]
+	c.finished = response.Type != p.Response_SUCCESS_PARTIAL && response.Type != p.Response_SUCCESS_FEED
+	atomic.StoreInt32(&c.fetching, 0)
 
-	// Load the new response into the buffer
-	var err error
-	c.buffer = c.responses[0].Responses
-	if err != nil {
-		c.err = err
-
-		return
+	// Asynchronously load next batch if possible
+	if len(c.responses) == 1 && !c.finished {
+		c.fetchMore(false)
 	}
-	c.responses = c.responses[1:]
-	c.mu.Unlock()
 }

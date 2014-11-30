@@ -1,7 +1,6 @@
 package gorethink
 
 import (
-	"fmt"
 	"sync"
 	"time"
 
@@ -193,26 +192,6 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, erro
 	cur, err := conn.StartQuery(t, opts)
 
 	return cur, err
-}
-
-// continueQuery continues a previously run query.
-// This is needed if a response is batched.
-func (s *Session) continueQuery(cursor *Cursor) error {
-	cursor.mu.Lock()
-	conn := cursor.conn
-	cursor.mu.Unlock()
-
-	return conn.ContinueQuery(cursor.token)
-}
-
-// stopQuery sends closes a query by sending Query_STOP to the server.
-func (s *Session) stopQuery(cursor *Cursor) error {
-	cursor.mu.Lock()
-	cursor.outstandingRequests++
-	conn := cursor.conn
-	cursor.mu.Unlock()
-
-	return conn.StopQuery(cursor.token)
 }
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
