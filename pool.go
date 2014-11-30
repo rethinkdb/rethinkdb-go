@@ -1,247 +1,284 @@
 package gorethink
 
 import (
+	"errors"
 	"sync"
-	"sync/atomic"
-	"time"
 )
 
-type ConnectionPool interface {
-	Runnable
+const defaultMaxIdleConns = 2
 
-	Size() int
-	HandleError(*Connection, error, bool)
+// maxBadConnRetries is the number of maximum retries if the driver returns
+// driver.ErrBadConn to signal a broken connection.
+const maxBadConnRetries = 10
+
+var (
+	connectionRequestQueueSize = 1000000
+
+	errPoolClosed   = errors.New("gorethink: pool is closed")
+	errConnClosed   = errors.New("gorethink: conn is closed")
+	errConnBusy     = errors.New("gorethink: conn is busy")
+	errConnInactive = errors.New("gorethink: conn was never active")
+)
+
+type Pool struct {
+	opts *ConnectOpts
+
+	mu           sync.Mutex // protects following fields
+	err          error      // the last error that occurred
+	freeConn     []*Connection
+	connRequests []chan openerRequest
+	numOpen      int
+	pendingOpens int
+	// Used to signal the need for new connections
+	// a goroutine running connectionOpener() reads on this chan and
+	// maybeOpenNewConnections sends on the chan (one send per needed connection)
+	// It is closed during p.Close(). The close tells the connectionOpener
+	// goroutine to exit.
+	openerCh chan struct{}
+	closed   bool
+	lastPut  map[*Connection]string // stacktrace of last conn's put; debug only
 }
 
-//NewPoolFunc is the type used by ClusterConfig to create a pool of a specific type.
-type NewPoolFunc func(*Session) ConnectionPool
+func NewPool(opts *ConnectOpts) (*Pool, error) {
+	p := &Pool{
+		opts: opts,
 
-//SimplePool is the current implementation of the connection pool inside gocql. This
-//pool is meant to be a simple default used by gocql so users can get up and running
-//quickly.
-type SimplePool struct {
-	s        *Session
-	connPool *RoundRobin
-	conns    map[*Connection]struct{}
-
-	// protects connPoll, conns, quit
-	mu sync.Mutex
-
-	cFillingPool chan int
-
-	quit     bool
-	quitWait chan bool
-	quitOnce sync.Once
+		openerCh: make(chan struct{}, connectionRequestQueueSize),
+		lastPut:  make(map[*Connection]string),
+	}
+	go p.connectionOpener()
+	return p, nil
 }
 
-//NewSimplePool is the function used by gocql to create the simple connection pool.
-//This is the default if no other pool type is specified.
-func NewSimplePool(s *Session) ConnectionPool {
-	pool := &SimplePool{
-		s:            s,
-		connPool:     NewRoundRobin(),
-		conns:        make(map[*Connection]struct{}),
-		quitWait:     make(chan bool),
-		cFillingPool: make(chan int, 1),
-	}
-
-	if pool.connect() == nil {
-		pool.cFillingPool <- 1
-		go pool.fillPool()
-	}
-
-	return pool
-}
-
-func (c *SimplePool) connect() error {
-	conn, err := Dial(c.s)
-	if err != nil {
-		return err
-	}
-
-	return c.addConn(newConnection(c.s, conn, c))
-}
-
-func (c *SimplePool) addConn(conn *Connection) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	if c.quit {
-		conn.Close()
-		return nil
-	}
-
-	c.connPool.AddNode(conn)
-	c.conns[conn] = struct{}{}
-
-	return nil
-}
-
-//fillPool manages the pool of connections making sure that each host has the correct
-//amount of connections defined. Also the method will test a host with one connection
-//instead of flooding the host with number of connections defined in the cluster config
-func (c *SimplePool) fillPool() {
-	//Debounce large amounts of requests to fill pool
-	select {
-	case <-time.After(1 * time.Millisecond):
-		return
-	case <-c.cFillingPool:
-		defer func() { c.cFillingPool <- 1 }()
-	}
-
-	c.mu.Lock()
-	isClosed := c.quit
-	c.mu.Unlock()
-	//Exit if cluster(session) is closed
-	if isClosed {
-		return
-	}
-
-	numConns := 1
-	//See if the host already has connections in the pool
-	c.mu.Lock()
-	conns := c.connPool
-	c.mu.Unlock()
-
-	//if the host has enough connections just exit
-	numConns = conns.Size()
-	if numConns >= c.s.Opts.MaxCap {
-		return
-	}
-
-	//This is reached if the host is responsive and needs more connections
-	//Create connections for host synchronously to mitigate flooding the host.
-	go func(conns int) {
-		for ; conns < c.s.Opts.MaxCap; conns++ {
-			c.connect()
-		}
-	}(numConns)
-}
-
-// Should only be called if c.mu is locked
-func (c *SimplePool) removeConnLocked(conn *Connection) {
-	conn.Close()
-	c.connPool.RemoveNode(conn)
-	delete(c.conns, conn)
-}
-
-func (c *SimplePool) removeConn(conn *Connection) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.removeConnLocked(conn)
-}
-
-//HandleError is called by a Connection object to report to the pool an error has occured.
-//Logic is then executed within the pool to clean up the erroroneous connection and try to
-//top off the pool.
-func (c *SimplePool) HandleError(conn *Connection, err error, closed bool) {
-	if !closed {
-		// ignore all non-fatal errors
-		return
-	}
-	c.removeConn(conn)
-	if !c.quit {
-		go c.fillPool() // top off pool.
-	}
-}
-
-//Pick selects a connection to be used by the query.
-func (c *SimplePool) GetConn() (*Connection, error) {
-	//Check if connections are available
-	c.mu.Lock()
-	conns := len(c.conns)
-	c.mu.Unlock()
-
-	if conns == 0 {
-		//try to populate the pool before returning.
-		c.fillPool()
-	}
-
-	return c.connPool.GetConn()
-}
-
-//Size returns the number of connections currently active in the pool
-func (p *SimplePool) Size() int {
+func (p *Pool) GetConn() (*Connection, error) {
 	p.mu.Lock()
-	conns := len(p.conns)
+	if p.closed {
+		p.mu.Unlock()
+		return nil, errPoolClosed
+	}
+	// If p.maxOpen > 0 and the number of open connections is over the limit
+	// and there are no free connection, make a request and wait.
+	if p.maxOpenConns() > 0 && p.numOpen >= p.maxOpenConns() && len(p.freeConn) == 0 {
+		// Make the openerRequest channel. It's buffered so that the
+		// connectionOpener doesn't block while waiting for the req to be read.
+		req := make(chan openerRequest, 1)
+		p.connRequests = append(p.connRequests, req)
+		p.maybeOpenNewConnections()
+		p.mu.Unlock()
+		ret := <-req
+		return ret.conn, ret.err
+	}
+	if n := len(p.freeConn); n > 0 {
+		c := p.freeConn[0]
+		copy(p.freeConn, p.freeConn[1:])
+		p.freeConn = p.freeConn[:n-1]
+		c.active = true
+		p.mu.Unlock()
+		return c, nil
+	}
+	p.numOpen++ // optimistically
 	p.mu.Unlock()
-	return conns
+	c, err := NewConnection(p.opts)
+	if err != nil {
+		p.mu.Lock()
+		p.numOpen-- // correct for earlier optimism
+		p.mu.Unlock()
+		return nil, err
+	}
+	p.mu.Lock()
+	c.pool = p
+	c.active = true
+	p.mu.Unlock()
+	return c, nil
 }
 
-//Close kills the pool and all associated connections.
-func (c *SimplePool) Close() error {
-	c.quitOnce.Do(func() {
-		c.mu.Lock()
-		defer c.mu.Unlock()
-		c.quit = true
-		close(c.quitWait)
-		for conn := range c.conns {
-			c.removeConnLocked(conn)
-		}
-	})
-
-	return nil
-}
-
-type RoundRobin struct {
-	pool []*Connection
-	pos  uint32
-	mu   sync.RWMutex
-}
-
-func NewRoundRobin() *RoundRobin {
-	return &RoundRobin{}
-}
-
-func (r *RoundRobin) AddNode(node *Connection) {
-	r.mu.Lock()
-	r.pool = append(r.pool, node)
-	r.mu.Unlock()
-}
-
-func (r *RoundRobin) RemoveNode(node *Connection) {
-	r.mu.Lock()
-	n := len(r.pool)
-	for i := 0; i < n; i++ {
-		if r.pool[i] == node {
-			r.pool[i], r.pool[n-1] = r.pool[n-1], r.pool[i]
-			r.pool = r.pool[:n-1]
+// connIfFree returns (wanted, nil) if wanted is still a valid conn and
+// isn't in use.
+//
+// The error is errConnClosed if the connection if the requested connection
+// is invalid because it's been closed.
+//
+// The error is errConnBusy if the connection is in use.
+func (p *Pool) connIfFree(wanted *Connection) (*Connection, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if wanted.closed {
+		return nil, errConnClosed
+	}
+	if wanted.active {
+		return nil, errConnBusy
+	}
+	idx := -1
+	for ii, v := range p.freeConn {
+		if v == wanted {
+			idx = ii
 			break
 		}
 	}
-	r.mu.Unlock()
+	if idx >= 0 {
+		p.freeConn = append(p.freeConn[:idx], p.freeConn[idx+1:]...)
+		wanted.active = true
+		return wanted, nil
+	}
+
+	return nil, errConnBusy
 }
 
-func (r *RoundRobin) Size() int {
-	r.mu.RLock()
-	n := len(r.pool)
-	r.mu.RUnlock()
-	return n
+func (p *Pool) PutConn(c *Connection, err error, closed bool) {
+	p.mu.Lock()
+	if !c.active {
+		p.mu.Unlock()
+		return
+	}
+	c.active = false
+	if closed {
+		p.maybeOpenNewConnections()
+		p.mu.Unlock()
+		c.Close()
+		return
+	}
+	added := p.putConnDBLocked(c, nil)
+	p.mu.Unlock()
+	if !added {
+		c.Close()
+	}
 }
 
-func (r *RoundRobin) GetConn() (*Connection, error) {
-	pos := atomic.AddUint32(&r.pos, 1)
-	var conn *Connection
-	r.mu.RLock()
-	if len(r.pool) > 0 {
-		conn = r.pool[pos%uint32(len(r.pool))]
+// Satisfy a openerRequest or put the Connection in the idle pool and return true
+// or return false.
+// putConnDBLocked will satisfy a openerRequest if there is one, or it will
+// return the *Connection to the freeConn list if err == nil and the idle
+// connection limit will not be exceeded.
+// If err != nil, the value of c is ignored.
+// If err == nil, then c must not equal nil.
+// If a openerRequest was fulfilled or the *Connection was placed in the
+// freeConn list, then true is returned, otherwise false is returned.
+func (p *Pool) putConnDBLocked(c *Connection, err error) bool {
+	if n := len(p.connRequests); n > 0 {
+		req := p.connRequests[0]
+		// This copy is O(n) but in practice faster than a linked list.
+		// TODO: consider compacting it down less often and
+		// moving the base instead?
+		copy(p.connRequests, p.connRequests[1:])
+		p.connRequests = p.connRequests[:n-1]
+		if err == nil {
+			c.active = true
+		}
+		req <- openerRequest{
+			conn: c,
+			err:  err,
+		}
+		return true
+	} else if err == nil && !p.closed && p.maxIdleConns() > len(p.freeConn) {
+		p.freeConn = append(p.freeConn, c)
+		return true
 	}
-	r.mu.RUnlock()
-	if conn == nil {
-		return nil, ErrNoConnections
-	}
-	if conn.closed {
-		return nil, ErrConnectionClosed
-	}
-	return conn, nil
+	return false
 }
 
-func (r *RoundRobin) Close() error {
-	r.mu.Lock()
-	for i := 0; i < len(r.pool); i++ {
-		r.pool[i].Close()
+func (p *Pool) Close() error {
+	p.mu.Lock()
+	if p.closed {
+		p.mu.Unlock()
+		return nil
 	}
-	r.pool = nil
-	r.mu.Unlock()
+	close(p.openerCh)
+	var err error
+	fns := make([]func() error, 0, len(p.freeConn))
+	for _, c := range p.freeConn {
+		fns = append(fns, c.Close)
+	}
+	p.freeConn = nil
+	p.closed = true
+	for _, req := range p.connRequests {
+		close(req)
+	}
+	p.mu.Unlock()
+	for _, fn := range fns {
+		err1 := fn()
+		if err1 != nil {
+			err = err1
+		}
+	}
+	return err
+}
 
-	return nil
+// Assumes p.mu is locked.
+// If there are connRequests and the connection limit hasn't been reached,
+// then tell the connectionOpener to open new connections.
+func (p *Pool) maybeOpenNewConnections() {
+	numRequests := len(p.connRequests) - p.pendingOpens
+	if p.maxOpenConns() > 0 {
+		numCanOpen := p.maxOpenConns() - (p.numOpen + p.pendingOpens)
+		if numRequests > numCanOpen {
+			numRequests = numCanOpen
+		}
+	}
+	for numRequests > 0 {
+		p.pendingOpens++
+		numRequests--
+		p.openerCh <- struct{}{}
+	}
+}
+
+// Runs in a separate goroutine, opens new connections when requested.
+func (p *Pool) connectionOpener() {
+	for _ = range p.openerCh {
+		p.openNewConnection()
+	}
+}
+
+// Open one new connection
+func (p *Pool) openNewConnection() {
+	c, err := NewConnection(p.opts)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	if p.closed {
+		if err == nil {
+			c.Close()
+		}
+		return
+	}
+	p.pendingOpens--
+	if err != nil {
+		p.putConnDBLocked(nil, err)
+		return
+	}
+	if p.putConnDBLocked(c, err) {
+		p.numOpen++
+	} else {
+		c.Close()
+	}
+}
+
+// openerRequest represents one request for a new connection
+// When there are no idle connections available, p.conn will create
+// a new openerRequest and put it on the p.connRequests list.
+type openerRequest struct {
+	conn *Connection
+	err  error
+}
+
+// Access pool options
+
+func (p *Pool) maxIdleConns() int {
+	n := p.opts.MaxIdle
+	switch {
+	case n == 0:
+		return defaultMaxIdleConns
+	case n < 0:
+		return 0
+	case p.opts.MaxOpen < n:
+		return p.opts.MaxOpen
+	default:
+		return n
+	}
+}
+
+func (p *Pool) maxOpenConns() int {
+	n := p.opts.MaxOpen
+	switch {
+	default:
+		return n
+	}
 }

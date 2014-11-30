@@ -10,13 +10,12 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-func newCursor(session *Session, conn *Connection, token int64, term *Term, opts map[string]interface{}) *Cursor {
+func newCursor(conn *Connection, token int64, term *Term, opts map[string]interface{}) *Cursor {
 	cursor := &Cursor{
-		session: session,
-		conn:    conn,
-		token:   token,
-		term:    term,
-		opts:    opts,
+		conn:  conn,
+		token: token,
+		term:  term,
+		opts:  opts,
 	}
 
 	return cursor
@@ -27,12 +26,11 @@ func newCursor(session *Session, conn *Connection, token int64, term *Term, opts
 // The code for this struct is based off of mgo's Iter and the official
 // python driver's cursor.
 type Cursor struct {
-	session *Session
-	conn    *Connection
-	token   int64
-	query   Query
-	term    *Term
-	opts    map[string]interface{}
+	conn  *Connection
+	token int64
+	query Query
+	term  *Term
+	opts  map[string]interface{}
 
 	sync.Mutex
 	err       error

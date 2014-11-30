@@ -28,27 +28,23 @@ func (q *Query) build() []interface{} {
 }
 
 type Session struct {
-	Opts ConnectOpts
+	opts ConnectOpts
+	pool *Pool
 
 	// Response cache, used for batched responses
 	sync.Mutex
 	closed bool
 	token  int64
-
-	pool ConnectionPool
 }
 
 type ConnectOpts struct {
-	Address  string `gorethink:"address,omitempty"`
-	Database string `gorethink:"database,omitempty"`
-	AuthKey  string `gorethink:"authkey,omitempty"`
+	Address  string        `gorethink:"address,omitempty"`
+	Database string        `gorethink:"database,omitempty"`
+	AuthKey  string        `gorethink:"authkey,omitempty"`
+	Timeout  time.Duration `gorethink:"timeout,omitempty"`
 
-	MinCap       int           `gorethink:"min_cap,omitempty"`
-	MaxCap       int           `gorethink:"max_cap,omitempty"`
-	Timeout      time.Duration `gorethink:"timeout,omitempty"`
-	IdleTimeout  time.Duration `gorethink:"idle_timeout,omitempty"`
-	WaitRetry    time.Duration `gorethink:"wait_retry,omitempty"`
-	MaxWaitRetry time.Duration `gorethink:"max_wait_retry,omitempty"`
+	MaxIdle int `gorethink:"max_idle,omitempty"`
+	MaxOpen int `gorethink:"max_open,omitempty"`
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {
@@ -73,29 +69,9 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 // 		AuthKey:  "14daak1cad13dj",
 // 	})
 func Connect(opts ConnectOpts) (*Session, error) {
-	// Set defaults
-	if opts.MinCap == 0 {
-		opts.MinCap = 1
-	}
-	if opts.MaxCap == 0 {
-		opts.MaxCap = 1
-	}
-	if opts.Timeout == 0 {
-		opts.Timeout = time.Second
-	}
-	if opts.IdleTimeout == 0 {
-		opts.IdleTimeout = time.Hour
-	}
-	if opts.WaitRetry == 0 {
-		opts.WaitRetry = 1
-	}
-	if opts.MaxWaitRetry == 0 {
-		opts.MaxWaitRetry = 1
-	}
-
 	// Connect
 	s := &Session{
-		Opts: opts,
+		opts: opts,
 	}
 	err := s.Reconnect()
 	if err != nil {
@@ -115,24 +91,29 @@ func (o *CloseOpts) toMap() map[string]interface{} {
 
 // Reconnect closes and re-opens a session.
 func (s *Session) Reconnect(optArgs ...CloseOpts) error {
-	if err := s.Close(optArgs...); err != nil {
+	var err error
+
+	if err = s.Close(optArgs...); err != nil {
 		return err
 	}
 
-	if s.pool != nil {
-		s.pool = NewSimplePool(s)
+	setup := s.pool == nil
+
+	s.pool, err = NewPool(&s.opts)
+	if err != nil {
+		return err
 	}
-	if s.pool == nil {
 
-		s.closed = false
-		s.pool = NewSimplePool(s)
-
-		// See if there are any connections in the pool
-		if s.pool.Size() == 0 {
-			s.pool.Close()
-			return ErrNoConnections
+	if setup {
+		// Check if we can get a connection
+		c, err := s.pool.GetConn()
+		if err != nil {
+			return err
 		}
+		s.pool.PutConn(c, nil, false)
 	}
+
+	s.closed = false
 
 	return nil
 }
@@ -167,7 +148,7 @@ func (s *Session) NoReplyWait() {
 
 // Use changes the default database used
 func (s *Session) Use(database string) {
-	s.Opts.Database = database
+	s.opts.Database = database
 }
 
 // startQuery creates a query from the term given and sends it to the server.

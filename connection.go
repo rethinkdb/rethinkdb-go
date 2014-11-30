@@ -35,20 +35,15 @@ type Response struct {
 	Profile   interface{}             `json:"p"`
 }
 
-type Conn interface {
-	SendQuery(s *Session, q *p.Query, t Term, opts map[string]interface{}) (*Cursor, error)
-	ReadResponse(s *Session, token int64) (*Response, error)
-	Close() error
-}
-
 // connection is a connection to a rethinkdb database
 type Connection struct {
-	sync.Mutex
-	conn    net.Conn
-	session *Session
-	pool    ConnectionPool
+	opts *ConnectOpts
+	conn net.Conn
+	pool *Pool
 
+	sync.Mutex
 	token       int64
+	active      bool
 	closed      bool
 	outstanding int64
 	cursors     map[int64]*Cursor
@@ -56,37 +51,37 @@ type Connection struct {
 }
 
 // Dial closes the previous connection and attempts to connect again.
-func Dial(s *Session) (net.Conn, error) {
-	conn, err := net.Dial("tcp", s.Opts.Address)
+func NewConnection(opts *ConnectOpts) (*Connection, error) {
+	c, err := net.Dial("tcp", opts.Address)
 	if err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
+	if err := binary.Write(c, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.Opts.AuthKey))); err != nil {
+	if err := binary.Write(c, binary.LittleEndian, uint32(len(opts.AuthKey))); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Send the auth key as an ASCII string
 	// If there is no auth key, skip this step
-	if s.Opts.AuthKey != "" {
-		if _, err := io.WriteString(conn, s.Opts.AuthKey); err != nil {
+	if opts.AuthKey != "" {
+		if _, err := io.WriteString(c, opts.AuthKey); err != nil {
 			return nil, RqlConnectionError{err.Error()}
 		}
 	}
 
 	// Send the protocol type as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
+	if err := binary.Write(c, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// read server response to authorization key (terminated by NUL)
-	reader := bufio.NewReader(conn)
+	reader := bufio.NewReader(c)
 	line, err := reader.ReadBytes('\x00')
 	if err != nil {
 		if err == io.EOF {
@@ -101,22 +96,16 @@ func Dial(s *Session) (net.Conn, error) {
 		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
 
-	return conn, nil
-}
-
-func newConnection(s *Session, c net.Conn, p ConnectionPool) *Connection {
 	conn := &Connection{
-		conn:    c,
-		session: s,
-		pool:    p,
+		opts: opts,
+		conn: c,
 
 		cursors:  make(map[int64]*Cursor),
 		requests: make(map[int64]connRequest),
 	}
-
 	go conn.readLoop()
 
-	return conn
+	return conn, nil
 }
 
 func (c *Connection) StartQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
@@ -130,7 +119,7 @@ func (c *Connection) StartQuery(t Term, opts map[string]interface{}) (*Cursor, e
 
 	// If no DB option was set default to the value set in the connection
 	if _, ok := opts["db"]; !ok {
-		globalOpts["db"] = Db(c.session.Opts.Database).build()
+		globalOpts["db"] = Db(c.opts.Database).build()
 	}
 
 	// Construct query
@@ -207,10 +196,6 @@ func (c *Connection) sendQuery(request connRequest) error {
 	closed := c.closed
 	c.Unlock()
 
-	c.session.Lock()
-	timeout := c.session.Opts.Timeout
-	c.session.Unlock()
-
 	if closed {
 		return ErrConnectionClosed
 	}
@@ -221,10 +206,10 @@ func (c *Connection) sendQuery(request connRequest) error {
 	}
 
 	// Set timeout
-	if timeout == 0 {
+	if c.opts.Timeout == 0 {
 		c.conn.SetDeadline(time.Time{})
 	} else {
-		c.conn.SetDeadline(time.Now().Add(timeout))
+		c.conn.SetDeadline(time.Now().Add(c.opts.Timeout))
 	}
 
 	// Send a unique 8-byte token
@@ -270,23 +255,15 @@ func (c *Connection) Close() error {
 	return nil
 }
 
-// Return returns the connection to the connection pool
-func (c *Connection) Return() error {
+// Release returns the connection to the connection pool
+func (c *Connection) Release() {
 	c.Lock()
-	closed := c.closed
+	pool := c.pool
 	c.Unlock()
 
-	if !closed {
-		err := c.conn.Close()
-
-		c.Lock()
-		c.closed = true
-		c.Unlock()
-
-		return err
+	if pool != nil {
+		pool.PutConn(c, nil, false)
 	}
-
-	return nil
 }
 
 // getToken generates the next query token, used to number requests and match
@@ -319,7 +296,7 @@ func (c *Connection) processResponse(request connRequest, response *Response) (*
 }
 
 func (c *Connection) processErrorResponse(request connRequest, response *Response, err error) (*Response, *Cursor, error) {
-	// c.Close()
+	c.Release()
 
 	c.Lock()
 	cursor := c.cursors[response.Token]
@@ -332,7 +309,7 @@ func (c *Connection) processErrorResponse(request connRequest, response *Respons
 }
 
 func (c *Connection) processAtomResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
-	// c.Close()
+	c.Release()
 
 	// Create cursor
 	var value []interface{}
@@ -353,7 +330,7 @@ func (c *Connection) processAtomResponse(request connRequest, response *Response
 		}
 	}
 
-	cursor := newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
+	cursor := newCursor(c, response.Token, request.Query.Term, request.Options)
 	cursor.profile = response.Profile
 	cursor.buffer = value
 	cursor.finished = true
@@ -369,7 +346,7 @@ func (c *Connection) processFeedResponse(request connRequest, response *Response
 	var cursor *Cursor
 	if _, ok := c.cursors[response.Token]; !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
+		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
 		cursor.profile = response.Profile
 		c.cursors[response.Token] = cursor
 	} else {
@@ -392,7 +369,7 @@ func (c *Connection) processPartialResponse(request connRequest, response *Respo
 
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
+		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
 		cursor.profile = response.Profile
 
 		c.Lock()
@@ -409,7 +386,7 @@ func (c *Connection) processPartialResponse(request connRequest, response *Respo
 }
 
 func (c *Connection) processSequenceResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
-	// c.Close()
+	c.Release()
 
 	c.Lock()
 	cursor, ok := c.cursors[response.Token]
@@ -417,7 +394,7 @@ func (c *Connection) processSequenceResponse(request connRequest, response *Resp
 
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c.session, c, response.Token, request.Query.Term, request.Options)
+		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
 		cursor.profile = response.Profile
 
 		c.Lock()
@@ -436,7 +413,7 @@ func (c *Connection) processSequenceResponse(request connRequest, response *Resp
 }
 
 func (c *Connection) processWaitResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
-	// c.Close()
+	c.Release()
 
 	c.Lock()
 	// delete(c.requests, response.Token)
@@ -474,8 +451,6 @@ func (c *Connection) readLoop() {
 		request.Response <- connResponse{response, err}
 	}
 
-	c.Close()
-
 	c.Lock()
 	requests := c.requests
 	c.Unlock()
@@ -488,7 +463,7 @@ func (c *Connection) readLoop() {
 		}
 	}
 
-	c.pool.HandleError(c, err, true)
+	c.pool.PutConn(c, err, true)
 }
 
 func (c *Connection) read() (*Response, error) {
