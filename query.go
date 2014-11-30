@@ -98,6 +98,11 @@ func (t Term) String() string {
 	return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
 }
 
+type Runnable interface {
+	GetConn() (*Connection, error)
+	Close() error
+}
+
 type WriteResponse struct {
 	Errors        int
 	Created       int

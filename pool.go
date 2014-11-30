@@ -7,10 +7,10 @@ import (
 )
 
 type ConnectionPool interface {
-	Get() *Connection
+	Runnable
+
 	Size() int
 	HandleError(*Connection, error, bool)
-	Close()
 }
 
 //NewPoolFunc is the type used by ClusterConfig to create a pool of a specific type.
@@ -104,14 +104,14 @@ func (c *SimplePool) fillPool() {
 
 	//if the host has enough connections just exit
 	numConns = conns.Size()
-	if numConns >= c.s.maxCap {
+	if numConns >= c.s.Opts.MaxCap {
 		return
 	}
 
 	//This is reached if the host is responsive and needs more connections
 	//Create connections for host synchronously to mitigate flooding the host.
 	go func(conns int) {
-		for ; conns < c.s.maxCap; conns++ {
+		for ; conns < c.s.Opts.MaxCap; conns++ {
 			c.connect()
 		}
 	}(numConns)
@@ -145,7 +145,7 @@ func (c *SimplePool) HandleError(conn *Connection, err error, closed bool) {
 }
 
 //Pick selects a connection to be used by the query.
-func (c *SimplePool) Get() *Connection {
+func (c *SimplePool) GetConn() (*Connection, error) {
 	//Check if connections are available
 	c.mu.Lock()
 	conns := len(c.conns)
@@ -156,7 +156,7 @@ func (c *SimplePool) Get() *Connection {
 		c.fillPool()
 	}
 
-	return c.connPool.Get()
+	return c.connPool.GetConn()
 }
 
 //Size returns the number of connections currently active in the pool
@@ -168,7 +168,7 @@ func (p *SimplePool) Size() int {
 }
 
 //Close kills the pool and all associated connections.
-func (c *SimplePool) Close() {
+func (c *SimplePool) Close() error {
 	c.quitOnce.Do(func() {
 		c.mu.Lock()
 		defer c.mu.Unlock()
@@ -178,6 +178,8 @@ func (c *SimplePool) Close() {
 			c.removeConnLocked(conn)
 		}
 	})
+
+	return nil
 }
 
 type RoundRobin struct {
@@ -216,7 +218,7 @@ func (r *RoundRobin) Size() int {
 	return n
 }
 
-func (r *RoundRobin) Get() *Connection {
+func (r *RoundRobin) GetConn() (*Connection, error) {
 	pos := atomic.AddUint32(&r.pos, 1)
 	var conn *Connection
 	r.mu.RLock()
@@ -225,19 +227,21 @@ func (r *RoundRobin) Get() *Connection {
 	}
 	r.mu.RUnlock()
 	if conn == nil {
-		return nil
+		return nil, ErrNoConnections
 	}
 	if conn.closed {
-		return nil
+		return nil, ErrConnectionClosed
 	}
-	return conn
+	return conn, nil
 }
 
-func (r *RoundRobin) Close() {
+func (r *RoundRobin) Close() error {
 	r.mu.Lock()
 	for i := 0; i < len(r.pool); i++ {
 		r.pool[i].Close()
 	}
 	r.pool = nil
 	r.mu.Unlock()
+
+	return nil
 }

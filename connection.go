@@ -57,7 +57,7 @@ type Connection struct {
 
 // Dial closes the previous connection and attempts to connect again.
 func Dial(s *Session) (net.Conn, error) {
-	conn, err := net.Dial("tcp", s.address)
+	conn, err := net.Dial("tcp", s.Opts.Address)
 	if err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
@@ -68,14 +68,14 @@ func Dial(s *Session) (net.Conn, error) {
 	}
 
 	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.authkey))); err != nil {
+	if err := binary.Write(conn, binary.LittleEndian, uint32(len(s.Opts.AuthKey))); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Send the auth key as an ASCII string
 	// If there is no auth key, skip this step
-	if s.authkey != "" {
-		if _, err := io.WriteString(conn, s.authkey); err != nil {
+	if s.Opts.AuthKey != "" {
+		if _, err := io.WriteString(conn, s.Opts.AuthKey); err != nil {
 			return nil, RqlConnectionError{err.Error()}
 		}
 	}
@@ -130,7 +130,7 @@ func (c *Connection) StartQuery(t Term, opts map[string]interface{}) (*Cursor, e
 
 	// If no DB option was set default to the value set in the connection
 	if _, ok := opts["db"]; !ok {
-		globalOpts["db"] = Db(c.session.database).build()
+		globalOpts["db"] = Db(c.session.Opts.Database).build()
 	}
 
 	// Construct query
@@ -208,7 +208,7 @@ func (c *Connection) sendQuery(request connRequest) error {
 	c.Unlock()
 
 	c.session.Lock()
-	timeout := c.session.timeout
+	timeout := c.session.Opts.Timeout
 	c.session.Unlock()
 
 	if closed {
@@ -244,6 +244,10 @@ func (c *Connection) sendQuery(request connRequest) error {
 	}
 
 	return nil
+}
+
+func (c *Connection) GetConn() (*Connection, error) {
+	return c, nil
 }
 
 // Close closes the underlying net.Conn. It also removes the connection

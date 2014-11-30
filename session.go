@@ -28,58 +28,27 @@ func (q *Query) build() []interface{} {
 }
 
 type Session struct {
-	address    string
-	database   string
-	timeout    time.Duration
-	authkey    string
-	timeFormat string
-
-	// Pool configuration options
-	maxCap int
-
-	token int64
+	Opts ConnectOpts
 
 	// Response cache, used for batched responses
 	sync.Mutex
 	closed bool
+	token  int64
 
 	pool ConnectionPool
 }
 
-func newSession(args map[string]interface{}) *Session {
-	s := &Session{}
-
-	if address, ok := args["address"]; ok {
-		s.address = address.(string)
-	}
-	if database, ok := args["database"]; ok {
-		s.database = database.(string)
-	}
-	if timeout, ok := args["timeout"]; ok {
-		s.timeout = timeout.(time.Duration)
-	}
-	if authkey, ok := args["authkey"]; ok {
-		s.authkey = authkey.(string)
-	}
-
-	// Pool configuration options
-	if maxCap, ok := args["max_active"]; ok {
-		s.maxCap = int(maxCap.(int64))
-	} else {
-		s.maxCap = 30
-	}
-
-	return s
-}
-
 type ConnectOpts struct {
-	Address     string        `gorethink:"address,omitempty"`
-	Database    string        `gorethink:"database,omitempty"`
-	Timeout     time.Duration `gorethink:"timeout,omitempty"`
-	AuthKey     string        `gorethink:"authkey,omitempty"`
-	InitialCap  int           `gorethink:"initial_cap,omitempty"`
-	MaxCap      int           `gorethink:"max_cap,omitempty"`
-	IdleTimeout time.Duration `gorethink:"idle_timeout,omitempty"`
+	Address  string `gorethink:"address,omitempty"`
+	Database string `gorethink:"database,omitempty"`
+	AuthKey  string `gorethink:"authkey,omitempty"`
+
+	MinCap       int           `gorethink:"min_cap,omitempty"`
+	MaxCap       int           `gorethink:"max_cap,omitempty"`
+	Timeout      time.Duration `gorethink:"timeout,omitempty"`
+	IdleTimeout  time.Duration `gorethink:"idle_timeout,omitempty"`
+	WaitRetry    time.Duration `gorethink:"wait_retry,omitempty"`
+	MaxWaitRetry time.Duration `gorethink:"max_wait_retry,omitempty"`
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {
@@ -103,11 +72,37 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 // 		Database: "test",
 // 		AuthKey:  "14daak1cad13dj",
 // 	})
-func Connect(args ConnectOpts) (*Session, error) {
-	s := newSession(args.toMap())
-	err := s.Reconnect()
+func Connect(opts ConnectOpts) (*Session, error) {
+	// Set defaults
+	if opts.MinCap == 0 {
+		opts.MinCap = 1
+	}
+	if opts.MaxCap == 0 {
+		opts.MaxCap = 1
+	}
+	if opts.Timeout == 0 {
+		opts.Timeout = time.Second
+	}
+	if opts.IdleTimeout == 0 {
+		opts.IdleTimeout = time.Hour
+	}
+	if opts.WaitRetry == 0 {
+		opts.WaitRetry = 1
+	}
+	if opts.MaxWaitRetry == 0 {
+		opts.MaxWaitRetry = 1
+	}
 
-	return s, err
+	// Connect
+	s := &Session{
+		Opts: opts,
+	}
+	err := s.Reconnect()
+	if err != nil {
+		return nil, err
+	}
+
+	return s, nil
 }
 
 type CloseOpts struct {
@@ -172,19 +167,13 @@ func (s *Session) NoReplyWait() {
 
 // Use changes the default database used
 func (s *Session) Use(database string) {
-	s.database = database
-}
-
-// SetTimeout causes any future queries that are run on this session to timeout
-// after the given duration, returning a timeout error.  Set to zero to disable.
-func (s *Session) SetTimeout(timeout time.Duration) {
-	s.timeout = timeout
+	s.Opts.Database = database
 }
 
 // startQuery creates a query from the term given and sends it to the server.
 // The result from the server is returned as a cursor
 func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
-	conn, err := s.getConn()
+	conn, err := s.GetConn()
 	if err != nil {
 		return nil, err
 	}
@@ -196,7 +185,7 @@ func (s *Session) startQuery(t Term, opts map[string]interface{}) (*Cursor, erro
 
 // noreplyWaitQuery sends the NOREPLY_WAIT query to the server.
 func (s *Session) noreplyWaitQuery() error {
-	conn, err := s.getConn()
+	conn, err := s.GetConn()
 	if err != nil {
 		return err
 	}
@@ -204,11 +193,6 @@ func (s *Session) noreplyWaitQuery() error {
 	return conn.NoReplyWait()
 }
 
-func (s *Session) getConn() (*Connection, error) {
-	conn := s.pool.Get()
-	if conn == nil {
-		return nil, RqlConnectionError{"No connections available"}
-	}
-
-	return s.pool.Get(), nil
+func (s *Session) GetConn() (*Connection, error) {
+	return s.pool.GetConn()
 }
