@@ -14,15 +14,15 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-type connRequest struct {
+type queryRequest struct {
 	Active int32
 
 	Query    Query
 	Options  map[string]interface{}
-	Response chan connResponse
+	Response chan queryResponse
 }
 
-type connResponse struct {
+type queryResponse struct {
 	Response *Response
 	Error    error
 }
@@ -47,7 +47,7 @@ type Connection struct {
 	closed      bool
 	outstanding int64
 	cursors     map[int64]*Cursor
-	requests    map[int64]connRequest
+	requests    map[int64]queryRequest
 }
 
 // Dial closes the previous connection and attempts to connect again.
@@ -101,7 +101,7 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 		conn: c,
 
 		cursors:  make(map[int64]*Cursor),
-		requests: make(map[int64]connRequest),
+		requests: make(map[int64]queryRequest),
 	}
 	go conn.readLoop()
 
@@ -165,11 +165,11 @@ func (c *Connection) NoReplyWait() error {
 }
 
 func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
-	request := connRequest{
+	request := queryRequest{
 		Query:   q,
 		Options: opts,
 	}
-	request.Response = make(chan connResponse, 1)
+	request.Response = make(chan queryResponse, 1)
 	atomic.AddInt64(&c.outstanding, 1)
 	atomic.StoreInt32(&request.Active, 1)
 
@@ -191,7 +191,7 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 	return c.processResponse(request, reply.Response)
 }
 
-func (c *Connection) sendQuery(request connRequest) error {
+func (c *Connection) sendQuery(request queryRequest) error {
 	c.Lock()
 	closed := c.closed
 	c.Unlock()
@@ -272,7 +272,7 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
 }
 
-func (c *Connection) processResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
 		return c.processErrorResponse(request, response, RqlClientError{rqlResponseError{response, request.Query.Term}})
@@ -295,7 +295,7 @@ func (c *Connection) processResponse(request connRequest, response *Response) (*
 	}
 }
 
-func (c *Connection) processErrorResponse(request connRequest, response *Response, err error) (*Response, *Cursor, error) {
+func (c *Connection) processErrorResponse(request queryRequest, response *Response, err error) (*Response, *Cursor, error) {
 	c.Release()
 
 	c.Lock()
@@ -308,7 +308,7 @@ func (c *Connection) processErrorResponse(request connRequest, response *Respons
 	return response, cursor, err
 }
 
-func (c *Connection) processAtomResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processAtomResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
 	c.Release()
 
 	// Create cursor
@@ -342,7 +342,7 @@ func (c *Connection) processAtomResponse(request connRequest, response *Response
 	return response, cursor, nil
 }
 
-func (c *Connection) processFeedResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processFeedResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
 	var cursor *Cursor
 	if _, ok := c.cursors[response.Token]; !ok {
 		// Create a new cursor if needed
@@ -362,7 +362,7 @@ func (c *Connection) processFeedResponse(request connRequest, response *Response
 	return response, cursor, nil
 }
 
-func (c *Connection) processPartialResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processPartialResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
 	c.Lock()
 	cursor, ok := c.cursors[response.Token]
 	c.Unlock()
@@ -385,7 +385,7 @@ func (c *Connection) processPartialResponse(request connRequest, response *Respo
 	return response, cursor, nil
 }
 
-func (c *Connection) processSequenceResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processSequenceResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
 	c.Release()
 
 	c.Lock()
@@ -412,7 +412,7 @@ func (c *Connection) processSequenceResponse(request connRequest, response *Resp
 	return response, cursor, nil
 }
 
-func (c *Connection) processWaitResponse(request connRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processWaitResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
 	c.Release()
 
 	c.Lock()
@@ -448,7 +448,7 @@ func (c *Connection) readLoop() {
 			continue
 		}
 		atomic.AddInt64(&c.outstanding, -1)
-		request.Response <- connResponse{response, err}
+		request.Response <- queryResponse{response, err}
 	}
 
 	c.Lock()
@@ -456,7 +456,7 @@ func (c *Connection) readLoop() {
 	c.Unlock()
 	for _, request := range requests {
 		if atomic.LoadInt32(&request.Active) == 1 {
-			request.Response <- connResponse{
+			request.Response <- queryResponse{
 				Response: response,
 				Error:    err,
 			}

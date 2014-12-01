@@ -2,10 +2,12 @@ package gorethink
 
 import (
 	"errors"
+	"log"
 	"sync"
 )
 
 const defaultMaxIdleConns = 2
+const defaultMaxOpenConns = 0
 
 // maxBadConnRetries is the number of maximum retries if the driver returns
 // driver.ErrBadConn to signal a broken connection.
@@ -26,7 +28,7 @@ type Pool struct {
 	mu           sync.Mutex // protects following fields
 	err          error      // the last error that occurred
 	freeConn     []*Connection
-	connRequests []chan openerRequest
+	connRequests []chan connRequest
 	numOpen      int
 	pendingOpens int
 	// Used to signal the need for new connections
@@ -37,6 +39,8 @@ type Pool struct {
 	openerCh chan struct{}
 	closed   bool
 	lastPut  map[*Connection]string // stacktrace of last conn's put; debug only
+	maxIdle  int                    // zero means defaultMaxIdleConns; negative means 0
+	maxOpen  int                    // <= 0 means unlimited
 }
 
 func NewPool(opts *ConnectOpts) (*Pool, error) {
@@ -45,6 +49,8 @@ func NewPool(opts *ConnectOpts) (*Pool, error) {
 
 		openerCh: make(chan struct{}, connectionRequestQueueSize),
 		lastPut:  make(map[*Connection]string),
+		maxIdle:  defaultMaxIdleConns,
+		maxOpen:  defaultMaxOpenConns,
 	}
 	go p.connectionOpener()
 	return p, nil
@@ -56,16 +62,21 @@ func (p *Pool) GetConn() (*Connection, error) {
 		p.mu.Unlock()
 		return nil, errPoolClosed
 	}
+
 	// If p.maxOpen > 0 and the number of open connections is over the limit
 	// and there are no free connection, make a request and wait.
-	if p.maxOpenConns() > 0 && p.numOpen >= p.maxOpenConns() && len(p.freeConn) == 0 {
-		// Make the openerRequest channel. It's buffered so that the
+	if p.maxOpen > 0 && p.numOpen >= p.maxOpen && len(p.freeConn) == 0 {
+		// Make the connRequest channel. It's buffered so that the
 		// connectionOpener doesn't block while waiting for the req to be read.
-		req := make(chan openerRequest, 1)
+		req := make(chan connRequest, 1)
 		p.connRequests = append(p.connRequests, req)
 		p.maybeOpenNewConnections()
 		p.mu.Unlock()
 		ret := <-req
+		// Check if pool has been closed
+		if ret.conn == nil && p.closed {
+			return nil, errPoolClosed
+		}
 		return ret.conn, ret.err
 	}
 	if n := len(p.freeConn); n > 0 {
@@ -144,16 +155,20 @@ func (p *Pool) PutConn(c *Connection, err error, closed bool) {
 	}
 }
 
-// Satisfy a openerRequest or put the Connection in the idle pool and return true
+// Satisfy a connRequest or put the Connection in the idle pool and return true
 // or return false.
-// putConnDBLocked will satisfy a openerRequest if there is one, or it will
+// putConnDBLocked will satisfy a connRequest if there is one, or it will
 // return the *Connection to the freeConn list if err == nil and the idle
 // connection limit will not be exceeded.
 // If err != nil, the value of c is ignored.
 // If err == nil, then c must not equal nil.
-// If a openerRequest was fulfilled or the *Connection was placed in the
+// If a connRequest was fulfilled or the *Connection was placed in the
 // freeConn list, then true is returned, otherwise false is returned.
 func (p *Pool) putConnDBLocked(c *Connection, err error) bool {
+	if c == nil {
+		return false
+	}
+
 	if n := len(p.connRequests); n > 0 {
 		req := p.connRequests[0]
 		// This copy is O(n) but in practice faster than a linked list.
@@ -164,7 +179,7 @@ func (p *Pool) putConnDBLocked(c *Connection, err error) bool {
 		if err == nil {
 			c.active = true
 		}
-		req <- openerRequest{
+		req <- connRequest{
 			conn: c,
 			err:  err,
 		}
@@ -208,8 +223,8 @@ func (p *Pool) Close() error {
 // then tell the connectionOpener to open new connections.
 func (p *Pool) maybeOpenNewConnections() {
 	numRequests := len(p.connRequests) - p.pendingOpens
-	if p.maxOpenConns() > 0 {
-		numCanOpen := p.maxOpenConns() - (p.numOpen + p.pendingOpens)
+	if p.maxOpen > 0 {
+		numCanOpen := p.maxOpen - (p.numOpen + p.pendingOpens)
 		if numRequests > numCanOpen {
 			numRequests = numCanOpen
 		}
@@ -251,10 +266,10 @@ func (p *Pool) openNewConnection() {
 	}
 }
 
-// openerRequest represents one request for a new connection
+// connRequest represents one request for a new connection
 // When there are no idle connections available, p.conn will create
-// a new openerRequest and put it on the p.connRequests list.
-type openerRequest struct {
+// a new connRequest and put it on the p.connRequests list.
+type connRequest struct {
 	conn *Connection
 	err  error
 }
@@ -262,23 +277,68 @@ type openerRequest struct {
 // Access pool options
 
 func (p *Pool) maxIdleConns() int {
-	n := p.opts.MaxIdle
+	n := p.maxIdle
 	switch {
 	case n == 0:
 		return defaultMaxIdleConns
 	case n < 0:
 		return 0
-	case p.opts.MaxOpen < n:
-		return p.opts.MaxOpen
+	case p.maxOpen < n:
+		return p.maxOpen
 	default:
 		return n
 	}
 }
 
-func (p *Pool) maxOpenConns() int {
-	n := p.opts.MaxOpen
-	switch {
-	default:
-		return n
+// SetMaxIdleConns sets the maximum number of connections in the idle
+// connection pool.
+//
+// If MaxOpenConns is greater than 0 but less than the new MaxIdleConns
+// then the new MaxIdleConns will be reduced to match the MaxOpenConns limit
+//
+// If n <= 0, no idle connections are retained.
+func (p *Pool) SetMaxIdleConns(n int) {
+	p.mu.Lock()
+	if n > 0 {
+		p.maxIdle = n
+	} else {
+		// No idle connections.
+		p.maxIdle = -1
+	}
+	// Make sure maxIdle doesn't exceed maxOpen
+	if p.maxOpen > 0 && p.maxIdleConns() > p.maxOpen {
+		p.maxIdle = p.maxOpen
+	}
+	var closing []*Connection
+	idleCount := len(p.freeConn)
+	maxIdle := p.maxIdleConns()
+	if idleCount > maxIdle {
+		closing = p.freeConn[maxIdle:]
+		p.freeConn = p.freeConn[:maxIdle]
+	}
+	p.mu.Unlock()
+	for _, c := range closing {
+		c.Close()
+	}
+}
+
+// SetMaxOpenConns sets the maximum number of open connections to the database.
+//
+// If MaxIdleConns is greater than 0 and the new MaxOpenConns is less than
+// MaxIdleConns, then MaxIdleConns will be reduced to match the new
+// MaxOpenConns limit
+//
+// If n <= 0, then there is no limit on the number of open connections.
+// The default is 0 (unlimited).
+func (p *Pool) SetMaxOpenConns(n int) {
+	p.mu.Lock()
+	p.maxOpen = n
+	if n < 0 {
+		p.maxOpen = 0
+	}
+	syncMaxIdle := p.maxOpen > 0 && p.maxIdleConns() > p.maxOpen
+	p.mu.Unlock()
+	if syncMaxIdle {
+		p.SetMaxIdleConns(n)
 	}
 }

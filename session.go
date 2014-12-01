@@ -42,9 +42,6 @@ type ConnectOpts struct {
 	Database string        `gorethink:"database,omitempty"`
 	AuthKey  string        `gorethink:"authkey,omitempty"`
 	Timeout  time.Duration `gorethink:"timeout,omitempty"`
-
-	MaxIdle int `gorethink:"max_idle,omitempty"`
-	MaxOpen int `gorethink:"max_open,omitempty"`
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {
@@ -137,6 +134,17 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	s.closed = true
 
 	return nil
+}
+
+// SetMaxIdleConns sets the maximum number of connections in the idle
+// connection pool.
+func (s *Session) SetMaxIdleConns(n int) {
+	s.pool.SetMaxIdleConns(n)
+}
+
+// SetMaxOpenConns sets the maximum number of open connections to the database.
+func (s *Session) SetMaxOpenConns(n int) {
+	s.pool.SetMaxOpenConns(n)
 }
 
 // noreplyWait ensures that previous queries with the noreply flag have been
