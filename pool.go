@@ -2,7 +2,6 @@ package gorethink
 
 import (
 	"errors"
-	"log"
 	"sync"
 )
 
