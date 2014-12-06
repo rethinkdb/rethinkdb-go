@@ -16,4 +16,5 @@ type Unmarshaler interface {
 
 func init() {
 	encoderCache.m = make(map[reflect.Type]encoderFunc)
+	decoderCache.m = make(map[decoderCacheKey]decoderFunc)
 }
