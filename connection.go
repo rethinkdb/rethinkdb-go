@@ -180,6 +180,8 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 	c.sendQuery(request)
 
 	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		c.Release()
+
 		return nil, nil, nil
 	}
 

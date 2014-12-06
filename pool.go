@@ -282,8 +282,6 @@ func (p *Pool) maxIdleConns() int {
 		return defaultMaxIdleConns
 	case n < 0:
 		return 0
-	case p.maxOpen < n:
-		return p.maxOpen
 	default:
 		return n
 	}
