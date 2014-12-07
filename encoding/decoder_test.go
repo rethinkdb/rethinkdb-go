@@ -1,6 +1,7 @@
 package encoding
 
 import (
+	"fmt"
 	"image"
 	"reflect"
 	"testing"
@@ -145,7 +146,7 @@ var decodeTests = []decodeTest{
 	{in: float64(2.0), ptr: new(interface{}), out: float64(2.0)},
 	{in: string("2"), ptr: new(interface{}), out: string("2")},
 	{in: "a\u1234", ptr: new(string), out: "a\u1234"},
-	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{}, err: &DecodeTypeError{"array", reflect.TypeOf("")}},
+	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{}, err: &InvalidTypeError{reflect.TypeOf([0]struct{}{}), reflect.TypeOf(""), fmt.Errorf("TODO")}},
 	{in: map[string]interface{}{"x": 1}, ptr: new(tx), out: tx{}},
 	{in: map[string]interface{}{"F1": float64(1), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: float64(1), F2: int32(2), F3: string("3")}},
 	{in: map[string]interface{}{"F1": string("1"), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: string("1"), F2: int32(2), F3: string("3")}},
@@ -249,11 +250,8 @@ func TestDecode(t *testing.T) {
 		v := reflect.New(reflect.TypeOf(tt.ptr).Elem())
 
 		err := Decode(v.Interface(), tt.in)
-		if tt.err != nil {
-			if !reflect.DeepEqual(err, tt.err) {
-				t.Errorf("#%d: got error %v want %v", i, err, tt.err)
-			}
-
+		if !reflect.DeepEqual(err, tt.err) {
+			t.Errorf("#%d: got error %v want %v", i, err, tt.err)
 			continue
 		}
 
@@ -323,7 +321,7 @@ var decodeTypeErrorTests = []struct {
 func TestDecodeTypeError(t *testing.T) {
 	for _, item := range decodeTypeErrorTests {
 		err := Decode(item.dest, item.src)
-		if _, ok := err.(*DecodeTypeError); !ok {
+		if _, ok := err.(*InvalidTypeError); !ok {
 			t.Errorf("expected type error for Decode(%q, type %T): got %T",
 				item.src, item.dest, err)
 		}

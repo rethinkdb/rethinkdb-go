@@ -7,23 +7,6 @@ import (
 	"strings"
 )
 
-// An InvalidEncodeError describes an invalid argument passed to Encode.
-// (The argument to Encode must be a non-nil pointer.)
-type InvalidEncodeError struct {
-	Type reflect.Type
-}
-
-func (e *InvalidEncodeError) Error() string {
-	if e.Type == nil {
-		return "gorethink: Encode(nil)"
-	}
-
-	if e.Type.Kind() != reflect.Ptr {
-		return "gorethink: Encode(non-pointer " + e.Type.String() + ")"
-	}
-	return "gorethink: Encode(nil " + e.Type.String() + ")"
-}
-
 type MarshalerError struct {
 	Type reflect.Type
 	Err  error
@@ -43,6 +26,26 @@ func (e *UnsupportedTypeError) Error() string {
 	return "gorethink: unsupported type: " + e.Type.String()
 }
 
+// An UnsupportedTypeError is returned by Marshal when attempting
+// to encode an unexpected value type.
+type UnexpectedTypeError struct {
+	ExpectedType, ActualType reflect.Type
+}
+
+func (e *UnexpectedTypeError) Error() string {
+	return "gorethink: expected type: " + e.ExpectedType.String() + ", got " + e.ActualType.String()
+}
+
+// An UnsupportedTypeError is returned by Marshal when attempting
+// to encode an unconvertible value type.
+type UnconvertibleTypeError struct {
+	ExpectedType, ActualType reflect.Type
+}
+
+func (e *UnconvertibleTypeError) Error() string {
+	return "gorethink: expected type: " + e.ExpectedType.String() + ", got unconvertible" + e.ActualType.String()
+}
+
 type UnsupportedValueError struct {
 	Value reflect.Value
 	Str   string
@@ -52,15 +55,15 @@ func (e *UnsupportedValueError) Error() string {
 	return "gorethink: unsupported value: " + e.Str
 }
 
-// An DecodeTypeError describes a value that was
+// An InvalidTypeError describes a value that was
 // not appropriate for a value of a specific Go type.
-type DecodeTypeError struct {
-	Value string       // description of value - "bool", "array", "number -5"
-	Type  reflect.Type // type of Go value it could not be assigned to
+type InvalidTypeError struct {
+	ExpectedType, ActualType reflect.Type
+	Reason                   error
 }
 
-func (e *DecodeTypeError) Error() string {
-	return "gorethink: cannot decode " + e.Value + " into Go value of type " + e.Type.String()
+func (e *InvalidTypeError) Error() string {
+	return "gorethink: cannot decode " + e.ActualType.String() + " into Go value of type " + e.ExpectedType.String() + ": " + e.Reason.Error()
 }
 
 // An DecodeFieldError describes a object key that
@@ -79,18 +82,17 @@ func (e *DecodeFieldError) Error() string {
 // An InvalidDecodeError describes an invalid argument passed to Decode.
 // (The argument to Decode must be a non-nil pointer.)
 type InvalidDecodeError struct {
-	Type reflect.Type
+	Value reflect.Value
 }
 
 func (e *InvalidDecodeError) Error() string {
-	if e.Type == nil {
-		return "gorethink: Decode(nil)"
+	if e.Value.Kind() != reflect.Ptr {
+		return "gorethink: Decode error (" + e.Value.Type().String() + " must be a pointer)"
 	}
-
-	if e.Type.Kind() != reflect.Ptr {
-		return "gorethink: Decode(non-pointer " + e.Type.String() + ")"
+	if !e.Value.CanAddr() {
+		return "gorethink: Decode error (" + e.Value.Type().String() + " must be addressable)"
 	}
-	return "gorethink: Decode(nil " + e.Type.String() + ")"
+	return "gorethink: Decode error"
 }
 
 // Error implements the error interface and can represents multiple

@@ -2,8 +2,8 @@ package encoding
 
 import "reflect"
 
-func getKind(val reflect.Value) reflect.Kind {
-	kind := val.Kind()
+func getTypeKind(t reflect.Type) reflect.Kind {
+	kind := t.Kind()
 
 	switch {
 	case kind >= reflect.Int && kind <= reflect.Int64:

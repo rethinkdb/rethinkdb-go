@@ -32,8 +32,13 @@ func Decode(dst interface{}, src interface{}) (err error) {
 
 	dv := reflect.ValueOf(dst)
 	sv := reflect.ValueOf(src)
-	if dv.Kind() != reflect.Ptr || dv.IsNil() {
-		return &InvalidDecodeError{reflect.TypeOf(dst)}
+	if dv.Kind() != reflect.Ptr {
+		return &InvalidDecodeError{dv}
+	}
+
+	dv = dv.Elem()
+	if !dv.CanAddr() {
+		return &InvalidDecodeError{dv}
 	}
 
 	decode(dv, sv)
