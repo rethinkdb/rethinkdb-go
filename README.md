@@ -41,7 +41,9 @@ See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect)
 
 ### Connection Pool
 
-The driver uses a connection pool at all times, however by default there is only a single connection available. In order to turn this into a proper connection pool, we need to pass the `maxIdle`, `maxActive` and/or `idleTimeout` parameters to Connect():
+The driver uses a connection pool at all times, by default it creates and frees connections automatically. It's safe for concurrent use by multiple goroutines.
+
+To configure the connection pool `MaxIdle`, `MaxOpen` and `IdleTimeout` can be specified during connection. If you wish to change the value of `MaxIdle` or `MaxOpen` during runtime then the functions `SetMaxIdleConns` and `SetMaxOpenConns` can be used.
 
 ```go
 import (
@@ -54,15 +56,18 @@ session, err := r.Connect(r.ConnectOpts{
     Address:  "localhost:28015",
     Database: "test",
     MaxIdle: 10,
+    MaxOpen: 10,
     IdleTimeout: time.Second * 10,
 })
-
 if err != nil {
     log.Fatalln(err.Error())
 }
+
+session.SetMaxOpenConns(5)
 ```
 
 A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) instance can also be passed to Connect().
+
 
 ## Query Functions
 

@@ -8,6 +8,11 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+var (
+	ErrNoConnections    = errors.New("gorethink: no connections were made when creating the session")
+	ErrConnectionClosed = errors.New("gorethink: the connection is closed")
+)
+
 func printCarrots(t Term, frames []*p.Frame) string {
 	var frame *p.Frame
 	if len(frames) > 1 {

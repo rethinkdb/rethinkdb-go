@@ -230,7 +230,6 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	go func() {
 		var response interface{}
 		for n < 10 && res.Next(&response) {
-			// log.Println(response)
 			n++
 		}
 
