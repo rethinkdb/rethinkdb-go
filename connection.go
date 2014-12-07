@@ -303,8 +303,8 @@ func (c *Connection) processErrorResponse(request queryRequest, response *Respon
 	c.Lock()
 	cursor := c.cursors[response.Token]
 
-	// delete(c.requests, response.Token)
-	// delete(c.cursors, response.Token)
+	delete(c.requests, response.Token)
+	delete(c.cursors, response.Token)
 	c.Unlock()
 
 	return response, cursor, err
@@ -338,7 +338,7 @@ func (c *Connection) processAtomResponse(request queryRequest, response *Respons
 	cursor.finished = true
 
 	c.Lock()
-	// delete(c.requests, response.Token)
+	delete(c.requests, response.Token)
 	c.Unlock()
 
 	return response, cursor, nil
@@ -356,7 +356,7 @@ func (c *Connection) processFeedResponse(request queryRequest, response *Respons
 	}
 
 	c.Lock()
-	// delete(c.requests, response.Token)
+	delete(c.requests, response.Token)
 	c.Unlock()
 
 	cursor.extend(response)
@@ -380,7 +380,7 @@ func (c *Connection) processPartialResponse(request queryRequest, response *Resp
 	}
 
 	c.Lock()
-	// delete(c.requests, response.Token)
+	delete(c.requests, response.Token)
 	c.Unlock()
 
 	cursor.extend(response)
@@ -405,8 +405,8 @@ func (c *Connection) processSequenceResponse(request queryRequest, response *Res
 	}
 
 	c.Lock()
-	// delete(c.requests, response.Token)
-	// delete(c.cursors, response.Token)
+	delete(c.requests, response.Token)
+	delete(c.cursors, response.Token)
 	c.Unlock()
 
 	cursor.extend(response)
@@ -418,8 +418,8 @@ func (c *Connection) processWaitResponse(request queryRequest, response *Respons
 	c.Release()
 
 	c.Lock()
-	// delete(c.requests, response.Token)
-	// delete(c.cursors, response.Token)
+	delete(c.requests, response.Token)
+	delete(c.cursors, response.Token)
 	c.Unlock()
 
 	return response, nil, nil

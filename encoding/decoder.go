@@ -5,9 +5,8 @@ package encoding
 import (
 
 	// "errors"
-	"errors"
+
 	"reflect"
-	"runtime"
 
 	// "runtime"
 	"strconv"
@@ -19,18 +18,18 @@ var byteSliceType = reflect.TypeOf([]byte(nil))
 // Decode decodes map[string]interface{} into a struct. The first parameter
 // must be a pointer.
 func Decode(dst interface{}, src interface{}) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			if _, ok := r.(runtime.Error); ok {
-				panic(r)
-			}
-			if v, ok := r.(string); ok {
-				err = errors.New(v)
-			} else {
-				err = r.(error)
-			}
-		}
-	}()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		if _, ok := r.(runtime.Error); ok {
+	// 			panic(r)
+	// 		}
+	// 		if v, ok := r.(string); ok {
+	// 			err = errors.New(v)
+	// 		} else {
+	// 			err = r.(error)
+	// 		}
+	// 	}
+	// }()
 
 	dv := reflect.ValueOf(dst)
 	sv := reflect.ValueOf(src)

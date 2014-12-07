@@ -38,8 +38,8 @@ func expr(val interface{}, depth int) Term {
 		return val
 	case []interface{}:
 		vals := make([]Term, len(val))
-		for _, v := range val {
-			vals = append(vals, expr(v, depth))
+		for i, v := range val {
+			vals[i] = expr(v, depth)
 		}
 
 		return makeArray(vals)
@@ -86,7 +86,7 @@ func expr(val interface{}, depth int) Term {
 			} else {
 				vals := make([]Term, valValue.Len())
 				for i := 0; i < valValue.Len(); i++ {
-					vals = append(vals, expr(valValue.Index(i).Interface(), depth))
+					vals[i] = expr(valValue.Index(i).Interface(), depth)
 				}
 
 				return makeArray(vals)
