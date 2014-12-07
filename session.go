@@ -42,6 +42,10 @@ type ConnectOpts struct {
 	Database string        `gorethink:"database,omitempty"`
 	AuthKey  string        `gorethink:"authkey,omitempty"`
 	Timeout  time.Duration `gorethink:"timeout,omitempty"`
+
+	MaxIdle     int           `gorethink:"max_idle,omitempty"`
+	MaxOpen     int           `gorethink:"max_open,omitempty"`
+	IdleTimeout time.Duration `gorethink:"idle_timeout,omitempty"`
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {

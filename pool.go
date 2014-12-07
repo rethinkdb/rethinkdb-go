@@ -3,10 +3,10 @@ package gorethink
 import (
 	"errors"
 	"sync"
+	"time"
 )
 
 const defaultMaxIdleConns = 2
-const defaultMaxOpenConns = 0
 
 // maxBadConnRetries is the number of maximum retries if the driver returns
 // driver.ErrBadConn to signal a broken connection.
@@ -21,12 +21,17 @@ var (
 	errConnInactive = errors.New("gorethink: conn was never active")
 )
 
+type idleConn struct {
+	c *Connection
+	t time.Time
+}
+
 type Pool struct {
 	opts *ConnectOpts
 
 	mu           sync.Mutex // protects following fields
 	err          error      // the last error that occurred
-	freeConn     []*Connection
+	freeConn     []idleConn
 	connRequests []chan connRequest
 	numOpen      int
 	pendingOpens int
@@ -35,11 +40,12 @@ type Pool struct {
 	// maybeOpenNewConnections sends on the chan (one send per needed connection)
 	// It is closed during p.Close(). The close tells the connectionOpener
 	// goroutine to exit.
-	openerCh chan struct{}
-	closed   bool
-	lastPut  map[*Connection]string // stacktrace of last conn's put; debug only
-	maxIdle  int                    // zero means defaultMaxIdleConns; negative means 0
-	maxOpen  int                    // <= 0 means unlimited
+	openerCh    chan struct{}
+	closed      bool
+	lastPut     map[*Connection]string // stacktrace of last conn's put; debug only
+	maxIdle     int                    // zero means defaultMaxIdleConns; negative means 0
+	idleTimeout time.Duration
+	maxOpen     int // <= 0 means unlimited
 }
 
 func NewPool(opts *ConnectOpts) (*Pool, error) {
@@ -48,8 +54,7 @@ func NewPool(opts *ConnectOpts) (*Pool, error) {
 
 		openerCh: make(chan struct{}, connectionRequestQueueSize),
 		lastPut:  make(map[*Connection]string),
-		maxIdle:  defaultMaxIdleConns,
-		maxOpen:  defaultMaxOpenConns,
+		maxIdle:  opts.MaxIdle,
 	}
 	go p.connectionOpener()
 	return p, nil
@@ -78,8 +83,24 @@ func (p *Pool) GetConn() (*Connection, error) {
 		}
 		return ret.conn, ret.err
 	}
+
+	// Remove any stale idle connections
+	if timeout := p.idleTimeout; timeout > 0 {
+		for i := 0; i < len(p.freeConn); i++ {
+			ic := p.freeConn[i]
+			if ic.t.Add(timeout).After(time.Now()) {
+				break
+			}
+			p.freeConn = p.freeConn[:i+copy(p.freeConn[i:], p.freeConn[i+1:])]
+			p.mu.Unlock()
+			ic.c.Close()
+			p.mu.Lock()
+		}
+	}
+
+	// Check for any free/idle connections
 	if n := len(p.freeConn); n > 0 {
-		c := p.freeConn[0]
+		c := p.freeConn[0].c
 		copy(p.freeConn, p.freeConn[1:])
 		p.freeConn = p.freeConn[:n-1]
 		c.active = true
@@ -120,7 +141,7 @@ func (p *Pool) connIfFree(wanted *Connection) (*Connection, error) {
 	}
 	idx := -1
 	for ii, v := range p.freeConn {
-		if v == wanted {
+		if v.c == wanted {
 			idx = ii
 			break
 		}
@@ -184,7 +205,7 @@ func (p *Pool) putConnDBLocked(c *Connection, err error) bool {
 		}
 		return true
 	} else if err == nil && !p.closed && p.maxIdleConns() > len(p.freeConn) {
-		p.freeConn = append(p.freeConn, c)
+		p.freeConn = append(p.freeConn, idleConn{c: c, t: time.Now()})
 		return true
 	}
 	return false
@@ -200,7 +221,7 @@ func (p *Pool) Close() error {
 	var err error
 	fns := make([]func() error, 0, len(p.freeConn))
 	for _, c := range p.freeConn {
-		fns = append(fns, c.Close)
+		fns = append(fns, c.c.Close)
 	}
 	p.freeConn = nil
 	p.closed = true
@@ -306,7 +327,7 @@ func (p *Pool) SetMaxIdleConns(n int) {
 	if p.maxOpen > 0 && p.maxIdleConns() > p.maxOpen {
 		p.maxIdle = p.maxOpen
 	}
-	var closing []*Connection
+	var closing []idleConn
 	idleCount := len(p.freeConn)
 	maxIdle := p.maxIdleConns()
 	if idleCount > maxIdle {
@@ -315,7 +336,7 @@ func (p *Pool) SetMaxIdleConns(n int) {
 	}
 	p.mu.Unlock()
 	for _, c := range closing {
-		c.Close()
+		c.c.Close()
 	}
 }
 

@@ -39,6 +39,36 @@ if err != nil {
 ```
 See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect) for a list of supported arguments to Connect().
 
+### Connection Pool
+
+The driver uses a connection pool at all times, by default it creates and frees connections automatically. It's safe for concurrent use by multiple goroutines.
+
+To configure the connection pool `MaxIdle`, `MaxOpen` and `IdleTimeout` can be specified during connection. If you wish to change the value of `MaxIdle` or `MaxOpen` during runtime then the functions `SetMaxIdleConns` and `SetMaxOpenConns` can be used.
+
+```go
+import (
+    r "github.com/dancannon/gorethink"
+)
+
+var session *r.Session
+
+session, err := r.Connect(r.ConnectOpts{
+    Address:  "localhost:28015",
+    Database: "test",
+    MaxIdle: 10,
+    MaxOpen: 10,
+    IdleTimeout: time.Second * 10,
+})
+if err != nil {
+    log.Fatalln(err.Error())
+}
+
+session.SetMaxOpenConns(5)
+```
+
+A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) instance can also be passed to Connect().
+
+
 ## Query Functions
 
 This library is based on the official drivers so the code on the [API](http://www.rethinkdb.com/api/) page should require very few changes to work.

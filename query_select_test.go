@@ -333,7 +333,7 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 	}
 
 	// Test queries concurrently
-	attempts := 1
+	attempts := 10
 	waitChannel := make(chan error, attempts)
 
 	for i := 0; i < attempts; i++ {
