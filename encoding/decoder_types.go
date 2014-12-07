@@ -95,9 +95,23 @@ func newTypeDecoder(dt, st reflect.Type, allowAddr bool) decoderFunc {
 	case reflect.Ptr:
 		return newPtrDecoder(dt, st)
 	// case reflect.Struct:
-	// 	return newStructDecoder(dt)
-	// case reflect.Map:
-	// 	return newMapDecoder(dt)
+	// 	switch st.Kind() {
+	// 	case reflect.Map:
+	// 		if kind := st.Key().Kind(); kind != reflect.String && kind != reflect.Interface {
+	// 			return newInvalidTypeError(fmt.Errorf("map needs string keys"))
+	// 		}
+
+	// 		return newStructDecoder(dt, st)
+	// 	default:
+	// 		return unconvertibleTypeDecoder
+	// 	}
+	case reflect.Map:
+		switch st.Kind() {
+		case reflect.Map:
+			return newMapAsMapDecoder(dt, st)
+		default:
+			return unconvertibleTypeDecoder
+		}
 	// case reflect.Slice:
 	// 	return newSliceDecoder(dt)
 	// case reflect.Array:
@@ -121,6 +135,12 @@ func unexpectedTypeDecoder(dv, sv reflect.Value) {
 
 func unconvertibleTypeDecoder(dv, sv reflect.Value) {
 	panic(&UnconvertibleTypeError{dv.Type(), sv.Type()})
+}
+
+func newInvalidTypeError(err error) decoderFunc {
+	return func(dv, sv reflect.Value) {
+		panic(&InvalidTypeError{dv.Type(), sv.Type(), err})
+	}
 }
 
 func interfaceDecoder(dv, sv reflect.Value) {
@@ -194,9 +214,6 @@ func intAsFloatDecoder(dv, sv reflect.Value) {
 func intAsStringDecoder(dv, sv reflect.Value) {
 	dv.SetString(strconv.FormatInt(sv.Int(), 10))
 }
-func intAsUnsupportedTypeDecoder(dv, sv reflect.Value) {
-	panic(&UnsupportedTypeError{dv.Type()})
-}
 
 // Uint decoders
 
@@ -215,9 +232,6 @@ func uintAsFloatDecoder(dv, sv reflect.Value) {
 func uintAsStringDecoder(dv, sv reflect.Value) {
 	dv.SetString(strconv.FormatUint(sv.Uint(), 10))
 }
-func uintAsUnsupportedTypeDecoder(dv, sv reflect.Value) {
-	panic(&UnsupportedTypeError{dv.Type()})
-}
 
 // Float decoders
 
@@ -235,9 +249,6 @@ func floatAsFloatDecoder(dv, sv reflect.Value) {
 }
 func floatAsStringDecoder(dv, sv reflect.Value) {
 	dv.SetString(strconv.FormatFloat(sv.Float(), 'f', -1, 64))
-}
-func floatAsUnsupportedTypeDecoder(dv, sv reflect.Value) {
-	panic(&UnsupportedTypeError{dv.Type()})
 }
 
 // String decoders
@@ -280,6 +291,68 @@ func stringAsFloatDecoder(dv, sv reflect.Value) {
 func stringAsStringDecoder(dv, sv reflect.Value) {
 	dv.SetString(sv.String())
 }
-func stringAsUnsupportedTypeDecoder(dv, sv reflect.Value) {
-	panic(&UnsupportedTypeError{dv.Type()})
+
+// Map decoder
+
+type mapAsMapDecoder struct {
+	keyDec, elemDec decoderFunc
 }
+
+func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) {
+	dt := sv.Type()
+
+	mt := reflect.MapOf(dt.Key(), dt.Elem())
+	m := reflect.MakeMap(mt)
+
+	for _, k := range sv.MapKeys() {
+		v := sv.MapIndex(k)
+		ek := reflect.Indirect(reflect.New(dt.Key()))
+		ev := reflect.Indirect(reflect.New(dt.Elem()))
+
+		d.keyDec(ek, k)
+		d.elemDec(ev, v)
+
+		m.SetMapIndex(ek, ev)
+	}
+
+	dv.Set(m)
+}
+
+func newMapAsMapDecoder(dt, st reflect.Type) decoderFunc {
+	d := &mapAsMapDecoder{typeDecoder(dt.Key(), st.Key()), typeDecoder(dt.Elem(), st.Elem())}
+	return d.decode
+}
+
+// Struct decoder
+
+// type structDecoder struct {
+// 	fields    []field
+// 	fieldEncs []decoderFunc
+// }
+
+// func (se *structDecoder) decode(dv, sv reflect.Value) {
+// 	m := make(map[string]interface{})
+
+// 	for i, f := range se.fields {
+// 		fv := fieldByIndex(v, f.index)
+// 		if !fv.IsValid() || f.omitEmpty && isEmptyValue(fv) {
+// 			continue
+// 		}
+
+// 		m[f.name] = se.fieldEncs[i](fv)
+// 	}
+
+// 	return m
+// }
+
+// func newStructDecoder(t reflect.Type) decoderFunc {
+// 	fields := cachedTypeFields(t)
+// 	se := &structDecoder{
+// 		fields:    fields,
+// 		fieldEncs: make([]decoderFunc, len(fields)),
+// 	}
+// 	for i, f := range fields {
+// 		se.fieldEncs[i] = typeDecoder(typeByIndex(t, f.index))
+// 	}
+// 	return se.decode
+// }
