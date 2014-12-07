@@ -37,14 +37,14 @@ func expr(val interface{}, depth int) Term {
 	case Term:
 		return val
 	case []interface{}:
-		vals := []Term{}
+		vals := make([]Term, len(val))
 		for _, v := range val {
 			vals = append(vals, expr(v, depth))
 		}
 
 		return makeArray(vals)
 	case map[string]interface{}:
-		vals := map[string]Term{}
+		vals := make(map[string]Term, len(val))
 		for k, v := range val {
 			vals[k] = expr(v, depth)
 		}
@@ -84,7 +84,7 @@ func expr(val interface{}, depth int) Term {
 
 				return expr(data, depth-1)
 			} else {
-				vals := []Term{}
+				vals := make([]Term, valValue.Len())
 				for i := 0; i < valValue.Len(); i++ {
 					vals = append(vals, expr(valValue.Index(i).Interface(), depth))
 				}
@@ -92,7 +92,7 @@ func expr(val interface{}, depth int) Term {
 				return makeArray(vals)
 			}
 		case reflect.Map:
-			vals := map[string]Term{}
+			vals := make(map[string]Term, len(valValue.MapKeys()))
 			for _, k := range valValue.MapKeys() {
 				vals[k.String()] = expr(valValue.MapIndex(k).Interface(), depth)
 			}

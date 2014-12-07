@@ -53,16 +53,10 @@ func makeArray(args termsList) Term {
 
 // makeObject takes a map of terms and produces a single MAKE_OBJECT term
 func makeObject(args termsObj) Term {
-	// First all evaluate all fields in the map
-	temp := make(termsObj)
-	for k, v := range args {
-		temp[k] = Expr(v)
-	}
-
 	return Term{
 		name:     "{...}",
 		termType: p.Term_MAKE_OBJ,
-		optArgs:  temp,
+		optArgs:  args,
 	}
 }
 
@@ -161,7 +155,7 @@ func convertTermList(l []interface{}) termsList {
 
 // Convert a map into a map of terms
 func convertTermObj(o map[string]interface{}) termsObj {
-	terms := termsObj{}
+	terms := make(termsObj, len(o))
 	for k, v := range o {
 		terms[k] = Expr(v)
 	}
