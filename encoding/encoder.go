@@ -3,7 +3,9 @@
 package encoding
 
 import (
+	"errors"
 	"reflect"
+	"runtime"
 	"sync"
 )
 
@@ -15,18 +17,18 @@ type encoderFunc func(v reflect.Value) interface{}
 // is found then it is checked for tagged fields and convert to
 // map[string]interface{}
 func Encode(v interface{}) (ev interface{}, err error) {
-	// defer func() {
-	// 	if r := recover(); r != nil {
-	// 		if _, ok := r.(runtime.Error); ok {
-	// 			panic(r)
-	// 		}
-	// 		if v, ok := r.(string); ok {
-	// 			err = errors.New(v)
-	// 		} else {
-	// 			err = r.(error)
-	// 		}
-	// 	}
-	// }()
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(runtime.Error); ok {
+				panic(r)
+			}
+			if v, ok := r.(string); ok {
+				err = errors.New(v)
+			} else {
+				err = r.(error)
+			}
+		}
+	}()
 
 	return encode(reflect.ValueOf(v)), nil
 }
