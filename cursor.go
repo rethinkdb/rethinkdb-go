@@ -63,6 +63,7 @@ func (c *Cursor) Err() error {
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
 	c.Lock()
+	defer c.Unlock()
 
 	// Stop any unfinished queries
 	if !c.closed && !c.finished {
@@ -75,15 +76,9 @@ func (c *Cursor) Close() error {
 	}
 
 	// Return connection to pool
-	// err := c.conn.Close()
-	// if err != nil {
-	// 	return err
-	// }
+	c.conn.Release()
 
-	err := c.err
-	c.Unlock()
-
-	return err
+	return c.err
 }
 
 // Next retrieves the next document from the result set, blocking if necessary.
@@ -193,8 +188,8 @@ func (c *Cursor) All(result interface{}) error {
 		i++
 	}
 	resultv.Elem().Set(slicev.Slice(0, i))
-	// return c.Close()
-	return nil
+
+	return c.Close()
 }
 
 // One retrieves a single document from the result set into the provided
@@ -213,9 +208,9 @@ func (c *Cursor) One(result interface{}) error {
 		}
 	}
 
-	// if e := c.Close(); e != nil {
-	// 	err = e
-	// }
+	if e := c.Close(); e != nil {
+		err = e
+	}
 
 	return err
 }
