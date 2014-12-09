@@ -9,14 +9,6 @@ import (
 	"github.com/dancannon/gorethink/types"
 )
 
-var (
-	marshalerType     = reflect.TypeOf(new(Marshaler)).Elem()
-	textMarshalerType = reflect.TypeOf(new(encoding.TextMarshaler)).Elem()
-
-	timeType     = reflect.TypeOf(new(time.Time)).Elem()
-	geometryType = reflect.TypeOf(new(types.Geometry)).Elem()
-)
-
 // newTypeEncoder constructs an encoderFunc for a type.
 // The returned encoder only checks CanAddr when allowAddr is true.
 func newTypeEncoder(t reflect.Type, allowAddr bool) encoderFunc {

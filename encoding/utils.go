@@ -39,12 +39,13 @@ func fieldByIndex(v reflect.Value, index []int) reflect.Value {
 	for _, i := range index {
 		if v.Kind() == reflect.Ptr {
 			if v.IsNil() {
-				return reflect.Value{}
+				v.Set(reflect.New(v.Type().Elem()))
 			}
 			v = v.Elem()
 		}
 		v = v.Field(i)
 	}
+
 	return v
 }
 
