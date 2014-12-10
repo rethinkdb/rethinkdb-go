@@ -36,6 +36,20 @@ func expr(val interface{}, depth int) Term {
 	switch val := val.(type) {
 	case Term:
 		return val
+	case []interface{}:
+		vals := make([]Term, len(val))
+		for i, v := range val {
+			vals[i] = expr(v, depth)
+		}
+
+		return makeArray(vals)
+	case map[string]interface{}:
+		vals := make(map[string]Term, len(val))
+		for k, v := range val {
+			vals[k] = expr(v, depth)
+		}
+
+		return makeObject(vals)
 	default:
 		// Use reflection to check for other types
 		valType := reflect.TypeOf(val)
@@ -70,15 +84,15 @@ func expr(val interface{}, depth int) Term {
 
 				return expr(data, depth-1)
 			} else {
-				vals := []Term{}
+				vals := make([]Term, valValue.Len())
 				for i := 0; i < valValue.Len(); i++ {
-					vals = append(vals, expr(valValue.Index(i).Interface(), depth))
+					vals[i] = expr(valValue.Index(i).Interface(), depth)
 				}
 
 				return makeArray(vals)
 			}
 		case reflect.Map:
-			vals := map[string]Term{}
+			vals := make(map[string]Term, len(valValue.MapKeys()))
 			for _, k := range valValue.MapKeys() {
 				vals[k.String()] = expr(valValue.MapIndex(k).Interface(), depth)
 			}

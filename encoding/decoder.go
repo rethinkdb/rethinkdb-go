@@ -1,12 +1,9 @@
-// This code is based on encoding/json and gorilla/schema
-
 package encoding
 
 import (
 	"errors"
 	"reflect"
 	"runtime"
-
 	"sync"
 )
 

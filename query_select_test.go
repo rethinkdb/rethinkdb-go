@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"fmt"
+	"testing"
 
 	test "gopkg.in/check.v1"
 )
@@ -308,13 +309,17 @@ func (s *RethinkSuite) TestSelectMany(c *test.C) {
 }
 
 func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
+	if testing.Short() {
+		c.Skip("Skipping long test")
+	}
+
 	// Ensure table + database exist
 	DbCreate("test").RunWrite(sess)
 	Db("test").TableCreate("TestMany").RunWrite(sess)
 	Db("test").Table("TestMany").Delete().RunWrite(sess)
 
 	// Insert rows
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 100; i++ {
 		data := []interface{}{}
 
 		for j := 0; j < 100; j++ {
@@ -333,6 +338,7 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 
 	for i := 0; i < attempts; i++ {
 		go func(i int, c chan error) {
+
 			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
 				BatchConf: BatchOpts{
 					MaxBatchRows: 1,
@@ -340,16 +346,19 @@ func (s *RethinkSuite) TestConcurrentSelectMany(c *test.C) {
 			})
 			if err != nil {
 				c <- err
+				return
 			}
 
-			var response []map[string]interface{}
+			var response []interface{}
 			err = res.All(&response)
 			if err != nil {
 				c <- err
+				return
 			}
 
-			if len(response) != 100 {
-				c <- fmt.Errorf("expected response length 100, received %d", len(response))
+			if len(response) != 10000 {
+				c <- fmt.Errorf("expected response length 10000, received %d", len(response))
+				return
 			}
 
 			c <- nil
