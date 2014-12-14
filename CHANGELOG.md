@@ -1,5 +1,9 @@
 # Changelog
 
+## Hotfix - 14 Dec 2014
+
+- Fixed empty slices being returned as `[]T(nil)` not `[]T{}` #138
+
 ## v0.5.0 - 6 Oct 2014
 
 - Added geospatial terms (`Circle`, `Distance`, `Fill`, `Geojson`, `ToGeojson`, `GetIntersecting`, `GetNearest`, `Includes`, `Intersects`, `Line`, `Point`, `Polygon`, `PolygonSub`)
