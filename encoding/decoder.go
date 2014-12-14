@@ -40,6 +40,7 @@ func Decode(dst interface{}, src interface{}) (err error) {
 	}
 
 	decode(dv, sv)
+
 	return nil
 }
 
@@ -248,6 +249,9 @@ func decodeArray(dv reflect.Value, sv reflect.Value) {
 			dv.SetBytes(sv.Bytes())
 			return
 		}
+
+		newdv := reflect.MakeSlice(dv.Type(), dv.Len(), dv.Cap())
+		dv.Set(newdv)
 
 		break
 	}
