@@ -103,7 +103,6 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 		cursors:  make(map[int64]*Cursor),
 		requests: make(map[int64]queryRequest),
 	}
-	go conn.readLoop()
 
 	return conn, nil
 }
@@ -169,15 +168,11 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 		Query:   q,
 		Options: opts,
 	}
-	request.Response = make(chan queryResponse, 1)
-	atomic.AddInt64(&c.outstanding, 1)
-	atomic.StoreInt32(&request.Active, 1)
 
-	c.Lock()
-	c.requests[q.Token] = request
-	c.Unlock()
-
-	c.sendQuery(request)
+	err := c.sendQuery(request)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
 		c.Release()
@@ -185,12 +180,12 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 		return nil, nil, nil
 	}
 
-	reply := <-request.Response
-	if reply.Error != nil {
-		return nil, nil, reply.Error
+	response, err := c.readResponse()
+	if err != nil {
+		return nil, nil, err
 	}
 
-	return c.processResponse(request, reply.Response)
+	return c.processResponse(request, response)
 }
 
 func (c *Connection) sendQuery(request queryRequest) error {
@@ -259,19 +254,43 @@ func (c *Connection) Close() error {
 
 // Release returns the connection to the connection pool
 func (c *Connection) Release() {
-	c.Lock()
-	pool := c.pool
-	c.Unlock()
-
-	if pool != nil {
-		pool.PutConn(c, nil, false)
-	}
+	c.pool.PutConn(c, nil, false)
 }
 
 // getToken generates the next query token, used to number requests and match
 // responses with requests.
 func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
+}
+
+func (c *Connection) readResponse() (*Response, error) {
+	// Read the 8-byte token of the query the response corresponds to.
+	var responseToken int64
+	if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Read the length of the JSON-encoded response as a 4-byte
+	// little-endian-encoded integer.
+	var messageLength uint32
+	if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Read the JSON encoding of the Response itself.
+	b := make([]byte, messageLength)
+	if _, err := io.ReadFull(c.conn, b); err != nil {
+		return nil, RqlConnectionError{err.Error()}
+	}
+
+	// Decode the response
+	var response = new(Response)
+	if err := json.Unmarshal(b, response); err != nil {
+		return nil, RqlDriverError{err.Error()}
+	}
+	response.Token = responseToken
+
+	return response, nil
 }
 
 func (c *Connection) processResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
@@ -298,7 +317,7 @@ func (c *Connection) processResponse(request queryRequest, response *Response) (
 }
 
 func (c *Connection) processErrorResponse(request queryRequest, response *Response, err error) (*Response, *Cursor, error) {
-	c.Release()
+	// c.Release()
 
 	c.Lock()
 	cursor := c.cursors[response.Token]
@@ -311,7 +330,7 @@ func (c *Connection) processErrorResponse(request queryRequest, response *Respon
 }
 
 func (c *Connection) processAtomResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
-	c.Release()
+	// c.Release()
 
 	// Create cursor
 	var value []interface{}
@@ -388,7 +407,7 @@ func (c *Connection) processPartialResponse(request queryRequest, response *Resp
 }
 
 func (c *Connection) processSequenceResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
-	c.Release()
+	// c.Release()
 
 	c.Lock()
 	cursor, ok := c.cursors[response.Token]
@@ -415,7 +434,7 @@ func (c *Connection) processSequenceResponse(request queryRequest, response *Res
 }
 
 func (c *Connection) processWaitResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
-	c.Release()
+	// c.Release()
 
 	c.Lock()
 	delete(c.requests, response.Token)
@@ -423,77 +442,4 @@ func (c *Connection) processWaitResponse(request queryRequest, response *Respons
 	c.Unlock()
 
 	return response, nil, nil
-}
-
-func (c *Connection) readLoop() {
-	var response *Response
-	var err error
-
-	for {
-		response, err = c.read()
-		if err != nil {
-			break
-		}
-
-		// Process response
-		c.Lock()
-		request, ok := c.requests[response.Token]
-		c.Unlock()
-
-		// If the cached request could not be found skip processing
-		if !ok {
-			continue
-		}
-
-		// If the cached request is not active skip processing
-		if !atomic.CompareAndSwapInt32(&request.Active, 1, 0) {
-			continue
-		}
-		atomic.AddInt64(&c.outstanding, -1)
-		request.Response <- queryResponse{response, err}
-	}
-
-	c.Lock()
-	requests := c.requests
-	c.Unlock()
-	for _, request := range requests {
-		if atomic.LoadInt32(&request.Active) == 1 {
-			request.Response <- queryResponse{
-				Response: response,
-				Error:    err,
-			}
-		}
-	}
-
-	c.pool.PutConn(c, err, true)
-}
-
-func (c *Connection) read() (*Response, error) {
-	// Read the 8-byte token of the query the response corresponds to.
-	var responseToken int64
-	if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Read the length of the JSON-encoded response as a 4-byte
-	// little-endian-encoded integer.
-	var messageLength uint32
-	if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Read the JSON encoding of the Response itself.
-	b := make([]byte, messageLength)
-	if _, err := io.ReadFull(c.conn, b); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Decode the response
-	var response = new(Response)
-	if err := json.Unmarshal(b, response); err != nil {
-		return nil, RqlDriverError{err.Error()}
-	}
-	response.Token = responseToken
-
-	return response, nil
 }

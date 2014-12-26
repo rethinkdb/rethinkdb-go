@@ -189,6 +189,10 @@ func (c *Cursor) All(result interface{}) error {
 	}
 	resultv.Elem().Set(slicev.Slice(0, i))
 
+	if c.err != nil {
+		return c.err
+	}
+
 	return c.Close()
 }
 

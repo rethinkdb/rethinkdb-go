@@ -21,8 +21,18 @@ var (
 	errConnInactive = errors.New("gorethink: conn was never active")
 )
 
+// depSet is a finalCloser's outstanding dependencies
+type depSet map[interface{}]bool // set of true bools
+// The finalCloser interface is used by (*Pool).addDep and related
+// dependency reference counting.
+type finalCloser interface {
+	// finalClose is called when the reference count of an object
+	// goes to zero. (*Pool).mu is not held while calling it.
+	finalClose() error
+}
+
 type idleConn struct {
-	c *Connection
+	c *poolConn
 	t time.Time
 }
 
@@ -42,10 +52,10 @@ type Pool struct {
 	// goroutine to exit.
 	openerCh    chan struct{}
 	closed      bool
-	lastPut     map[*Connection]string // stacktrace of last conn's put; debug only
-	maxIdle     int                    // zero means defaultMaxIdleConns; negative means 0
-	idleTimeout time.Duration
+	dep         map[finalCloser]depSet
+	maxIdle     int // zero means defaultMaxIdleConns; negative means 0
 	maxOpen     int // <= 0 means unlimited
+	idleTimeout time.Duration
 }
 
 func NewPool(opts *ConnectOpts) (*Pool, error) {
@@ -53,14 +63,14 @@ func NewPool(opts *ConnectOpts) (*Pool, error) {
 		opts: opts,
 
 		openerCh: make(chan struct{}, connectionRequestQueueSize),
-		lastPut:  make(map[*Connection]string),
+		lastPut:  make(map[*poolConn]string),
 		maxIdle:  opts.MaxIdle,
 	}
 	go p.connectionOpener()
 	return p, nil
 }
 
-func (p *Pool) GetConn() (*Connection, error) {
+func (p *Pool) GetConn() (*poolConn, error) {
 	p.mu.Lock()
 	if p.closed {
 		p.mu.Unlock()
@@ -130,7 +140,7 @@ func (p *Pool) GetConn() (*Connection, error) {
 // is invalid because it's been closed.
 //
 // The error is errConnBusy if the connection is in use.
-func (p *Pool) connIfFree(wanted *Connection) (*Connection, error) {
+func (p *Pool) connIfFree(wanted *poolConn) (*poolConn, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if wanted.closed {
@@ -155,7 +165,7 @@ func (p *Pool) connIfFree(wanted *Connection) (*Connection, error) {
 	return nil, errConnBusy
 }
 
-func (p *Pool) PutConn(c *Connection, err error, closed bool) {
+func (p *Pool) PutConn(c *poolConn, err error, closed bool) {
 	p.mu.Lock()
 	if !c.active {
 		p.mu.Unlock()
@@ -168,7 +178,7 @@ func (p *Pool) PutConn(c *Connection, err error, closed bool) {
 		c.Close()
 		return
 	}
-	added := p.putConnDBLocked(c, nil)
+	added := p.putConnPoolLocked(c, nil)
 	p.mu.Unlock()
 	if !added {
 		c.Close()
@@ -177,14 +187,14 @@ func (p *Pool) PutConn(c *Connection, err error, closed bool) {
 
 // Satisfy a connRequest or put the Connection in the idle pool and return true
 // or return false.
-// putConnDBLocked will satisfy a connRequest if there is one, or it will
-// return the *Connection to the freeConn list if err == nil and the idle
+// putConnPoolLocked will satisfy a connRequest if there is one, or it will
+// return the *poolConn to the freeConn list if err == nil and the idle
 // connection limit will not be exceeded.
 // If err != nil, the value of c is ignored.
 // If err == nil, then c must not equal nil.
-// If a connRequest was fulfilled or the *Connection was placed in the
+// If a connRequest was fulfilled or the *poolConn was placed in the
 // freeConn list, then true is returned, otherwise false is returned.
-func (p *Pool) putConnDBLocked(c *Connection, err error) bool {
+func (p *Pool) putConnPoolLocked(c *poolConn, err error) bool {
 	if c == nil {
 		return false
 	}
@@ -204,7 +214,7 @@ func (p *Pool) putConnDBLocked(c *Connection, err error) bool {
 			err:  err,
 		}
 		return true
-	} else if err == nil && !p.closed && p.maxIdleConns() > len(p.freeConn) {
+	} else if err == nil && !p.closed && p.maxIdleConnsLocked() > len(p.freeConn) {
 		p.freeConn = append(p.freeConn, idleConn{c: c, t: time.Now()})
 		return true
 	}
@@ -236,6 +246,58 @@ func (p *Pool) Close() error {
 		}
 	}
 	return err
+}
+
+// addDep notes that x now depends on dep, and x's finalClose won't be
+// called until all of x's dependencies are removed with removeDep.
+func (p *Pool) addDep(x finalCloser, dep interface{}) {
+	//println(fmt.Sprintf("addDep(%T %p, %T %p)", x, x, dep, dep))
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.addDepLocked(x, dep)
+}
+func (p *Pool) addDepLocked(x finalCloser, dep interface{}) {
+	if p.dep == nil {
+		p.dep = make(map[finalCloser]depSet)
+	}
+	xdep := p.dep[x]
+	if xdep == nil {
+		xdep = make(depSet)
+		p.dep[x] = xdep
+	}
+	xdep[dep] = true
+}
+
+// removeDep notes that x no longer depends on dep.
+// If x still has dependencies, nil is returned.
+// If x no longer has any dependencies, its finalClose method will be
+// called and its error value will be returned.
+func (p *Pool) removeDep(x finalCloser, dep interface{}) error {
+	p.mu.Lock()
+	fn := p.removeDepLocked(x, dep)
+	p.mu.Unlock()
+	return fn()
+}
+func (p *Pool) removeDepLocked(x finalCloser, dep interface{}) func() error {
+	//println(fmt.Sprintf("removeDep(%T %p, %T %p)", x, x, dep, dep))
+	xdep, ok := p.dep[x]
+	if !ok {
+		panic(fmt.Sprintf("unpaired removeDep: no deps for %T", x))
+	}
+	l0 := len(xdep)
+	delete(xdep, dep)
+	switch len(xdep) {
+	case l0:
+		// Nothing removed. Shouldn't happen.
+		panic(fmt.Sprintf("unpaired removeDep: no %T dep on %T", dep, x))
+	case 0:
+		// No more dependencies.
+		delete(p.dep, x)
+		return x.finalClose
+	default:
+		// Dependencies remain.
+		return func() error { return nil }
+	}
 }
 
 // Assumes p.mu is locked.
@@ -276,10 +338,10 @@ func (p *Pool) openNewConnection() {
 	}
 	p.pendingOpens--
 	if err != nil {
-		p.putConnDBLocked(nil, err)
+		p.putConnPoolLocked(nil, err)
 		return
 	}
-	if p.putConnDBLocked(c, err) {
+	if p.putConnPoolLocked(c, err) {
 		p.numOpen++
 	} else {
 		c.Close()
@@ -290,13 +352,13 @@ func (p *Pool) openNewConnection() {
 // When there are no idle connections available, p.conn will create
 // a new connRequest and put it on the p.connRequests list.
 type connRequest struct {
-	conn *Connection
+	conn *poolConn
 	err  error
 }
 
 // Access pool options
 
-func (p *Pool) maxIdleConns() int {
+func (p *Pool) maxIdleConnsLocked() int {
 	n := p.maxIdle
 	switch {
 	case n == 0:
@@ -324,12 +386,12 @@ func (p *Pool) SetMaxIdleConns(n int) {
 		p.maxIdle = -1
 	}
 	// Make sure maxIdle doesn't exceed maxOpen
-	if p.maxOpen > 0 && p.maxIdleConns() > p.maxOpen {
+	if p.maxOpen > 0 && p.maxIdleConnsLocked() > p.maxOpen {
 		p.maxIdle = p.maxOpen
 	}
 	var closing []idleConn
 	idleCount := len(p.freeConn)
-	maxIdle := p.maxIdleConns()
+	maxIdle := p.maxIdleConnsLocked()
 	if idleCount > maxIdle {
 		closing = p.freeConn[maxIdle:]
 		p.freeConn = p.freeConn[:maxIdle]
@@ -354,7 +416,7 @@ func (p *Pool) SetMaxOpenConns(n int) {
 	if n < 0 {
 		p.maxOpen = 0
 	}
-	syncMaxIdle := p.maxOpen > 0 && p.maxIdleConns() > p.maxOpen
+	syncMaxIdle := p.maxOpen > 0 && p.maxIdleConnsLocked() > p.maxOpen
 	p.mu.Unlock()
 	if syncMaxIdle {
 		p.SetMaxIdleConns(n)
