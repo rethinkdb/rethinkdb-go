@@ -320,8 +320,8 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 		Address: url,
 		AuthKey: authKey,
 
-		MaxOpen: 100,
-		MaxIdle: 10,
+		MaxOpen: 200,
+		MaxIdle: 200,
 	})
 
 	// Ensure table + database exist
@@ -352,7 +352,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 	// Start workers
 	for i := 0; i < numWorkers; i++ {
 		go func() {
-			for q := range queryChan {
+			for _ = range queryChan {
 				res, err := Db("test").Table("TestConcurrent2").EqJoin("j", Db("test").Table("TestConcurrent")).Zip().Run(sess, RunOpts{
 					BatchConf: BatchOpts{
 						MaxBatchRows: 1,
@@ -375,7 +375,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 				}
 
 				if len(response) != 200 {
-					doneChan <- fmt.Errorf("query %d: expected response length 200, received %d", q, len(response))
+					doneChan <- fmt.Errorf("expected response length 200, received %d", len(response))
 					return
 				}
 
@@ -400,7 +400,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 				}
 
 				if len(response) != 1 {
-					doneChan <- fmt.Errorf("query %d: expected response length 1, received %d", q, len(response))
+					doneChan <- fmt.Errorf("expected response length 1, received %d", len(response))
 					return
 				}
 

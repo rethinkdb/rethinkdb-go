@@ -13,6 +13,11 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+const (
+	writerBufferSize = 4096
+	readerBufferSize = 4096
+)
+
 type Request struct {
 	Query   Query
 	Options map[string]interface{}
@@ -32,6 +37,9 @@ type Connection struct {
 	opts    *ConnectOpts
 	token   int64
 	cursors map[int64]*Cursor
+
+	br *bufio.Reader
+	bw *bufio.Writer
 }
 
 // Dial closes the previous connection and attempts to connect again.
@@ -81,10 +89,11 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 	}
 
 	conn := &Connection{
-		opts: opts,
-		conn: c,
-
+		opts:    opts,
+		conn:    c,
 		cursors: make(map[int64]*Cursor),
+		bw:      bufio.NewWriterSize(c, writerBufferSize),
+		br:      bufio.NewReaderSize(c, readerBufferSize),
 	}
 
 	return conn, nil
@@ -164,19 +173,24 @@ func (c *Connection) sendQuery(request Request) error {
 	}
 
 	// Send a unique 8-byte token
-	if err = binary.Write(c.conn, binary.LittleEndian, request.Query.Token); err != nil {
-		return RqlConnectionError{err.Error()}
+	if err = binary.Write(c.bw, binary.LittleEndian, request.Query.Token); err != nil {
+		return RqlDriverError{err.Error()}
 	}
 
 	// Send the length of the JSON-encoded query as a 4-byte
 	// little-endian-encoded integer.
-	if err = binary.Write(c.conn, binary.LittleEndian, uint32(len(b))); err != nil {
-		return RqlConnectionError{err.Error()}
+	if err = binary.Write(c.bw, binary.LittleEndian, uint32(len(b))); err != nil {
+		return RqlDriverError{err.Error()}
 	}
 
 	// Send the JSON encoding of the query itself.
-	if err = binary.Write(c.conn, binary.BigEndian, b); err != nil {
-		return RqlConnectionError{err.Error()}
+	if err = binary.Write(c.bw, binary.BigEndian, b); err != nil {
+		return RqlDriverError{err.Error()}
+	}
+
+	// Flush buffer
+	if err := c.bw.Flush(); err != nil {
+		return ErrBadConn
 	}
 
 	return nil
@@ -191,20 +205,20 @@ func (c *Connection) nextToken() int64 {
 func (c *Connection) readResponse() (*Response, error) {
 	// Read the 8-byte token of the query the response corresponds to.
 	var responseToken int64
-	if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
+	if err := binary.Read(c.br, binary.LittleEndian, &responseToken); err != nil {
 		return nil, ErrBadConn
 	}
 
 	// Read the length of the JSON-encoded response as a 4-byte
 	// little-endian-encoded integer.
 	var messageLength uint32
-	if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
+	if err := binary.Read(c.br, binary.LittleEndian, &messageLength); err != nil {
 		return nil, ErrBadConn
 	}
 
 	// Read the JSON encoding of the Response itself.
 	b := make([]byte, messageLength)
-	if _, err := io.ReadFull(c.conn, b); err != nil {
+	if _, err := io.ReadFull(c.br, b); err != nil {
 		return nil, ErrBadConn
 	}
 

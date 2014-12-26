@@ -184,7 +184,15 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 // When NoReply is true it causes the driver not to wait to receive the result
 // and return immediately.
 type ExecOpts struct {
-	RunOpts
+	Db             interface{} `gorethink:"db,omitempty"`
+	Profile        interface{} `gorethink:"profile,omitempty"`
+	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"`
+	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
+	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
+	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
+	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
+	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
+	BatchConf      BatchOpts   `gorethink:"batch_conf,omitempty"`
 
 	NoReply interface{} `gorethink:"noreply,omitempty"`
 }
