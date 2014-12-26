@@ -479,7 +479,7 @@ func (p *Pool) exec(q Query, opts map[string]interface{}) (err error) {
 	}()
 
 	pc.Lock()
-	err = pc.ci.Exec(q, opts)
+	_, _, err = pc.ci.Query(q, opts)
 	pc.Unlock()
 
 	if err != nil {

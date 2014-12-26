@@ -103,34 +103,6 @@ func (c *Connection) Close() error {
 	return nil
 }
 
-func (c *Connection) Exec(q Query, opts map[string]interface{}) error {
-	if c.conn == nil {
-		return ErrBadConn
-	}
-
-	// Add token if query is a START/NOREPLY_WAIT
-	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
-		q.Token = c.nextToken()
-	}
-
-	// If no DB option was set default to the value set in the connection
-	if _, ok := opts["db"]; !ok {
-		opts["db"] = Db(c.opts.Database).build()
-	}
-
-	request := Request{
-		Query:   q,
-		Options: opts,
-	}
-
-	err := c.sendQuery(request)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (c *Connection) Query(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
 	if c.conn == nil {
 		return nil, nil, ErrBadConn
@@ -154,6 +126,10 @@ func (c *Connection) Query(q Query, opts map[string]interface{}) (*Response, *Cu
 	err := c.sendQuery(request)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+		return nil, nil, nil
 	}
 
 	var response *Response

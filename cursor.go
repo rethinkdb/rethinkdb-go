@@ -89,7 +89,7 @@ func (c *Cursor) Close() error {
 			Token: c.token,
 		}
 
-		err = conn.Exec(q, map[string]interface{}{})
+		_, _, err = conn.Query(q, map[string]interface{}{})
 	}
 
 	c.closed = true
