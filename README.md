@@ -57,7 +57,6 @@ session, err := r.Connect(r.ConnectOpts{
     Database: "test",
     MaxIdle: 10,
     MaxOpen: 10,
-    IdleTimeout: time.Second * 10,
 })
 if err != nil {
     log.Fatalln(err.Error())

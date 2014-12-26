@@ -26,6 +26,9 @@ func newCursor(conn *Connection, token int64, term *Term, opts map[string]interf
 // The code for this struct is based off of mgo's Iter and the official
 // python driver's cursor.
 type Cursor struct {
+	pc          *poolConn
+	releaseConn func(error)
+
 	conn  *Connection
 	token int64
 	query Query
@@ -33,7 +36,7 @@ type Cursor struct {
 	opts  map[string]interface{}
 
 	sync.Mutex
-	err       error
+	lastErr   error
 	fetching  int32
 	closed    bool
 	finished  bool
@@ -44,41 +47,47 @@ type Cursor struct {
 
 // Profile returns the information returned from the query profiler.
 func (c *Cursor) Profile() interface{} {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.profile
 }
 
 // Err returns nil if no errors happened during iteration, or the actual
 // error otherwise.
 func (c *Cursor) Err() error {
-	c.Lock()
-	defer c.Unlock()
-
-	return c.err
+	return c.lastErr
 }
 
 // Close closes the cursor, preventing further enumeration. If the end is
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
-	c.Lock()
-	defer c.Unlock()
+	var err error
+
+	if c.closed {
+		return nil
+	}
+
+	conn := c.conn
+	if conn == nil {
+		return nil
+	}
+	if conn.conn == nil {
+		return nil
+	}
 
 	// Stop any unfinished queries
 	if !c.closed && !c.finished {
-		err := c.conn.StopQuery(c.token)
-
-		if err != nil && (c.err == nil || c.err == ErrEmptyResult) {
-			c.err = err
+		q := Query{
+			Type:  p.Query_STOP,
+			Token: c.token,
 		}
-		c.closed = true
+
+		_, _, err = conn.SendQuery(q, map[string]interface{}{}, true)
 	}
 
-	// Return connection to pool
-	c.conn.Release()
+	c.closed = true
+	c.conn = nil
+	c.releaseConn(err)
 
-	return c.err
+	return err
 }
 
 // Next retrieves the next document from the result set, blocking if necessary.
@@ -90,29 +99,31 @@ func (c *Cursor) Close() error {
 // and false at the end of the result set or if an error happened.
 // When Next returns false, the Err method should be called to verify if
 // there was an error during iteration.
-func (c *Cursor) Next(result interface{}) bool {
-	ok, data := c.loadNext()
-	if !ok {
+func (c *Cursor) Next(dest interface{}) bool {
+	var hasMore bool
+
+	if c.closed {
 		return false
 	}
 
-	if c.handleError(encoding.Decode(result, data)) != nil {
+	hasMore, c.lastErr = c.loadNext(dest)
+	if c.lastErr != nil {
+		c.Close()
 		return false
 	}
 
-	return true
+	return hasMore
 }
 
-func (c *Cursor) loadNext() (bool, interface{}) {
-	c.Lock()
-	defer c.Unlock()
+func (c *Cursor) loadNext(dest interface{}) (bool, error) {
+	var err error
 
 	// Load more data if needed
-	for c.err == nil {
+	for err == nil {
 		// Check if response is closed/finished
 		if len(c.buffer) == 0 && len(c.responses) == 0 && c.closed {
-			c.err = errors.New("connection closed, cannot read cursor")
-			return false, nil
+			err = errors.New("connection closed, cannot read cursor")
+			return false, err
 		}
 		if len(c.buffer) == 0 && len(c.responses) == 0 && c.finished {
 			return false, nil
@@ -126,12 +137,9 @@ func (c *Cursor) loadNext() (bool, interface{}) {
 		// If the buffer is empty fetch more results
 		if len(c.buffer) == 0 {
 			if len(c.responses) == 0 && !c.finished {
-				c.Unlock()
-				err := c.fetchMore(true)
-				c.Lock()
-
+				err = c.fetchMore(true)
 				if err != nil {
-					return false, nil
+					return false, err
 				}
 			}
 
@@ -148,14 +156,16 @@ func (c *Cursor) loadNext() (bool, interface{}) {
 		}
 	}
 
-	if c.err != nil {
-		return false, nil
-	}
-
+	// Decode result into dest value
 	var data interface{}
 	data, c.buffer = c.buffer[0], c.buffer[1:]
 
-	return true, data
+	err = encoding.Decode(dest, data)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // All retrieves all documents from the result set into the provided slice
@@ -189,8 +199,9 @@ func (c *Cursor) All(result interface{}) error {
 	}
 	resultv.Elem().Set(slicev.Slice(0, i))
 
-	if c.err != nil {
-		return c.err
+	if c.lastErr != nil {
+		c.Close()
+		return c.lastErr
 	}
 
 	return c.Close()
@@ -219,23 +230,9 @@ func (c *Cursor) One(result interface{}) error {
 	return err
 }
 
-// Tests if the current row is nil.
+// IsNil tests if the current row is nil.
 func (c *Cursor) IsNil() bool {
-	c.Lock()
-	defer c.Unlock()
-
 	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
-}
-
-func (c *Cursor) handleError(err error) error {
-	c.Lock()
-	defer c.Unlock()
-
-	if c.err != nil {
-		c.err = err
-	}
-
-	return err
 }
 
 func (c *Cursor) fetchMore(wait bool) error {
@@ -246,13 +243,13 @@ func (c *Cursor) fetchMore(wait bool) error {
 
 		wg.Add(1)
 
-		go func() {
-			c.Lock()
-			token := c.token
-			conn := c.conn
-			c.Unlock()
+		q := Query{
+			Type:  p.Query_CONTINUE,
+			Token: c.token,
+		}
 
-			err = conn.ContinueQuery(token)
+		go func() {
+			_, _, err = c.conn.SendQuery(q, map[string]interface{}{}, true)
 			c.handleError(err)
 
 			wg.Done()
@@ -264,6 +261,17 @@ func (c *Cursor) fetchMore(wait bool) error {
 	}
 
 	return err
+}
+
+func (c *Cursor) handleError(err error) error {
+	c.Lock()
+	defer c.Unlock()
+
+	if c.lastErr != nil {
+		c.lastErr = err
+	}
+
+	return c.lastErr
 }
 
 func (c *Cursor) extend(response *Response) {

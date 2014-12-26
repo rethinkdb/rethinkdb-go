@@ -7,24 +7,15 @@ import (
 	"fmt"
 	"io"
 	"net"
-	"sync"
 	"sync/atomic"
 	"time"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-type queryRequest struct {
-	Active int32
-
-	Query    Query
-	Options  map[string]interface{}
-	Response chan queryResponse
-}
-
-type queryResponse struct {
-	Response *Response
-	Error    error
+type Request struct {
+	Query   Query
+	Options map[string]interface{}
 }
 
 type Response struct {
@@ -37,17 +28,10 @@ type Response struct {
 
 // connection is a connection to a rethinkdb database
 type Connection struct {
-	opts *ConnectOpts
-	conn net.Conn
-	pool *Pool
-
-	sync.Mutex
-	token       int64
-	active      bool
-	closed      bool
-	outstanding int64
-	cursors     map[int64]*Cursor
-	requests    map[int64]queryRequest
+	conn    net.Conn
+	opts    *ConnectOpts
+	token   int64
+	cursors map[int64]*Cursor
 }
 
 // Dial closes the previous connection and attempts to connect again.
@@ -100,71 +84,37 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 		opts: opts,
 		conn: c,
 
-		cursors:  make(map[int64]*Cursor),
-		requests: make(map[int64]queryRequest),
+		cursors: make(map[int64]*Cursor),
 	}
 
 	return conn, nil
 }
 
-func (c *Connection) StartQuery(t Term, opts map[string]interface{}) (*Cursor, error) {
-	token := c.nextToken()
+// Close closes the underlying net.Conn
+func (c *Connection) Close() error {
+	if c.conn != nil {
+		c.conn.Close()
+		c.conn = nil
+	}
 
-	// Build global options
-	globalOpts := map[string]interface{}{}
-	for k, v := range opts {
-		globalOpts[k] = Expr(v).build()
+	c.cursors = nil
+	c.opts = nil
+
+	return nil
+}
+
+func (c *Connection) SendQuery(q Query, opts map[string]interface{}, wait bool) (*Response, *Cursor, error) {
+	// Add token if query is a START/NOREPLY_WAIT
+	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
+		q.Token = c.nextToken()
 	}
 
 	// If no DB option was set default to the value set in the connection
 	if _, ok := opts["db"]; !ok {
-		globalOpts["db"] = Db(c.opts.Database).build()
+		opts["db"] = Db(c.opts.Database).build()
 	}
 
-	// Construct query
-	q := Query{
-		Type:       p.Query_START,
-		Token:      token,
-		Term:       &t,
-		GlobalOpts: globalOpts,
-	}
-
-	_, cursor, err := c.SendQuery(q, opts)
-	return cursor, err
-}
-
-func (c *Connection) ContinueQuery(token int64) error {
-	q := Query{
-		Type:  p.Query_CONTINUE,
-		Token: token,
-	}
-
-	_, _, err := c.SendQuery(q, map[string]interface{}{})
-	return err
-}
-
-func (c *Connection) StopQuery(token int64) error {
-	q := Query{
-		Type:  p.Query_STOP,
-		Token: token,
-	}
-
-	_, _, err := c.SendQuery(q, map[string]interface{}{})
-	return err
-}
-
-func (c *Connection) NoReplyWait() error {
-	q := Query{
-		Type:  p.Query_NOREPLY_WAIT,
-		Token: c.nextToken(),
-	}
-
-	_, _, err := c.SendQuery(q, map[string]interface{}{})
-	return err
-}
-
-func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
-	request := queryRequest{
+	request := Request{
 		Query:   q,
 		Options: opts,
 	}
@@ -174,9 +124,8 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 		return nil, nil, err
 	}
 
-	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
-		c.Release()
-
+	// Return if the response does not need to be read
+	if !wait {
 		return nil, nil, nil
 	}
 
@@ -188,14 +137,7 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}) (*Response,
 	return c.processResponse(request, response)
 }
 
-func (c *Connection) sendQuery(request queryRequest) error {
-	c.Lock()
-	closed := c.closed
-	c.Unlock()
-
-	if closed {
-		return ErrConnectionClosed
-	}
+func (c *Connection) sendQuery(request Request) error {
 	// Build query
 	b, err := json.Marshal(request.Query.build())
 	if err != nil {
@@ -226,35 +168,6 @@ func (c *Connection) sendQuery(request queryRequest) error {
 	}
 
 	return nil
-}
-
-func (c *Connection) GetConn() (*Connection, error) {
-	return c, nil
-}
-
-// Close closes the underlying net.Conn. It also removes the connection
-// from the connection pool
-func (c *Connection) Close() error {
-	c.Lock()
-	closed := c.closed
-	c.Unlock()
-
-	if !closed {
-		err := c.conn.Close()
-
-		c.Lock()
-		c.closed = true
-		c.Unlock()
-
-		return err
-	}
-
-	return nil
-}
-
-// Release returns the connection to the connection pool
-func (c *Connection) Release() {
-	c.pool.PutConn(c, nil, false)
 }
 
 // getToken generates the next query token, used to number requests and match
@@ -293,7 +206,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	return response, nil
 }
 
-func (c *Connection) processResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processResponse(request Request, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
 		return c.processErrorResponse(request, response, RqlClientError{rqlResponseError{response, request.Query.Term}})
@@ -316,22 +229,15 @@ func (c *Connection) processResponse(request queryRequest, response *Response) (
 	}
 }
 
-func (c *Connection) processErrorResponse(request queryRequest, response *Response, err error) (*Response, *Cursor, error) {
-	// c.Release()
-
-	c.Lock()
+func (c *Connection) processErrorResponse(request Request, response *Response, err error) (*Response, *Cursor, error) {
 	cursor := c.cursors[response.Token]
 
-	delete(c.requests, response.Token)
 	delete(c.cursors, response.Token)
-	c.Unlock()
 
 	return response, cursor, err
 }
 
-func (c *Connection) processAtomResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
-	// c.Release()
-
+func (c *Connection) processAtomResponse(request Request, response *Response) (*Response, *Cursor, error) {
 	// Create cursor
 	var value []interface{}
 	if len(response.Responses) == 0 {
@@ -356,14 +262,10 @@ func (c *Connection) processAtomResponse(request queryRequest, response *Respons
 	cursor.buffer = value
 	cursor.finished = true
 
-	c.Lock()
-	delete(c.requests, response.Token)
-	c.Unlock()
-
 	return response, cursor, nil
 }
 
-func (c *Connection) processFeedResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processFeedResponse(request Request, response *Response) (*Response, *Cursor, error) {
 	var cursor *Cursor
 	if _, ok := c.cursors[response.Token]; !ok {
 		// Create a new cursor if needed
@@ -374,72 +276,42 @@ func (c *Connection) processFeedResponse(request queryRequest, response *Respons
 		cursor = c.cursors[response.Token]
 	}
 
-	c.Lock()
-	delete(c.requests, response.Token)
-	c.Unlock()
-
 	cursor.extend(response)
 
 	return response, cursor, nil
 }
 
-func (c *Connection) processPartialResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
-	c.Lock()
+func (c *Connection) processPartialResponse(request Request, response *Response) (*Response, *Cursor, error) {
 	cursor, ok := c.cursors[response.Token]
-	c.Unlock()
-
 	if !ok {
 		// Create a new cursor if needed
 		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
 		cursor.profile = response.Profile
 
-		c.Lock()
 		c.cursors[response.Token] = cursor
-		c.Unlock()
 	}
-
-	c.Lock()
-	delete(c.requests, response.Token)
-	c.Unlock()
 
 	cursor.extend(response)
 	return response, cursor, nil
 }
 
-func (c *Connection) processSequenceResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
-	// c.Release()
-
-	c.Lock()
+func (c *Connection) processSequenceResponse(request Request, response *Response) (*Response, *Cursor, error) {
 	cursor, ok := c.cursors[response.Token]
-	c.Unlock()
-
 	if !ok {
 		// Create a new cursor if needed
 		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
 		cursor.profile = response.Profile
-
-		c.Lock()
-		c.cursors[response.Token] = cursor
-		c.Unlock()
 	}
 
-	c.Lock()
-	delete(c.requests, response.Token)
 	delete(c.cursors, response.Token)
-	c.Unlock()
 
 	cursor.extend(response)
 
 	return response, cursor, nil
 }
 
-func (c *Connection) processWaitResponse(request queryRequest, response *Response) (*Response, *Cursor, error) {
-	// c.Release()
-
-	c.Lock()
-	delete(c.requests, response.Token)
+func (c *Connection) processWaitResponse(request Request, response *Response) (*Response, *Cursor, error) {
 	delete(c.cursors, response.Token)
-	c.Unlock()
 
 	return response, nil, nil
 }

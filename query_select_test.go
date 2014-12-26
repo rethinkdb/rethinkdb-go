@@ -320,9 +320,8 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 		Address: url,
 		AuthKey: authKey,
 
-		MaxOpen:     100,
-		MaxIdle:     10,
-		IdleTimeout: time.Second * 10,
+		MaxOpen: 100,
+		MaxIdle: 10,
 	})
 
 	// // Ensure table + database exist

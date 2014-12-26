@@ -5,12 +5,25 @@ import (
 	"sync"
 )
 
+// ErrBadConn should be returned by a driver to signal to the sql
+// package that a driver.Conn is in a bad state (such as the server
+// having earlier closed the connection) and the sql package should
+// retry on a new connection.
+//
+// To prevent duplicate operations, ErrBadConn should NOT be returned
+// if there's a possibility that the database server might have
+// performed the operation. Even if the server sends back an error,
+// you shouldn't return ErrBadConn.
+var ErrBadConn = errors.New("gorethink: bad connection")
+
 type poolConn struct {
-	p           *Pool
+	p *Pool
+
 	sync.Mutex  // guards following
 	ci          *Connection
 	closed      bool
 	finalClosed bool // ci.Close has been called
+
 	// guarded by p.mu
 	inUse     bool
 	onPut     []func() // code (with p.mu held) run when conn is next returned
