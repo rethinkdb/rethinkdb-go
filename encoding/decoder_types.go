@@ -98,6 +98,10 @@ func newTypeDecoder(dt, st reflect.Type, allowAddr bool) decoderFunc {
 	case reflect.Ptr:
 		return newPtrDecoder(dt, st)
 	case reflect.Map:
+		if st.AssignableTo(dt) {
+			return interfaceDecoder
+		}
+
 		switch st.Kind() {
 		case reflect.Map:
 			return newMapAsMapDecoder(dt, st)
@@ -105,6 +109,10 @@ func newTypeDecoder(dt, st reflect.Type, allowAddr bool) decoderFunc {
 			return decodeTypeError
 		}
 	case reflect.Struct:
+		if st.AssignableTo(dt) {
+			return interfaceDecoder
+		}
+
 		switch st.Kind() {
 		case reflect.Map:
 			if kind := st.Key().Kind(); kind != reflect.String && kind != reflect.Interface {
@@ -116,6 +124,10 @@ func newTypeDecoder(dt, st reflect.Type, allowAddr bool) decoderFunc {
 			return decodeTypeError
 		}
 	case reflect.Slice:
+		if st.AssignableTo(dt) {
+			return interfaceDecoder
+		}
+
 		switch st.Kind() {
 		case reflect.Array, reflect.Slice:
 			return newSliceDecoder(dt, st)
@@ -123,6 +135,10 @@ func newTypeDecoder(dt, st reflect.Type, allowAddr bool) decoderFunc {
 			return decodeTypeError
 		}
 	case reflect.Array:
+		if st.AssignableTo(dt) {
+			return interfaceDecoder
+		}
+
 		switch st.Kind() {
 		case reflect.Array, reflect.Slice:
 			return newArrayDecoder(dt, st)
@@ -318,9 +334,11 @@ type sliceDecoder struct {
 }
 
 func (d *sliceDecoder) decode(dv, sv reflect.Value) {
-	if sv.IsNil() {
-		dv.Set(reflect.New(dv.Type()))
-	} else {
+	if dv.Kind() == reflect.Slice {
+		dv.Set(reflect.MakeSlice(dv.Type(), dv.Len(), dv.Cap()))
+	}
+
+	if !sv.IsNil() {
 		d.arrayDec(dv, sv)
 	}
 }
@@ -394,20 +412,37 @@ type mapAsMapDecoder struct {
 
 func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) {
 	dt := dv.Type()
-	m := reflect.MakeMap(reflect.MapOf(dt.Key(), dt.Elem()))
+	dv.Set(reflect.MakeMap(reflect.MapOf(dt.Key(), dt.Elem())))
+
+	var mapKey reflect.Value
+	var mapElem reflect.Value
+
+	keyType := dv.Type().Key()
+	elemType := dv.Type().Elem()
 
 	for _, sElemKey := range sv.MapKeys() {
-		sElemVal := sv.MapIndex(sElemKey)
-		dElemKey := reflect.Indirect(reflect.New(dt.Key()))
-		dElemVal := reflect.Indirect(reflect.New(dt.Elem()))
+		var dElemKey reflect.Value
+		var dElemVal reflect.Value
+
+		if !mapKey.IsValid() {
+			mapKey = reflect.New(keyType).Elem()
+		} else {
+			mapKey.Set(reflect.Zero(keyType))
+		}
+		dElemKey = mapKey
+
+		if !mapElem.IsValid() {
+			mapElem = reflect.New(elemType).Elem()
+		} else {
+			mapElem.Set(reflect.Zero(elemType))
+		}
+		dElemVal = mapElem
 
 		d.keyDec(dElemKey, sElemKey)
-		d.elemDec(dElemVal, sElemVal)
+		d.elemDec(dElemVal, sv.MapIndex(sElemKey))
 
-		m.SetMapIndex(dElemKey, dElemVal)
+		dv.SetMapIndex(dElemKey, dElemVal)
 	}
-
-	dv.Set(m)
 }
 
 func newMapAsMapDecoder(dt, st reflect.Type) decoderFunc {
