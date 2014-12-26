@@ -21,10 +21,19 @@ func newCursor(conn *Connection, token int64, term *Term, opts map[string]interf
 	return cursor
 }
 
-// Cursors are used to represent data returned from the database.
+// Cursor is the result of a query. Its cursor starts before the first row
+// of the result set. Use Next to advance through the rows:
 //
-// The code for this struct is based off of mgo's Iter and the official
-// python driver's cursor.
+//     cursor, err := query.Run(session)
+//     ...
+//     defer cursor.Close()
+//
+//     var response interface{}
+//     for cursor.Next(&response) {
+//         ...
+//     }
+//     err = cursor.Err() // get any error encountered during iteration
+//     ...
 type Cursor struct {
 	pc          *poolConn
 	releaseConn func(error)
@@ -80,7 +89,7 @@ func (c *Cursor) Close() error {
 			Token: c.token,
 		}
 
-		_, _, err = conn.SendQuery(q, map[string]interface{}{}, true)
+		err = conn.Exec(q, map[string]interface{}{})
 	}
 
 	c.closed = true
@@ -235,6 +244,10 @@ func (c *Cursor) IsNil() bool {
 	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
 }
 
+// fetchMore fetches more rows from the database.
+//
+// If wait is true then it will wait for the database to reply otherwise it
+// will return after sending the continue query.
 func (c *Cursor) fetchMore(wait bool) error {
 	var err error
 
@@ -249,7 +262,7 @@ func (c *Cursor) fetchMore(wait bool) error {
 		}
 
 		go func() {
-			_, _, err = c.conn.SendQuery(q, map[string]interface{}{}, true)
+			_, _, err = c.conn.Query(q, map[string]interface{}{})
 			c.handleError(err)
 
 			wg.Done()
@@ -263,6 +276,7 @@ func (c *Cursor) fetchMore(wait bool) error {
 	return err
 }
 
+// handleError sets the value of lastErr to err if lastErr is not yet set.
 func (c *Cursor) handleError(err error) error {
 	c.Lock()
 	defer c.Unlock()
@@ -274,6 +288,7 @@ func (c *Cursor) handleError(err error) error {
 	return c.lastErr
 }
 
+// extend adds the result of a continue query to the cursor.
 func (c *Cursor) extend(response *Response) {
 	c.Lock()
 	defer c.Unlock()

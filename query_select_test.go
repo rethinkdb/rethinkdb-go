@@ -324,24 +324,24 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 		MaxIdle: 10,
 	})
 
-	// // Ensure table + database exist
-	// DbCreate("test").RunWrite(sess)
-	// Db("test").TableDrop("TestConcurrent").RunWrite(sess)
-	// Db("test").TableCreate("TestConcurrent").RunWrite(sess)
-	// Db("test").TableDrop("TestConcurrent2").RunWrite(sess)
-	// Db("test").TableCreate("TestConcurrent2").RunWrite(sess)
+	// Ensure table + database exist
+	DbCreate("test").RunWrite(sess)
+	Db("test").TableDrop("TestConcurrent").RunWrite(sess)
+	Db("test").TableCreate("TestConcurrent").RunWrite(sess)
+	Db("test").TableDrop("TestConcurrent2").RunWrite(sess)
+	Db("test").TableCreate("TestConcurrent2").RunWrite(sess)
 
-	// // Insert rows
-	// for j := 0; j < 200; j++ {
-	// 	Db("test").Table("TestConcurrent").Insert(map[string]interface{}{
-	// 		"id": j,
-	// 		"i":  j,
-	// 	}).Run(sess)
-	// 	Db("test").Table("TestConcurrent2").Insert(map[string]interface{}{
-	// 		"j": j,
-	// 		"k": j * 2,
-	// 	}).Run(sess)
-	// }
+	// Insert rows
+	for j := 0; j < 200; j++ {
+		Db("test").Table("TestConcurrent").Insert(map[string]interface{}{
+			"id": j,
+			"i":  j,
+		}).Run(sess)
+		Db("test").Table("TestConcurrent2").Insert(map[string]interface{}{
+			"j": j,
+			"k": j * 2,
+		}).Run(sess)
+	}
 
 	// Test queries concurrently
 	numQueries := 1000
@@ -460,16 +460,19 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 			})
 			if err != nil {
 				c <- err
+				return
 			}
 
 			var response []map[string]interface{}
 			err = res.All(&response)
 			if err != nil {
 				c <- err
+				return
 			}
 
 			if len(response) != 100 {
 				c <- fmt.Errorf("expected response length 100, received %d", len(response))
+				return
 			}
 
 			c <- nil

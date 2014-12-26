@@ -185,7 +185,7 @@ func (s *RethinkSuite) TestControlJson(c *test.C) {
 
 func (s *RethinkSuite) TestControlError(c *test.C) {
 	query := Error("An error occurred")
-	err := query.Exec(sess)
+	_, err := query.Run(sess)
 	c.Assert(err, test.NotNil)
 
 	c.Assert(err, test.NotNil)

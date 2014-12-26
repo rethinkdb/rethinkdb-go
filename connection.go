@@ -38,30 +38,30 @@ type Connection struct {
 func NewConnection(opts *ConnectOpts) (*Connection, error) {
 	c, err := net.Dial("tcp", opts.Address)
 	if err != nil {
-		return nil, RqlConnectionError{err.Error()}
+		return nil, ErrBadConn
 	}
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
 	if err := binary.Write(c, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
-		return nil, RqlConnectionError{err.Error()}
+		return nil, ErrBadConn
 	}
 
 	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
 	if err := binary.Write(c, binary.LittleEndian, uint32(len(opts.AuthKey))); err != nil {
-		return nil, RqlConnectionError{err.Error()}
+		return nil, ErrBadConn
 	}
 
 	// Send the auth key as an ASCII string
 	// If there is no auth key, skip this step
 	if opts.AuthKey != "" {
 		if _, err := io.WriteString(c, opts.AuthKey); err != nil {
-			return nil, RqlConnectionError{err.Error()}
+			return nil, ErrBadConn
 		}
 	}
 
 	// Send the protocol type as a 4-byte little-endian-encoded integer
 	if err := binary.Write(c, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
-		return nil, RqlConnectionError{err.Error()}
+		return nil, ErrBadConn
 	}
 
 	// read server response to authorization key (terminated by NUL)
@@ -103,7 +103,39 @@ func (c *Connection) Close() error {
 	return nil
 }
 
-func (c *Connection) SendQuery(q Query, opts map[string]interface{}, wait bool) (*Response, *Cursor, error) {
+func (c *Connection) Exec(q Query, opts map[string]interface{}) error {
+	if c.conn == nil {
+		return ErrBadConn
+	}
+
+	// Add token if query is a START/NOREPLY_WAIT
+	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
+		q.Token = c.nextToken()
+	}
+
+	// If no DB option was set default to the value set in the connection
+	if _, ok := opts["db"]; !ok {
+		opts["db"] = Db(c.opts.Database).build()
+	}
+
+	request := Request{
+		Query:   q,
+		Options: opts,
+	}
+
+	err := c.sendQuery(request)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Connection) Query(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
+	if c.conn == nil {
+		return nil, nil, ErrBadConn
+	}
+
 	// Add token if query is a START/NOREPLY_WAIT
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		q.Token = c.nextToken()
@@ -124,17 +156,21 @@ func (c *Connection) SendQuery(q Query, opts map[string]interface{}, wait bool) 
 		return nil, nil, err
 	}
 
-	// Return if the response does not need to be read
-	if !wait {
-		return nil, nil, nil
-	}
+	var response *Response
+	for {
+		response, err = c.readResponse()
+		if err != nil {
+			return nil, nil, err
+		}
 
-	response, err := c.readResponse()
-	if err != nil {
-		return nil, nil, err
+		if response.Token == request.Query.Token {
+			// If this was the requested response process and return
+			return c.processResponse(request, response)
+		} else if _, ok := c.cursors[response.Token]; ok {
+			// If the token is in the cursor cache then process the response
+			c.processResponse(request, response)
+		}
 	}
-
-	return c.processResponse(request, response)
 }
 
 func (c *Connection) sendQuery(request Request) error {
@@ -180,20 +216,20 @@ func (c *Connection) readResponse() (*Response, error) {
 	// Read the 8-byte token of the query the response corresponds to.
 	var responseToken int64
 	if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
-		return nil, RqlConnectionError{err.Error()}
+		return nil, ErrBadConn
 	}
 
 	// Read the length of the JSON-encoded response as a 4-byte
 	// little-endian-encoded integer.
 	var messageLength uint32
 	if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
-		return nil, RqlConnectionError{err.Error()}
+		return nil, ErrBadConn
 	}
 
 	// Read the JSON encoding of the Response itself.
 	b := make([]byte, messageLength)
 	if _, err := io.ReadFull(c.conn, b); err != nil {
-		return nil, RqlConnectionError{err.Error()}
+		return nil, ErrBadConn
 	}
 
 	// Decode the response
@@ -292,6 +328,7 @@ func (c *Connection) processPartialResponse(request Request, response *Response)
 	}
 
 	cursor.extend(response)
+
 	return response, cursor, nil
 }
 

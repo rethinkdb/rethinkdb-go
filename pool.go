@@ -59,6 +59,7 @@ func NewPool(opts *ConnectOpts) (*Pool, error) {
 		opts: opts,
 
 		openerCh: make(chan struct{}, connectionRequestQueueSize),
+		lastPut:  make(map[*poolConn]string),
 		maxIdle:  opts.MaxIdle,
 	}
 	go p.connectionOpener()
@@ -311,9 +312,6 @@ func (p *Pool) connIfFree(wanted *poolConn) (*poolConn, error) {
 	panic("connIfFree call requested a non-closed, non-busy, non-free conn")
 }
 
-// putConnHook is a hook for testing.
-var putConnHook func(*Pool, *poolConn)
-
 // noteUnusedCursor notes that si is no longer used and should
 // be closed whenever possible (when c is next not in use), unless c is
 // already closed.
@@ -364,9 +362,6 @@ func (p *Pool) putConn(pc *poolConn, err error) {
 		p.mu.Unlock()
 		pc.Close()
 		return
-	}
-	if putConnHook != nil {
-		putConnHook(p, pc)
 	}
 	added := p.putConnPoolLocked(pc, nil)
 	p.mu.Unlock()
@@ -484,7 +479,7 @@ func (p *Pool) exec(q Query, opts map[string]interface{}) (err error) {
 	}()
 
 	pc.Lock()
-	_, _, err = pc.ci.SendQuery(q, opts, false)
+	err = pc.ci.Exec(q, opts)
 	pc.Unlock()
 
 	if err != nil {
@@ -517,7 +512,7 @@ func (p *Pool) query(query Query, opts map[string]interface{}) (*Cursor, error) 
 // The connection gets released by the releaseConn function.
 func (p *Pool) queryConn(pc *poolConn, releaseConn func(error), q Query, opts map[string]interface{}) (*Cursor, error) {
 	pc.Lock()
-	_, cursor, err := pc.ci.SendQuery(q, opts, true)
+	_, cursor, err := pc.ci.Query(q, opts)
 	pc.Unlock()
 	if err != nil {
 		releaseConn(err)
