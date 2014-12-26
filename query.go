@@ -122,7 +122,6 @@ type RunOpts struct {
 	Db             interface{} `gorethink:"db,omitempty"`
 	Profile        interface{} `gorethink:"profile,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"`
-	NoReply        interface{} `gorethink:"noreply,omitempty"`
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
 	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
@@ -169,9 +168,7 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 // scans the result into a variable of type WriteResponse. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
 //
-//	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess, r.RunOpts{
-//		NoReply: true,
-//	})
+//	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
 func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	var response WriteResponse
 	res, err := t.Run(s, optArgs...)
@@ -181,8 +178,28 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	return response, err
 }
 
-// Exec runs the query but does not return the result.
-func (t Term) Exec(s *Session, optArgs ...RunOpts) error {
+// ExecOpts inherits its options from RunOpts, the only difference is the
+// addition of the NoReply field.
+//
+// When NoReply is true it causes the driver not to wait to receive the result
+// and return immediately.
+type ExecOpts struct {
+	RunOpts
+
+	NoReply interface{} `gorethink:"noreply,omitempty"`
+}
+
+func (o *ExecOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
+// Exec runs the query but does not return the result. Exec will still wait for
+// the response to be received unless the NoReply field is true.
+//
+//	res, err := r.Db("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
+//		NoReply: true,
+//	})
+func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()

@@ -228,7 +228,7 @@ func (s *RethinkSuite) BenchmarkNoReplyExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query
 		query := Expr(true)
-		err := query.Exec(sess, RunOpts{NoReply: true})
+		err := query.Exec(sess, ExecOpts{NoReply: true})
 		c.Assert(err, test.IsNil)
 	}
 }

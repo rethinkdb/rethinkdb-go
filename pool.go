@@ -490,15 +490,15 @@ func (p *Pool) exec(q Query, opts map[string]interface{}) (err error) {
 
 // Query executes a query and waits for the response
 func (p *Pool) Query(q Query, opts map[string]interface{}) (*Cursor, error) {
-	var rows *Cursor
+	var cursor *Cursor
 	var err error
 	for i := 0; i < maxBadConnRetries; i++ {
-		rows, err = p.query(q, opts)
+		cursor, err = p.query(q, opts)
 		if err != ErrBadConn {
 			break
 		}
 	}
-	return rows, err
+	return cursor, err
 }
 func (p *Pool) query(query Query, opts map[string]interface{}) (*Cursor, error) {
 	ci, err := p.conn()
