@@ -46,6 +46,8 @@ func Decode(dst interface{}, src interface{}) (err error) {
 		}
 	}
 
+	dv.Set(reflect.New(dv.Type()))
+
 	decode(dv, sv)
 	return nil
 }

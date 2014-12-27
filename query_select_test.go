@@ -345,7 +345,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 
 	// Test queries concurrently
 	numQueries := 1000
-	numWorkers := 100
+	numWorkers := 10
 	queryChan := make(chan int)
 	doneChan := make(chan error)
 
@@ -353,11 +353,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 	for i := 0; i < numWorkers; i++ {
 		go func() {
 			for _ = range queryChan {
-				res, err := Db("test").Table("TestConcurrent2").EqJoin("j", Db("test").Table("TestConcurrent")).Zip().Run(sess, RunOpts{
-					BatchConf: BatchOpts{
-						MaxBatchRows: 1,
-					},
-				})
+				res, err := Db("test").Table("TestConcurrent2").EqJoin("j", Db("test").Table("TestConcurrent")).Zip().Run(sess)
 				if err != nil {
 					doneChan <- err
 					return
@@ -379,11 +375,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 					return
 				}
 
-				res, err = Db("test").Table("TestConcurrent").Get(response[rand.Intn(len(response))]["id"]).Run(sess, RunOpts{
-					BatchConf: BatchOpts{
-						MaxBatchRows: 1,
-					},
-				})
+				res, err = Db("test").Table("TestConcurrent").Get(response[rand.Intn(len(response))]["id"]).Run(sess)
 				if err != nil {
 					doneChan <- err
 					return
@@ -434,17 +426,10 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 	Db("test").Table("TestMany").Delete().RunWrite(sess)
 
 	// Insert rows
-	for i := 0; i < 1; i++ {
-		data := []interface{}{}
-
-		for j := 0; j < 100; j++ {
-			data = append(data, map[string]interface{}{
+	for i := 0; i < 100; i++ {
+		Db("test").Table("TestMany").Insert(map[string]interface{}{
 				"i": i,
-				"j": j,
-			})
-		}
-
-		Db("test").Table("TestMany").Insert(data).Run(sess)
+			}).Run(sess)
 	}
 
 	// Test queries concurrently
@@ -453,11 +438,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 
 	for i := 0; i < attempts; i++ {
 		go func(i int, c chan error) {
-			res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
-				BatchConf: BatchOpts{
-					MaxBatchRows: 1,
-				},
-			})
+			res, err := Db("test").Table("TestMany").Run(sess)
 			if err != nil {
 				c <- err
 				return
