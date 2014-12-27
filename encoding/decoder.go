@@ -46,8 +46,6 @@ func Decode(dst interface{}, src interface{}) (err error) {
 		}
 	}
 
-	dv.Set(reflect.New(dv.Type()))
-
 	decode(dv, sv)
 	return nil
 }
@@ -70,6 +68,12 @@ func valueDecoder(dv, sv reflect.Value) decoderFunc {
 	if !sv.IsValid() {
 		return invalidValueDecoder
 	}
+
+	if dv.IsValid() {
+		val := indirect(dv, false)
+		val.Set(reflect.Zero(val.Type()))
+	}
+
 	return typeDecoder(dv.Type(), sv.Type())
 }
 

@@ -99,18 +99,18 @@ func (t Term) String() string {
 }
 
 type WriteResponse struct {
-	Errors        int
-	Created       int
-	Inserted      int
-	Updated       int
-	Unchanged     int
-	Replaced      int
-	Renamed       int
-	Skipped       int
-	Deleted       int
-	GeneratedKeys []string `gorethink:"generated_keys"`
-	FirstError    string   `gorethink:"first_error"` // populated if Errors > 0
-	Changes       []WriteChanges
+	Errors        int            `gorethink:"errors"`
+	Created       int            `gorethink:"created"`
+	Inserted      int            `gorethink:"inserted"`
+	Updated       int            `gorethink:"updadte"`
+	Unchanged     int            `gorethink:"unchanged"`
+	Replaced      int            `gorethink:"replaced"`
+	Renamed       int            `gorethink:"renamed"`
+	Skipped       int            `gorethink:"skipped"`
+	Deleted       int            `gorethink:"deleted"`
+	GeneratedKeys []string       `gorethink:"generated_keys"`
+	FirstError    string         `gorethink:"first_error"` // populated if Errors > 0
+	Changes       []WriteChanges `gorethink:"changes"`
 }
 
 type WriteChanges struct {

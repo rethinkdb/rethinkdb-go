@@ -164,13 +164,11 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 			c.Unlock()
 			var value interface{}
 			err := json.Unmarshal(response, &value)
-			c.handleError(err)
 			if err != nil {
 				return false, err
 			}
 
 			value, err = recursivelyConvertPseudotype(value, c.opts)
-			c.handleError(err)
 			if err != nil {
 				return false, err
 			}
@@ -202,7 +200,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 	c.Unlock()
 
 	err := encoding.Decode(dest, data)
-	c.handleError(err)
 	if err != nil {
 		return false, err
 	}
@@ -342,7 +339,7 @@ func (c *Cursor) handleError(err error) error {
 	c.Lock()
 	defer c.Unlock()
 
-	if c.lastErr != nil {
+	if c.lastErr == nil {
 		c.lastErr = err
 	}
 
