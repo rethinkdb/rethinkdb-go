@@ -26,7 +26,7 @@ type Request struct {
 type Response struct {
 	Token     int64
 	Type      p.Response_ResponseType `json:"t"`
-	Responses []interface{}           `json:"r"`
+	Responses []json.RawMessage       `json:"r"`
 	Backtrace []interface{}           `json:"b"`
 	Profile   interface{}             `json:"p"`
 }
@@ -265,28 +265,10 @@ func (c *Connection) processErrorResponse(request Request, response *Response, e
 
 func (c *Connection) processAtomResponse(request Request, response *Response) (*Response, *Cursor, error) {
 	// Create cursor
-	var value []interface{}
-	if len(response.Responses) == 0 {
-		value = []interface{}{}
-	} else {
-		v, err := recursivelyConvertPseudotype(response.Responses[0], request.Options)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		if sv, ok := v.([]interface{}); ok {
-			value = sv
-		} else if v == nil {
-			value = []interface{}{nil}
-		} else {
-			value = []interface{}{v}
-		}
-	}
-
 	cursor := newCursor(c, response.Token, request.Query.Term, request.Options)
 	cursor.profile = response.Profile
-	cursor.buffer = value
-	cursor.finished = true
+
+	cursor.extend(response)
 
 	return response, cursor, nil
 }

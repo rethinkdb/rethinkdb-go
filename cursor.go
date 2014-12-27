@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"encoding/json"
 	"errors"
 	"reflect"
 	"sync"
@@ -8,6 +9,10 @@ import (
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
+)
+
+var (
+	errCursorClosed = errors.New("connection closed, cannot read cursor")
 )
 
 func newCursor(conn *Connection, token int64, term *Term, opts map[string]interface{}) *Cursor {
@@ -49,25 +54,34 @@ type Cursor struct {
 	fetching  int32
 	closed    bool
 	finished  bool
-	responses []*Response
+	buffer    queue
+	responses queue
 	profile   interface{}
-	buffer    []interface{}
 }
 
 // Profile returns the information returned from the query profiler.
 func (c *Cursor) Profile() interface{} {
+	c.Lock()
+	defer c.Unlock()
+
 	return c.profile
 }
 
 // Err returns nil if no errors happened during iteration, or the actual
 // error otherwise.
 func (c *Cursor) Err() error {
+	c.Lock()
+	defer c.Unlock()
+
 	return c.lastErr
 }
 
 // Close closes the cursor, preventing further enumeration. If the end is
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
+	c.Lock()
+	defer c.Unlock()
+
 	var err error
 
 	if c.closed {
@@ -109,14 +123,12 @@ func (c *Cursor) Close() error {
 // When Next returns false, the Err method should be called to verify if
 // there was an error during iteration.
 func (c *Cursor) Next(dest interface{}) bool {
-	var hasMore bool
-
 	if c.closed {
 		return false
 	}
 
-	hasMore, c.lastErr = c.loadNext(dest)
-	if c.lastErr != nil {
+	hasMore, err := c.loadNext(dest)
+	if c.handleError(err) != nil {
 		c.Close()
 		return false
 	}
@@ -125,51 +137,72 @@ func (c *Cursor) Next(dest interface{}) bool {
 }
 
 func (c *Cursor) loadNext(dest interface{}) (bool, error) {
-	var err error
+	c.Lock()
 
 	// Load more data if needed
-	for err == nil {
+	for c.lastErr == nil && c.buffer.Len() == 0 && c.responses.Len() == 0 && !c.finished {
 		// Check if response is closed/finished
-		if len(c.buffer) == 0 && len(c.responses) == 0 && c.closed {
-			err = errors.New("connection closed, cannot read cursor")
+		if c.closed {
+			return false, errCursorClosed
+		}
+
+		c.Unlock()
+		err := c.fetchMore()
+		if err != nil {
 			return false, err
 		}
-		if len(c.buffer) == 0 && len(c.responses) == 0 && c.finished {
-			return false, nil
-		}
+		c.Lock()
+	}
 
-		// Asynchronously loading next batch if possible
-		if len(c.responses) == 1 && !c.finished {
-			c.fetchMore(false)
-		}
+	if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
+		c.Unlock()
+		return false, nil
+	}
 
-		// If the buffer is empty fetch more results
-		if len(c.buffer) == 0 {
-			if len(c.responses) == 0 && !c.finished {
-				err = c.fetchMore(true)
-				if err != nil {
-					return false, err
+	if c.buffer.Len() == 0 && c.responses.Len() > 0 {
+		if response, ok := c.responses.Pop().(json.RawMessage); ok {
+			c.Unlock()
+			var value interface{}
+			err := json.Unmarshal(response, &value)
+			c.handleError(err)
+			if err != nil {
+				return false, err
+			}
+
+			value, err = recursivelyConvertPseudotype(value, c.opts)
+			c.handleError(err)
+			if err != nil {
+				return false, err
+			}
+
+			c.Lock()
+			if data, ok := value.([]interface{}); ok {
+				for _, v := range data {
+					c.buffer.Push(v)
 				}
+			} else if value == nil {
+				c.buffer.Push(nil)
+			} else {
+				c.buffer.Push(value)
 			}
-
-			// Load the new response into the buffer
-			if len(c.responses) > 0 {
-				c.buffer, c.responses = c.responses[0].Responses, c.responses[1:]
-			}
-		}
-
-		// If the buffer is no longer empty then move on otherwise
-		// try again
-		if len(c.buffer) > 0 {
-			break
 		}
 	}
 
-	// Decode result into dest value
-	var data interface{}
-	data, c.buffer = c.buffer[0], c.buffer[1:]
+	// Asynchronously loading next batch if possible
+	if c.responses.Len() == 1 && !c.finished {
+		go c.fetchMore()
+	}
 
-	err = encoding.Decode(dest, data)
+	if c.buffer.Len() == 0 {
+		c.Unlock()
+		return false, nil
+	}
+
+	data := c.buffer.Pop()
+	c.Unlock()
+
+	err := encoding.Decode(dest, data)
+	c.handleError(err)
 	if err != nil {
 		return false, err
 	}
@@ -208,12 +241,16 @@ func (c *Cursor) All(result interface{}) error {
 	}
 	resultv.Elem().Set(slicev.Slice(0, i))
 
-	if c.lastErr != nil {
+	if err := c.Err(); err != nil {
 		c.Close()
-		return c.lastErr
+		return err
 	}
 
-	return c.Close()
+	if err := c.Close(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // One retrieves a single document from the result set into the provided
@@ -223,54 +260,78 @@ func (c *Cursor) One(result interface{}) error {
 		return ErrEmptyResult
 	}
 
-	var err error
-	ok := c.Next(result)
-	if !ok {
-		err = c.Err()
-		if err == nil {
-			err = ErrEmptyResult
-		}
+	hasResult := c.Next(result)
+
+	if err := c.Err(); err != nil {
+		c.Close()
+		return err
 	}
 
-	if e := c.Close(); e != nil {
-		err = e
+	if err := c.Close(); err != nil {
+		return err
 	}
 
-	return err
+	if !hasResult {
+		return ErrEmptyResult
+	}
+
+	return nil
 }
 
 // IsNil tests if the current row is nil.
 func (c *Cursor) IsNil() bool {
-	return (len(c.responses) == 0 && len(c.buffer) == 0) || (len(c.buffer) == 1 && c.buffer[0] == nil)
+	c.Lock()
+	defer c.Unlock()
+	if c.buffer.Len() > 0 {
+		bufferedItem := c.buffer.Peek()
+		if bufferedItem == nil {
+			return true
+		}
+
+		if bufferedItem == nil {
+			return true
+		}
+
+		return false
+	}
+
+	if c.responses.Len() > 0 {
+		response := c.responses.Peek()
+		if response == nil {
+			return true
+		}
+
+		if response, ok := response.(json.RawMessage); ok {
+			if string(response) == "null" {
+				return true
+			}
+		}
+
+		return false
+	}
+
+	return true
 }
 
 // fetchMore fetches more rows from the database.
 //
 // If wait is true then it will wait for the database to reply otherwise it
 // will return after sending the continue query.
-func (c *Cursor) fetchMore(wait bool) error {
+func (c *Cursor) fetchMore() error {
 	var err error
 
 	if atomic.CompareAndSwapInt32(&c.fetching, 0, 1) {
-		var wg sync.WaitGroup
-
-		wg.Add(1)
-
+		c.Lock()
+		conn := c.conn
+		token := c.token
 		q := Query{
 			Type:  p.Query_CONTINUE,
-			Token: c.token,
+			Token: token,
 		}
+		c.Unlock()
 
-		go func() {
-			_, _, err = c.conn.Query(q, map[string]interface{}{})
-			c.handleError(err)
-
-			wg.Done()
-		}()
-
-		if wait {
-			wg.Wait()
-		}
+		_, _, err = conn.Query(q, map[string]interface{}{})
+		c.handleError(err)
 	}
 
 	return err
@@ -293,13 +354,75 @@ func (c *Cursor) extend(response *Response) {
 	c.Lock()
 	defer c.Unlock()
 
-	c.responses = append(c.responses, response)
-	c.buffer, c.responses = c.responses[0].Responses, c.responses[1:]
+	for _, response := range response.Responses {
+		c.responses.Push(response)
+	}
+
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL && response.Type != p.Response_SUCCESS_FEED
 	atomic.StoreInt32(&c.fetching, 0)
 
 	// Asynchronously load next batch if possible
-	if len(c.responses) == 1 && !c.finished {
-		c.fetchMore(false)
+	if c.responses.Len() == 1 && !c.finished {
+		go c.fetchMore()
 	}
+}
+
+// Queue structure used for storing responses
+
+type queue struct {
+	elems               []interface{}
+	nelems, popi, pushi int
+}
+
+func (q *queue) Len() int {
+	return q.nelems
+}
+func (q *queue) Push(elem interface{}) {
+	if q.nelems == len(q.elems) {
+		q.expand()
+	}
+	q.elems[q.pushi] = elem
+	q.nelems++
+	q.pushi = (q.pushi + 1) % len(q.elems)
+}
+func (q *queue) Pop() (elem interface{}) {
+	if q.nelems == 0 {
+		return nil
+	}
+	elem = q.elems[q.popi]
+	q.elems[q.popi] = nil // Help GC.
+	q.nelems--
+	q.popi = (q.popi + 1) % len(q.elems)
+	return elem
+}
+func (q *queue) Peek() (elem interface{}) {
+	if q.nelems == 0 {
+		return nil
+	}
+	return q.elems[q.popi]
+}
+func (q *queue) expand() {
+	curcap := len(q.elems)
+	var newcap int
+	if curcap == 0 {
+		newcap = 8
+	} else if curcap < 1024 {
+		newcap = curcap * 2
+	} else {
+		newcap = curcap + (curcap / 4)
+	}
+	elems := make([]interface{}, newcap)
+	if q.popi == 0 {
+		copy(elems, q.elems)
+		q.pushi = curcap
+	} else {
+		newpopi := newcap - (curcap - q.popi)
+		copy(elems, q.elems[:q.popi])
+		copy(elems[newpopi:], q.elems[q.popi:])
+		q.popi = newpopi
+	}
+	for i := range q.elems {
+		q.elems[i] = nil // Help GC.
+	}
+	q.elems = elems
 }
