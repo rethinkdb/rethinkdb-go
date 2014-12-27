@@ -1,6 +1,7 @@
 package encoding
 
 import (
+	"bytes"
 	"fmt"
 	"reflect"
 	"strconv"
@@ -456,16 +457,59 @@ type mapAsStructDecoder struct {
 }
 
 func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
-	for i, f := range d.fields {
+	for _, kv := range sv.MapKeys() {
+		var f *field
+		var fieldDec decoderFunc
+		key := []byte(kv.String())
+		for i := range d.fields {
+			ff := &d.fields[i]
+			ffd := d.fieldDecs[i]
+			if bytes.Equal(ff.nameBytes, key) {
+				f = ff
+				fieldDec = ffd
+				break
+			}
+			if f == nil && ff.equalFold(ff.nameBytes, key) {
+				f = ff
+				fieldDec = ffd
+				break
+			}
+		}
+
 		dElemVal := fieldByIndex(dv, f.index)
-		sElemVal := sv.MapIndex(reflect.ValueOf(f.name))
+		sElemVal := sv.MapIndex(kv)
 
 		if !sElemVal.IsValid() || !dElemVal.CanSet() {
 			continue
 		}
 
-		d.fieldDecs[i](dElemVal, sElemVal)
+		fieldDec(dElemVal, sElemVal)
 	}
+
+	// for i, f := range d.fields {
+	// 	dElemVal := fieldByIndex(dv, f.index)
+	// 	sElemVal := sv.MapIndex(reflect.ValueOf(f.name))
+	// 	if !sElemVal.IsValid() {
+	// 		for _, key := range sv.MapKeys() {
+	// 			if bytes.Equal(f.nameBytes, []byte(key.String())) {
+	// 				dElemVal = fieldByIndex(dv, f.index)
+	// 				break
+	// 			}
+	// 			if sElemVal == nilf.equalFold(f.nameBytes, []byte(key.String())) {
+	// 				dElemVal = fieldByIndex(dv, f.index)
+	// 				break
+	// 			}
+	// 		}
+	// 	}
+
+	// 	spew.Dump(dElemVal)
+
+	// 	if !sElemVal.IsValid() || !dElemVal.CanSet() {
+	// 		continue
+	// 	}
+
+	// 	d.fieldDecs[i](dElemVal, sElemVal)
+	// }
 }
 
 func newMapAsStructDecoder(dt, st reflect.Type) decoderFunc {
