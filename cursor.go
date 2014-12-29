@@ -329,9 +329,7 @@ func (c *Cursor) fetchMore() error {
 			Token: c.token,
 		}
 		c.Unlock()
-		_, _, err = c.conn.Query(q, map[string]interface{}{
-			"noreply": async,
-		})
+		_, _, err = c.conn.Query(q, map[string]interface{}{})
 		c.handleError(err)
 		c.Lock()
 	}
