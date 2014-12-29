@@ -145,7 +145,7 @@ func (s *Session) SetMaxOpenConns(n int) {
 	s.pool.SetMaxOpenConns(n)
 }
 
-// noreplyWait ensures that previous queries with the noreply flag have been
+// NoReplyWait ensures that previous queries with the noreply flag have been
 // processed by the server. Note that this guarantee only applies to queries
 // run on the given connection
 func (s *Session) NoReplyWait() error {

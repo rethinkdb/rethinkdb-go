@@ -5,10 +5,10 @@ import (
 	"sync"
 )
 
-// ErrBadConn should be returned by a driver to signal to the sql
-// package that a driver.Conn is in a bad state (such as the server
-// having earlier closed the connection) and the sql package should
-// retry on a new connection.
+// ErrBadConn should be returned by a connection operation to signal to the
+// pool that a driver.Conn is in a bad state (such as the server
+// having earlier closed the connection) and the pool should retry on a
+// new connection.
 //
 // To prevent duplicate operations, ErrBadConn should NOT be returned
 // if there's a possibility that the database server might have
