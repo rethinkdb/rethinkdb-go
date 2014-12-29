@@ -5,7 +5,6 @@ import (
 	"errors"
 	"reflect"
 	"sync"
-	"sync/atomic"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
@@ -51,7 +50,7 @@ type Cursor struct {
 
 	sync.Mutex
 	lastErr   error
-	fetching  int32
+	fetching  bool
 	closed    bool
 	finished  bool
 	buffer    queue
@@ -106,9 +105,10 @@ func (c *Cursor) Close() error {
 		_, _, err = conn.Query(q, map[string]interface{}{})
 	}
 
+	c.releaseConn(err)
+
 	c.closed = true
 	c.conn = nil
-	c.releaseConn(err)
 
 	return err
 }
@@ -139,72 +139,70 @@ func (c *Cursor) Next(dest interface{}) bool {
 func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 	c.Lock()
 
-	// Load more data if needed
-	for c.lastErr == nil && c.buffer.Len() == 0 && c.responses.Len() == 0 && !c.finished {
+	for c.lastErr == nil {
 		// Check if response is closed/finished
-		if c.closed {
+		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed {
+			c.Unlock()
 			return false, errCursorClosed
 		}
 
-		c.Unlock()
-		err := c.fetchMore()
-		if err != nil {
-			return false, err
-		}
-		c.Lock()
-	}
-
-	if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
-		c.Unlock()
-		return false, nil
-	}
-
-	if c.buffer.Len() == 0 && c.responses.Len() > 0 {
-		if response, ok := c.responses.Pop().(json.RawMessage); ok {
+		if c.buffer.Len() == 0 && c.responses.Len() == 0 && !c.finished {
 			c.Unlock()
-			var value interface{}
-			err := json.Unmarshal(response, &value)
+			err := c.fetchMore()
 			if err != nil {
 				return false, err
 			}
-
-			value, err = recursivelyConvertPseudotype(value, c.opts)
-			if err != nil {
-				return false, err
-			}
-
 			c.Lock()
-			if data, ok := value.([]interface{}); ok {
-				for _, v := range data {
-					c.buffer.Push(v)
+		}
+
+		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
+			c.Unlock()
+			return false, nil
+		}
+
+		if c.buffer.Len() == 0 && c.responses.Len() > 0 {
+			if response, ok := c.responses.Pop().(json.RawMessage); ok {
+				c.Unlock()
+				var value interface{}
+				err := json.Unmarshal(response, &value)
+				if err != nil {
+					return false, err
 				}
-			} else if value == nil {
-				c.buffer.Push(nil)
-			} else {
-				c.buffer.Push(value)
+
+				value, err = recursivelyConvertPseudotype(value, c.opts)
+				if err != nil {
+					return false, err
+				}
+				c.Lock()
+
+				if data, ok := value.([]interface{}); ok {
+					for _, v := range data {
+						c.buffer.Push(v)
+					}
+				} else if value == nil {
+					c.buffer.Push(nil)
+				} else {
+					c.buffer.Push(value)
+				}
 			}
+		}
+
+		if c.buffer.Len() > 0 {
+			data := c.buffer.Pop()
+			c.Unlock()
+
+			err := encoding.Decode(dest, data)
+			if err != nil {
+				return false, err
+			}
+
+			return true, nil
 		}
 	}
 
-	// Asynchronously loading next batch if possible
-	if c.responses.Len() == 1 && !c.finished {
-		go c.fetchMore()
-	}
-
-	if c.buffer.Len() == 0 {
-		c.Unlock()
-		return false, nil
-	}
-
-	data := c.buffer.Pop()
 	c.Unlock()
 
-	err := encoding.Decode(dest, data)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
+	return false, c.lastErr
 }
 
 // All retrieves all documents from the result set into the provided slice
@@ -315,20 +313,27 @@ func (c *Cursor) IsNil() bool {
 // If wait is true then it will wait for the database to reply otherwise it
 // will return after sending the continue query.
 func (c *Cursor) fetchMore() error {
-	var err error
+	c.Lock()
+	defer c.Unlock()
 
-	if atomic.CompareAndSwapInt32(&c.fetching, 0, 1) {
-		c.Lock()
-		conn := c.conn
-		token := c.token
+	var err error
+	if !c.fetching {
+		c.fetching = true
+
+		if c.closed {
+			return errCursorClosed
+		}
+
 		q := Query{
 			Type:  p.Query_CONTINUE,
-			Token: token,
+			Token: c.token,
 		}
 		c.Unlock()
-
-		_, _, err = conn.Query(q, map[string]interface{}{})
+		_, _, err = c.conn.Query(q, map[string]interface{}{
+			"noreply": async,
+		})
 		c.handleError(err)
+		c.Lock()
 	}
 
 	return err
@@ -339,6 +344,11 @@ func (c *Cursor) handleError(err error) error {
 	c.Lock()
 	defer c.Unlock()
 
+	return c.handleErrorLocked(err)
+}
+
+// handleError sets the value of lastErr to err if lastErr is not yet set.
+func (c *Cursor) handleErrorLocked(err error) error {
 	if c.lastErr == nil {
 		c.lastErr = err
 	}
@@ -356,12 +366,7 @@ func (c *Cursor) extend(response *Response) {
 	}
 
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL && response.Type != p.Response_SUCCESS_FEED
-	atomic.StoreInt32(&c.fetching, 0)
-
-	// Asynchronously load next batch if possible
-	if c.responses.Len() == 1 && !c.finished {
-		go c.fetchMore()
-	}
+	c.fetching = false
 }
 
 // Queue structure used for storing responses
