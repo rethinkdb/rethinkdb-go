@@ -353,7 +353,7 @@ func (p *Pool) putConn(pc *poolConn, err error) {
 		fn()
 	}
 	pc.onPut = nil
-	if err == ErrBadConn {
+	if err != nil && pc.ci.bad {
 		// Don't reuse bad connections.
 		// Since the conn is considered bad and is being discarded, treat it
 		// as closed. Don't decrement the open count here, finalClose will
