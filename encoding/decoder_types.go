@@ -472,8 +472,11 @@ func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
 			if f == nil && ff.equalFold(ff.nameBytes, key) {
 				f = ff
 				fieldDec = ffd
-				break
 			}
+		}
+
+		if f == nil {
+			continue
 		}
 
 		dElemVal := fieldByIndex(dv, f.index)
