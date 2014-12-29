@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -62,7 +63,10 @@ type rqlResponseError struct {
 }
 
 func (e rqlResponseError) Error() string {
-	return fmt.Sprintf("gorethink: %s in: \n%s", e.response.Responses[0], e.term.String())
+	var err = "An error occurred"
+	json.Unmarshal(e.response.Responses[0], &err)
+
+	return fmt.Sprintf("gorethink: %s in: \n%s", err, e.term.String())
 }
 
 func (e rqlResponseError) String() string {
