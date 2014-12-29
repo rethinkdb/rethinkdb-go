@@ -66,7 +66,7 @@ func (e rqlResponseError) Error() string {
 	var err = "An error occurred"
 	json.Unmarshal(e.response.Responses[0], &err)
 
-	return fmt.Sprintf("gorethink: %s", err)
+	return fmt.Sprintf("gorethink: %s in: \n%s", err, e.term.String())
 }
 
 func (e rqlResponseError) String() string {
