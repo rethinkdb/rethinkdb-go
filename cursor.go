@@ -102,7 +102,7 @@ func (c *Cursor) Close() error {
 			Token: c.token,
 		}
 
-		_, _, err = conn.Query(q, map[string]interface{}{})
+		_, _, err = conn.Query(q)
 	}
 
 	c.releaseConn(err)
@@ -329,7 +329,7 @@ func (c *Cursor) fetchMore() error {
 			Token: c.token,
 		}
 		c.Unlock()
-		_, _, err = c.conn.Query(q, map[string]interface{}{})
+		_, _, err = c.conn.Query(q)
 		c.handleError(err)
 		c.Lock()
 	}

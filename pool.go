@@ -459,17 +459,17 @@ func (p *Pool) removeDepLocked(x finalCloser, dep interface{}) func() error {
 // Query execution functions
 
 // Exec executes a query without waiting for any response.
-func (p *Pool) Exec(q Query, opts map[string]interface{}) error {
+func (p *Pool) Exec(q Query) error {
 	var err error
 	for i := 0; i < maxBadConnRetries; i++ {
-		err = p.exec(q, opts)
+		err = p.exec(q)
 		if err != ErrBadConn {
 			break
 		}
 	}
 	return err
 }
-func (p *Pool) exec(q Query, opts map[string]interface{}) (err error) {
+func (p *Pool) exec(q Query) (err error) {
 	pc, err := p.conn()
 	if err != nil {
 		return err
@@ -479,7 +479,7 @@ func (p *Pool) exec(q Query, opts map[string]interface{}) (err error) {
 	}()
 
 	pc.Lock()
-	_, _, err = pc.ci.Query(q, opts)
+	_, _, err = pc.ci.Query(q)
 	pc.Unlock()
 
 	if err != nil {
@@ -489,30 +489,30 @@ func (p *Pool) exec(q Query, opts map[string]interface{}) (err error) {
 }
 
 // Query executes a query and waits for the response
-func (p *Pool) Query(q Query, opts map[string]interface{}) (*Cursor, error) {
+func (p *Pool) Query(q Query) (*Cursor, error) {
 	var cursor *Cursor
 	var err error
 	for i := 0; i < maxBadConnRetries; i++ {
-		cursor, err = p.query(q, opts)
+		cursor, err = p.query(q)
 		if err != ErrBadConn {
 			break
 		}
 	}
 	return cursor, err
 }
-func (p *Pool) query(query Query, opts map[string]interface{}) (*Cursor, error) {
+func (p *Pool) query(query Query) (*Cursor, error) {
 	ci, err := p.conn()
 	if err != nil {
 		return nil, err
 	}
-	return p.queryConn(ci, ci.releaseConn, query, opts)
+	return p.queryConn(ci, ci.releaseConn, query)
 }
 
 // queryConn executes a query on the given connection.
 // The connection gets released by the releaseConn function.
-func (p *Pool) queryConn(pc *poolConn, releaseConn func(error), q Query, opts map[string]interface{}) (*Cursor, error) {
+func (p *Pool) queryConn(pc *poolConn, releaseConn func(error), q Query) (*Cursor, error) {
 	pc.Lock()
-	_, cursor, err := pc.ci.Query(q, opts)
+	_, cursor, err := pc.ci.Query(q)
 	pc.Unlock()
 	if err != nil {
 		releaseConn(err)

@@ -13,11 +13,6 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-type Request struct {
-	Query   Query
-	Options map[string]interface{}
-}
-
 type Response struct {
 	Token     int64
 	Type      p.Response_ResponseType `json:"t"`
@@ -105,7 +100,7 @@ func (c *Connection) Close() error {
 	return nil
 }
 
-func (c *Connection) Query(q Query, opts map[string]interface{}) (*Response, *Cursor, error) {
+func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	if c == nil {
 		return nil, nil, nil
 	}
@@ -117,24 +112,17 @@ func (c *Connection) Query(q Query, opts map[string]interface{}) (*Response, *Cu
 	// Add token if query is a START/NOREPLY_WAIT
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		q.Token = c.nextToken()
+		if c.opts.Database != "" {
+			q.Opts["db"] = Db(c.opts.Database).build()
+		}
 	}
 
-	// If no DB option was set default to the value set in the connection
-	if _, ok := opts["db"]; !ok {
-		opts["db"] = Db(c.opts.Database).build()
-	}
-
-	request := Request{
-		Query:   q,
-		Options: opts,
-	}
-
-	err := c.sendQuery(request)
+	err := c.sendQuery(q)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	if noreply, ok := opts["noreply"]; ok && noreply.(bool) {
+	if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
 		return nil, nil, nil
 	}
 
@@ -145,19 +133,19 @@ func (c *Connection) Query(q Query, opts map[string]interface{}) (*Response, *Cu
 			return nil, nil, err
 		}
 
-		if response.Token == request.Query.Token {
+		if response.Token == q.Token {
 			// If this was the requested response process and return
-			return c.processResponse(request, response)
+			return c.processResponse(q, response)
 		} else if _, ok := c.cursors[response.Token]; ok {
 			// If the token is in the cursor cache then process the response
-			c.processResponse(request, response)
+			c.processResponse(q, response)
 		}
 	}
 }
 
-func (c *Connection) sendQuery(request Request) error {
+func (c *Connection) sendQuery(q Query) error {
 	// Build query
-	b, err := json.Marshal(request.Query.build())
+	b, err := json.Marshal(q.build())
 	if err != nil {
 		return RqlDriverError{"Error building query"}
 	}
@@ -170,7 +158,7 @@ func (c *Connection) sendQuery(request Request) error {
 	}
 
 	// Send a unique 8-byte token
-	if err = binary.Write(c.conn, binary.LittleEndian, request.Query.Token); err != nil {
+	if err = binary.Write(c.conn, binary.LittleEndian, q.Token); err != nil {
 		c.bad = true
 		return RqlConnectionError{err.Error()}
 	}
@@ -231,30 +219,30 @@ func (c *Connection) readResponse() (*Response, error) {
 	return response, nil
 }
 
-func (c *Connection) processResponse(request Request, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
-		return c.processErrorResponse(request, response, RqlClientError{rqlResponseError{response, request.Query.Term}})
+		return c.processErrorResponse(q, response, RqlClientError{rqlResponseError{response, q.Term}})
 	case p.Response_COMPILE_ERROR:
-		return c.processErrorResponse(request, response, RqlCompileError{rqlResponseError{response, request.Query.Term}})
+		return c.processErrorResponse(q, response, RqlCompileError{rqlResponseError{response, q.Term}})
 	case p.Response_RUNTIME_ERROR:
-		return c.processErrorResponse(request, response, RqlRuntimeError{rqlResponseError{response, request.Query.Term}})
+		return c.processErrorResponse(q, response, RqlRuntimeError{rqlResponseError{response, q.Term}})
 	case p.Response_SUCCESS_ATOM:
-		return c.processAtomResponse(request, response)
+		return c.processAtomResponse(q, response)
 	case p.Response_SUCCESS_FEED:
-		return c.processFeedResponse(request, response)
+		return c.processFeedResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
-		return c.processPartialResponse(request, response)
+		return c.processPartialResponse(q, response)
 	case p.Response_SUCCESS_SEQUENCE:
-		return c.processSequenceResponse(request, response)
+		return c.processSequenceResponse(q, response)
 	case p.Response_WAIT_COMPLETE:
-		return c.processWaitResponse(request, response)
+		return c.processWaitResponse(q, response)
 	default:
 		return nil, nil, RqlDriverError{"Unexpected response type"}
 	}
 }
 
-func (c *Connection) processErrorResponse(request Request, response *Response, err error) (*Response, *Cursor, error) {
+func (c *Connection) processErrorResponse(q Query, response *Response, err error) (*Response, *Cursor, error) {
 	cursor := c.cursors[response.Token]
 
 	delete(c.cursors, response.Token)
@@ -262,9 +250,9 @@ func (c *Connection) processErrorResponse(request Request, response *Response, e
 	return response, cursor, err
 }
 
-func (c *Connection) processAtomResponse(request Request, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processAtomResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	// Create cursor
-	cursor := newCursor(c, response.Token, request.Query.Term, request.Options)
+	cursor := newCursor(c, response.Token, q.Term, q.Opts)
 	cursor.profile = response.Profile
 
 	cursor.extend(response)
@@ -272,11 +260,11 @@ func (c *Connection) processAtomResponse(request Request, response *Response) (*
 	return response, cursor, nil
 }
 
-func (c *Connection) processFeedResponse(request Request, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processFeedResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	var cursor *Cursor
 	if _, ok := c.cursors[response.Token]; !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
+		cursor = newCursor(c, response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 		c.cursors[response.Token] = cursor
 	} else {
@@ -288,11 +276,11 @@ func (c *Connection) processFeedResponse(request Request, response *Response) (*
 	return response, cursor, nil
 }
 
-func (c *Connection) processPartialResponse(request Request, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processPartialResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
+		cursor = newCursor(c, response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 
 		c.cursors[response.Token] = cursor
@@ -303,11 +291,11 @@ func (c *Connection) processPartialResponse(request Request, response *Response)
 	return response, cursor, nil
 }
 
-func (c *Connection) processSequenceResponse(request Request, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processSequenceResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c, response.Token, request.Query.Term, request.Options)
+		cursor = newCursor(c, response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 	}
 
@@ -318,7 +306,7 @@ func (c *Connection) processSequenceResponse(request Request, response *Response
 	return response, cursor, nil
 }
 
-func (c *Connection) processWaitResponse(request Request, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processWaitResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	delete(c.cursors, response.Token)
 
 	return response, nil, nil

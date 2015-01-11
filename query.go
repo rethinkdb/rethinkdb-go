@@ -159,9 +159,9 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 		opts = optArgs[0].toMap()
 	}
 
-	q := newStartQuery(t, opts)
+	q := newStartQuery(s, t, opts)
 
-	return s.pool.Query(q, opts)
+	return s.pool.Query(q)
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
@@ -213,15 +213,18 @@ func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
 		opts = optArgs[0].toMap()
 	}
 
-	q := newStartQuery(t, opts)
+	q := newStartQuery(s, t, opts)
 
-	return s.pool.Exec(q, opts)
+	return s.pool.Exec(q)
 }
 
-func newStartQuery(t Term, opts map[string]interface{}) Query {
+func newStartQuery(s *Session, t Term, opts map[string]interface{}) Query {
 	queryOpts := map[string]interface{}{}
 	for k, v := range opts {
 		queryOpts[k] = Expr(v).build()
+	}
+	if s.opts.Database != "" {
+		queryOpts["db"] = Db(s.opts.Database).build()
 	}
 
 	// Construct query

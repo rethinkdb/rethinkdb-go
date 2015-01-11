@@ -151,7 +151,7 @@ func (s *Session) SetMaxOpenConns(n int) {
 func (s *Session) NoReplyWait() error {
 	return s.pool.Exec(Query{
 		Type: p.Query_NOREPLY_WAIT,
-	}, map[string]interface{}{})
+	})
 }
 
 // Use changes the default database used
