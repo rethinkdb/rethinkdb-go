@@ -16,24 +16,48 @@ type Point struct {
 type Line []Point
 type Lines []Line
 
-func (p Point) Marshal() interface{} {
+func (p Point) Coords() interface{} {
 	return []interface{}{p.Lon, p.Lat}
 }
 
-func (l Line) Marshal() interface{} {
+func (p Point) Marshal() interface{} {
+	return map[string]interface{}{
+		"$reql_type$": "GEOMETRY",
+		"coordinates": p.Coords(),
+		"type":        "Point",
+	}
+}
+
+func (l Line) Coords() interface{} {
 	coords := make([]interface{}, len(l))
 	for i, point := range l {
-		coords[i] = point.Marshal()
+		coords[i] = point.Coords()
+	}
+	return coords
+}
+
+func (l Line) Marshal() interface{} {
+	return map[string]interface{}{
+		"$reql_type$": "GEOMETRY",
+		"coordinates": l.Coords(),
+		"type":        "Line",
+	}
+}
+
+func (l Lines) Coords() interface{} {
+	coords := make([]interface{}, len(l))
+	for i, line := range l {
+		coords[i] = line.Coords()
 	}
 	return coords
 }
 
 func (l Lines) Marshal() interface{} {
-	coords := make([]interface{}, len(l))
-	for i, line := range l {
-		coords[i] = line.Marshal()
+	return map[string]interface{}{
+		"$reql_type$": "GEOMETRY",
+		"coordinates": l.Coords(),
+		"type":        "Lines",
 	}
-	return coords
 }
 
 func UnmarshalPoint(v interface{}) (Point, error) {
