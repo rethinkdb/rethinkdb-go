@@ -99,15 +99,15 @@ func (t Term) String() string {
 }
 
 type WriteResponse struct {
-	Errors        int
-	Created       int
-	Inserted      int
-	Updated       int
-	Unchanged     int
-	Replaced      int
-	Renamed       int
-	Skipped       int
-	Deleted       int
+	Errors        int      `gorethink:"errors"`
+	Created       int      `gorethink:"created"`
+	Inserted      int      `gorethink:"inserted"`
+	Updated       int      `gorethink:"updadte"`
+	Unchanged     int      `gorethink:"unchanged"`
+	Replaced      int      `gorethink:"replaced"`
+	Renamed       int      `gorethink:"renamed"`
+	Skipped       int      `gorethink:"skipped"`
+	Deleted       int      `gorethink:"deleted"`
 	GeneratedKeys []string `gorethink:"generated_keys"`
 	FirstError    string   `gorethink:"first_error"` // populated if Errors > 0
 	Changes       []WriteChanges
@@ -122,7 +122,6 @@ type RunOpts struct {
 	Db             interface{} `gorethink:"db,omitempty"`
 	Profile        interface{} `gorethink:"profile,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"`
-	NoReply        interface{} `gorethink:"noreply,omitempty"`
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
 	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
@@ -159,16 +158,17 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
-	return s.startQuery(t, opts)
+
+	q := newStartQuery(s, t, opts)
+
+	return s.pool.Query(q)
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
 // scans the result into a variable of type WriteResponse. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
 //
-//	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess, r.RunOpts{
-//		NoReply: true,
-//	})
+//	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
 func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	var response WriteResponse
 	res, err := t.Run(s, optArgs...)
@@ -178,20 +178,59 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	return response, err
 }
 
-// Exec runs the query but does not return the result.
-func (t Term) Exec(s *Session, optArgs ...RunOpts) error {
-	res, err := t.Run(s, optArgs...)
-	if err != nil {
-		return err
-	}
-	if res == nil {
-		return nil
+// ExecOpts inherits its options from RunOpts, the only difference is the
+// addition of the NoReply field.
+//
+// When NoReply is true it causes the driver not to wait to receive the result
+// and return immediately.
+type ExecOpts struct {
+	Db             interface{} `gorethink:"db,omitempty"`
+	Profile        interface{} `gorethink:"profile,omitempty"`
+	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"`
+	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
+	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
+	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
+	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
+	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
+	BatchConf      BatchOpts   `gorethink:"batch_conf,omitempty"`
+
+	NoReply interface{} `gorethink:"noreply,omitempty"`
+}
+
+func (o *ExecOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
+// Exec runs the query but does not return the result. Exec will still wait for
+// the response to be received unless the NoReply field is true.
+//
+//	res, err := r.Db("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
+//		NoReply: true,
+//	})
+func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
 	}
 
-	err = res.Close()
-	if err != nil {
-		return err
+	q := newStartQuery(s, t, opts)
+
+	return s.pool.Exec(q)
+}
+
+func newStartQuery(s *Session, t Term, opts map[string]interface{}) Query {
+	queryOpts := map[string]interface{}{}
+	for k, v := range opts {
+		queryOpts[k] = Expr(v).build()
+	}
+	if s.opts.Database != "" {
+		queryOpts["db"] = Db(s.opts.Database).build()
 	}
 
-	return nil
+	// Construct query
+	return Query{
+		Type: p.Query_START,
+		Term: &t,
+		Opts: queryOpts,
+	}
 }
