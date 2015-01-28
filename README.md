@@ -133,7 +133,7 @@ Examples:
 
 ```go
 var row interface{}
-for res.Next(&result) {
+for res.Next(&row) {
     // Do something with row
 }
 if res.Err() != nil {
