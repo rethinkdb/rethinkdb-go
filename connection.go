@@ -21,7 +21,8 @@ type Response struct {
 	Profile   interface{}             `json:"p"`
 }
 
-// connection is a connection to a rethinkdb database
+// Connection is a connection to a rethinkdb database. Connection is not thread
+// safe and should only be accessed be a single goroutine
 type Connection struct {
 	conn    net.Conn
 	opts    *ConnectOpts
