@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
-	"sync"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
@@ -26,7 +25,9 @@ func newCursor(conn *Connection, token int64, term *Term, opts map[string]interf
 }
 
 // Cursor is the result of a query. Its cursor starts before the first row
-// of the result set. Use Next to advance through the rows:
+// of the result set. A Cursor is not thread safe and should only be accessed
+// by a single goroutine at any given time. Use Next to advance through the
+// rows:
 //
 //     cursor, err := query.Run(session)
 //     ...
@@ -48,7 +49,6 @@ type Cursor struct {
 	term  *Term
 	opts  map[string]interface{}
 
-	sync.Mutex
 	lastErr   error
 	fetching  bool
 	closed    bool
@@ -60,27 +60,18 @@ type Cursor struct {
 
 // Profile returns the information returned from the query profiler.
 func (c *Cursor) Profile() interface{} {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.profile
 }
 
 // Err returns nil if no errors happened during iteration, or the actual
 // error otherwise.
 func (c *Cursor) Err() error {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.lastErr
 }
 
 // Close closes the cursor, preventing further enumeration. If the end is
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
-	c.Lock()
-	defer c.Unlock()
-
 	var err error
 
 	if c.closed {
@@ -137,32 +128,29 @@ func (c *Cursor) Next(dest interface{}) bool {
 }
 
 func (c *Cursor) loadNext(dest interface{}) (bool, error) {
-	c.Lock()
-
 	for c.lastErr == nil {
 		// Check if response is closed/finished
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed {
-			c.Unlock()
+
 			return false, errCursorClosed
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && !c.finished {
-			c.Unlock()
+
 			err := c.fetchMore()
 			if err != nil {
 				return false, err
 			}
-			c.Lock()
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
-			c.Unlock()
+
 			return false, nil
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() > 0 {
 			if response, ok := c.responses.Pop().(json.RawMessage); ok {
-				c.Unlock()
+
 				var value interface{}
 				err := json.Unmarshal(response, &value)
 				if err != nil {
@@ -173,7 +161,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 				if err != nil {
 					return false, err
 				}
-				c.Lock()
 
 				if data, ok := value.([]interface{}); ok {
 					for _, v := range data {
@@ -189,7 +176,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 
 		if c.buffer.Len() > 0 {
 			data := c.buffer.Pop()
-			c.Unlock()
 
 			err := encoding.Decode(dest, data)
 			if err != nil {
@@ -199,8 +185,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 			return true, nil
 		}
 	}
-
-	c.Unlock()
 
 	return false, c.lastErr
 }
@@ -275,8 +259,6 @@ func (c *Cursor) One(result interface{}) error {
 
 // IsNil tests if the current row is nil.
 func (c *Cursor) IsNil() bool {
-	c.Lock()
-	defer c.Unlock()
 	if c.buffer.Len() > 0 {
 		bufferedItem := c.buffer.Peek()
 		if bufferedItem == nil {
@@ -313,9 +295,6 @@ func (c *Cursor) IsNil() bool {
 // If wait is true then it will wait for the database to reply otherwise it
 // will return after sending the continue query.
 func (c *Cursor) fetchMore() error {
-	c.Lock()
-	defer c.Unlock()
-
 	var err error
 	if !c.fetching {
 		c.fetching = true
@@ -328,10 +307,9 @@ func (c *Cursor) fetchMore() error {
 			Type:  p.Query_CONTINUE,
 			Token: c.token,
 		}
-		c.Unlock()
+
 		_, _, err = c.conn.Query(q)
 		c.handleError(err)
-		c.Lock()
 	}
 
 	return err
@@ -339,9 +317,6 @@ func (c *Cursor) fetchMore() error {
 
 // handleError sets the value of lastErr to err if lastErr is not yet set.
 func (c *Cursor) handleError(err error) error {
-	c.Lock()
-	defer c.Unlock()
-
 	return c.handleErrorLocked(err)
 }
 
@@ -356,9 +331,6 @@ func (c *Cursor) handleErrorLocked(err error) error {
 
 // extend adds the result of a continue query to the cursor.
 func (c *Cursor) extend(response *Response) {
-	c.Lock()
-	defer c.Unlock()
-
 	for _, response := range response.Responses {
 		c.responses.Push(response)
 	}
