@@ -15,6 +15,21 @@ func (e *MarshalerError) Error() string {
 	return "gorethink: error calling MarshalRQL for type " + e.Type.String() + ": " + e.Err.Error()
 }
 
+type InvalidUnmarshalError struct {
+	Type reflect.Type
+}
+
+func (e *InvalidUnmarshalError) Error() string {
+	if e.Type == nil {
+		return "gorethink: UnmarshalRQL(nil)"
+	}
+
+	if e.Type.Kind() != reflect.Ptr {
+		return "gorethink: UnmarshalRQL(non-pointer " + e.Type.String() + ")"
+	}
+	return "gorethink: UnmarshalRQL(nil " + e.Type.String() + ")"
+}
+
 // An InvalidTypeError describes a value that was
 // not appropriate for a value of a specific Go type.
 type DecodeTypeError struct {

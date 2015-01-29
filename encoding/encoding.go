@@ -1,21 +1,17 @@
 package encoding
 
 import (
-	"encoding"
 	"reflect"
 	"time"
-
-	"github.com/dancannon/gorethink/types"
 )
 
 var (
 	// type constants
 	stringType   = reflect.TypeOf("")
 	timeType     = reflect.TypeOf(new(time.Time)).Elem()
-	geometryType = reflect.TypeOf(new(types.Geometry)).Elem()
 
 	marshalerType     = reflect.TypeOf(new(Marshaler)).Elem()
-	textMarshalerType = reflect.TypeOf(new(encoding.TextMarshaler)).Elem()
+	unmarshalerType     = reflect.TypeOf(new(Unmarshaler)).Elem()
 )
 
 // Marshaler is the interface implemented by objects that
