@@ -100,7 +100,7 @@ func typeDecoder(dt, st reflect.Type) decoderFunc {
 
 	// Compute fields without lock.
 	// Might duplicate effort but won't hold other computations back.
-	f = newTypeDecoder(dt, st, true)
+	f = newTypeDecoder(dt, st)
 	wg.Done()
 	decoderCache.Lock()
 	decoderCache.m[decoderCacheKey{dt, st}] = f

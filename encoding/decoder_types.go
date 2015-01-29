@@ -8,8 +8,11 @@ import (
 )
 
 // newTypeDecoder constructs an decoderFunc for a type.
-// The returned decoder only checks CanAddr when allowAddr is true.
-func newTypeDecoder(dt, st reflect.Type, allowAddr bool) decoderFunc {
+func newTypeDecoder(dt, st reflect.Type) decoderFunc {
+	if dt.Implements(unmarshalerType) {
+		return unmarshalerDecoder
+	}
+
 	if st.Kind() == reflect.Interface {
 		return interfaceAsTypeDecoder
 	}
@@ -198,6 +201,18 @@ func newPtrDecoder(dt, st reflect.Type) decoderFunc {
 	dec := &ptrDecoder{typeDecoder(dt.Elem(), st)}
 
 	return dec.decode
+}
+
+func unmarshalerDecoder(dv, sv reflect.Value) {
+	if dv.Kind() != reflect.Ptr || dv.IsNil() {
+		panic(&InvalidUnmarshalError{sv.Type()})
+	}
+
+	u := dv.Interface().(Unmarshaler)
+	err := u.UnmarshalRQL(sv.Interface())
+	if err != nil {
+		panic(&DecodeTypeError{dv.Type(), sv.Type(), err.Error()})
+	}
 }
 
 // Boolean decoders
@@ -488,31 +503,6 @@ func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
 
 		fieldDec(dElemVal, sElemVal)
 	}
-
-	// for i, f := range d.fields {
-	// 	dElemVal := fieldByIndex(dv, f.index)
-	// 	sElemVal := sv.MapIndex(reflect.ValueOf(f.name))
-	// 	if !sElemVal.IsValid() {
-	// 		for _, key := range sv.MapKeys() {
-	// 			if bytes.Equal(f.nameBytes, []byte(key.String())) {
-	// 				dElemVal = fieldByIndex(dv, f.index)
-	// 				break
-	// 			}
-	// 			if sElemVal == nilf.equalFold(f.nameBytes, []byte(key.String())) {
-	// 				dElemVal = fieldByIndex(dv, f.index)
-	// 				break
-	// 			}
-	// 		}
-	// 	}
-
-	// 	spew.Dump(dElemVal)
-
-	// 	if !sElemVal.IsValid() || !dElemVal.CanSet() {
-	// 		continue
-	// 	}
-
-	// 	d.fieldDecs[i](dElemVal, sElemVal)
-	// }
 }
 
 func newMapAsStructDecoder(dt, st reflect.Type) decoderFunc {
