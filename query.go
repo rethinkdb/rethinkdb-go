@@ -99,22 +99,23 @@ func (t Term) String() string {
 }
 
 type WriteResponse struct {
-	Errors        int      `gorethink:"errors"`
-	Created       int      `gorethink:"created"`
-	Inserted      int      `gorethink:"inserted"`
-	Updated       int      `gorethink:"updadte"`
-	Unchanged     int      `gorethink:"unchanged"`
-	Replaced      int      `gorethink:"replaced"`
-	Renamed       int      `gorethink:"renamed"`
-	Skipped       int      `gorethink:"skipped"`
-	Deleted       int      `gorethink:"deleted"`
-	DBsCreated    int      `gorethink:"dbs_created"`
-	TablesCreated int      `gorethink:"tables_created"`
-	DBsDropped    int      `gorethink:"dbs_dropped"`
-	TablesDropped int      `gorethink:"tables_dropped"`
-	ConfigChanges int      `gorethink:"config_changes"`
-	GeneratedKeys []string `gorethink:"generated_keys"`
-	FirstError    string   `gorethink:"first_error"` // populated if Errors > 0
+	Errors        int            `gorethink:"errors"`
+	Inserted      int            `gorethink:"inserted"`
+	Updated       int            `gorethink:"updadte"`
+	Unchanged     int            `gorethink:"unchanged"`
+	Replaced      int            `gorethink:"replaced"`
+	Renamed       int            `gorethink:"renamed"`
+	Skipped       int            `gorethink:"skipped"`
+	Deleted       int            `gorethink:"deleted"`
+	Created       int            `gorethink:"created"`
+	DBsCreated    int            `gorethink:"dbs_created"`
+	TablesCreated int            `gorethink:"tables_created"`
+	Dropped       int            `gorethink:"dropped"`
+	DBsDropped    int            `gorethink:"dbs_dropped"`
+	TablesDropped int            `gorethink:"tables_dropped"`
+	GeneratedKeys []string       `gorethink:"generated_keys"`
+	FirstError    string         `gorethink:"first_error"` // populated if Errors > 0
+	ConfigChanges []WriteChanges `gorethink:"config_changes"`
 	Changes       []WriteChanges
 }
 
@@ -132,10 +133,7 @@ type RunOpts struct {
 	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
 	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
 	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
-	BatchConf      BatchOpts   `gorethink:"batch_conf,omitempty"`
-}
 
-type BatchOpts struct {
 	MinBatchRows              interface{} `gorethink:"min_batch_rows,omitempty"`
 	MaxBatchRows              interface{} `gorethink:"max_batch_rows,omitempty"`
 	MaxBatchBytes             interface{} `gorethink:"max_batch_bytes,omitempty"`
@@ -197,7 +195,12 @@ type ExecOpts struct {
 	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
 	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
 	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
-	BatchConf      BatchOpts   `gorethink:"batch_conf,omitempty"`
+
+	MinBatchRows              interface{} `gorethink:"min_batch_rows,omitempty"`
+	MaxBatchRows              interface{} `gorethink:"max_batch_rows,omitempty"`
+	MaxBatchBytes             interface{} `gorethink:"max_batch_bytes,omitempty"`
+	MaxBatchSeconds           interface{} `gorethink:"max_batch_seconds,omitempty"`
+	FirstBatchScaledownFactor interface{} `gorethink:"first_batch_scaledown_factor,omitempty"`
 
 	NoReply interface{} `gorethink:"noreply,omitempty"`
 }
