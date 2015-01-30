@@ -19,8 +19,8 @@ func (t Term) Rebalance() Term {
 type ReconfigureOpts struct {
 	Shards     interface{} `gorethink:"shards,omitempty"`
 	Replicas   interface{} `gorethink:"replicas,omitempty"`
-	PrimaryTag interface{} `gorethink:"primaryTag,omitempty"`
-	DryRun     interface{} `gorethink:"dryRun,omitempty"`
+	PrimaryTag interface{} `gorethink:"primary_replicas_tag,omitempty"`
+	DryRun     interface{} `gorethink:"dry_run,omitempty"`
 }
 
 func (o *ReconfigureOpts) toMap() map[string]interface{} {

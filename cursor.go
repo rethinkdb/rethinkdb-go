@@ -335,7 +335,9 @@ func (c *Cursor) extend(response *Response) {
 		c.responses.Push(response)
 	}
 
-	c.finished = response.Type != p.Response_SUCCESS_PARTIAL && response.Type != p.Response_SUCCESS_FEED
+	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
+		response.Type != p.Response_SUCCESS_FEED &&
+		response.Type != p.Response_SUCCESS_ATOM_FEED
 	c.fetching = false
 }
 
