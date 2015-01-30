@@ -210,6 +210,48 @@ func (s *RethinkSuite) TestAggregationGroupMax(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestAggregationMin(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table2").Exec(sess)
+	Db("test").Table("Table2").IndexCreate("num").Exec(sess)
+
+	// Insert rows
+	Db("test").Table("Table2").Insert(objList).Exec(sess)
+
+	// Test query
+	var response interface{}
+	query := Db("test").Table("Table2").MinIndex("num")
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, map[string]interface{}{"id": 1, "g1": 1, "g2": 1, "num": 0})
+}
+
+func (s *RethinkSuite) TestAggregationMaxIndex(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").Exec(sess)
+	Db("test").TableCreate("Table2").Exec(sess)
+	Db("test").Table("Table2").IndexCreate("num").Exec(sess)
+
+	// Insert rows
+	Db("test").Table("Table2").Insert(objList).Exec(sess)
+
+	// Test query
+	var response interface{}
+	query := Db("test").Table("Table2").MaxIndex("num")
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, map[string]interface{}{"id": 5, "g1": 2, "g2": 3, "num": 100})
+}
+
 func (s *RethinkSuite) TestAggregationMultipleGroupSum(c *test.C) {
 	var response []interface{}
 	query := Expr(objList).Group("g1", "g2").Sum("num")
