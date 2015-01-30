@@ -225,6 +225,12 @@ func (t Term) ForEach(args ...interface{}) Term {
 	return constructMethodTerm(t, "Foreach", p.Term_FOR_EACH, funcWrapArgs(args), map[string]interface{}{})
 }
 
+// Range generates a stream of sequential integers in a specified range. It
+// accepts 0, 1, or 2 arguments, all of which should be numbers.
+func Range(args ...interface{}) Term {
+	return constructRootTerm("Range", p.Term_RANGE, args, map[string]interface{}{})
+}
+
 // Handle non-existence errors. Tries to evaluate and return its first argument.
 // If an error related to the absence of a value is thrown in the process, or if
 // its first argument returns null, returns its second argument. (Alternatively,

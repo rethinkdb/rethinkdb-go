@@ -398,3 +398,39 @@ func (s *RethinkSuite) TestControlTypeOf(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, "NUMBER")
 }
+
+func (s *RethinkSuite) TestControlRangeNoArgs(c *test.C) {
+	var response []int
+	query := Range().Limit(100)
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(len(response), test.Equals, 100)
+}
+
+func (s *RethinkSuite) TestControlRangeSingleArgs(c *test.C) {
+	var response []int
+	query := Range(4)
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.DeepEquals, []int{0, 1, 2, 3})
+}
+
+func (s *RethinkSuite) TestControlRangeTwoArgs(c *test.C) {
+	var response []int
+	query := Range(4, 6)
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.DeepEquals, []int{4, 5})
+}
