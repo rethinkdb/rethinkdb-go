@@ -54,7 +54,7 @@ func (t Term) build() interface{} {
 		optArgs[k] = v.build()
 	}
 
-	return []interface{}{t.termType, args, optArgs}
+	return []interface{}{int(t.termType), args, optArgs}
 }
 
 // String returns a string representation of the query tree

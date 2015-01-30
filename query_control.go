@@ -222,7 +222,7 @@ func Branch(args ...interface{}) Term {
 
 // Loop over a sequence, evaluating the given write query for each element.
 func (t Term) ForEach(args ...interface{}) Term {
-	return constructMethodTerm(t, "Foreach", p.Term_FOREACH, funcWrapArgs(args), map[string]interface{}{})
+	return constructMethodTerm(t, "Foreach", p.Term_FOR_EACH, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Handle non-existence errors. Tries to evaluate and return its first argument.
@@ -244,7 +244,7 @@ func (t Term) CoerceTo(args ...interface{}) Term {
 
 // Gets the type of a value.
 func (t Term) TypeOf(args ...interface{}) Term {
-	return constructMethodTerm(t, "TypeOf", p.Term_TYPEOF, args, map[string]interface{}{})
+	return constructMethodTerm(t, "TypeOf", p.Term_TYPE_OF, args, map[string]interface{}{})
 }
 
 // Get information about a RQL value.

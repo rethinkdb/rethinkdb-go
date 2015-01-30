@@ -18,7 +18,7 @@ func (t Term) WithFields(args ...interface{}) Term {
 // Flattens a sequence of arrays returned by the mapping function into a single
 // sequence.
 func (t Term) ConcatMap(args ...interface{}) Term {
-	return constructMethodTerm(t, "ConcatMap", p.Term_CONCATMAP, funcWrapArgs(args), map[string]interface{}{})
+	return constructMethodTerm(t, "ConcatMap", p.Term_CONCAT_MAP, funcWrapArgs(args), map[string]interface{}{})
 }
 
 type OrderByOpts struct {
@@ -57,7 +57,7 @@ func (t Term) OrderBy(args ...interface{}) Term {
 		}
 	}
 
-	return constructMethodTerm(t, "OrderBy", p.Term_ORDERBY, args, opts)
+	return constructMethodTerm(t, "OrderBy", p.Term_ORDER_BY, args, opts)
 }
 
 func Desc(args ...interface{}) Term {

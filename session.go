@@ -15,7 +15,7 @@ type Query struct {
 }
 
 func (q *Query) build() []interface{} {
-	res := []interface{}{q.Type}
+	res := []interface{}{int(q.Type)}
 	if q.Term != nil {
 		res = append(res, q.Term.build())
 	}
