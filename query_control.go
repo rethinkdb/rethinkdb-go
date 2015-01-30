@@ -253,6 +253,11 @@ func (t Term) TypeOf(args ...interface{}) Term {
 	return constructMethodTerm(t, "TypeOf", p.Term_TYPE_OF, args, map[string]interface{}{})
 }
 
+// Gets the type of a value.
+func (t Term) ToJSON() Term {
+	return constructMethodTerm(t, "ToJSON", p.Term_TO_JSON_STRING, []interface{}{}, map[string]interface{}{})
+}
+
 // Get information about a RQL value.
 func (t Term) Info(args ...interface{}) Term {
 	return constructMethodTerm(t, "Info", p.Term_INFO, args, map[string]interface{}{})

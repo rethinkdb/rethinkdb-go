@@ -434,3 +434,15 @@ func (s *RethinkSuite) TestControlRangeTwoArgs(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.DeepEquals, []int{4, 5})
 }
+
+func (s *RethinkSuite) TestControlToJSON(c *test.C) {
+	var response string
+	query := Expr([]int{4, 5}).ToJSON()
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "[4,5]")
+}
