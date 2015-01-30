@@ -108,6 +108,11 @@ type WriteResponse struct {
 	Renamed       int      `gorethink:"renamed"`
 	Skipped       int      `gorethink:"skipped"`
 	Deleted       int      `gorethink:"deleted"`
+	DBsCreated    int      `gorethink:"dbs_created"`
+	TablesCreated int      `gorethink:"tables_created"`
+	DBsDropped    int      `gorethink:"dbs_dropped"`
+	TablesDropped int      `gorethink:"tables_dropped"`
+	ConfigChanges int      `gorethink:"config_changes"`
 	GeneratedKeys []string `gorethink:"generated_keys"`
 	FirstError    string   `gorethink:"first_error"` // populated if Errors > 0
 	Changes       []WriteChanges
