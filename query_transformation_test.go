@@ -70,6 +70,48 @@ func (s *RethinkSuite) TestTransformationConcatMap(c *test.C) {
 	c.Assert(response, JsonEquals, []interface{}{0, 5, 10, 0, 100, 15, 0, 50, 25})
 }
 
+func (s *RethinkSuite) TestTransformationVariadicMap(c *test.C) {
+	query := Range(5).Map(Range(5), func(a, b Term) interface{} {
+		return []interface{}{a, b}
+	})
+
+	var response []interface{}
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, [][]int{
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 4},
+	})
+}
+
+func (s *RethinkSuite) TestTransformationVariadicRootMap(c *test.C) {
+	query := Map(Range(5), Range(5), func(a, b Term) interface{} {
+		return []interface{}{a, b}
+	})
+
+	var response []interface{}
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, JsonEquals, [][]int{
+		{0, 0},
+		{1, 1},
+		{2, 2},
+		{3, 3},
+		{4, 4},
+	})
+}
+
 func (s *RethinkSuite) TestTransformationOrderByDesc(c *test.C) {
 	query := Expr(noDupNumObjList).OrderBy(Desc("num"))
 

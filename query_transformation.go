@@ -3,6 +3,15 @@ package gorethink
 import p "github.com/dancannon/gorethink/ql2"
 
 // Transform each element of the sequence by applying the given mapping function.
+func Map(args ...interface{}) Term {
+	if len(args) > 0 {
+		args = append(args[:len(args)-1], funcWrapArgs(args[len(args)-1:])...)
+	}
+
+	return constructRootTerm("Map", p.Term_MAP, funcWrapArgs(args), map[string]interface{}{})
+}
+
+// Transfor >m each element of the sequence by applying the given mapping function.
 func (t Term) Map(args ...interface{}) Term {
 	return constructMethodTerm(t, "Map", p.Term_MAP, funcWrapArgs(args), map[string]interface{}{})
 }
