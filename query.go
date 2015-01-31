@@ -8,9 +8,26 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-type OptArgs interface {
-	toMap() map[string]interface{}
+type Query struct {
+	Type  p.Query_QueryType
+	Token int64
+	Term  *Term
+	Opts  map[string]interface{}
 }
+
+func (q *Query) build() []interface{} {
+	res := []interface{}{int(q.Type)}
+	if q.Term != nil {
+		res = append(res, q.Term.build())
+	}
+
+	if len(q.Opts) > 0 {
+		res = append(res, q.Opts)
+	}
+
+	return res
+}
+
 type termsList []Term
 type termsObj map[string]Term
 type Term struct {
@@ -54,7 +71,16 @@ func (t Term) build() interface{} {
 		optArgs[k] = v.build()
 	}
 
-	return []interface{}{int(t.termType), args, optArgs}
+	ret := []interface{}{int(t.termType)}
+
+	if len(args) > 0 {
+		ret = append(ret, args)
+	}
+	if len(optArgs) > 0 {
+		ret = append(ret, optArgs)
+	}
+
+	return ret
 }
 
 // String returns a string representation of the query tree
@@ -96,6 +122,10 @@ func (t Term) String() string {
 		return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 	}
 	return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
+}
+
+type OptArgs interface {
+	toMap() map[string]interface{}
 }
 
 type WriteResponse struct {
