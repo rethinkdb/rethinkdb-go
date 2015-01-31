@@ -5,21 +5,15 @@ import (
 )
 
 func (s *RethinkSuite) TestDbCreate(c *test.C) {
-	var response interface{}
-
 	// Delete the test2 database if it already exists
 	DbDrop("test").Exec(sess)
 
 	// Test database creation
 	query := DbCreate("test")
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
+	c.Assert(response.DBsCreated, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestDbList(c *test.C) {
@@ -48,21 +42,15 @@ func (s *RethinkSuite) TestDbList(c *test.C) {
 }
 
 func (s *RethinkSuite) TestDbDelete(c *test.C) {
-	var response interface{}
-
 	// Delete the test2 database if it already exists
 	DbCreate("test").Exec(sess)
 
 	// Test database creation
 	query := DbDrop("test")
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
+	c.Assert(response.DBsDropped, JsonEquals, 1)
 
 	// Ensure that there is still a test DB after the test has finished
 	DbCreate("test").Exec(sess)

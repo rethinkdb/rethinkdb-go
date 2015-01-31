@@ -294,9 +294,7 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 
 	// Test query
 	res, err := Db("test").Table("TestMany").Run(sess, RunOpts{
-		BatchConf: BatchOpts{
-			MaxBatchRows: 1,
-		},
+		MaxBatchRows: 1,
 	})
 	c.Assert(err, test.IsNil)
 
@@ -428,8 +426,8 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 	// Insert rows
 	for i := 0; i < 100; i++ {
 		Db("test").Table("TestMany").Insert(map[string]interface{}{
-				"i": i,
-			}).Run(sess)
+			"i": i,
+		}).Run(sess)
 	}
 
 	// Test queries concurrently

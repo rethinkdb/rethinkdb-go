@@ -24,7 +24,7 @@ func Example_TableCreate() {
 		log.Fatalf("Error creating table: %s", err)
 	}
 
-	fmt.Printf("%d table created", response.Created)
+	fmt.Printf("%d table created", response.TablesCreated)
 
 	// Output:
 	// 1 table created

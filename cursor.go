@@ -53,6 +53,7 @@ type Cursor struct {
 	fetching  bool
 	closed    bool
 	finished  bool
+	isAtom    bool
 	buffer    queue
 	responses queue
 	profile   interface{}
@@ -162,7 +163,8 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 					return false, err
 				}
 
-				if data, ok := value.([]interface{}); ok {
+				// If response is an ATOM then try and convert to an array
+				if data, ok := value.([]interface{}); ok && c.isAtom {
 					for _, v := range data {
 						c.buffer.Push(v)
 					}
@@ -335,8 +337,11 @@ func (c *Cursor) extend(response *Response) {
 		c.responses.Push(response)
 	}
 
-	c.finished = response.Type != p.Response_SUCCESS_PARTIAL && response.Type != p.Response_SUCCESS_FEED
+	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
+		response.Type != p.Response_SUCCESS_FEED &&
+		response.Type != p.Response_SUCCESS_ATOM_FEED
 	c.fetching = false
+	c.isAtom = response.Type == p.Response_SUCCESS_ATOM
 }
 
 // Queue structure used for storing responses

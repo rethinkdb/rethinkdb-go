@@ -7,26 +7,6 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-type Query struct {
-	Type  p.Query_QueryType
-	Token int64
-	Term  *Term
-	Opts  map[string]interface{}
-}
-
-func (q *Query) build() []interface{} {
-	res := []interface{}{q.Type}
-	if q.Term != nil {
-		res = append(res, q.Term.build())
-	}
-
-	if len(q.Opts) > 0 {
-		res = append(res, q.Opts)
-	}
-
-	return res
-}
-
 type Session struct {
 	opts ConnectOpts
 	pool *Pool

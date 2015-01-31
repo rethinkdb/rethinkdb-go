@@ -122,10 +122,22 @@ func (t Term) IndexWait(args ...interface{}) Term {
 	return constructMethodTerm(t, "IndexWait", p.Term_INDEX_WAIT, args, map[string]interface{}{})
 }
 
+type ChangesOpts struct {
+	Squash interface{} `gorethink:"squash,omitempty"`
+}
+
+func (o *ChangesOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Takes a table and returns an infinite stream of objects representing changes to that table.
 // Whenever an insert, delete, update or replace is performed on the table, an object of the form
 // {old_val:..., new_val:...} will be added to the stream. For an insert, old_val will be
 // null, and for a delete, new_val will be null.
-func (t Term) Changes() Term {
-	return constructMethodTerm(t, "Changes", p.Term_CHANGES, []interface{}{}, map[string]interface{}{})
+func (t Term) Changes(optArgs ...ChangesOpts) Term {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return constructMethodTerm(t, "Changes", p.Term_CHANGES, []interface{}{}, opts)
 }

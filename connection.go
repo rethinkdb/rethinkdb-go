@@ -230,7 +230,7 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 		return c.processErrorResponse(q, response, RqlRuntimeError{rqlResponseError{response, q.Term}})
 	case p.Response_SUCCESS_ATOM:
 		return c.processAtomResponse(q, response)
-	case p.Response_SUCCESS_FEED:
+	case p.Response_SUCCESS_FEED, p.Response_SUCCESS_ATOM_FEED:
 		return c.processFeedResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
 		return c.processPartialResponse(q, response)
