@@ -1,12 +1,18 @@
-GoRethink - RethinkDB Driver for Go [![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/s/master "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2) [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
-=====================
+# GoRethink - RethinkDB Driver for Go 
 
-[Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) made by [Daniel Cannon](http://github.com/dancannon) and based off of Christopher Hesse's [RethinkGo](https://github.com/christopherhesse/rethinkgo) driver.
+[![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)]()
+[![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
+[![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/s/master "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2) 
+
+[Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
 
 
 Current version: v0.6.0 (RethinkDB v1.16.0) 
 
-**Version 0.3 introduced some API changes, for more information check the [change log](CHANGELOG.md)**
+**Version 0.6 introduced some small API changes and some significant internal changes, for more information check the [change log](CHANGELOG.md) and please be aware the driver is not yet stable so please report any bugs
+**
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dancannon/gorethink?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Installation
 
