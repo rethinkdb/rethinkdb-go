@@ -9,8 +9,7 @@
 
 Current version: v0.6.0 (RethinkDB v1.16.0) 
 
-**Version 0.6 introduced some small API changes and some significant internal changes, for more information check the [change log](CHANGELOG.md) and please be aware the driver is not yet stable so please report any bugs
-**
+**Version 0.6 introduced some small API changes and some significant internal changes, for more information check the [change log](CHANGELOG.md) and please be aware the driver is not yet stable**
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dancannon/gorethink?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
