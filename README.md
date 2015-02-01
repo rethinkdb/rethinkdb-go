@@ -1,12 +1,17 @@
-GoRethink - RethinkDB Driver for Go [![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/s/master "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2) [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
-=====================
+# GoRethink - RethinkDB Driver for Go 
 
-[Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) made by [Daniel Cannon](http://github.com/dancannon) and based off of Christopher Hesse's [RethinkGo](https://github.com/christopherhesse/rethinkgo) driver.
+[![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)]()
+[![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
+[![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/s/master "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2) 
+
+[Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
 
 
-Current version: v0.5.0 (RethinkDB v1.15.1) 
+Current version: v0.6.0 (RethinkDB v1.16.0) 
 
-**Version 0.3 introduced some API changes, for more information check the [change log](CHANGELOG.md)**
+**Version 0.6 introduced some small API changes and some significant internal changes, for more information check the [change log](CHANGELOG.md) and please be aware the driver is not yet stable**
+
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dancannon/gorethink?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Installation
 
@@ -116,7 +121,7 @@ Different result types are returned depending on what function is used to execut
 - `Run` returns a cursor which can be used to view
 all rows returned.
 - `RunWrite` returns a WriteResponse and should be used for queries such as Insert,Update,etc...
-- `Exec` sends a query to the server with the noreply flag set and returns immediately
+- `Exec` sends a query to the server and closes the connection immediately after reading the response from the database. If you do not wish to wait for the response then you can set the `NoReply` flag.
 
 Example:
 
@@ -137,7 +142,7 @@ Examples:
 
 ```go
 var row interface{}
-for res.Next(&result) {
+for res.Next(&row) {
     // Do something with row
 }
 if res.Err() != nil {
