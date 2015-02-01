@@ -122,7 +122,7 @@ Different result types are returned depending on what function is used to execut
 - `Run` returns a cursor which can be used to view
 all rows returned.
 - `RunWrite` returns a WriteResponse and should be used for queries such as Insert,Update,etc...
-- `Exec` sends a query to the server with the noreply flag set and returns immediately
+- `Exec` sends a query to the server and closes the connection immediately after reading the response from the database. If you do not wish to wait for the response then you can set the `NoReply` flag.
 
 Example:
 

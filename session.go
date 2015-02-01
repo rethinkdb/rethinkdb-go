@@ -33,11 +33,11 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 
 // Connect creates a new database session.
 //
-// Supported arguments include address, database, timeout, authkey,
-// and timeFormat. Pool options include maxIdle, maxOpen.
+// Supported arguments include Address, Database, Timeout, Authkey. Pool
+// options include MaxIdle, MaxOpen.
 //
 // By default maxIdle and maxOpen are set to 1: passing values greater
-// than the default (e.g. maxIdle: "10", maxActive: "20") will provide a
+// than the default (e.g. MaxIdle: "10", MaxOpen: "20") will provide a
 // pool of re-usable connections.
 //
 // Basic connection example:
