@@ -1,5 +1,30 @@
 # Changelog
 
+## v0.6.0 - 1 Feb 2015
+
+There are some major changes to the driver with this release that are not related to the RethinkDB v1.16 release. Please have a read through them:
+- Improvements to result decoding by caching reflection calls.
+- Finished implementing the `Marshaler`/`Unmarshaler` interfaces
+- Connection pool overhauled. There were a couple of issues with connections in the previous releases so this release replaces the `fatih/pool` package with a connection pool based on the `database/sql` connection pool.
+- Another change is the removal of the prefetching mechanism as the connection+cursor logic was becoming quite complex and causing bugs, hopefully this will be added back in the near future but for now I am focusing my efforts on ensuring the driver is as stable as possible #130 #137
+- Due to the above change the API for connecting has changed slightly (The API is now closer to the `database/sql` API. `ConnectOpts` changes:
+  - `MaxActive` renamed to `MaxOpen`
+  - `IdleTimeout` renamed to `Timeout`
+- `Cursor`s are now only closed automatically when calling either `All` or `One`
+- `Exec` now takes `ExecOpts` instead of `RunOpts`. The only difference is that `Exec` has the `NoReply` field
+
+With that out the way here are the v1.16 changes:
+
+- Added `Range` which generates all numbers from a given range
+- Added an optional squash argument to the changes command, which lets the server combine multiple changes to the same document (defaults to true)
+- Added new admin functions (`Config`, `Rebalance`, `Reconfigure`, `Status`, `Wait`)
+- Added support for `SUCCESS_ATOM_FEED`
+- Added `MinIndex` + `MaxInde`x functions
+- Added `ToJSON` function
+- Updated `WriteResponse` type
+
+Since this release has a lot of changes and although I have tested these changes sometimes things fall through the gaps. If you discover any bugs please let me know and I will try to fix them as soon as possible.
+
 ## Hotfix - 14 Dec 2014
 
 - Fixed empty slices being returned as `[]T(nil)` not `[]T{}` #138
