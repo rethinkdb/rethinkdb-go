@@ -45,10 +45,8 @@ var _ = test.Suite(&RethinkSuite{})
 func (s *RethinkSuite) SetUpSuite(c *test.C) {
 	var err error
 	sess, err = Connect(ConnectOpts{
-		Address:   url,
-		MaxIdle:   3,
-		MaxActive: 3,
-		AuthKey:   authKey,
+		Address: url,
+		AuthKey: authKey,
 	})
 	c.Assert(err, test.IsNil)
 }
@@ -230,7 +228,7 @@ func (s *RethinkSuite) BenchmarkNoReplyExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query
 		query := Expr(true)
-		err := query.Exec(sess, RunOpts{NoReply: true})
+		err := query.Exec(sess, ExecOpts{NoReply: true})
 		c.Assert(err, test.IsNil)
 	}
 }

@@ -94,6 +94,17 @@ func (t Term) Min(args ...interface{}) Term {
 	return constructMethodTerm(t, "Min", p.Term_MIN, funcWrapArgs(args), map[string]interface{}{})
 }
 
+// Finds the minimum of a sequence. If called with a field name, finds the element
+// of that sequence with the smallest value in that field. If called with a function,
+// calls that function on every element of the sequence and returns the element
+// which produced the smallest value, ignoring any elements where the function
+// returns null or produces a non-existence error.
+func (t Term) MinIndex(index interface{}, args ...interface{}) Term {
+	return constructMethodTerm(t, "Min", p.Term_MIN, funcWrapArgs(args), map[string]interface{}{
+		"index": index,
+	})
+}
+
 // Finds the maximum of a sequence. If called with a field name, finds the element
 // of that sequence with the largest value in that field. If called with a function,
 // calls that function on every element of the sequence and returns the element
@@ -101,4 +112,15 @@ func (t Term) Min(args ...interface{}) Term {
 // returns null or produces a non-existence error.
 func (t Term) Max(args ...interface{}) Term {
 	return constructMethodTerm(t, "Max", p.Term_MAX, funcWrapArgs(args), map[string]interface{}{})
+}
+
+// Finds the maximum of a sequence. If called with a field name, finds the element
+// of that sequence with the largest value in that field. If called with a function,
+// calls that function on every element of the sequence and returns the element
+// which produced the largest value, ignoring any elements where the function
+// returns null or produces a non-existence error.
+func (t Term) MaxIndex(index interface{}, args ...interface{}) Term {
+	return constructMethodTerm(t, "Max", p.Term_MAX, funcWrapArgs(args), map[string]interface{}{
+		"index": index,
+	})
 }

@@ -1,22 +1,9 @@
 package encoding
 
 import (
-	"encoding"
 	"encoding/base64"
-	"math"
 	"reflect"
-	"strconv"
 	"time"
-
-	"github.com/dancannon/gorethink/types"
-)
-
-var (
-	marshalerType     = reflect.TypeOf(new(Marshaler)).Elem()
-	textMarshalerType = reflect.TypeOf(new(encoding.TextMarshaler)).Elem()
-
-	timeType     = reflect.TypeOf(new(time.Time)).Elem()
-	geometryType = reflect.TypeOf(new(types.Geometry)).Elem()
 )
 
 // newTypeEncoder constructs an encoderFunc for a type.
@@ -30,12 +17,11 @@ func newTypeEncoder(t reflect.Type, allowAddr bool) encoderFunc {
 			return newCondAddrEncoder(addrMarshalerEncoder, newTypeEncoder(t, false))
 		}
 	}
+
 	// Check for psuedo-types first
 	switch t {
 	case timeType:
 		return timePseudoTypeEncoder
-	case geometryType:
-		return geometryPseudoTypeEncoder
 	}
 
 	switch t.Kind() {
@@ -45,10 +31,8 @@ func newTypeEncoder(t reflect.Type, allowAddr bool) encoderFunc {
 		return intEncoder
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return uintEncoder
-	case reflect.Float32:
-		return float32Encoder
-	case reflect.Float64:
-		return float64Encoder
+	case reflect.Float32, reflect.Float64:
+		return floatEncoder
 	case reflect.String:
 		return stringEncoder
 	case reflect.Interface:
@@ -103,33 +87,6 @@ func addrMarshalerEncoder(v reflect.Value) interface{} {
 	return ev
 }
 
-func textMarshalerEncoder(v reflect.Value) interface{} {
-	if v.Kind() == reflect.Ptr && v.IsNil() {
-		return ""
-	}
-	m := v.Interface().(encoding.TextMarshaler)
-	b, err := m.MarshalText()
-	if err != nil {
-		panic(&MarshalerError{v.Type(), err})
-	}
-
-	return b
-}
-
-func addrTextMarshalerEncoder(v reflect.Value) interface{} {
-	va := v.Addr()
-	if va.IsNil() {
-		return ""
-	}
-	m := va.Interface().(encoding.TextMarshaler)
-	b, err := m.MarshalText()
-	if err != nil {
-		panic(&MarshalerError{v.Type(), err})
-	}
-
-	return b
-}
-
 func boolEncoder(v reflect.Value) interface{} {
 	if v.Bool() {
 		return true
@@ -146,20 +103,9 @@ func uintEncoder(v reflect.Value) interface{} {
 	return v.Uint()
 }
 
-type floatEncoder int // number of bits
-
-func (bits floatEncoder) encode(v reflect.Value) interface{} {
-	f := v.Float()
-	if math.IsInf(f, 0) || math.IsNaN(f) {
-		panic(&UnsupportedValueError{v, strconv.FormatFloat(f, 'g', -1, int(bits))})
-	}
-	return f
+func floatEncoder(v reflect.Value) interface{} {
+	return v.Float()
 }
-
-var (
-	float32Encoder = (floatEncoder(32)).encode
-	float64Encoder = (floatEncoder(64)).encode
-)
 
 func stringEncoder(v reflect.Value) interface{} {
 	return v.String()
@@ -320,27 +266,6 @@ func timePseudoTypeEncoder(v reflect.Value) interface{} {
 		"$reql_type$": "TIME",
 		"epoch_time":  t.Unix(),
 		"timezone":    "+00:00",
-	}
-}
-
-// Encode a time.Time value to the TIME RQL type
-func geometryPseudoTypeEncoder(v reflect.Value) interface{} {
-	g := v.Interface().(types.Geometry)
-
-	var coords interface{}
-	switch g.Type {
-	case "Point":
-		coords = g.Point.Marshal()
-	case "LineString":
-		coords = g.Line.Marshal()
-	case "Polygon":
-		coords = g.Lines.Marshal()
-	}
-
-	return map[string]interface{}{
-		"$reql_type$": "GEOMETRY",
-		"type":        g.Type,
-		"coordinates": coords,
 	}
 }
 

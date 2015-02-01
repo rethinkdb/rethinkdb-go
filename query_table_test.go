@@ -7,25 +7,17 @@ import (
 )
 
 func (s *RethinkSuite) TestTableCreate(c *test.C) {
-	var response interface{}
-
 	Db("test").TableDrop("test").Exec(sess)
 
 	// Test database creation
 	query := Db("test").TableCreate("test")
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
+	c.Assert(response.TablesCreated, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
-	var response interface{}
-
 	Db("test").TableDrop("testOpts").Exec(sess)
 
 	// Test database creation
@@ -33,18 +25,12 @@ func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
 		PrimaryKey: "it",
 	})
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
+	c.Assert(response.TablesCreated, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
-	var response interface{}
-
 	Db("test").TableDrop("testOpts").Exec(sess)
 
 	// Test database creation
@@ -52,18 +38,12 @@ func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
 		Durability: "soft",
 	})
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
+	c.Assert(response.TablesCreated, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
-	var response interface{}
-
 	Db("test").TableDrop("testOpts").Exec(sess)
 
 	// Test database creation
@@ -72,13 +52,9 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 		Durability: "soft",
 	})
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
+	c.Assert(response.TablesCreated, JsonEquals, 1)
 
 	Db("test").TableDrop("test").Exec(sess)
 }
@@ -108,25 +84,17 @@ func (s *RethinkSuite) TestTableList(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableDelete(c *test.C) {
-	var response interface{}
-
 	Db("test").TableCreate("test").Exec(sess)
 
 	// Test database creation
 	query := Db("test").TableDrop("test")
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
+	c.Assert(response.TablesDropped, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
-	var response interface{}
-
 	Db("test").TableCreate("test").Exec(sess)
 	Db("test").Table("test").IndexDrop("test").Exec(sess)
 
@@ -135,13 +103,9 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 		Multi: true,
 	})
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"created": 1})
+	c.Assert(response.Created, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCompoundIndexCreate(c *test.C) {
@@ -181,21 +145,15 @@ func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
-	var response interface{}
-
 	Db("test").TableCreate("test").Exec(sess)
 	Db("test").Table("test").IndexCreate("test").Exec(sess)
 
 	// Test database creation
 	query := Db("test").Table("test").IndexDrop("test")
 
-	res, err := query.Run(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	err = res.One(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"dropped": 1})
+	c.Assert(response.Dropped, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
@@ -206,10 +164,9 @@ func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
 	// Test index rename
 	query := Db("test").Table("test").IndexRename("test", "test2")
 
-	res, err := query.RunWrite(sess)
+	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-
-	c.Assert(res.Renamed, JsonEquals, 1)
+	c.Assert(response.Renamed, JsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableChanges(c *test.C) {
@@ -230,7 +187,6 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	go func() {
 		var response interface{}
 		for n < 10 && res.Next(&response) {
-			// log.Println(response)
 			n++
 		}
 

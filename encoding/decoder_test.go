@@ -1,6 +1,9 @@
 package encoding
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"image"
 	"reflect"
 	"testing"
@@ -146,7 +149,7 @@ var decodeTests = []decodeTest{
 	{in: string("2"), ptr: new(interface{}), out: string("2")},
 	{in: "a\u1234", ptr: new(string), out: "a\u1234"},
 	{in: []interface{}{}, ptr: new([]string), out: []string{}},
-	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{}, err: &DecodeTypeError{"array", reflect.TypeOf("")}},
+	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{}, err: &DecodeTypeError{reflect.TypeOf([0]interface{}{}), reflect.TypeOf(""), ""}},
 	{in: map[string]interface{}{"x": 1}, ptr: new(tx), out: tx{}},
 	{in: map[string]interface{}{"F1": float64(1), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: float64(1), F2: int32(2), F3: string("3")}},
 	{in: map[string]interface{}{"F1": string("1"), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: string("1"), F2: int32(2), F3: string("3")}},
@@ -208,7 +211,6 @@ var decodeTests = []decodeTest{
 				Level1b: 9,
 				Level1c: 10,
 				Level1d: 11,
-				Level1e: 12,
 			},
 			Loop: Loop{
 				Loop1: 13,
@@ -227,7 +229,6 @@ var decodeTests = []decodeTest{
 		ptr: new(Ambig),
 		out: Ambig{First: 1},
 	},
-
 	{
 		in:  map[string]interface{}{"X": 1, "Y": 2},
 		ptr: new(S5),
@@ -250,15 +251,14 @@ func TestDecode(t *testing.T) {
 		v := reflect.New(reflect.TypeOf(tt.ptr).Elem())
 
 		err := Decode(v.Interface(), tt.in)
-		if tt.err != nil {
-			if !reflect.DeepEqual(err, tt.err) {
-				t.Errorf("#%d: got error %v want %v", i, err, tt.err)
-			}
-
+		if !jsonEqual(err, tt.err) {
+			t.Errorf("#%d: got error %v want %v", i, err, tt.err)
 			continue
 		}
 
-		if !reflect.DeepEqual(v.Elem().Interface(), tt.out) {
+		if !jsonEqual(v.Elem().Interface(), tt.out) {
+			fmt.Printf("%#v\n", v.Elem().Interface())
+			fmt.Printf("%#v\n", tt.out)
 			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
 		}
@@ -276,8 +276,7 @@ func TestDecode(t *testing.T) {
 				t.Errorf("#%d: error re-decodeing: %v", i, err)
 				continue
 			}
-
-			if !reflect.DeepEqual(v.Elem().Interface(), vv.Elem().Interface()) {
+			if !jsonEqual(v.Elem().Interface(), vv.Elem().Interface()) {
 				t.Errorf("#%d: mismatch\nhave: %#+v\nwant: %#+v", i, v.Elem().Interface(), vv.Elem().Interface())
 				continue
 			}
@@ -303,32 +302,10 @@ func TestStringKind(t *testing.T) {
 		t.Errorf("Unexpected error decoding: %v", err)
 	}
 
-	if !reflect.DeepEqual(m1, m2) {
+	if !jsonEqual(m1, m2) {
 		t.Error("Items should be equal after encoding and then decoding")
 	}
 
-}
-
-var decodeTypeErrorTests = []struct {
-	dest interface{}
-	src  interface{}
-}{
-	{new(string), map[interface{}]interface{}{"user": "name"}},
-	{new(error), map[interface{}]interface{}{}},
-	{new(error), []interface{}{}},
-	{new(error), ""},
-	{new(error), 123},
-	{new(error), true},
-}
-
-func TestDecodeTypeError(t *testing.T) {
-	for _, item := range decodeTypeErrorTests {
-		err := Decode(item.dest, item.src)
-		if _, ok := err.(*DecodeTypeError); !ok {
-			t.Errorf("expected type error for Decode(%q, type %T): got %T",
-				item.src, item.dest, err)
-		}
-	}
 }
 
 // Test handling of unexported fields that should be ignored.
@@ -358,7 +335,7 @@ func TestDecodeUnexported(t *testing.T) {
 	if err != nil {
 		t.Errorf("got error %v, expected nil", err)
 	}
-	if !reflect.DeepEqual(out, want) {
+	if !jsonEqual(out, want) {
 		t.Errorf("got %q, want %q", out, want)
 	}
 }
@@ -368,4 +345,17 @@ type Foo struct {
 }
 type Bar struct {
 	Baz int `gorethink:"baz"`
+}
+
+func jsonEqual(a, b interface{}) bool {
+	ba, err := json.Marshal(a)
+	if err != nil {
+		panic(err)
+	}
+	bb, err := json.Marshal(b)
+	if err != nil {
+		panic(err)
+	}
+
+	return bytes.Compare(ba, bb) == 0
 }

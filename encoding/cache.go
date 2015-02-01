@@ -12,6 +12,7 @@ import (
 type field struct {
 	name      string
 	nameBytes []byte // []byte(name)
+	equalFold func(s, t []byte) bool
 
 	tag       bool
 	index     []int
@@ -22,6 +23,7 @@ type field struct {
 
 func fillField(f field) field {
 	f.nameBytes = []byte(f.name)
+	f.equalFold = foldFunc(f.nameBytes)
 
 	return f
 }

@@ -36,6 +36,20 @@ func expr(val interface{}, depth int) Term {
 	switch val := val.(type) {
 	case Term:
 		return val
+	case []interface{}:
+		vals := make([]Term, len(val))
+		for i, v := range val {
+			vals[i] = expr(v, depth)
+		}
+
+		return makeArray(vals)
+	case map[string]interface{}:
+		vals := make(map[string]Term, len(val))
+		for k, v := range val {
+			vals[k] = expr(v, depth)
+		}
+
+		return makeObject(vals)
 	default:
 		// Use reflection to check for other types
 		valType := reflect.TypeOf(val)
@@ -70,15 +84,15 @@ func expr(val interface{}, depth int) Term {
 
 				return expr(data, depth-1)
 			} else {
-				vals := []Term{}
+				vals := make([]Term, valValue.Len())
 				for i := 0; i < valValue.Len(); i++ {
-					vals = append(vals, expr(valValue.Index(i).Interface(), depth))
+					vals[i] = expr(valValue.Index(i).Interface(), depth)
 				}
 
 				return makeArray(vals)
 			}
 		case reflect.Map:
-			vals := map[string]Term{}
+			vals := make(map[string]Term, len(valValue.MapKeys()))
 			for _, k := range valValue.MapKeys() {
 				vals[k.String()] = expr(valValue.MapIndex(k).Interface(), depth)
 			}
@@ -208,7 +222,13 @@ func Branch(args ...interface{}) Term {
 
 // Loop over a sequence, evaluating the given write query for each element.
 func (t Term) ForEach(args ...interface{}) Term {
-	return constructMethodTerm(t, "Foreach", p.Term_FOREACH, funcWrapArgs(args), map[string]interface{}{})
+	return constructMethodTerm(t, "Foreach", p.Term_FOR_EACH, funcWrapArgs(args), map[string]interface{}{})
+}
+
+// Range generates a stream of sequential integers in a specified range. It
+// accepts 0, 1, or 2 arguments, all of which should be numbers.
+func Range(args ...interface{}) Term {
+	return constructRootTerm("Range", p.Term_RANGE, args, map[string]interface{}{})
 }
 
 // Handle non-existence errors. Tries to evaluate and return its first argument.
@@ -230,7 +250,12 @@ func (t Term) CoerceTo(args ...interface{}) Term {
 
 // Gets the type of a value.
 func (t Term) TypeOf(args ...interface{}) Term {
-	return constructMethodTerm(t, "TypeOf", p.Term_TYPEOF, args, map[string]interface{}{})
+	return constructMethodTerm(t, "TypeOf", p.Term_TYPE_OF, args, map[string]interface{}{})
+}
+
+// Gets the type of a value.
+func (t Term) ToJSON() Term {
+	return constructMethodTerm(t, "ToJSON", p.Term_TO_JSON_STRING, []interface{}{}, map[string]interface{}{})
 }
 
 // Get information about a RQL value.

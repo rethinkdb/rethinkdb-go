@@ -14,6 +14,11 @@ func (s *RethinkSuite) TestQueryRun(c *test.C) {
 	c.Assert(response, test.Equals, "Test")
 }
 
+func (s *RethinkSuite) TestQueryExec(c *test.C) {
+	err := Expr("Test").Exec(sess)
+	c.Assert(err, test.IsNil)
+}
+
 func (s *RethinkSuite) TestQueryProfile(c *test.C) {
 	var response string
 

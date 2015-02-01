@@ -2,10 +2,16 @@ package gorethink
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 
 	p "github.com/dancannon/gorethink/ql2"
+)
+
+var (
+	ErrNoConnections    = errors.New("gorethink: no connections were made when creating the session")
+	ErrConnectionClosed = errors.New("gorethink: the connection is closed")
 )
 
 func printCarrots(t Term, frames []*p.Frame) string {
@@ -57,7 +63,17 @@ type rqlResponseError struct {
 }
 
 func (e rqlResponseError) Error() string {
-	return fmt.Sprintf("gorethink: %s in: \n%s", e.response.Responses[0], e.term.String())
+	var err = "An error occurred"
+	if e.response != nil {
+		json.Unmarshal(e.response.Responses[0], &err)
+	}
+
+	if e.term == nil {
+		return fmt.Sprintf("gorethink: %s", err)
+	}
+
+	return fmt.Sprintf("gorethink: %s in: \n%s", err, e.term.String())
+
 }
 
 func (e rqlResponseError) String() string {
