@@ -13,6 +13,10 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+const (
+	respHeaderLen = 12
+)
+
 type Response struct {
 	Token     int64
 	Type      p.Response_ResponseType `json:"t"`
@@ -29,6 +33,9 @@ type Connection struct {
 	token   int64
 	cursors map[int64]*Cursor
 	bad     bool
+
+	headerBuf [respHeaderLen]byte
+	readBuf   []byte
 }
 
 // Dial closes the previous connection and attempts to connect again.
@@ -187,23 +194,31 @@ func (c *Connection) nextToken() int64 {
 }
 
 func (c *Connection) readResponse() (*Response, error) {
-	// Read the 8-byte token of the query the response corresponds to.
-	var responseToken int64
-	if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
-		c.bad = true
-		return nil, RqlConnectionError{err.Error()}
+	// // Read the 8-byte token of the query the response corresponds to.
+	// var responseToken int64
+	// if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
+	// 	c.bad = true
+	// 	return nil, RqlConnectionError{err.Error()}
+	// }
+
+	// // Read the length of the JSON-encoded response as a 4-byte
+	// // little-endian-encoded integer.
+	// var messageLength uint32
+	// if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
+	// 	c.bad = true
+	// 	return nil, RqlConnectionError{err.Error()}
+	// }
+	// Read response header (token+length)
+	_, err := io.ReadFull(c.conn, c.headerBuf[:respHeaderLen])
+	if err != nil {
+		return nil, err
 	}
 
-	// Read the length of the JSON-encoded response as a 4-byte
-	// little-endian-encoded integer.
-	var messageLength uint32
-	if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
-		c.bad = true
-		return nil, RqlConnectionError{err.Error()}
-	}
+	responseToken := int64(binary.LittleEndian.Uint64(c.headerBuf[:8]))
+	messageLength := binary.LittleEndian.Uint32(c.headerBuf[8:])
 
 	// Read the JSON encoding of the Response itself.
-	b := make([]byte, messageLength)
+	b := c.getReadBuf(messageLength)
 	if _, err := io.ReadFull(c.conn, b); err != nil {
 		c.bad = true
 		return nil, RqlConnectionError{err.Error()}
@@ -311,4 +326,12 @@ func (c *Connection) processWaitResponse(q Query, response *Response) (*Response
 	delete(c.cursors, response.Token)
 
 	return response, nil, nil
+}
+
+func (c *Connection) getReadBuf(size uint32) []byte {
+	if cap(c.readBuf) >= int(size) {
+		return c.readBuf[:size]
+	}
+	c.readBuf = make([]byte, size)
+	return c.readBuf
 }
