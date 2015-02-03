@@ -204,8 +204,11 @@ func newPtrDecoder(dt, st reflect.Type) decoderFunc {
 }
 
 func unmarshalerDecoder(dv, sv reflect.Value) {
-	if dv.Kind() != reflect.Ptr || dv.IsNil() {
+	if dv.Kind() != reflect.Ptr {
 		panic(&InvalidUnmarshalError{sv.Type()})
+	}
+	if dv.IsNil() {
+		dv.Set(reflect.New(dv.Type().Elem()))
 	}
 
 	u := dv.Interface().(Unmarshaler)
