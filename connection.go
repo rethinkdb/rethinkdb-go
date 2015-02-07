@@ -1,10 +1,8 @@
 package gorethink
 
 import (
-	"bufio"
 	"encoding/binary"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net"
 	"sync/atomic"
@@ -35,62 +33,50 @@ type Connection struct {
 	bad     bool
 
 	headerBuf [respHeaderLen]byte
-	readBuf   []byte
+	buf       buffer
 }
 
 // Dial closes the previous connection and attempts to connect again.
 func NewConnection(opts *ConnectOpts) (*Connection, error) {
-	conn, err := net.Dial("tcp", opts.Address)
-	if err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
+	var err error
 
-	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_V0_3); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, uint32(len(opts.AuthKey))); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// Send the auth key as an ASCII string
-	// If there is no auth key, skip this step
-	if opts.AuthKey != "" {
-		if _, err := io.WriteString(conn, opts.AuthKey); err != nil {
-			return nil, RqlConnectionError{err.Error()}
-		}
-	}
-
-	// Send the protocol type as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, p.VersionDummy_JSON); err != nil {
-		return nil, RqlConnectionError{err.Error()}
-	}
-
-	// read server response to authorization key (terminated by NUL)
-	reader := bufio.NewReader(conn)
-	line, err := reader.ReadBytes('\x00')
-	if err != nil {
-		if err == io.EOF {
-			return nil, fmt.Errorf("Unexpected EOF: %s", string(line))
-		}
-		return nil, RqlConnectionError{err.Error()}
-	}
-	// convert to string and remove trailing NUL byte
-	response := string(line[:len(line)-1])
-	if response != "SUCCESS" {
-		// we failed authorization or something else terrible happened
-		return nil, RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
-	}
-
+	// New mysqlConn
 	c := &Connection{
 		opts:    opts,
-		conn:    conn,
 		cursors: make(map[int64]*Cursor),
 	}
 
-	c.conn.SetDeadline(time.Time{})
+	// Connect to Server
+	nd := net.Dialer{Timeout: c.opts.Timeout}
+	c.conn, err = nd.Dial("tcp", c.opts.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	// Enable TCP Keepalives on TCP connections
+	if tc, ok := c.conn.(*net.TCPConn); ok {
+		if err := tc.SetKeepAlive(true); err != nil {
+			// Don't send COM_QUIT before handshake.
+			c.conn.Close()
+			c.conn = nil
+			return nil, err
+		}
+	}
+
+	c.buf = newBuffer(c.conn)
+
+	// Send handshake request
+	if err = c.writeHandshakeReq(); err != nil {
+		c.Close()
+		return nil, err
+	}
+
+	// Read handshake response
+	err = c.readHandshakeSuccess()
+	if err != nil {
+		c.Close()
+		return nil, err
+	}
 
 	return c, nil
 }
@@ -165,21 +151,8 @@ func (c *Connection) sendQuery(q Query) error {
 		c.conn.SetDeadline(time.Now().Add(c.opts.Timeout))
 	}
 
-	// Send a unique 8-byte token
-	if err = binary.Write(c.conn, binary.LittleEndian, q.Token); err != nil {
-		c.bad = true
-		return RqlConnectionError{err.Error()}
-	}
-
-	// Send the length of the JSON-encoded query as a 4-byte
-	// little-endian-encoded integer.
-	if err = binary.Write(c.conn, binary.LittleEndian, uint32(len(b))); err != nil {
-		c.bad = true
-		return RqlConnectionError{err.Error()}
-	}
-
 	// Send the JSON encoding of the query itself.
-	if err = binary.Write(c.conn, binary.BigEndian, b); err != nil {
+	if err = c.writeQuery(q.Token, b); err != nil {
 		c.bad = true
 		return RqlConnectionError{err.Error()}
 	}
@@ -194,20 +167,6 @@ func (c *Connection) nextToken() int64 {
 }
 
 func (c *Connection) readResponse() (*Response, error) {
-	// // Read the 8-byte token of the query the response corresponds to.
-	// var responseToken int64
-	// if err := binary.Read(c.conn, binary.LittleEndian, &responseToken); err != nil {
-	// 	c.bad = true
-	// 	return nil, RqlConnectionError{err.Error()}
-	// }
-
-	// // Read the length of the JSON-encoded response as a 4-byte
-	// // little-endian-encoded integer.
-	// var messageLength uint32
-	// if err := binary.Read(c.conn, binary.LittleEndian, &messageLength); err != nil {
-	// 	c.bad = true
-	// 	return nil, RqlConnectionError{err.Error()}
-	// }
 	// Read response header (token+length)
 	_, err := io.ReadFull(c.conn, c.headerBuf[:respHeaderLen])
 	if err != nil {
@@ -218,8 +177,8 @@ func (c *Connection) readResponse() (*Response, error) {
 	messageLength := binary.LittleEndian.Uint32(c.headerBuf[8:])
 
 	// Read the JSON encoding of the Response itself.
-	b := c.getReadBuf(messageLength)
-	if _, err := io.ReadFull(c.conn, b); err != nil {
+	b := c.buf.takeBuffer(int(messageLength))
+	if _, err := io.ReadFull(c.conn, b[:]); err != nil {
 		c.bad = true
 		return nil, RqlConnectionError{err.Error()}
 	}
@@ -326,12 +285,4 @@ func (c *Connection) processWaitResponse(q Query, response *Response) (*Response
 	delete(c.cursors, response.Token)
 
 	return response, nil, nil
-}
-
-func (c *Connection) getReadBuf(size uint32) []byte {
-	if cap(c.readBuf) >= int(size) {
-		return c.readBuf[:size]
-	}
-	c.readBuf = make([]byte, size)
-	return c.readBuf
 }
