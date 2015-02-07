@@ -122,3 +122,22 @@ func (b *buffer) takeCompleteBuffer() []byte {
 	}
 	return nil
 }
+
+var responseCache = make(chan *Response, 16)
+
+func newCachedResponse() *Response {
+	select {
+	case r := <-responseCache:
+		return r
+	default:
+		return new(Response)
+	}
+}
+
+func putResponse(r *Response) {
+	*r = Response{} // zero it
+	select {
+	case responseCache <- r:
+	default:
+	}
+}

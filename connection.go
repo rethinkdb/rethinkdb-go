@@ -120,9 +120,8 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 		return nil, nil, nil
 	}
 
-	var response *Response
 	for {
-		response, err = c.readResponse()
+		response, err := c.readResponse()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -133,6 +132,8 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 		} else if _, ok := c.cursors[response.Token]; ok {
 			// If the token is in the cursor cache then process the response
 			c.processResponse(q, response)
+		} else {
+			putResponse(response)
 		}
 	}
 }
@@ -184,7 +185,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	}
 
 	// Decode the response
-	var response = new(Response)
+	var response = newCachedResponse()
 	if err := json.Unmarshal(b, response); err != nil {
 		c.bad = true
 		return nil, RqlDriverError{err.Error()}
@@ -213,6 +214,7 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 	case p.Response_WAIT_COMPLETE:
 		return c.processWaitResponse(q, response)
 	default:
+		putResponse(response)
 		return nil, nil, RqlDriverError{"Unexpected response type"}
 	}
 }
