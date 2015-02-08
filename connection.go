@@ -24,16 +24,16 @@ type Response struct {
 // Connection is a connection to a rethinkdb database. Connection is not thread
 // safe and should only be accessed be a single goroutine
 type Connection struct {
+	host    Host
 	conn    net.Conn
-	opts    *ConnectOpts
 	token   int64
 	cursors map[int64]*Cursor
 	bad     bool
 }
 
 // Dial closes the previous connection and attempts to connect again.
-func NewConnection(opts *ConnectOpts) (*Connection, error) {
-	conn, err := net.Dial("tcp", opts.Address)
+func NewConnection(host Host) (*Connection, error) {
+	conn, err := net.Dial("tcp", host.Address)
 	if err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
@@ -44,14 +44,14 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 	}
 
 	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
-	if err := binary.Write(conn, binary.LittleEndian, uint32(len(opts.AuthKey))); err != nil {
+	if err := binary.Write(conn, binary.LittleEndian, uint32(len(host.AuthKey))); err != nil {
 		return nil, RqlConnectionError{err.Error()}
 	}
 
 	// Send the auth key as an ASCII string
 	// If there is no auth key, skip this step
-	if opts.AuthKey != "" {
-		if _, err := io.WriteString(conn, opts.AuthKey); err != nil {
+	if host.AuthKey != "" {
+		if _, err := io.WriteString(conn, host.AuthKey); err != nil {
 			return nil, RqlConnectionError{err.Error()}
 		}
 	}
@@ -78,7 +78,7 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 	}
 
 	c := &Connection{
-		opts:    opts,
+		host:    host,
 		conn:    conn,
 		cursors: make(map[int64]*Cursor),
 	}
@@ -96,7 +96,6 @@ func (c *Connection) Close() error {
 	}
 
 	c.cursors = nil
-	c.opts = nil
 
 	return nil
 }
@@ -113,8 +112,8 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	// Add token if query is a START/NOREPLY_WAIT
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		q.Token = c.nextToken()
-		if c.opts.Database != "" {
-			q.Opts["db"] = Db(c.opts.Database).build()
+		if c.host.Database != "" {
+			q.Opts["db"] = Db(c.host.Database).build()
 		}
 	}
 
@@ -152,10 +151,10 @@ func (c *Connection) sendQuery(q Query) error {
 	}
 
 	// Set timeout
-	if c.opts.Timeout == 0 {
+	if c.host.Timeout == 0 {
 		c.conn.SetDeadline(time.Time{})
 	} else {
-		c.conn.SetDeadline(time.Now().Add(c.opts.Timeout))
+		c.conn.SetDeadline(time.Now().Add(c.host.Timeout))
 	}
 
 	// Send a unique 8-byte token

@@ -7,6 +7,13 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+type executor interface {
+	Exec(q Query) error
+	Query(q Query) (*Cursor, error)
+
+	newQuery(t Term, opts map[string]interface{}) Query
+}
+
 type Session struct {
 	opts ConnectOpts
 	pool *Pool
@@ -77,7 +84,12 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 		return err
 	}
 
-	s.pool, err = NewPool(&s.opts)
+	s.pool, err = NewPool(Host{
+		Address:  s.opts.Address,
+		Database: s.opts.Database,
+		AuthKey:  s.opts.AuthKey,
+		Timeout:  s.opts.Timeout,
+	}, s.opts.MaxIdle, s.opts.MaxOpen)
 	if err != nil {
 		return err
 	}
@@ -137,4 +149,29 @@ func (s *Session) NoReplyWait() error {
 // Use changes the default database used
 func (s *Session) Use(database string) {
 	s.opts.Database = database
+}
+
+func (s *Session) Query(q Query) (*Cursor, error) {
+	return s.pool.Query(q)
+}
+
+func (s *Session) Exec(q Query) error {
+	return s.pool.Exec(q)
+}
+
+func (s *Session) newQuery(t Term, opts map[string]interface{}) Query {
+	queryOpts := map[string]interface{}{}
+	for k, v := range opts {
+		queryOpts[k] = Expr(v).build()
+	}
+	if s.opts.Database != "" {
+		queryOpts["db"] = Db(s.opts.Database).build()
+	}
+
+	// Construct query
+	return Query{
+		Type: p.Query_START,
+		Term: &t,
+		Opts: queryOpts,
+	}
 }
