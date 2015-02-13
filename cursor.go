@@ -101,6 +101,8 @@ func (c *Cursor) Close() error {
 
 	c.closed = true
 	c.conn = nil
+	c.buffer.elems = nil
+	c.responses.elems = nil
 
 	return err
 }
@@ -151,7 +153,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 
 		if c.buffer.Len() == 0 && c.responses.Len() > 0 {
 			if response, ok := c.responses.Pop().(json.RawMessage); ok {
-
 				var value interface{}
 				err := json.Unmarshal(response, &value)
 				if err != nil {
@@ -342,6 +343,8 @@ func (c *Cursor) extend(response *Response) {
 		response.Type != p.Response_SUCCESS_ATOM_FEED
 	c.fetching = false
 	c.isAtom = response.Type == p.Response_SUCCESS_ATOM
+
+	putResponse(response)
 }
 
 // Queue structure used for storing responses
