@@ -36,6 +36,27 @@ func (s *RethinkSuite) TestTimeEpochTime(c *test.C) {
 	c.Assert(response.Equal(time.Date(1986, 11, 3, 0, 0, 0, 0, time.UTC)), test.Equals, true)
 }
 
+func (s *RethinkSuite) TestTimeExpr(c *test.C) {
+	var response time.Time
+	t := time.Unix(531360000, 0)
+	res, err := Expr(Expr(t)).Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+	c.Assert(err, test.IsNil)
+}
+
+func (s *RethinkSuite) TestTimeExprMillisecond(c *test.C) {
+	var response time.Time
+	t := time.Unix(531360000, 679000000)
+	res, err := Expr(t).Run(sess)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(float64(response.UnixNano()), test.Equals, float64(t.UnixNano()))
+}
+
 func (s *RethinkSuite) TestTimeISO8601(c *test.C) {
 	var t1, t2 time.Time
 	t2, _ = time.Parse("2006-01-02T15:04:05-07:00", "1986-11-03T08:30:00-07:00")

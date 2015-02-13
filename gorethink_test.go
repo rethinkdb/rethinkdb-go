@@ -75,10 +75,10 @@ func (j jsonChecker) Check(params []interface{}, names []string) (result bool, e
 	return test.DeepEquals.Check(jsonParams, names)
 }
 
-// JsonEquals compares two interface{} objects by converting them to JSON and
+// jsonEquals compares two interface{} objects by converting them to JSON and
 // seeing if the strings match
-var JsonEquals = &jsonChecker{
-	&test.CheckerInfo{Name: "JsonEquals", Params: []string{"obtained", "expected"}},
+var jsonEquals = &jsonChecker{
+	&test.CheckerInfo{Name: "jsonEquals", Params: []string{"obtained", "expected"}},
 }
 
 // Expressions used in tests
@@ -260,7 +260,7 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 		err = res.One(&response)
 
 		c.Assert(err, test.IsNil)
-		c.Assert(response, JsonEquals, map[string]interface{}{"id": n})
+		c.Assert(response, jsonEquals, map[string]interface{}{"id": n})
 	}
 }
 
