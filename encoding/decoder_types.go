@@ -9,7 +9,8 @@ import (
 
 // newTypeDecoder constructs an decoderFunc for a type.
 func newTypeDecoder(dt, st reflect.Type) decoderFunc {
-	if dt.Implements(unmarshalerType) {
+	if reflect.PtrTo(dt).Implements(unmarshalerType) ||
+		dt.Implements(unmarshalerType) {
 		return unmarshalerDecoder
 	}
 
@@ -204,11 +205,9 @@ func newPtrDecoder(dt, st reflect.Type) decoderFunc {
 }
 
 func unmarshalerDecoder(dv, sv reflect.Value) {
-	if dv.Kind() != reflect.Ptr {
-		panic(&InvalidUnmarshalError{sv.Type()})
-	}
-	if dv.IsNil() {
-		dv.Set(reflect.New(dv.Type().Elem()))
+	// modeled off of https://golang.org/src/encoding/json/decode.go?#L325
+	if dv.Kind() != reflect.Ptr && dv.Type().Name() != "" && dv.CanAddr() {
+		dv = dv.Addr()
 	}
 
 	u := dv.Interface().(Unmarshaler)
