@@ -116,6 +116,9 @@ func (c *Cursor) Close() error {
 // and false at the end of the result set or if an error happened.
 // When Next returns false, the Err method should be called to verify if
 // there was an error during iteration.
+//
+// Also note that you are able to reuse the same variable multiple times as
+// `Next` zeroes the value before scanning in the result.
 func (c *Cursor) Next(dest interface{}) bool {
 	if c.closed {
 		return false
@@ -197,6 +200,11 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 //
 // The result argument must necessarily be the address for a slice. The slice
 // may be nil or previously allocated.
+//
+// Also note that you are able to reuse the same variable multiple times as
+// `All` zeroes the value before scanning in the result. It also attempts
+// to reuse the existing slice without allocating any more space by either
+// resizing or returning a selection of the slice if necessary.
 func (c *Cursor) All(result interface{}) error {
 	resultv := reflect.ValueOf(result)
 	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
@@ -237,6 +245,9 @@ func (c *Cursor) All(result interface{}) error {
 
 // One retrieves a single document from the result set into the provided
 // slice and closes the cursor.
+//
+// Also note that you are able to reuse the same variable multiple times as
+// `One` zeroes the value before scanning in the result.
 func (c *Cursor) One(result interface{}) error {
 	if c.IsNil() {
 		return ErrEmptyResult

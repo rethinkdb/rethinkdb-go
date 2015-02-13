@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.1 - 13 Feb 2015
+
+- Reduce GC by using buffers when reading and writing
+- Fixed encoding `time.Time` ignoring millseconds
+- Fixed pointers in structs that implement the `Marshaler`/`Unmarshaler` interfaces being ignored
+
 ## v0.6.0 - 1 Feb 2015
 
 There are some major changes to the driver with this release that are not related to the RethinkDB v1.16 release. Please have a read through them:
