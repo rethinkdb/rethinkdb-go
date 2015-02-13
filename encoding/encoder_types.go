@@ -264,7 +264,7 @@ func timePseudoTypeEncoder(v reflect.Value) interface{} {
 
 	return map[string]interface{}{
 		"$reql_type$": "TIME",
-		"epoch_time":  t.Unix(),
+		"epoch_time":  float64(t.UnixNano())/1000/1000/1000, //milliseconds
 		"timezone":    "+00:00",
 	}
 }

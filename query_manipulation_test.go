@@ -27,7 +27,7 @@ func (s *RethinkSuite) TestManipulationPluck(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"a": 1, "c": 3})
+	c.Assert(response, jsonEquals, map[string]interface{}{"a": 1, "c": 3})
 }
 
 func (s *RethinkSuite) TestManipulationWithout(c *test.C) {
@@ -40,7 +40,7 @@ func (s *RethinkSuite) TestManipulationWithout(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"a": 1, "c": 3})
+	c.Assert(response, jsonEquals, map[string]interface{}{"a": 1, "c": 3})
 }
 
 func (s *RethinkSuite) TestManipulationMerge(c *test.C) {
@@ -53,7 +53,7 @@ func (s *RethinkSuite) TestManipulationMerge(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"a": 1, "b": 2, "c": 3})
+	c.Assert(response, jsonEquals, map[string]interface{}{"a": 1, "b": 2, "c": 3})
 }
 
 func (s *RethinkSuite) TestManipulationMergeLiteral(c *test.C) {
@@ -77,7 +77,7 @@ func (s *RethinkSuite) TestManipulationMergeLiteral(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"a": map[string]interface{}{"aa": map[string]interface{}{"aab": 2, "aaa": 1}}})
+	c.Assert(response, jsonEquals, map[string]interface{}{"a": map[string]interface{}{"aa": map[string]interface{}{"aab": 2, "aaa": 1}}})
 }
 
 func (s *RethinkSuite) TestManipulationAppend(c *test.C) {
@@ -90,7 +90,7 @@ func (s *RethinkSuite) TestManipulationAppend(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
 func (s *RethinkSuite) TestManipulationPrepend(c *test.C) {
@@ -103,7 +103,7 @@ func (s *RethinkSuite) TestManipulationPrepend(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
 func (s *RethinkSuite) TestManipulationDifference(c *test.C) {
@@ -116,7 +116,7 @@ func (s *RethinkSuite) TestManipulationDifference(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{5})
+	c.Assert(response, jsonEquals, []interface{}{5})
 }
 
 func (s *RethinkSuite) TestManipulationSetInsert(c *test.C) {
@@ -129,7 +129,7 @@ func (s *RethinkSuite) TestManipulationSetInsert(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4})
 }
 
 func (s *RethinkSuite) TestManipulationSetUnion(c *test.C) {
@@ -142,7 +142,7 @@ func (s *RethinkSuite) TestManipulationSetUnion(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4})
 }
 
 func (s *RethinkSuite) TestManipulationSetIntersection(c *test.C) {
@@ -155,7 +155,7 @@ func (s *RethinkSuite) TestManipulationSetIntersection(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{2, 3})
+	c.Assert(response, jsonEquals, []interface{}{2, 3})
 }
 
 func (s *RethinkSuite) TestManipulationSetDifference(c *test.C) {
@@ -168,7 +168,7 @@ func (s *RethinkSuite) TestManipulationSetDifference(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1})
+	c.Assert(response, jsonEquals, []interface{}{1})
 }
 
 func (s *RethinkSuite) TestManipulationHasFieldsTrue(c *test.C) {
@@ -233,7 +233,7 @@ func (s *RethinkSuite) TestManipulationInsertAt(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 1.5, 2, 3})
+	c.Assert(response, jsonEquals, []interface{}{1, 1.5, 2, 3})
 }
 
 func (s *RethinkSuite) TestManipulationSpliceAt(c *test.C) {
@@ -246,7 +246,7 @@ func (s *RethinkSuite) TestManipulationSpliceAt(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 1.25, 1.5, 1.75, 2, 3})
+	c.Assert(response, jsonEquals, []interface{}{1, 1.25, 1.5, 1.75, 2, 3})
 }
 
 func (s *RethinkSuite) TestManipulationDeleteAt(c *test.C) {
@@ -259,7 +259,7 @@ func (s *RethinkSuite) TestManipulationDeleteAt(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 3})
+	c.Assert(response, jsonEquals, []interface{}{1, 3})
 }
 
 func (s *RethinkSuite) TestManipulationDeleteAtRange(c *test.C) {
@@ -272,7 +272,7 @@ func (s *RethinkSuite) TestManipulationDeleteAtRange(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 4})
+	c.Assert(response, jsonEquals, []interface{}{1, 4})
 }
 
 func (s *RethinkSuite) TestManipulationChangeAt(c *test.C) {
@@ -285,7 +285,7 @@ func (s *RethinkSuite) TestManipulationChangeAt(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4})
 }
 
 func (s *RethinkSuite) TestManipulationKeys(c *test.C) {
@@ -298,7 +298,7 @@ func (s *RethinkSuite) TestManipulationKeys(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{"a", "b", "c"})
+	c.Assert(response, jsonEquals, []interface{}{"a", "b", "c"})
 }
 
 func (s *RethinkSuite) TestManipulationObject(c *test.C) {
@@ -311,7 +311,7 @@ func (s *RethinkSuite) TestManipulationObject(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"a": 1,
 		"b": 2,
 	})
