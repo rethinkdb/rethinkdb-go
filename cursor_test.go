@@ -24,7 +24,7 @@ func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
 	var response interface{}
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, 5)
+	c.Assert(response, jsonEquals, 5)
 }
 
 func (s *RethinkSuite) TestCursorSlice(c *test.C) {
@@ -34,7 +34,7 @@ func (s *RethinkSuite) TestCursorSlice(c *test.C) {
 	var response []interface{}
 	err = res.All(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4, 5})
 }
 
 func (s *RethinkSuite) TestCursorPartiallyNilSlice(c *test.C) {
@@ -49,7 +49,7 @@ func (s *RethinkSuite) TestCursorPartiallyNilSlice(c *test.C) {
 	var response map[string]interface{}
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"item": []interface{}{
 			map[string]interface{}{"num": 1},
 			nil,
@@ -67,7 +67,7 @@ func (s *RethinkSuite) TestCursorMap(c *test.C) {
 	var response map[string]interface{}
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 	})
@@ -83,7 +83,7 @@ func (s *RethinkSuite) TestCursorMapIntoInterface(c *test.C) {
 	var response interface{}
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 	})
@@ -103,7 +103,7 @@ func (s *RethinkSuite) TestCursorMapNested(c *test.C) {
 	var response interface{}
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
 		"attr": []interface{}{map[string]interface{}{
@@ -151,7 +151,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	c.Assert(response.T.Equal(time.Unix(t.Unix(), 0)), test.Equals, true)
-	c.Assert(response.B, JsonEquals, []byte("hello"))
+	c.Assert(response.B, jsonEquals, []byte("hello"))
 }
 
 func (s *RethinkSuite) TestCursorAtomString(c *test.C) {

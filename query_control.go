@@ -220,7 +220,14 @@ func Branch(args ...interface{}) Term {
 	return constructRootTerm("Branch", p.Term_BRANCH, args, map[string]interface{}{})
 }
 
-// Loop over a sequence, evaluating the given write query for each element.
+// ForEach loops over a sequence, evaluating the given write query for each element.
+//
+// It takes one argument of type `func (r.Term) interface{}`, for
+// example clones a table:
+//
+//     r.Table("table").ForEach(func (row r.Term) interface{} {
+//         return r.Table("new_table").Insert(row)
+//     })
 func (t Term) ForEach(args ...interface{}) Term {
 	return constructMethodTerm(t, "Foreach", p.Term_FOR_EACH, funcWrapArgs(args), map[string]interface{}{})
 }

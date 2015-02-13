@@ -14,7 +14,7 @@ func (s *RethinkSuite) TestTableCreate(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.TablesCreated, JsonEquals, 1)
+	c.Assert(response.TablesCreated, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
@@ -27,7 +27,7 @@ func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.TablesCreated, JsonEquals, 1)
+	c.Assert(response.TablesCreated, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
@@ -40,7 +40,7 @@ func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.TablesCreated, JsonEquals, 1)
+	c.Assert(response.TablesCreated, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
@@ -54,7 +54,7 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.TablesCreated, JsonEquals, 1)
+	c.Assert(response.TablesCreated, jsonEquals, 1)
 
 	Db("test").TableDrop("test").Exec(sess)
 }
@@ -91,7 +91,7 @@ func (s *RethinkSuite) TestTableDelete(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.TablesDropped, JsonEquals, 1)
+	c.Assert(response.TablesDropped, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
@@ -105,7 +105,7 @@ func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.Created, JsonEquals, 1)
+	c.Assert(response.Created, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCompoundIndexCreate(c *test.C) {
@@ -153,7 +153,7 @@ func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.Dropped, JsonEquals, 1)
+	c.Assert(response.Dropped, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
@@ -166,7 +166,7 @@ func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
 
 	response, err := query.RunWrite(sess)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.Renamed, JsonEquals, 1)
+	c.Assert(response.Renamed, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableChanges(c *test.C) {

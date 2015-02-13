@@ -26,7 +26,7 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
+	c.Assert(response, jsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
 }
 
 func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
@@ -47,7 +47,7 @@ func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
 	})
 }
@@ -70,7 +70,7 @@ func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
@@ -95,7 +95,7 @@ func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
+	c.Assert(response, jsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
 }
 
 func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
@@ -116,7 +116,7 @@ func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
+	c.Assert(response, jsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
 }
 
 func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
@@ -142,7 +142,7 @@ func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{"id": 1, "first_name": "John", "last_name": "Smith", "gender": "M"})
+	c.Assert(response, jsonEquals, map[string]interface{}{"id": 1, "first_name": "John", "last_name": "Smith", "gender": "M"})
 }
 
 func (s *RethinkSuite) TestSelectBetween(c *test.C) {
@@ -162,7 +162,7 @@ func (s *RethinkSuite) TestSelectBetween(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 	})
@@ -188,7 +188,7 @@ func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 25, "id": 9, "g2": 3, "g1": 2},
@@ -216,7 +216,7 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
@@ -241,7 +241,7 @@ func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 	})
@@ -266,7 +266,7 @@ func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 	})
