@@ -67,7 +67,7 @@ func (c *Connection) readHandshakeSuccess() error {
 	return nil
 }
 
-func (c *Connection) writeQueryg(token int64, q []byte) error {
+func (c *Connection) writeQuery(token int64, q []byte) error {
 	pos := 0
 	dataLen := 8 + 4 + len(q)
 
