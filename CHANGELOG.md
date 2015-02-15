@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.6.2 - 15 Feb 2015
+
+- Fixed `writeQuery` being too small when sending large queries
+
 ## v0.6.1 - 13 Feb 2015
 
 - Reduce GC by using buffers when reading and writing
