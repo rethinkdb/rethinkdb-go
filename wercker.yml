@@ -31,6 +31,7 @@ build:
             name: Test
             code: |-
                 go get -u gopkg.in/check.v1
+                go test ./...
         - script:
             name: Store cache
             code: |-
