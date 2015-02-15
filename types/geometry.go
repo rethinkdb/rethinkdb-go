@@ -1,6 +1,8 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type Geometry struct {
 	Type  string
@@ -23,6 +25,15 @@ func (g Geometry) MarshalRQL() (interface{}, error) {
 }
 
 func (g *Geometry) UnmarshalRQL(data interface{}) error {
+	if data, ok := data.(Geometry); ok {
+		g.Type = data.Type
+		g.Point = data.Point
+		g.Line = data.Line
+		g.Lines = data.Lines
+
+		return nil
+	}
+
 	m, ok := data.(map[string]interface{})
 	if !ok {
 		return fmt.Errorf("pseudo-type GEOMETRY object is not valid")

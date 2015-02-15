@@ -69,6 +69,11 @@ func valueDecoder(dv, sv reflect.Value) decoderFunc {
 		return invalidValueDecoder
 	}
 
+	if dv.IsValid() {
+		dv = indirect(dv, false)
+		dv.Set(reflect.Zero(dv.Type()))
+	}
+
 	return typeDecoder(dv.Type(), sv.Type())
 }
 
