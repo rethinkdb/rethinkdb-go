@@ -67,11 +67,11 @@ func (c *Connection) readHandshakeSuccess() error {
 	return nil
 }
 
-func (c *Connection) writeQuery(token int64, q []byte) error {
+func (c *Connection)(token int64, q []byte) error {
 	pos := 0
 	dataLen := 8 + 4 + len(q)
 
-	data := c.buf.takeSmallBuffer(dataLen)
+	data := c.buf.takeBuffer(dataLen)
 	if data == nil {
 		return RqlDriverError{ErrBusyBuffer.Error()}
 	}
