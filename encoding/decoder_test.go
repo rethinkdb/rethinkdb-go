@@ -3,7 +3,6 @@ package encoding
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"image"
 	"reflect"
 	"testing"
@@ -149,7 +148,7 @@ var decodeTests = []decodeTest{
 	{in: string("2"), ptr: new(interface{}), out: string("2")},
 	{in: "a\u1234", ptr: new(string), out: "a\u1234"},
 	{in: []interface{}{}, ptr: new([]string), out: []string{}},
-	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{}, err: &DecodeTypeError{reflect.TypeOf([0]interface{}{}), reflect.TypeOf(""), ""}},
+	{in: map[string]interface{}{"X": []interface{}{1, 2, 3}, "Y": 4}, ptr: new(T), out: T{}, err: &DecodeTypeError{reflect.TypeOf(""), reflect.TypeOf([]interface{}{}), ""}},
 	{in: map[string]interface{}{"x": 1}, ptr: new(tx), out: tx{}},
 	{in: map[string]interface{}{"F1": float64(1), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: float64(1), F2: int32(2), F3: string("3")}},
 	{in: map[string]interface{}{"F1": string("1"), "F2": 2, "F3": 3}, ptr: new(V), out: V{F1: string("1"), F2: int32(2), F3: string("3")}},
@@ -256,9 +255,7 @@ func TestDecode(t *testing.T) {
 			continue
 		}
 
-		if !jsonEqual(v.Elem().Interface(), tt.out) {
-			fmt.Printf("%#v\n", v.Elem().Interface())
-			fmt.Printf("%#v\n", tt.out)
+		if tt.err != nil && !jsonEqual(v.Elem().Interface(), tt.out) {
 			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
 		}
