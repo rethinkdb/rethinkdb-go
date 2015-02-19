@@ -255,7 +255,7 @@ func TestDecode(t *testing.T) {
 			continue
 		}
 
-		if tt.err != nil && !jsonEqual(v.Elem().Interface(), tt.out) {
+		if tt.err == nil && !jsonEqual(v.Elem().Interface(), tt.out) {
 			t.Errorf("#%d: mismatch\nhave: %+v\nwant: %+v", i, v.Elem().Interface(), tt.out)
 			continue
 		}
