@@ -2,6 +2,9 @@ package gorethink
 
 import (
 	"errors"
+	"fmt"
+	"log"
+	"strings"
 	"sync"
 	"time"
 
@@ -21,15 +24,15 @@ type Cluster struct {
 }
 
 type ClusterOpts struct {
-	Hosts             []string      `gorethink:"hosts,omitempty"`
-	Database          string        `gorethink:"database,omitempty"`
-	AuthKey           string        `gorethink:"authkey,omitempty"`
-	Timeout           time.Duration `gorethink:"timeout,omitempty"`
-	MaxIdle           int           `gorethink:"max_idle,omitempty"`
-	MaxOpen           int           `gorethink:"max_open,omitempty"`
-	DiscoverHosts     bool          `gorethink:"discover_hosts,omitempty"`
-	DiscoverInterval  time.Duration `gorethink:"discover_interval,omitempty"`
-	HostDecayDuration time.Duration `gorethink:"host_decay_duration,omitempty"`
+	Hosts              []string      `gorethink:"hosts,omitempty"`
+	Database           string        `gorethink:"database,omitempty"`
+	AuthKey            string        `gorethink:"authkey,omitempty"`
+	Timeout            time.Duration `gorethink:"timeout,omitempty"`
+	MaxIdle            int           `gorethink:"max_idle,omitempty"`
+	MaxOpen            int           `gorethink:"max_open,omitempty"`
+	DiscoverHosts      bool          `gorethink:"discover_hosts,omitempty"`
+	HostDecayDuration  time.Duration `gorethink:"host_decay_duration,omitempty"`
+	ErrorSleepDuration time.Duration `gorethink:"error_sleep_duration,omitempty"`
 }
 
 func ConnectCluster(opts ClusterOpts) (*Cluster, error) {
@@ -51,7 +54,7 @@ func ConnectCluster(opts ClusterOpts) (*Cluster, error) {
 	}
 
 	if opts.DiscoverHosts {
-		go c.nodes.discover()
+		go c.discover()
 	}
 
 	return c, nil
@@ -112,6 +115,92 @@ func (c *Cluster) newQuery(t Term, opts map[string]interface{}) Query {
 	}
 }
 
+type serverStatusResult struct {
+	ID      string `gorethink:"id"`
+	Name    string `gorethink:"name"`
+	Status  string `gorethink:"status"`
+	Network struct {
+		Hostname           string `gorethink:"hostname"`
+		HTTPAdminPort      int64  `gorethink:"http_admin_port"`
+		ClusterPort        int64  `gorethink:"cluster_port"`
+		ReqlPort           int64  `gorethink:"reql_port"`
+		CanonicalAddresses []struct {
+			Host string `gorethink:"host"`
+			Port int64  `gorethink:"port"`
+		} `gorethink:"canonical_addresses"`
+	} `gorethink:"network"`
+}
+
+// discover attempts to find new nodes in the cluster using the current nodes
+func (c *Cluster) discover() {
+	c.discoverInitialHosts()
+	c.discoverHostChanges()
+}
+
+func (c *Cluster) discoverInitialHosts() {
+	query := Db("rethinkdb").Table("server_status")
+	cursor, err := c.Query(c.newQuery(query, map[string]interface{}{}))
+	if err != nil {
+		log.Printf("Error discovering hosts, %s", err)
+	}
+
+	var result []serverStatusResult
+	err = cursor.All(&result)
+	if err != nil {
+		log.Printf("Error discovering hosts, %s", err)
+	}
+
+	addrs := make([]string, 0, len(result))
+	for _, host := range result {
+		if host.Status == "connected" {
+			addrs = append(addrs, strings.ToLower(fmt.Sprintf("%s:%d", host.Network.Hostname, host.Network.ReqlPort)))
+		}
+	}
+	c.nodes.Seed(addrs)
+}
+
+func (c *Cluster) discoverHostChanges() {
+	for {
+		query := Db("rethinkdb").Table("server_status").Changes()
+		cursor, err := c.Query(c.newQuery(query, map[string]interface{}{}))
+		if err != nil {
+			log.Printf("Error discovering hosts, %s", err)
+		}
+
+		var result struct {
+			NewVal serverStatusResult `gorethink:"new_val"`
+			OldVal serverStatusResult `gorethink:"old_val"`
+		}
+
+		for cursor.Next(&result) {
+			addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
+			addr = strings.ToLower(addr)
+
+			switch result.NewVal.Status {
+			case "connected":
+				c.nodes.AddHost(addr)
+			case "disconnected":
+				c.nodes.RemoveHost(addr)
+			default:
+				continue
+			}
+
+			// If all hosts have been removed then return
+			if c.nodes.Size() <= 0 {
+				return
+			}
+
+			c.nodes.refreshHostPool()
+		}
+		if cursor.Err() != nil {
+			log.Printf("Error discovering hosts %s, retrying in %d", err, c.opts.ErrorSleepDuration)
+		}
+
+		// If an error occurs sleep and setup changefeed again
+		time.Sleep(c.opts.ErrorSleepDuration)
+	}
+}
+
 // Nodes stores a list of all of the discovered hosts. Internally it uses an
 // epsilon greedy hostpool from the go-hostpool package to determine which
 // node to use.
@@ -124,29 +213,13 @@ type Nodes struct {
 	hp    hostpool.HostPool
 }
 
-func (n *Nodes) Seed(seeds []string) error {
-	n.hosts = []string{}
+func (n *Nodes) Seed(addrs []string) error {
 	n.nodes = make(map[string]*Node)
 
-	for _, addr := range seeds {
-		host := Host{
-			Address:  addr,
-			Database: n.opts.Database,
-			AuthKey:  n.opts.AuthKey,
-			Timeout:  n.opts.Timeout,
-		}
-		pool, err := NewPool(host, n.opts.MaxIdle, n.opts.MaxOpen)
-		if err != nil {
+	for _, addr := range addrs {
+		if err := n.AddHost(addr); err != nil {
+			log.Printf("Error connecting to host %s in cluster %s", addr, err)
 			continue
-		}
-		if err := pool.Ping(); err != nil {
-			continue
-		}
-
-		n.hosts = append(n.hosts, addr)
-		n.nodes[addr] = &Node{
-			host: host,
-			pool: pool,
 		}
 	}
 
@@ -170,6 +243,47 @@ func (n *Nodes) Get() (hostpool.HostPoolResponse, *Node) {
 	return hpr, node
 }
 
+func (n *Nodes) AddHost(addr string) error {
+	host := Host{
+		Address:  addr,
+		Database: n.opts.Database,
+		AuthKey:  n.opts.AuthKey,
+		Timeout:  n.opts.Timeout,
+	}
+	pool, err := NewPool(host, n.opts.MaxIdle, n.opts.MaxOpen)
+	if err != nil {
+		return err
+	}
+	if err := pool.Ping(); err != nil {
+		return err
+	}
+
+	n.nodes[addr] = &Node{
+		host: host,
+		pool: pool,
+	}
+
+	return nil
+}
+
+func (n *Nodes) RemoveHost(addr string) {
+	delete(n.nodes, addr)
+}
+
+func (n *Nodes) Hosts() []string {
+	n.RLock()
+	defer n.RUnlock()
+
+	i := 0
+	hosts := make([]string, len(n.nodes))
+	for _, h := range n.nodes {
+		hosts[i] = h.host.Address
+		i++
+	}
+
+	return hosts
+}
+
 func (n *Nodes) Size() int {
 	n.RLock()
 	defer n.RUnlock()
@@ -178,12 +292,7 @@ func (n *Nodes) Size() int {
 }
 
 func (n *Nodes) refreshHostPool() {
-	n.hp = hostpool.NewEpsilonGreedy(n.hosts, n.opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{})
-}
-
-// discover attempts to find new nodes in the cluster using the current nodes
-func (n *Nodes) discover() {
-
+	n.hp = hostpool.NewEpsilonGreedy(n.Hosts(), n.opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{})
 }
 
 type Node struct {
