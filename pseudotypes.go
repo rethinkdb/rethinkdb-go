@@ -214,6 +214,6 @@ func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, erro
 			}, nil
 		}
 	} else {
-		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field has unknown type %s", typ)
+		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field has unknown type %s", obj, typ)
 	}
 }
