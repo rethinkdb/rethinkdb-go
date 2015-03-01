@@ -279,10 +279,6 @@ func (c *Cursor) IsNil() bool {
 			return true
 		}
 
-		if bufferedItem == nil {
-			return true
-		}
-
 		return false
 	}
 
