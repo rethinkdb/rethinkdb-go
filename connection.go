@@ -28,6 +28,7 @@ type Response struct {
 type Connection struct {
 	conn    net.Conn
 	opts    *ConnectOpts
+	_       [4]byte
 	token   int64
 	cursors map[int64]*Cursor
 	bad     bool
@@ -164,6 +165,7 @@ func (c *Connection) sendQuery(q Query) error {
 // getToken generates the next query token, used to number requests and match
 // responses with requests.
 func (c *Connection) nextToken() int64 {
+	// requires c.token to be 64-bit aligned on ARM
 	return atomic.AddInt64(&c.token, 1)
 }
 
