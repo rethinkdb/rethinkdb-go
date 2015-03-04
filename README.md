@@ -7,7 +7,7 @@
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
 
 
-Current version: v0.6.2 (RethinkDB v1.16) 
+Current version: v0.6.3 (RethinkDB v1.16) 
 
 **Version 0.6 introduced some small API changes and some significant internal changes, for more information check the [change log](CHANGELOG.md) and please be aware the driver is not yet stable**
 
