@@ -210,6 +210,10 @@ func unmarshalerDecoder(dv, sv reflect.Value) {
 		dv = dv.Addr()
 	}
 
+	if dv.IsNil() {
+		dv.Set(reflect.New(dv.Type().Elem()))
+	}
+
 	u := dv.Interface().(Unmarshaler)
 	err := u.UnmarshalRQL(sv.Interface())
 	if err != nil {
