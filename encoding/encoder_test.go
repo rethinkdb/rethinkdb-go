@@ -123,6 +123,38 @@ func TestAnonymousNonstruct(t *testing.T) {
 	}
 }
 
+func TestEncodePointer(t *testing.T) {
+	v := Pointer{PPoint: &Point{Z: 1}, Point: Point{Z: 2}}
+	var want = map[string]interface{}{
+		"PPoint": map[string]interface{}{"Z": int64(1)},
+		"Point":  map[string]interface{}{"Z": int64(2)},
+	}
+
+	got, err := Encode(v)
+	if err != nil {
+		t.Fatalf("Encode: %v", err)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
+func TestEncodeNilPointer(t *testing.T) {
+	v := Pointer{PPoint: nil, Point: Point{Z: 2}}
+	var want = map[string]interface{}{
+		"PPoint": nil,
+		"Point":  map[string]interface{}{"Z": int64(2)},
+	}
+
+	got, err := Encode(v)
+	if err != nil {
+		t.Fatalf("Encode: %v", err)
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("got %v, want %v", got, want)
+	}
+}
+
 type BugA struct {
 	S string
 }
