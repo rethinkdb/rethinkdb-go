@@ -1,7 +1,6 @@
 package gorethink
 
 import (
-	"encoding/json"
 	"flag"
 	"math/rand"
 	"os"
@@ -53,32 +52,6 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 
 func (s *RethinkSuite) TearDownSuite(c *test.C) {
 	sess.Close()
-}
-
-type jsonChecker struct {
-	info *test.CheckerInfo
-}
-
-func (j jsonChecker) Info() *test.CheckerInfo {
-	return j.info
-}
-
-func (j jsonChecker) Check(params []interface{}, names []string) (result bool, error string) {
-	var jsonParams []interface{}
-	for _, param := range params {
-		jsonParam, err := json.Marshal(param)
-		if err != nil {
-			return false, err.Error()
-		}
-		jsonParams = append(jsonParams, jsonParam)
-	}
-	return test.DeepEquals.Check(jsonParams, names)
-}
-
-// jsonEquals compares two interface{} objects by converting them to JSON and
-// seeing if the strings match
-var jsonEquals = &jsonChecker{
-	&test.CheckerInfo{Name: "jsonEquals", Params: []string{"obtained", "expected"}},
 }
 
 // Expressions used in tests
