@@ -7,7 +7,7 @@
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
 
 
-Current version: v0.6.0 (RethinkDB v1.16.0) 
+Current version: v0.6.3 (RethinkDB v1.16) 
 
 **Version 0.6 introduced some small API changes and some significant internal changes, for more information check the [change log](CHANGELOG.md) and please be aware the driver is not yet stable**
 
@@ -118,15 +118,14 @@ As shown above in the Between example optional arguments are passed to the funct
 
 Different result types are returned depending on what function is used to execute the query.
 
-- `Run` returns a cursor which can be used to view
-all rows returned.
-- `RunWrite` returns a WriteResponse and should be used for queries such as Insert,Update,etc...
+- `Run` returns a cursor which can be used to view all rows returned.
+- `RunWrite` returns a WriteResponse and should be used for queries such as Insert, Update, etc...
 - `Exec` sends a query to the server and closes the connection immediately after reading the response from the database. If you do not wish to wait for the response then you can set the `NoReply` flag.
 
 Example:
 
 ```go
-res, err := Table("tablename").Get(key).Run(session)
+res, err := r.Db("database").Table("tablename").Get(key).Run(session)
 if err != nil {
     // error
 }

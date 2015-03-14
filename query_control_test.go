@@ -41,7 +41,7 @@ func (s *RethinkSuite) TestControlExprList(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		1, 2, 3, 4, 5, 6, []interface{}{
 			7.1, 7.2, 7.3,
 		},
@@ -57,7 +57,7 @@ func (s *RethinkSuite) TestControlExprObj(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"A": 1,
 		"B": 2,
 		"C": map[string]interface{}{
@@ -76,7 +76,7 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"id": "A",
 		"B":  1,
 		"D":  map[string]interface{}{"D2": "2", "D1": 1},
@@ -114,7 +114,7 @@ func (s *RethinkSuite) TestControlMapTypeAlias(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, TMap{"A": 1, "B": 2})
+	c.Assert(response, jsonEquals, TMap{"A": 1, "B": 2})
 }
 
 func (s *RethinkSuite) TestControlStringTypeAlias(c *test.C) {
@@ -126,7 +126,7 @@ func (s *RethinkSuite) TestControlStringTypeAlias(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, TStr("Hello"))
+	c.Assert(response, jsonEquals, TStr("Hello"))
 }
 
 func (s *RethinkSuite) TestControlExprTypes(c *test.C) {
@@ -138,7 +138,7 @@ func (s *RethinkSuite) TestControlExprTypes(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
+	c.Assert(response, jsonEquals, []interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
 }
 
 func (s *RethinkSuite) TestControlJs(c *test.C) {
@@ -166,7 +166,7 @@ func (s *RethinkSuite) TestControlHttp(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response["args"], JsonEquals, map[string]interface{}{
+	c.Assert(response["args"], jsonEquals, map[string]interface{}{
 		"data": "1",
 	})
 }
@@ -180,7 +180,7 @@ func (s *RethinkSuite) TestControlJson(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3})
 }
 
 func (s *RethinkSuite) TestControlError(c *test.C) {
@@ -203,7 +203,7 @@ func (s *RethinkSuite) TestControlDoNothing(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
+	c.Assert(response, jsonEquals, []interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
 }
 
 func (s *RethinkSuite) TestControlArgs(c *test.C) {
@@ -308,7 +308,7 @@ func (s *RethinkSuite) TestControlDo(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3})
 }
 
 func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
@@ -326,7 +326,7 @@ func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3})
 }
 
 func (s *RethinkSuite) TestControlBranchSimple(c *test.C) {
@@ -358,7 +358,7 @@ func (s *RethinkSuite) TestControlBranchWithMapExpr(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{2, 1, 4})
+	c.Assert(response, jsonEquals, []interface{}{2, 1, 4})
 }
 
 func (s *RethinkSuite) TestControlDefault(c *test.C) {
@@ -372,7 +372,7 @@ func (s *RethinkSuite) TestControlDefault(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 1})
+	c.Assert(response, jsonEquals, []interface{}{1, 1})
 }
 
 func (s *RethinkSuite) TestControlCoerceTo(c *test.C) {

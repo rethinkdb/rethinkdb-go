@@ -7,8 +7,15 @@ import (
 // Aggregation
 // These commands are used to compute smaller values from large sequences.
 
-// Produce a single value from a sequence through repeated application of a
-// reduction function
+// Reduce produces a single value from a sequence through repeated application
+// of a reduction function
+//
+// It takes one argument of type `func (r.Term, r.Term) interface{}`, for
+// example this query sums all elements in an array:
+//
+//     r.Expr([]int{1,3,6}).Reduce(func (left, right r.Term) interface{} {
+//         return left.Add(right)
+//     })
 func (t Term) Reduce(args ...interface{}) Term {
 	return constructMethodTerm(t, "Reduce", p.Term_REDUCE, funcWrapArgs(args), map[string]interface{}{})
 }

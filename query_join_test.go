@@ -23,7 +23,7 @@ func (s *RethinkSuite) TestJoinInnerJoin(c *test.C) {
 	c.Assert(err, test.IsNil)
 	err = res.All(&response)
 
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{
 			"right": map[string]interface{}{"title": "goof", "id": 0},
 			"left":  map[string]interface{}{"name": "bob", "id": 0},
@@ -56,7 +56,7 @@ func (s *RethinkSuite) TestJoinInnerJoinZip(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0},
 		map[string]interface{}{"title": "lmoe", "name": "joe", "id": 2},
 	})
@@ -83,7 +83,7 @@ func (s *RethinkSuite) TestJoinOuterJoinZip(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0},
 		map[string]interface{}{"name": "tom", "id": 1},
 		map[string]interface{}{"title": "lmoe", "name": "joe", "id": 2},
@@ -107,7 +107,7 @@ func (s *RethinkSuite) TestJoinEqJoinZip(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0},
 		map[string]interface{}{"title": "lmoe", "name": "joe", "id": 2},
 	})
@@ -138,7 +138,7 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"title": "goof", "name": "bob", "id": 0, "it": 0},
 		map[string]interface{}{"title": "lmoe", "name": "joe", "id": 2, "it": 2},
 	})

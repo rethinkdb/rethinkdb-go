@@ -14,7 +14,7 @@ func (s *RethinkSuite) TestTransformationMapImplicit(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
+	c.Assert(response, jsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
 }
 
 func (s *RethinkSuite) TestTransformationMapFunc(c *test.C) {
@@ -29,7 +29,7 @@ func (s *RethinkSuite) TestTransformationMapFunc(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
+	c.Assert(response, jsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
 }
 
 func (s *RethinkSuite) TestTransformationWithFields(c *test.C) {
@@ -42,7 +42,7 @@ func (s *RethinkSuite) TestTransformationWithFields(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1},
 		map[string]interface{}{"num": 5, "id": 2},
 		map[string]interface{}{"num": 10, "id": 3},
@@ -67,7 +67,7 @@ func (s *RethinkSuite) TestTransformationConcatMap(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{0, 5, 10, 0, 100, 15, 0, 50, 25})
+	c.Assert(response, jsonEquals, []interface{}{0, 5, 10, 0, 100, 15, 0, 50, 25})
 }
 
 func (s *RethinkSuite) TestTransformationVariadicMap(c *test.C) {
@@ -82,7 +82,7 @@ func (s *RethinkSuite) TestTransformationVariadicMap(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, [][]int{
+	c.Assert(response, jsonEquals, [][]int{
 		{0, 0},
 		{1, 1},
 		{2, 2},
@@ -103,7 +103,7 @@ func (s *RethinkSuite) TestTransformationVariadicRootMap(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, [][]int{
+	c.Assert(response, jsonEquals, [][]int{
 		{0, 0},
 		{1, 1},
 		{2, 2},
@@ -122,7 +122,7 @@ func (s *RethinkSuite) TestTransformationOrderByDesc(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 		map[string]interface{}{"num": 25, "id": 9, "g2": 3, "g1": 2},
@@ -143,7 +143,7 @@ func (s *RethinkSuite) TestTransformationOrderByAsc(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
@@ -173,7 +173,7 @@ func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
@@ -203,7 +203,7 @@ func (s *RethinkSuite) TestTransformationOrderByIndexAsc(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
@@ -224,7 +224,7 @@ func (s *RethinkSuite) TestTransformationOrderByMultiple(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 		map[string]interface{}{"num": 25, "id": 9, "g2": 3, "g1": 2},
@@ -249,7 +249,7 @@ func (s *RethinkSuite) TestTransformationOrderByFunc(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{
+	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 0, "id": 4, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
@@ -272,7 +272,7 @@ func (s *RethinkSuite) TestTransformationSkip(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{8, 9})
+	c.Assert(response, jsonEquals, []interface{}{8, 9})
 }
 
 func (s *RethinkSuite) TestTransformationLimit(c *test.C) {
@@ -285,7 +285,7 @@ func (s *RethinkSuite) TestTransformationLimit(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2})
+	c.Assert(response, jsonEquals, []interface{}{1, 2})
 }
 
 func (s *RethinkSuite) TestTransformationSlice(c *test.C) {
@@ -298,7 +298,7 @@ func (s *RethinkSuite) TestTransformationSlice(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{5, 6, 7, 8, 9})
+	c.Assert(response, jsonEquals, []interface{}{5, 6, 7, 8, 9})
 }
 
 func (s *RethinkSuite) TestTransformationSliceRight(c *test.C) {
@@ -311,7 +311,7 @@ func (s *RethinkSuite) TestTransformationSliceRight(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{6})
+	c.Assert(response, jsonEquals, []interface{}{6})
 }
 
 func (s *RethinkSuite) TestTransformationSliceOpts(c *test.C) {
@@ -324,7 +324,7 @@ func (s *RethinkSuite) TestTransformationSliceOpts(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{6, 7, 8, 9})
+	c.Assert(response, jsonEquals, []interface{}{6, 7, 8, 9})
 }
 
 func (s *RethinkSuite) TestTransformationSliceRightOpts(c *test.C) {
@@ -337,7 +337,7 @@ func (s *RethinkSuite) TestTransformationSliceRightOpts(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{6, 7})
+	c.Assert(response, jsonEquals, []interface{}{6, 7})
 }
 
 func (s *RethinkSuite) TestTransformationNth(c *test.C) {
@@ -350,7 +350,7 @@ func (s *RethinkSuite) TestTransformationNth(c *test.C) {
 	err = r.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, 3)
+	c.Assert(response, jsonEquals, 3)
 }
 
 func (s *RethinkSuite) TestTransformationAtIndexNth(c *test.C) {
@@ -363,7 +363,7 @@ func (s *RethinkSuite) TestTransformationAtIndexNth(c *test.C) {
 	err = r.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, 1)
+	c.Assert(response, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTransformationAtIndexField(c *test.C) {
@@ -376,7 +376,7 @@ func (s *RethinkSuite) TestTransformationAtIndexField(c *test.C) {
 	err = r.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, 1)
+	c.Assert(response, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTransformationAtIndexArrayField(c *test.C) {
@@ -396,7 +396,7 @@ func (s *RethinkSuite) TestTransformationIndexesOf(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1})
+	c.Assert(response, jsonEquals, []interface{}{1})
 }
 
 func (s *RethinkSuite) TestTransformationIsEmpty(c *test.C) {
@@ -422,5 +422,5 @@ func (s *RethinkSuite) TestTransformationUnion(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, JsonEquals, []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9})
 }
