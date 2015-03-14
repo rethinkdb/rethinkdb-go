@@ -8,10 +8,9 @@ import (
 )
 
 func Example_TableCreate() {
-	sess, err := r.Connect(r.ConnectOpts{
-		Address: url,
+	sess, err := r.ConnectWithOpts(r.ConnectOpts{
 		AuthKey: authKey,
-	})
+	}, url)
 	if err != nil {
 		log.Fatalf("Error connecting to DB: %s", err)
 	}
@@ -31,10 +30,9 @@ func Example_TableCreate() {
 }
 
 func Example_IndexCreate() {
-	sess, err := r.Connect(r.ConnectOpts{
-		Address: url,
+	sess, err := r.ConnectWithOpts(r.ConnectOpts{
 		AuthKey: authKey,
-	})
+	}, url)
 	if err != nil {
 		log.Fatalf("Error connecting to DB: %s", err)
 	}
@@ -55,10 +53,9 @@ func Example_IndexCreate() {
 }
 
 func Example_IndexCreate_compound() {
-	sess, err := r.Connect(r.ConnectOpts{
-		Address: url,
+	sess, err := r.ConnectWithOpts(r.ConnectOpts{
 		AuthKey: authKey,
-	})
+	}, url)
 	if err != nil {
 		log.Fatalf("Error connecting to DB: %s", err)
 	}

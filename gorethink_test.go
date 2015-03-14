@@ -54,10 +54,9 @@ var _ = test.Suite(&RethinkSuite{})
 
 func (s *RethinkSuite) SetUpSuite(c *test.C) {
 	var err error
-	sess, err = Connect(ConnectOpts{
-		Address: url,
+	sess, err = ConnectWithOpts(ConnectOpts{
 		AuthKey: authKey,
-	})
+	}, url)
 	c.Assert(err, test.IsNil)
 }
 

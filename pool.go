@@ -34,6 +34,7 @@ type finalCloser interface {
 
 type Pool struct {
 	host Host
+	opts ConnectOpts
 
 	mu           sync.Mutex // protects following fields
 	err          error      // the last error that occurred
@@ -55,15 +56,16 @@ type Pool struct {
 }
 
 // NewPool creates a new connection pool for the given host
-func NewPool(host Host, maxIdle, maxOpen int) (*Pool, error) {
+func NewPool(host Host, opts ConnectOpts) (*Pool, error) {
 	p := &Pool{
 		host:     host,
+		opts:     opts,
 		openerCh: make(chan struct{}, connectionRequestQueueSize),
 		lastPut:  make(map[*poolConn]string),
 	}
 
-	p.SetMaxIdleConns(maxIdle)
-	p.SetMaxOpenConns(maxOpen)
+	p.SetMaxIdleConns(opts.MaxIdle)
+	p.SetMaxOpenConns(opts.MaxOpen)
 
 	go p.connectionOpener()
 	return p, nil
@@ -203,7 +205,7 @@ func (p *Pool) connectionOpener() {
 
 // Open one new connection
 func (p *Pool) openNewConnection() {
-	ci, err := NewConnection(p.host)
+	ci, err := NewConnection(p.host.String(), p.opts)
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.closed {
@@ -265,7 +267,7 @@ func (p *Pool) conn() (*poolConn, error) {
 	}
 	p.numOpen++ // optimistically
 	p.mu.Unlock()
-	ci, err := NewConnection(p.host)
+	ci, err := NewConnection(p.host.String(), p.opts)
 	if err != nil {
 		p.mu.Lock()
 		p.numOpen-- // correct for earlier optimism

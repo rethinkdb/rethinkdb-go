@@ -9,9 +9,7 @@ import (
 )
 
 func (s *RethinkSuite) TestClusterConnect(c *test.C) {
-	cluster, err := ConnectCluster(ClusterOpts{
-		Hosts: []string{url, url2, url3},
-	})
+	cluster, err := ConnectCluster(url, url2, url3)
 	c.Assert(err, test.IsNil)
 
 	row, err := Expr("Hello World").Run(cluster)
@@ -24,9 +22,7 @@ func (s *RethinkSuite) TestClusterConnect(c *test.C) {
 }
 
 func (s *RethinkSuite) TestClusterMultipleQueries(c *test.C) {
-	cluster, err := ConnectCluster(ClusterOpts{
-		Hosts: []string{url, url2, url3},
-	})
+	cluster, err := ConnectCluster(url, url2, url3)
 	c.Assert(err, test.IsNil)
 
 	for i := 0; i < 10; i++ {
@@ -42,17 +38,14 @@ func (s *RethinkSuite) TestClusterMultipleQueries(c *test.C) {
 
 func (s *RethinkSuite) TestClusterConnectError(c *test.C) {
 	var err error
-	_, err = ConnectCluster(ClusterOpts{
-		Hosts: []string{"nonexistanturl"},
-	})
+	_, err = ConnectCluster("nonexistanturl")
 	c.Assert(err, test.NotNil)
 }
 
 func (s *RethinkSuite) TestClusterConnectDatabase(c *test.C) {
-	session, err := ConnectCluster(ClusterOpts{
-		Hosts:    []string{url, url2, url3},
+	session, err := ConnectClusterWithOpts(ConnectOpts{
 		Database: "test2",
-	})
+	}, url, url2, url3)
 	c.Assert(err, test.IsNil)
 
 	_, err = Table("test2").Run(session)

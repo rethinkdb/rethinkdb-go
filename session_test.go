@@ -2,15 +2,15 @@ package gorethink
 
 import (
 	"os"
+	"time"
 
 	test "gopkg.in/check.v1"
 )
 
 func (s *RethinkSuite) TestSessionConnect(c *test.C) {
-	session, err := Connect(ConnectOpts{
-		Address: url,
+	session, err := ConnectWithOpts(ConnectOpts{
 		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
-	})
+	}, url)
 	c.Assert(err, test.IsNil)
 
 	row, err := Expr("Hello World").Run(session)
@@ -23,10 +23,9 @@ func (s *RethinkSuite) TestSessionConnect(c *test.C) {
 }
 
 func (s *RethinkSuite) TestSessionReconnect(c *test.C) {
-	session, err := Connect(ConnectOpts{
-		Address: url,
+	session, err := ConnectWithOpts(ConnectOpts{
 		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
-	})
+	}, url)
 	c.Assert(err, test.IsNil)
 
 	row, err := Expr("Hello World").Run(session)
@@ -50,18 +49,17 @@ func (s *RethinkSuite) TestSessionReconnect(c *test.C) {
 
 func (s *RethinkSuite) TestSessionConnectError(c *test.C) {
 	var err error
-	_, err = Connect(ConnectOpts{
-		Address: "nonexistanturl",
-	})
+	_, err = ConnectWithOpts(ConnectOpts{
+		Timeout: time.Second,
+	}, "nonexistanturl")
 	c.Assert(err, test.NotNil)
 }
 
 func (s *RethinkSuite) TestSessionConnectDatabase(c *test.C) {
-	session, err := Connect(ConnectOpts{
-		Address:  url,
+	session, err := ConnectWithOpts(ConnectOpts{
 		AuthKey:  os.Getenv("RETHINKDB_AUTHKEY"),
 		Database: "test2",
-	})
+	}, url)
 	c.Assert(err, test.IsNil)
 
 	_, err = Table("test2").Run(session)

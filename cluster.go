@@ -4,53 +4,52 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
-
-	"github.com/bitly/go-hostpool"
-	p "github.com/dancannon/gorethink/ql2"
 )
 
 var (
 	ErrNoHosts              = errors.New("no hosts provided")
 	ErrNoConnectionsStarted = errors.New("no connections were made when creating the session")
 	ErrHostQueryFailed      = errors.New("unable to populate hosts")
+	ErrInvalidNode          = errors.New("invalid node")
 )
 
 type Cluster struct {
-	opts  ClusterOpts
-	nodes *Nodes
+	opts ConnectOpts
+
+	mu sync.RWMutex
+	// Initial host nodes specified by user.
+	seeds []Host
+	// Active nodes in cluster.
+	nodes []*Node
+
+	nodeIndex int64
 }
 
-type ClusterOpts struct {
-	Hosts              []string      `gorethink:"hosts,omitempty"`
-	Database           string        `gorethink:"database,omitempty"`
-	AuthKey            string        `gorethink:"authkey,omitempty"`
-	Timeout            time.Duration `gorethink:"timeout,omitempty"`
-	MaxIdle            int           `gorethink:"max_idle,omitempty"`
-	MaxOpen            int           `gorethink:"max_open,omitempty"`
-	DiscoverHosts      bool          `gorethink:"discover_hosts,omitempty"`
-	HostDecayDuration  time.Duration `gorethink:"host_decay_duration,omitempty"`
-	ErrorSleepDuration time.Duration `gorethink:"error_sleep_duration,omitempty"`
+func ConnectCluster(addresses ...string) (*Cluster, error) {
+	return ConnectClusterWithOpts(ConnectOpts{}, addresses...)
 }
 
-func ConnectCluster(opts ClusterOpts) (*Cluster, error) {
+func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Cluster, error) {
+	hosts := make([]Host, len(addresses))
+	for i, address := range addresses {
+		hostname, port := splitAddress(address)
+		hosts[i] = NewHost(hostname, port)
+	}
+
 	c := &Cluster{
-		opts: opts,
-		nodes: &Nodes{
-			opts: opts,
-		},
+		seeds: hosts,
+		opts:  opts,
 	}
 
 	//Check that hosts in the ClusterConfig is not empty
-	if len(opts.Hosts) <= 0 {
+	c.seedNodes()
+	if len(hosts) <= 0 {
 		return nil, ErrNoHosts
-	}
-
-	// Seed host pool
-	if err := c.nodes.Seed(opts.Hosts); err != nil {
-		return nil, err
 	}
 
 	if opts.DiscoverHosts {
@@ -60,116 +59,92 @@ func ConnectCluster(opts ClusterOpts) (*Cluster, error) {
 	return c, nil
 }
 
-func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
-	hpr, node := c.nodes.Get()
-	defer func() {
-		// Only mark RqlConnectionErrors as failures
-		if _, ok := err.(RqlConnectionError); ok {
-			hpr.Mark(err)
-		} else {
-			hpr.Mark(nil)
-		}
-	}()
+func (c *Cluster) seedNodes() {
+	nodesMap := map[string]*Node{}
 
-	if node == nil {
-		return nil, ErrNoHosts
+	for _, seedHost := range c.seeds {
+		conn, err := NewConnection(seedHost.String(), ConnectOpts{})
+		if err != nil {
+			continue
+		}
+		defer conn.Close()
+
+		_, cursor, err := conn.Query(newQuery(
+			Db("rethinkdb").Table("server_status"),
+			map[string]interface{}{},
+			c.opts,
+		))
+		if err != nil {
+			continue
+		}
+
+		var results []nodeStatus
+		err = cursor.All(&results)
+		if err != nil {
+			continue
+		}
+
+		for _, result := range results {
+			node := result.CreateNode(c)
+			if _, ok := nodesMap[node.ID]; !ok {
+				nodesMap[node.ID] = node
+			}
+		}
 	}
 
-	cursor, err = node.pool.Query(q)
-	return
+	nodes := make([]*Node, len(nodesMap))
+	i := 0
+	for _, node := range nodesMap {
+		nodes[i] = node
+	}
+
+	c.addNodes(nodes)
+}
+
+func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
+	node, err := c.GetRandomNode()
+	if err != nil {
+		return nil, err
+	}
+
+	return node.Query(q)
 }
 
 func (c *Cluster) Exec(q Query) (err error) {
-	hpr, node := c.nodes.Get()
-	defer func() {
-		// Only mark RqlConnectionErrors as failures
-		if _, ok := err.(RqlConnectionError); ok {
-			hpr.Mark(err)
-		} else {
-			hpr.Mark(nil)
-		}
-	}()
-
-	if node == nil {
-		return ErrNoHosts
+	node, err := c.GetRandomNode()
+	if err != nil {
+		return err
 	}
 
-	err = node.pool.Exec(q)
-	return
+	return node.Exec(q)
 }
 
 func (c *Cluster) newQuery(t Term, opts map[string]interface{}) Query {
-	queryOpts := map[string]interface{}{}
-	for k, v := range opts {
-		queryOpts[k] = Expr(v).build()
-	}
-	if c.opts.Database != "" {
-		queryOpts["db"] = Db(c.opts.Database).build()
-	}
-
-	// Construct query
-	return Query{
-		Type: p.Query_START,
-		Term: &t,
-		Opts: queryOpts,
-	}
-}
-
-type serverStatusResult struct {
-	ID      string `gorethink:"id"`
-	Name    string `gorethink:"name"`
-	Status  string `gorethink:"status"`
-	Network struct {
-		Hostname           string `gorethink:"hostname"`
-		HTTPAdminPort      int64  `gorethink:"http_admin_port"`
-		ClusterPort        int64  `gorethink:"cluster_port"`
-		ReqlPort           int64  `gorethink:"reql_port"`
-		CanonicalAddresses []struct {
-			Host string `gorethink:"host"`
-			Port int64  `gorethink:"port"`
-		} `gorethink:"canonical_addresses"`
-	} `gorethink:"network"`
+	return newQuery(t, opts, c.opts)
 }
 
 // discover attempts to find new nodes in the cluster using the current nodes
 func (c *Cluster) discover() {
-	c.discoverInitialHosts()
-	c.discoverHostChanges()
-}
-
-func (c *Cluster) discoverInitialHosts() {
-	query := Db("rethinkdb").Table("server_status")
-	cursor, err := c.Query(c.newQuery(query, map[string]interface{}{}))
-	if err != nil {
-		log.Printf("Error discovering hosts, %s", err)
-	}
-
-	var result []serverStatusResult
-	err = cursor.All(&result)
-	if err != nil {
-		log.Printf("Error discovering hosts, %s", err)
-	}
-
-	addrs := make([]string, 0, len(result))
-	for _, host := range result {
-		if host.Status == "connected" {
-			addrs = append(addrs, strings.ToLower(fmt.Sprintf("%s:%d", host.Network.Hostname, host.Network.ReqlPort)))
-		}
-	}
-	c.nodes.Seed(addrs)
-}
-
-func (c *Cluster) discoverHostChanges() {
 	for {
-		query := Db("rethinkdb").Table("server_status").Changes()
-		cursor, err := c.Query(c.newQuery(query, map[string]interface{}{}))
+		node, err := c.GetRandomNode()
+		if err != nil {
+			time.Sleep(c.opts.ErrorSleepDuration)
+			continue
+		}
+
+		cursor, err := node.Query(newQuery(
+			Db("rethinkdb").Table("server_status").Changes(),
+			map[string]interface{}{},
+			c.opts,
+		))
+
 		if err != nil {
 			log.Printf("Error discovering hosts, %s", err)
 		}
 
 		var result struct {
-			NewVal serverStatusResult `gorethink:"new_val"`
-			OldVal serverStatusResult `gorethink:"old_val"`
+			NewVal nodeStatus `gorethink:"new_val"`
+			OldVal nodeStatus `gorethink:"old_val"`
 		}
 
 		for cursor.Next(&result) {
@@ -178,19 +153,17 @@ func (c *Cluster) discoverHostChanges() {
 
 			switch result.NewVal.Status {
 			case "connected":
-				c.nodes.AddHost(addr)
+				c.addNode(result.NewVal.CreateNode(c))
 			case "disconnected":
-				c.nodes.RemoveHost(addr)
+				c.removeNode(result.OldVal.ID)
 			default:
 				continue
 			}
 
 			// If all hosts have been removed then return
-			if c.nodes.Size() <= 0 {
+			if len(c.GetNodes()) <= 0 {
 				return
 			}
-
-			c.nodes.refreshHostPool()
 		}
 		if cursor.Err() != nil {
 			log.Printf("Error discovering hosts %s, retrying in %d", err, c.opts.ErrorSleepDuration)
@@ -201,109 +174,91 @@ func (c *Cluster) discoverHostChanges() {
 	}
 }
 
-// Nodes stores a list of all of the discovered hosts. Internally it uses an
-// epsilon greedy hostpool from the go-hostpool package to determine which
-// node to use.
-type Nodes struct {
-	opts ClusterOpts
-
-	sync.RWMutex
-	hosts []string
-	nodes map[string]*Node
-	hp    hostpool.HostPool
+// AddSeeds adds new hosts to the cluster.
+// They will be added to the cluster on next tend call.
+func (c *Cluster) AddSeeds(hosts []Host) {
+	c.mu.Lock()
+	c.seeds = append(c.seeds, hosts...)
+	c.mu.Unlock()
 }
 
-func (n *Nodes) Seed(addrs []string) error {
-	n.nodes = make(map[string]*Node)
+func (c *Cluster) getSeeds() []Host {
+	c.mu.RLock()
+	seeds := c.seeds
+	c.mu.RUnlock()
 
-	for _, addr := range addrs {
-		if err := n.AddHost(addr); err != nil {
-			log.Printf("Error connecting to host %s in cluster %s", addr, err)
-			continue
+	return seeds
+}
+
+// GetRandomNode returns a random node on the cluster
+// TODO(dancannon) replace with hostpool
+func (c *Cluster) GetRandomNode() (*Node, error) {
+	// Must copy array reference for copy on write semantics to work.
+	nodeArray := c.GetNodes()
+	length := len(nodeArray)
+	for i := 0; i < length; i++ {
+		// Must handle concurrency with other non-tending goroutines, so nodeIndex is consistent.
+		index := int(math.Abs(float64(c.nextNodeIndex() % int64(length))))
+		node := nodeArray[index]
+
+		if node.IsActive() {
+			return node, nil
+		}
+	}
+	return nil, ErrInvalidNode
+}
+
+// GetNodes returns a list of all nodes in the cluster
+func (c *Cluster) GetNodes() []*Node {
+	c.mu.RLock()
+	nodes := c.nodes
+	c.mu.RUnlock()
+
+	return nodes
+}
+
+func (c *Cluster) addNode(node *Node) {
+	c.mu.Lock()
+	c.nodes = append(c.nodes, node)
+	c.mu.Unlock()
+}
+
+func (c *Cluster) addNodes(nodesToAdd []*Node) {
+	c.mu.Lock()
+	c.nodes = append(c.nodes, nodesToAdd...)
+	c.mu.Unlock()
+}
+
+func (c *Cluster) setNodes(nodes []*Node) {
+	c.mu.Lock()
+	c.nodes = nodes
+	c.mu.Unlock()
+}
+
+func (c *Cluster) removeNode(nodeID string) {
+	nodes := c.GetNodes()
+	nodeArray := make([]*Node, len(nodes)-1)
+	count := 0
+
+	// Add nodes that are not in remove list.
+	for _, n := range nodes {
+		if n.ID != nodeID {
+			nodeArray[count] = n
+			count++
 		}
 	}
 
-	if n.Size() <= 0 {
-		return ErrNoConnectionsStarted
+	// Do sanity check to make sure assumptions are correct.
+	if count < len(nodeArray) {
+		// Resize array.
+		nodeArray2 := make([]*Node, count)
+		copy(nodeArray2, nodeArray)
+		nodeArray = nodeArray2
 	}
 
-	n.refreshHostPool()
-
-	return nil
+	c.setNodes(nodeArray)
 }
 
-func (n *Nodes) Get() (hostpool.HostPoolResponse, *Node) {
-	hpr := n.hp.Get()
-
-	node, ok := n.nodes[hpr.Host()]
-	if !ok {
-		return hpr, nil
-	}
-
-	return hpr, node
-}
-
-func (n *Nodes) AddHost(addr string) error {
-	host := Host{
-		Address:  addr,
-		Database: n.opts.Database,
-		AuthKey:  n.opts.AuthKey,
-		Timeout:  n.opts.Timeout,
-	}
-	pool, err := NewPool(host, n.opts.MaxIdle, n.opts.MaxOpen)
-	if err != nil {
-		return err
-	}
-	if err := pool.Ping(); err != nil {
-		return err
-	}
-
-	n.nodes[addr] = &Node{
-		host: host,
-		pool: pool,
-	}
-
-	return nil
-}
-
-func (n *Nodes) RemoveHost(addr string) {
-	delete(n.nodes, addr)
-}
-
-func (n *Nodes) Hosts() []string {
-	n.RLock()
-	defer n.RUnlock()
-
-	i := 0
-	hosts := make([]string, len(n.nodes))
-	for _, h := range n.nodes {
-		hosts[i] = h.host.Address
-		i++
-	}
-
-	return hosts
-}
-
-func (n *Nodes) Size() int {
-	n.RLock()
-	defer n.RUnlock()
-
-	return len(n.nodes)
-}
-
-func (n *Nodes) refreshHostPool() {
-	n.hp = hostpool.NewEpsilonGreedy(n.Hosts(), n.opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{})
-}
-
-type Node struct {
-	host Host
-	pool *Pool
-}
-
-// Host contains information about a discovered RethinkDB server.
-type Host struct {
-	Address  string        `gorethink:"address,omitempty"`
-	Database string        `gorethink:"database,omitempty"`
-	AuthKey  string        `gorethink:"authkey,omitempty"`
-	Timeout  time.Duration `gorethink:"timeout,omitempty"`
+func (c *Cluster) nextNodeIndex() int64 {
+	return atomic.AddInt64(&c.nodeIndex, 1)
 }

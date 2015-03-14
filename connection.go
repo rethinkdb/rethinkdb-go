@@ -26,7 +26,8 @@ type Response struct {
 // Connection is a connection to a rethinkdb database. Connection is not thread
 // safe and should only be accessed be a single goroutine
 type Connection struct {
-	host    Host
+	address string
+	opts    ConnectOpts
 	conn    net.Conn
 	_       [4]byte
 	token   int64
@@ -37,17 +38,18 @@ type Connection struct {
 	buf       buffer
 }
 
-// Dial closes the previous connection and attempts to connect again.
-func NewConnection(host Host) (*Connection, error) {
+// NewConnection creates a new connection to the database server
+func NewConnection(address string, opts ConnectOpts) (*Connection, error) {
 	var err error
 	// New mysqlConn
 	c := &Connection{
-		host:    host,
+		address: address,
+		opts:    opts,
 		cursors: make(map[int64]*Cursor),
 	}
 	// Connect to Server
-	nd := net.Dialer{Timeout: c.host.Timeout}
-	c.conn, err = nd.Dial("tcp", c.host.Address)
+	nd := net.Dialer{Timeout: c.opts.Timeout}
+	c.conn, err = nd.Dial("tcp", c.address)
 	if err != nil {
 		return nil, err
 	}
@@ -72,6 +74,7 @@ func NewConnection(host Host) (*Connection, error) {
 		c.Close()
 		return nil, err
 	}
+
 	return c, nil
 }
 
@@ -99,8 +102,8 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	// Add token if query is a START/NOREPLY_WAIT
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		q.Token = c.nextToken()
-		if c.host.Database != "" {
-			q.Opts["db"] = Db(c.host.Database).build()
+		if c.opts.Database != "" {
+			q.Opts["db"] = Db(c.opts.Database).build()
 		}
 	}
 
@@ -139,10 +142,10 @@ func (c *Connection) sendQuery(q Query) error {
 	}
 
 	// Set timeout
-	if c.host.Timeout == 0 {
+	if c.opts.Timeout == 0 {
 		c.conn.SetDeadline(time.Time{})
 	} else {
-		c.conn.SetDeadline(time.Now().Add(c.host.Timeout))
+		c.conn.SetDeadline(time.Now().Add(c.opts.Timeout))
 	}
 
 	// Send the JSON encoding of the query itself.

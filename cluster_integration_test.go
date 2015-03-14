@@ -10,10 +10,9 @@ import (
 )
 
 func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
-	cluster, err := ConnectCluster(ClusterOpts{
-		Hosts:         []string{url, url2},
+	cluster, err := ConnectClusterWithOpts(ConnectOpts{
 		DiscoverHosts: true,
-	})
+	}, url, url2)
 	c.Assert(err, test.IsNil)
 
 	t := time.NewTimer(time.Minute * 5)
@@ -24,7 +23,7 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 			c.Fatal("No node was added to the cluster")
 		default:
 			// Pass if another node was added
-			if cluster.nodes.Size() >= 3 {
+			if len(cluster.nodes) >= 3 {
 				return
 			}
 		}
@@ -32,10 +31,9 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 }
 
 func (s *RethinkSuite) TestClusterDetectRemovedNode(c *test.C) {
-	cluster, err := ConnectCluster(ClusterOpts{
-		Hosts:         []string{url, url2, url3},
+	cluster, err := ConnectClusterWithOpts(ConnectOpts{
 		DiscoverHosts: true,
-	})
+	}, url, url2, url3)
 	c.Assert(err, test.IsNil)
 
 	t := time.NewTimer(time.Minute * 5)
@@ -46,7 +44,7 @@ func (s *RethinkSuite) TestClusterDetectRemovedNode(c *test.C) {
 			c.Fatal("No node was removed from the cluster")
 		default:
 			// Pass if another node was added
-			if cluster.nodes.Size() < 3 {
+			if len(cluster.nodes) < 3 {
 				return
 			}
 		}

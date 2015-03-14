@@ -15,6 +15,7 @@ type executor interface {
 }
 
 type Session struct {
+	host Host
 	opts ConnectOpts
 	pool *Pool
 
@@ -25,13 +26,16 @@ type Session struct {
 }
 
 type ConnectOpts struct {
-	Address  string        `gorethink:"address,omitempty"`
 	Database string        `gorethink:"database,omitempty"`
 	AuthKey  string        `gorethink:"authkey,omitempty"`
 	Timeout  time.Duration `gorethink:"timeout,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	MaxOpen int `gorethink:"max_open,omitempty"`
+
+	DiscoverHosts      bool          `gorethink:"discover_hosts,omitempty"`
+	HostDecayDuration  time.Duration `gorethink:"host_decay_duration,omitempty"`
+	ErrorSleepDuration time.Duration `gorethink:"error_sleep_duration,omitempty"`
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {
@@ -40,7 +44,14 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 
 // Connect creates a new database session.
 //
-// Supported arguments include Address, Database, Timeout, Authkey. Pool
+// 	session, err := r.Connect("localhost:28015")
+func Connect(address string) (*Session, error) {
+	return ConnectWithOpts(ConnectOpts{}, address)
+}
+
+// Connect creates a new database session with the given options.
+//
+// Supported arguments include Database, Timeout, Authkey. Pool
 // options include MaxIdle, MaxOpen.
 //
 // By default maxIdle and maxOpen are set to 1: passing values greater
@@ -49,17 +60,19 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 //
 // Basic connection example:
 //
-//	var session *r.Session
-// 	session, err := r.Connect(r.ConnectOpts{
-// 		Address:  "localhost:28015",
+// 	session, err := r.ConnectWithOpts(r.ConnectOpts{
 // 		Database: "test",
 // 		AuthKey:  "14daak1cad13dj",
-// 	})
-func Connect(opts ConnectOpts) (*Session, error) {
+// 	}, "localhost:28015")
+func ConnectWithOpts(opts ConnectOpts, address string) (*Session, error) {
+	hostname, port := splitAddress(address)
+
 	// Connect
 	s := &Session{
+		host: NewHost(hostname, port),
 		opts: opts,
 	}
+
 	err := s.Reconnect()
 	if err != nil {
 		return nil, err
@@ -84,12 +97,7 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 		return err
 	}
 
-	s.pool, err = NewPool(Host{
-		Address:  s.opts.Address,
-		Database: s.opts.Database,
-		AuthKey:  s.opts.AuthKey,
-		Timeout:  s.opts.Timeout,
-	}, s.opts.MaxIdle, s.opts.MaxOpen)
+	s.pool, err = NewPool(s.host, s.opts)
 	if err != nil {
 		return err
 	}
@@ -160,18 +168,5 @@ func (s *Session) Exec(q Query) error {
 }
 
 func (s *Session) newQuery(t Term, opts map[string]interface{}) Query {
-	queryOpts := map[string]interface{}{}
-	for k, v := range opts {
-		queryOpts[k] = Expr(v).build()
-	}
-	if s.opts.Database != "" {
-		queryOpts["db"] = Db(s.opts.Database).build()
-	}
-
-	// Construct query
-	return Query{
-		Type: p.Query_START,
-		Term: &t,
-		Opts: queryOpts,
-	}
+	return newQuery(t, opts, s.opts)
 }

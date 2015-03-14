@@ -21,7 +21,7 @@ func (c *Connection) writeData(data []byte) error {
 
 func (c *Connection) writeHandshakeReq() error {
 	pos := 0
-	dataLen := 4 + 4 + len(c.host.AuthKey) + 4
+	dataLen := 4 + 4 + len(c.opts.AuthKey) + 4
 
 	data := c.buf.takeSmallBuffer(dataLen)
 	if data == nil {
@@ -33,12 +33,12 @@ func (c *Connection) writeHandshakeReq() error {
 	pos += 4
 
 	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer
-	binary.LittleEndian.PutUint32(data[pos:], uint32(len(c.host.AuthKey)))
+	binary.LittleEndian.PutUint32(data[pos:], uint32(len(c.opts.AuthKey)))
 	pos += 4
 
 	// Send the auth key as an ASCII string
-	if len(c.host.AuthKey) > 0 {
-		pos += copy(data[pos:], c.host.AuthKey)
+	if len(c.opts.AuthKey) > 0 {
+		pos += copy(data[pos:], c.opts.AuthKey)
 	}
 
 	// Send the protocol type as a 4-byte little-endian-encoded integer
