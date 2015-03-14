@@ -1,8 +1,6 @@
 package gorethink
 
 import (
-	"reflect"
-
 	"github.com/dancannon/gorethink/types"
 
 	test "gopkg.in/check.v1"
@@ -38,14 +36,14 @@ func soclose(a, b, e float64) bool  { return tolerance(a, b, e) }
 
 func compareCoordinates(co [][]float64, lines types.Lines, c *test.C) {
 	for _, points := range lines {
-		for ip, point := range points {
-			v := reflect.ValueOf(point)
-			for i := 0; i < v.NumField(); i++ {
-				lc := co[ip][i]
-				f := v.Field(i).Float()
-				if !kindaclose(lc, f) {
-					c.Errorf("the deviation between the compared floats is too great [%v:%v]", lc, f)
-				}
+		for i, point := range points {
+			lon := co[i][0]
+			lat := co[i][1]
+			if !kindaclose(lon, point.Lon) {
+				c.Errorf("the deviation between the compared floats is too great [%v:%v]", lon, point.Lon)
+			}
+			if !kindaclose(lat, point.Lat) {
+				c.Errorf("the deviation between the compared floats is too great [%v:%v]", lat, point.Lat)
 			}
 		}
 	}
