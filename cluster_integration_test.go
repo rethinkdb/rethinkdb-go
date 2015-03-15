@@ -15,7 +15,7 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 	}, url, url2)
 	c.Assert(err, test.IsNil)
 
-	t := time.NewTimer(time.Minute * 5)
+	t := time.NewTimer(time.Second * 10)
 	for {
 		select {
 		// Fail if deadline has passed
@@ -23,7 +23,7 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 			c.Fatal("No node was added to the cluster")
 		default:
 			// Pass if another node was added
-			if len(cluster.nodes) >= 3 {
+			if len(cluster.GetNodes()) >= 3 {
 				return
 			}
 		}
@@ -44,7 +44,7 @@ func (s *RethinkSuite) TestClusterDetectRemovedNode(c *test.C) {
 			c.Fatal("No node was removed from the cluster")
 		default:
 			// Pass if another node was added
-			if len(cluster.nodes) < 3 {
+			if len(cluster.GetNodes()) < 3 {
 				return
 			}
 		}

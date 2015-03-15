@@ -4,6 +4,7 @@ package gorethink
 
 import (
 	"fmt"
+	"time"
 
 	test "gopkg.in/check.v1"
 )
@@ -25,7 +26,7 @@ func (s *RethinkSuite) TestClusterMultipleQueries(c *test.C) {
 	cluster, err := ConnectCluster(url, url2, url3)
 	c.Assert(err, test.IsNil)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 1000; i++ {
 		row, err := Expr(fmt.Sprintf("Hello World", i)).Run(cluster)
 		c.Assert(err, test.IsNil)
 
@@ -38,7 +39,9 @@ func (s *RethinkSuite) TestClusterMultipleQueries(c *test.C) {
 
 func (s *RethinkSuite) TestClusterConnectError(c *test.C) {
 	var err error
-	_, err = ConnectCluster("nonexistanturl")
+	_, err = ConnectClusterWithOpts(ConnectOpts{
+		Timeout: time.Second,
+	}, "nonexistanturl")
 	c.Assert(err, test.NotNil)
 }
 

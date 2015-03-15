@@ -2,6 +2,8 @@ package gorethink
 
 import (
 	"sync"
+
+	p "github.com/dancannon/gorethink/ql2"
 )
 
 // Node represents a database server in the cluster
@@ -14,19 +16,63 @@ type Node struct {
 	pool    *Pool
 
 	mu     sync.RWMutex
-	active bool
+	closed bool
 }
 
-// IsActive returns true if the node is active
-func (n *Node) IsActive() bool {
+// Closed returns true if the node is closed
+func (n *Node) Closed() bool {
 	n.mu.RLock()
 	defer n.mu.RUnlock()
 
-	return n.active
+	return n.closed
+}
+
+// Close closes the session
+func (n *Node) Close(optArgs ...CloseOpts) error {
+	n.mu.Lock()
+	defer n.mu.Unlock()
+
+	if n.closed {
+		return nil
+	}
+
+	if len(optArgs) >= 1 {
+		if optArgs[0].NoReplyWait {
+			n.NoReplyWait()
+		}
+	}
+
+	if n.pool != nil {
+		n.pool.Close()
+	}
+	n.pool = nil
+	n.closed = true
+
+	return nil
+}
+
+// SetMaxIdleConns sets the maximum number of connections in the idle
+// connection pool.
+func (n *Node) SetMaxIdleConns(idleConns int) {
+	n.pool.SetMaxIdleConns(idleConns)
+}
+
+// SetMaxOpenConns sets the maximum number of open connections to the database.
+func (n *Node) SetMaxOpenConns(openConns int) {
+	n.pool.SetMaxOpenConns(openConns)
+}
+
+// NoReplyWait ensures that previous queries with the noreply flag have been
+// processed by the server. Note that this guarantee only applies to queries
+// run on the given connection
+func (n *Node) NoReplyWait() error {
+	return n.pool.Exec(Query{
+		Type: p.Query_NOREPLY_WAIT,
+	})
 }
 
 func (n *Node) Query(q Query) (cursor *Cursor, err error) {
-	if !n.IsActive() {
+	if n.Closed() {
 		return nil, ErrInvalidNode
 	}
 
@@ -35,7 +81,7 @@ func (n *Node) Query(q Query) (cursor *Cursor, err error) {
 }
 
 func (n *Node) Exec(q Query) (err error) {
-	if !n.IsActive() {
+	if n.Closed() {
 		return ErrInvalidNode
 	}
 
@@ -57,18 +103,4 @@ type nodeStatus struct {
 			Port int64  `gorethink:"port"`
 		} `gorethink:"canonical_addresses"`
 	} `gorethink:"network"`
-}
-
-func (s nodeStatus) CreateNode(c *Cluster) *Node {
-	aliases := make([]Host, len(s.Network.CanonicalAddresses))
-	for i, aliasAddress := range s.Network.CanonicalAddresses {
-		aliases[i] = NewHost(aliasAddress.Host, int(aliasAddress.Port))
-	}
-
-	return &Node{
-		ID:      s.ID,
-		Host:    aliases[0],
-		aliases: aliases,
-		cluster: c,
-	}
 }

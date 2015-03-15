@@ -49,7 +49,7 @@ func NewConnection(address string, opts ConnectOpts) (*Connection, error) {
 	}
 	// Connect to Server
 	nd := net.Dialer{Timeout: c.opts.Timeout}
-	c.conn, err = nd.Dial("tcp", c.address)
+	c.conn, err = nd.Dial("tcp", address)
 	if err != nil {
 		return nil, err
 	}

@@ -16,6 +16,7 @@ var (
 	ErrNoConnectionsStarted = errors.New("no connections were made when creating the session")
 	ErrHostQueryFailed      = errors.New("unable to populate hosts")
 	ErrInvalidNode          = errors.New("invalid node")
+	ErrClusterClosed        = errors.New("cluster closed")
 )
 
 type Cluster struct {
@@ -25,7 +26,8 @@ type Cluster struct {
 	// Initial host nodes specified by user.
 	seeds []Host
 	// Active nodes in cluster.
-	nodes []*Node
+	nodes  []*Node
+	closed bool
 
 	nodeIndex int64
 }
@@ -40,6 +42,9 @@ func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Cluster, er
 		hostname, port := splitAddress(address)
 		hosts[i] = NewHost(hostname, port)
 	}
+	if len(hosts) <= 0 {
+		return nil, ErrNoHosts
+	}
 
 	c := &Cluster{
 		seeds: hosts,
@@ -48,7 +53,7 @@ func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Cluster, er
 
 	//Check that hosts in the ClusterConfig is not empty
 	c.seedNodes()
-	if len(hosts) <= 0 {
+	if !c.IsConnected() {
 		return nil, ErrNoHosts
 	}
 
@@ -59,8 +64,52 @@ func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Cluster, er
 	return c, nil
 }
 
+func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
+	node, err := c.GetRandomNode()
+	if err != nil {
+		return nil, err
+	}
+
+	return node.Query(q)
+}
+
+func (c *Cluster) Exec(q Query) (err error) {
+	node, err := c.GetRandomNode()
+	if err != nil {
+		return err
+	}
+
+	return node.Exec(q)
+}
+
+func (c *Cluster) newQuery(t Term, opts map[string]interface{}) Query {
+	return newQuery(t, opts, c.opts)
+}
+
+// Close closes the cluster
+func (c *Cluster) Close(optArgs ...CloseOpts) error {
+	if c.closed {
+		return nil
+	}
+
+	for _, node := range c.GetNodes() {
+		err := node.Close(optArgs...)
+		if err != nil {
+			return err
+		}
+	}
+
+	c.closed = true
+
+	return nil
+}
+
 func (c *Cluster) seedNodes() {
+	// Add existing nodes to map
 	nodesMap := map[string]*Node{}
+	for _, node := range c.GetNodes() {
+		nodesMap[node.ID] = node
+	}
 
 	for _, seedHost := range c.seeds {
 		conn, err := NewConnection(seedHost.String(), ConnectOpts{})
@@ -85,42 +134,21 @@ func (c *Cluster) seedNodes() {
 		}
 
 		for _, result := range results {
-			node := result.CreateNode(c)
-			if _, ok := nodesMap[node.ID]; !ok {
-				nodesMap[node.ID] = node
+			node, err := c.connectNode(result)
+			if err == nil {
+				if _, ok := nodesMap[node.ID]; !ok {
+					nodesMap[node.ID] = node
+				}
 			}
 		}
 	}
 
-	nodes := make([]*Node, len(nodesMap))
-	i := 0
+	nodes := []*Node{}
 	for _, node := range nodesMap {
-		nodes[i] = node
+		nodes = append(nodes, node)
 	}
 
-	c.addNodes(nodes)
-}
-
-func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
-	node, err := c.GetRandomNode()
-	if err != nil {
-		return nil, err
-	}
-
-	return node.Query(q)
-}
-
-func (c *Cluster) Exec(q Query) (err error) {
-	node, err := c.GetRandomNode()
-	if err != nil {
-		return err
-	}
-
-	return node.Exec(q)
-}
-
-func (c *Cluster) newQuery(t Term, opts map[string]interface{}) Query {
-	return newQuery(t, opts, c.opts)
+	c.setNodes(nodes)
 }
 
 // discover attempts to find new nodes in the cluster using the current nodes
@@ -153,7 +181,12 @@ func (c *Cluster) discover() {
 
 			switch result.NewVal.Status {
 			case "connected":
-				c.addNode(result.NewVal.CreateNode(c))
+				node, err := c.connectNode(result.NewVal)
+				if !c.nodeExists(node) {
+					if err == nil {
+						c.addNode(node)
+					}
+				}
 			case "disconnected":
 				c.removeNode(result.OldVal.ID)
 			default:
@@ -172,6 +205,58 @@ func (c *Cluster) discover() {
 		// If an error occurs sleep and setup changefeed again
 		time.Sleep(c.opts.ErrorSleepDuration)
 	}
+}
+
+func (c *Cluster) connectNode(s nodeStatus) (*Node, error) {
+	aliases := make([]Host, len(s.Network.CanonicalAddresses))
+	for i, aliasAddress := range s.Network.CanonicalAddresses {
+		aliases[i] = NewHost(aliasAddress.Host, int(s.Network.ReqlPort))
+	}
+
+	// Keep trying to connect to one of the host aliases
+	var pool *Pool
+	var err error
+
+	for len(aliases) > 0 {
+		pool, err = NewPool(aliases[0], c.opts)
+		if err != nil {
+			aliases = aliases[1:]
+			continue
+		}
+
+		err = pool.Ping()
+		if err != nil {
+			aliases = aliases[1:]
+			continue
+		}
+
+		// Ping successful so break out of loop
+		break
+	}
+
+	if len(aliases) == 0 {
+		return nil, ErrInvalidNode
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	return &Node{
+		ID:      s.ID,
+		Host:    aliases[0],
+		aliases: aliases,
+		cluster: c,
+		pool:    pool,
+	}, nil
+}
+
+// IsConnected returns true if cluster has nodes and is not already closed.
+func (c *Cluster) IsConnected() bool {
+	c.mu.RLock()
+	closed := c.closed
+	c.mu.RUnlock()
+
+	return (len(c.GetNodes()) > 0) && !closed
 }
 
 // AddSeeds adds new hosts to the cluster.
@@ -193,6 +278,9 @@ func (c *Cluster) getSeeds() []Host {
 // GetRandomNode returns a random node on the cluster
 // TODO(dancannon) replace with hostpool
 func (c *Cluster) GetRandomNode() (*Node, error) {
+	if !c.IsConnected() {
+		return nil, ErrClusterClosed
+	}
 	// Must copy array reference for copy on write semantics to work.
 	nodeArray := c.GetNodes()
 	length := len(nodeArray)
@@ -201,11 +289,11 @@ func (c *Cluster) GetRandomNode() (*Node, error) {
 		index := int(math.Abs(float64(c.nextNodeIndex() % int64(length))))
 		node := nodeArray[index]
 
-		if node.IsActive() {
+		if !node.Closed() {
 			return node, nil
 		}
 	}
-	return nil, ErrInvalidNode
+	return nil, ErrNoHosts
 }
 
 // GetNodes returns a list of all nodes in the cluster
@@ -215,6 +303,15 @@ func (c *Cluster) GetNodes() []*Node {
 	c.mu.RUnlock()
 
 	return nodes
+}
+
+func (c *Cluster) nodeExists(search *Node) bool {
+	for _, node := range c.GetNodes() {
+		if node.ID == search.ID {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *Cluster) addNode(node *Node) {
