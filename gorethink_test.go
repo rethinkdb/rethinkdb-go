@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"flag"
+	"log"
 	"math/rand"
 	"os"
 	"runtime"
@@ -33,6 +34,59 @@ func init() {
 	// Needed for running tests for RethinkDB with a non-empty authkey
 	authKey = os.Getenv("RETHINKDB_AUTHKEY")
 }
+
+//
+// Begin TestMain(), Setup, Teardown
+//
+func testBenchmarkSetup() {
+
+	var err error
+
+	bDbName = "benchmark"
+	bTableName = "benchmarks"
+
+	bSess, err = Connect(ConnectOpts{
+		Address:  "localhost:28015",
+		Database: bDbName,
+		MaxIdle:  50,
+		MaxOpen:  50,
+	})
+
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	DbDrop(bDbName).Exec(bSess)
+	DbCreate(bDbName).Exec(bSess)
+
+	Db(bDbName).TableDrop(bTableName).Run(bSess)
+	Db(bDbName).TableCreate(bTableName).Run(bSess)
+
+}
+
+func testBenchmarkTeardown() {
+	Db(bDbName).TableDrop(bTableName).Run(bSess)
+	bSess.Close()
+}
+
+// stubs
+func testSetup()    {}
+func testTeardown() {}
+
+func TestMain(m *testing.M) {
+	// seed randomness for use with tests
+	rand.Seed(time.Now().UTC().UnixNano())
+	testSetup()
+	testBenchmarkSetup()
+	res := m.Run()
+	testTeardown()
+	testBenchmarkTeardown()
+	os.Exit(res)
+}
+
+//
+// End TestMain(), Setup, Teardown
+//
 
 // Hook up gocheck into the gotest runner.
 func Test(t *testing.T) { test.TestingT(t) }
