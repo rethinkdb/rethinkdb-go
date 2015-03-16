@@ -1,42 +1,43 @@
 package gorethink
 
 import (
-	"github.com/dancannon/gorethink/types"
-
 	test "gopkg.in/check.v1"
+
+	"github.com/dancannon/gorethink/types"
 )
 
 func (s *RethinkSuite) TestGeospatialDecodeGeometryPseudoType(c *test.C) {
 	var response types.Geometry
+
+	// setup coordinates
+	coords := [][][]float64{
+		{
+			{-122.423246, 37.779388},
+			{-122.423246, 37.329898},
+			{-121.88642, 37.329898},
+			{-121.88642, 37.329898},
+			{-122.423246, 37.779388},
+		},
+	}
+
+	gt := "Polygon"
 	res, err := Expr(map[string]interface{}{
 		"$reql_type$": "GEOMETRY",
 		"type":        "Polygon",
-		"coordinates": []interface{}{
-			[]interface{}{
-				[]interface{}{-122.423246, 37.779388},
-				[]interface{}{-122.423246, 37.329898},
-				[]interface{}{-121.88642, 37.329898},
-				[]interface{}{-121.88642, 37.779388},
-				[]interface{}{-122.423246, 37.779388},
-			},
-		},
+		"coordinates": coords,
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "Polygon",
-		Lines: types.Lines{
-			types.Line{
-				types.Point{Lon: -122.423246, Lat: 37.779388},
-				types.Point{Lon: -122.423246, Lat: 37.329898},
-				types.Point{Lon: -121.88642, Lat: 37.329898},
-				types.Point{Lon: -121.88642, Lat: 37.779388},
-				types.Point{Lon: -122.423246, Lat: 37.779388},
-			},
-		},
-	})
+
+	// test shape
+	if response.Type != gt {
+		c.Errorf("expected [%v], instead [%v]", gt, response.Type)
+	}
+
+	// assert points are within threshold
+	c.Assert(response, geometryEquals, "Polygon", coords)
 }
 
 func (s *RethinkSuite) TestGeospatialEncodeGeometryPseudoType(c *test.C) {
@@ -53,7 +54,7 @@ func (s *RethinkSuite) TestGeospatialEncodeGeometryPseudoType(c *test.C) {
 		},
 	})
 	c.Assert(err, test.IsNil)
-	c.Assert(encoded, test.DeepEquals, map[string]interface{}{
+	c.Assert(encoded, jsonEquals, map[string]interface{}{
 		"$reql_type$": "GEOMETRY",
 		"type":        "Polygon",
 		"coordinates": []interface{}{
@@ -75,44 +76,41 @@ func (s *RethinkSuite) TestGeospatialCircle(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "Polygon",
-		Lines: types.Lines{
-			types.Line{
-				types.Point{Lon: -122.423246, Lat: 37.77929790366427},
-				types.Point{Lon: -122.42326814543915, Lat: 37.77929963483801},
-				types.Point{Lon: -122.4232894398445, Lat: 37.779304761831504},
-				types.Point{Lon: -122.42330906488651, Lat: 37.77931308761787},
-				types.Point{Lon: -122.42332626638755, Lat: 37.77932429224285},
-				types.Point{Lon: -122.42334038330416, Lat: 37.77933794512014},
-				types.Point{Lon: -122.42335087313059, Lat: 37.77935352157849},
-				types.Point{Lon: -122.42335733274696, Lat: 37.77937042302436},
-				types.Point{Lon: -122.4233595139113, Lat: 37.77938799994533},
-				types.Point{Lon: -122.42335733279968, Lat: 37.7794055768704},
-				types.Point{Lon: -122.42335087322802, Lat: 37.779422478327966},
-				types.Point{Lon: -122.42334038343147, Lat: 37.77943805480385},
-				types.Point{Lon: -122.42332626652532, Lat: 37.779451707701796},
-				types.Point{Lon: -122.42330906501378, Lat: 37.77946291234741},
-				types.Point{Lon: -122.42328943994191, Lat: 37.77947123815131},
-				types.Point{Lon: -122.42326814549187, Lat: 37.77947636515649},
-				types.Point{Lon: -122.423246, Lat: 37.779478096334365},
-				types.Point{Lon: -122.42322385450814, Lat: 37.77947636515649},
-				types.Point{Lon: -122.4232025600581, Lat: 37.77947123815131},
-				types.Point{Lon: -122.42318293498623, Lat: 37.77946291234741},
-				types.Point{Lon: -122.42316573347469, Lat: 37.779451707701796},
-				types.Point{Lon: -122.42315161656855, Lat: 37.77943805480385},
-				types.Point{Lon: -122.423141126772, Lat: 37.779422478327966},
-				types.Point{Lon: -122.42313466720033, Lat: 37.7794055768704},
-				types.Point{Lon: -122.42313248608872, Lat: 37.77938799994533},
-				types.Point{Lon: -122.42313466725305, Lat: 37.77937042302436},
-				types.Point{Lon: -122.42314112686942, Lat: 37.77935352157849},
-				types.Point{Lon: -122.42315161669585, Lat: 37.77933794512014},
-				types.Point{Lon: -122.42316573361246, Lat: 37.77932429224285},
-				types.Point{Lon: -122.4231829351135, Lat: 37.77931308761787},
-				types.Point{Lon: -122.42320256015552, Lat: 37.779304761831504},
-				types.Point{Lon: -122.42322385456086, Lat: 37.77929963483801},
-				types.Point{Lon: -122.423246, Lat: 37.77929790366427},
-			},
+	c.Assert(response, geometryEquals, "Polygon", [][][]float64{
+		{
+			{-122.423246, 37.77929790366427},
+			{-122.42326814543915, 37.77929963483801},
+			{-122.4232894398445, 37.779304761831504},
+			{-122.42330906488651, 37.77931308761787},
+			{-122.42332626638755, 37.77932429224285},
+			{-122.42334038330416, 37.77933794512014},
+			{-122.42335087313059, 37.77935352157849},
+			{-122.42335733274696, 37.77937042302436},
+			{-122.4233595139113, 37.77938799994533},
+			{-122.42335733279968, 37.7794055768704},
+			{-122.42335087322802, 37.779422478327966},
+			{-122.42334038343147, 37.77943805480385},
+			{-122.42332626652532, 37.779451707701796},
+			{-122.42330906501378, 37.77946291234741},
+			{-122.42328943994191, 37.77947123815131},
+			{-122.42326814549187, 37.77947636515649},
+			{-122.423246, 37.779478096334365},
+			{-122.42322385450814, 37.77947636515649},
+			{-122.4232025600581, 37.77947123815131},
+			{-122.42318293498623, 37.77946291234741},
+			{-122.42316573347469, 37.779451707701796},
+			{-122.42315161656855, 37.77943805480385},
+			{-122.423141126772, 37.779422478327966},
+			{-122.42313466720033, 37.7794055768704},
+			{-122.42313248608872, 37.77938799994533},
+			{-122.42313466725305, 37.77937042302436},
+			{-122.42314112686942, 37.77935352157849},
+			{-122.42315161669585, 37.77933794512014},
+			{-122.42316573361246, 37.77932429224285},
+			{-122.4231829351135, 37.77931308761787},
+			{-122.42320256015552, 37.779304761831504},
+			{-122.42322385456086, 37.77929963483801},
+			{-122.423246, 37.77929790366427},
 		},
 	})
 }
@@ -124,44 +122,41 @@ func (s *RethinkSuite) TestGeospatialCirclePoint(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "Polygon",
-		Lines: types.Lines{
-			types.Line{
-				types.Point{Lon: -122.423246, Lat: 37.77929790366427},
-				types.Point{Lon: -122.42326814543915, Lat: 37.77929963483801},
-				types.Point{Lon: -122.4232894398445, Lat: 37.779304761831504},
-				types.Point{Lon: -122.42330906488651, Lat: 37.77931308761787},
-				types.Point{Lon: -122.42332626638755, Lat: 37.77932429224285},
-				types.Point{Lon: -122.42334038330416, Lat: 37.77933794512014},
-				types.Point{Lon: -122.42335087313059, Lat: 37.77935352157849},
-				types.Point{Lon: -122.42335733274696, Lat: 37.77937042302436},
-				types.Point{Lon: -122.4233595139113, Lat: 37.77938799994533},
-				types.Point{Lon: -122.42335733279968, Lat: 37.7794055768704},
-				types.Point{Lon: -122.42335087322802, Lat: 37.779422478327966},
-				types.Point{Lon: -122.42334038343147, Lat: 37.77943805480385},
-				types.Point{Lon: -122.42332626652532, Lat: 37.779451707701796},
-				types.Point{Lon: -122.42330906501378, Lat: 37.77946291234741},
-				types.Point{Lon: -122.42328943994191, Lat: 37.77947123815131},
-				types.Point{Lon: -122.42326814549187, Lat: 37.77947636515649},
-				types.Point{Lon: -122.423246, Lat: 37.779478096334365},
-				types.Point{Lon: -122.42322385450814, Lat: 37.77947636515649},
-				types.Point{Lon: -122.4232025600581, Lat: 37.77947123815131},
-				types.Point{Lon: -122.42318293498623, Lat: 37.77946291234741},
-				types.Point{Lon: -122.42316573347469, Lat: 37.779451707701796},
-				types.Point{Lon: -122.42315161656855, Lat: 37.77943805480385},
-				types.Point{Lon: -122.423141126772, Lat: 37.779422478327966},
-				types.Point{Lon: -122.42313466720033, Lat: 37.7794055768704},
-				types.Point{Lon: -122.42313248608872, Lat: 37.77938799994533},
-				types.Point{Lon: -122.42313466725305, Lat: 37.77937042302436},
-				types.Point{Lon: -122.42314112686942, Lat: 37.77935352157849},
-				types.Point{Lon: -122.42315161669585, Lat: 37.77933794512014},
-				types.Point{Lon: -122.42316573361246, Lat: 37.77932429224285},
-				types.Point{Lon: -122.4231829351135, Lat: 37.77931308761787},
-				types.Point{Lon: -122.42320256015552, Lat: 37.779304761831504},
-				types.Point{Lon: -122.42322385456086, Lat: 37.77929963483801},
-				types.Point{Lon: -122.423246, Lat: 37.77929790366427},
-			},
+	c.Assert(response, geometryEquals, "Polygon", [][][]float64{
+		{
+			{-122.423246, 37.77929790366427},
+			{-122.42326814543915, 37.77929963483801},
+			{-122.4232894398445, 37.779304761831504},
+			{-122.42330906488651, 37.77931308761787},
+			{-122.42332626638755, 37.77932429224285},
+			{-122.42334038330416, 37.77933794512014},
+			{-122.42335087313059, 37.77935352157849},
+			{-122.42335733274696, 37.77937042302436},
+			{-122.4233595139113, 37.77938799994533},
+			{-122.42335733279968, 37.7794055768704},
+			{-122.42335087322802, 37.779422478327966},
+			{-122.42334038343147, 37.77943805480385},
+			{-122.42332626652532, 37.779451707701796},
+			{-122.42330906501378, 37.77946291234741},
+			{-122.42328943994191, 37.77947123815131},
+			{-122.42326814549187, 37.77947636515649},
+			{-122.423246, 37.779478096334365},
+			{-122.42322385450814, 37.77947636515649},
+			{-122.4232025600581, 37.77947123815131},
+			{-122.42318293498623, 37.77946291234741},
+			{-122.42316573347469, 37.779451707701796},
+			{-122.42315161656855, 37.77943805480385},
+			{-122.423141126772, 37.779422478327966},
+			{-122.42313466720033, 37.7794055768704},
+			{-122.42313248608872, 37.77938799994533},
+			{-122.42313466725305, 37.77937042302436},
+			{-122.42314112686942, 37.77935352157849},
+			{-122.42315161669585, 37.77933794512014},
+			{-122.42316573361246, 37.77932429224285},
+			{-122.4231829351135, 37.77931308761787},
+			{-122.42320256015552, 37.779304761831504},
+			{-122.42322385456086, 37.77929963483801},
+			{-122.423246, 37.77929790366427},
 		},
 	})
 }
@@ -173,76 +168,83 @@ func (s *RethinkSuite) TestGeospatialCirclePointFill(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "Polygon",
-		Lines: types.Lines{
-			types.Line{
-				types.Point{Lon: -122.423246, Lat: 37.77929790366427},
-				types.Point{Lon: -122.42326814543915, Lat: 37.77929963483801},
-				types.Point{Lon: -122.4232894398445, Lat: 37.779304761831504},
-				types.Point{Lon: -122.42330906488651, Lat: 37.77931308761787},
-				types.Point{Lon: -122.42332626638755, Lat: 37.77932429224285},
-				types.Point{Lon: -122.42334038330416, Lat: 37.77933794512014},
-				types.Point{Lon: -122.42335087313059, Lat: 37.77935352157849},
-				types.Point{Lon: -122.42335733274696, Lat: 37.77937042302436},
-				types.Point{Lon: -122.4233595139113, Lat: 37.77938799994533},
-				types.Point{Lon: -122.42335733279968, Lat: 37.7794055768704},
-				types.Point{Lon: -122.42335087322802, Lat: 37.779422478327966},
-				types.Point{Lon: -122.42334038343147, Lat: 37.77943805480385},
-				types.Point{Lon: -122.42332626652532, Lat: 37.779451707701796},
-				types.Point{Lon: -122.42330906501378, Lat: 37.77946291234741},
-				types.Point{Lon: -122.42328943994191, Lat: 37.77947123815131},
-				types.Point{Lon: -122.42326814549187, Lat: 37.77947636515649},
-				types.Point{Lon: -122.423246, Lat: 37.779478096334365},
-				types.Point{Lon: -122.42322385450814, Lat: 37.77947636515649},
-				types.Point{Lon: -122.4232025600581, Lat: 37.77947123815131},
-				types.Point{Lon: -122.42318293498623, Lat: 37.77946291234741},
-				types.Point{Lon: -122.42316573347469, Lat: 37.779451707701796},
-				types.Point{Lon: -122.42315161656855, Lat: 37.77943805480385},
-				types.Point{Lon: -122.423141126772, Lat: 37.779422478327966},
-				types.Point{Lon: -122.42313466720033, Lat: 37.7794055768704},
-				types.Point{Lon: -122.42313248608872, Lat: 37.77938799994533},
-				types.Point{Lon: -122.42313466725305, Lat: 37.77937042302436},
-				types.Point{Lon: -122.42314112686942, Lat: 37.77935352157849},
-				types.Point{Lon: -122.42315161669585, Lat: 37.77933794512014},
-				types.Point{Lon: -122.42316573361246, Lat: 37.77932429224285},
-				types.Point{Lon: -122.4231829351135, Lat: 37.77931308761787},
-				types.Point{Lon: -122.42320256015552, Lat: 37.779304761831504},
-				types.Point{Lon: -122.42322385456086, Lat: 37.77929963483801},
-				types.Point{Lon: -122.423246, Lat: 37.77929790366427},
-			},
+	c.Assert(response, geometryEquals, "Polygon", [][][]float64{
+		{
+			{-122.423246, 37.77929790366427},
+			{-122.42326814543915, 37.77929963483801},
+			{-122.4232894398445, 37.779304761831504},
+			{-122.42330906488651, 37.77931308761787},
+			{-122.42332626638755, 37.77932429224285},
+			{-122.42334038330416, 37.77933794512014},
+			{-122.42335087313059, 37.77935352157849},
+			{-122.42335733274696, 37.77937042302436},
+			{-122.4233595139113, 37.77938799994533},
+			{-122.42335733279968, 37.7794055768704},
+			{-122.42335087322802, 37.779422478327966},
+			{-122.42334038343147, 37.77943805480385},
+			{-122.42332626652532, 37.779451707701796},
+			{-122.42330906501378, 37.77946291234741},
+			{-122.42328943994191, 37.77947123815131},
+			{-122.42326814549187, 37.77947636515649},
+			{-122.423246, 37.779478096334365},
+			{-122.42322385450814, 37.77947636515649},
+			{-122.4232025600581, 37.77947123815131},
+			{-122.42318293498623, 37.77946291234741},
+			{-122.42316573347469, 37.779451707701796},
+			{-122.42315161656855, 37.77943805480385},
+			{-122.423141126772, 37.779422478327966},
+			{-122.42313466720033, 37.7794055768704},
+			{-122.42313248608872, 37.77938799994533},
+			{-122.42313466725305, 37.77937042302436},
+			{-122.42314112686942, 37.77935352157849},
+			{-122.42315161669585, 37.77933794512014},
+			{-122.42316573361246, 37.77932429224285},
+			{-122.4231829351135, 37.77931308761787},
+			{-122.42320256015552, 37.779304761831504},
+			{-122.42322385456086, 37.77929963483801},
+			{-122.423246, 37.77929790366427},
 		},
 	})
+
 }
 
 func (s *RethinkSuite) TestGeospatialPointDistanceMethod(c *test.C) {
 	var response float64
+	f := 734125.249602186
 	res, err := Point(-122.423246, 37.779388).Distance(Point(-117.220406, 32.719464)).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.Equals, 734125.249602186)
+	if !kindaclose(response, f) {
+		c.Errorf("the deviation between the compared floats is too great [%v:%v]", response, f)
+	}
 }
 
 func (s *RethinkSuite) TestGeospatialPointDistanceRoot(c *test.C) {
 	var response float64
+	f := 734125.249602186
 	res, err := Distance(Point(-122.423246, 37.779388), Point(-117.220406, 32.719464)).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.Equals, 734125.249602186)
+	if !kindaclose(response, f) {
+		c.Errorf("the deviation between the compared floats is too great [%v:%v]", response, f)
+	}
 }
 
 func (s *RethinkSuite) TestGeospatialPointDistanceRootKm(c *test.C) {
 	var response float64
+	f := 734.125249602186
 	res, err := Distance(Point(-122.423246, 37.779388), Point(-117.220406, 32.719464), DistanceOpts{Unit: "km"}).Run(sess)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.Equals, 734.125249602186)
+	if !kindaclose(response, f) {
+		c.Errorf("the deviation between the compared floats is too great [%v:%v]", response, f)
+	}
 }
 
 func (s *RethinkSuite) TestGeospatialFill(c *test.C) {
@@ -257,16 +259,13 @@ func (s *RethinkSuite) TestGeospatialFill(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "Polygon",
-		Lines: types.Lines{
-			types.Line{
-				types.Point{Lon: -122.423246, Lat: 37.779388},
-				types.Point{Lon: -122.423246, Lat: 37.329898},
-				types.Point{Lon: -121.88642, Lat: 37.329898},
-				types.Point{Lon: -121.88642, Lat: 37.779388},
-				types.Point{Lon: -122.423246, Lat: 37.779388},
-			},
+	c.Assert(response, geometryEquals, "Polygon", [][][]float64{
+		{
+			{-122.423246, 37.779388},
+			{-122.423246, 37.329898},
+			{-121.88642, 37.329898},
+			{-121.88642, 37.779388},
+			{-122.423246, 37.779388},
 		},
 	})
 }
@@ -281,10 +280,7 @@ func (s *RethinkSuite) TestGeospatialGeojson(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type:  "Point",
-		Point: types.Point{Lon: -122.423246, Lat: 37.779388},
-	})
+	c.Assert(response, geometryEquals, "Point", []float64{-122.423246, 37.779388})
 }
 
 func (s *RethinkSuite) TestGeospatialToGeojson(c *test.C) {
@@ -294,7 +290,7 @@ func (s *RethinkSuite) TestGeospatialToGeojson(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, map[string]interface{}{
+	c.Assert(response, jsonEquals, map[string]interface{}{
 		"type":        "Point",
 		"coordinates": []interface{}{-122.423246, 37.779388},
 	})
@@ -433,12 +429,9 @@ func (s *RethinkSuite) TestGeospatialLineLatLon(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "LineString",
-		Line: types.Line{
-			types.Point{Lon: -122.423246, Lat: 37.779388},
-			types.Point{Lon: -121.886420, Lat: 37.329898},
-		},
+	c.Assert(response, geometryEquals, "LineString", [][]float64{
+		{-122.423246, 37.779388},
+		{-121.886420, 37.329898},
 	})
 }
 
@@ -449,12 +442,9 @@ func (s *RethinkSuite) TestGeospatialLinePoint(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "LineString",
-		Line: types.Line{
-			types.Point{Lon: -122.423246, Lat: 37.779388},
-			types.Point{Lon: -121.886420, Lat: 37.329898},
-		},
+	c.Assert(response, geometryEquals, "LineString", [][]float64{
+		{-122.423246, 37.779388},
+		{-121.886420, 37.329898},
 	})
 }
 
@@ -465,10 +455,11 @@ func (s *RethinkSuite) TestGeospatialPoint(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
+	c.Assert(response, jsonEquals, types.Geometry{
 		Type:  "Point",
 		Point: types.Point{Lon: -122.423246, Lat: 37.779388},
 	})
+	c.Assert(response, geometryEquals, "Point", []float64{-122.423246, 37.779388})
 }
 
 func (s *RethinkSuite) TestGeospatialPolygon(c *test.C) {
@@ -478,15 +469,12 @@ func (s *RethinkSuite) TestGeospatialPolygon(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "Polygon",
-		Lines: types.Lines{
-			types.Line{
-				types.Point{Lon: -122.423246, Lat: 37.779388},
-				types.Point{Lon: -122.423246, Lat: 37.329898},
-				types.Point{Lon: -121.88642, Lat: 37.329898},
-				types.Point{Lon: -122.423246, Lat: 37.779388},
-			},
+	c.Assert(response, geometryEquals, "Polygon", [][][]float64{
+		{
+			{-122.423246, 37.779388},
+			{-122.423246, 37.329898},
+			{-121.88642, 37.329898},
+			{-122.423246, 37.779388},
 		},
 	})
 }
@@ -508,23 +496,20 @@ func (s *RethinkSuite) TestGeospatialPolygonSub(c *test.C) {
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response, test.DeepEquals, types.Geometry{
-		Type: "Polygon",
-		Lines: types.Lines{
-			types.Line{
-				types.Point{Lon: -122.4, Lat: 37.7},
-				types.Point{Lon: -122.4, Lat: 37.3},
-				types.Point{Lon: -121.8, Lat: 37.3},
-				types.Point{Lon: -121.8, Lat: 37.7},
-				types.Point{Lon: -122.4, Lat: 37.7},
-			},
-			types.Line{
-				types.Point{Lon: -122.3, Lat: 37.4},
-				types.Point{Lon: -122.3, Lat: 37.6},
-				types.Point{Lon: -122, Lat: 37.6},
-				types.Point{Lon: -122, Lat: 37.4},
-				types.Point{Lon: -122.3, Lat: 37.4},
-			},
+	c.Assert(response, geometryEquals, "Polygon", [][][]float64{
+		{
+			{-122.4, 37.7},
+			{-122.4, 37.3},
+			{-121.8, 37.3},
+			{-121.8, 37.7},
+			{-122.4, 37.7},
+		},
+		{
+			{-122.3, 37.4},
+			{-122.3, 37.6},
+			{-122, 37.6},
+			{-122, 37.4},
+			{-122.3, 37.4},
 		},
 	})
 }

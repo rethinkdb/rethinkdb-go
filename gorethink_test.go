@@ -1,8 +1,8 @@
 package gorethink
 
 import (
-	"encoding/json"
 	"flag"
+	"log"
 	"math/rand"
 	"os"
 	"runtime"
@@ -35,6 +35,59 @@ func init() {
 	authKey = os.Getenv("RETHINKDB_AUTHKEY")
 }
 
+//
+// Begin TestMain(), Setup, Teardown
+//
+func testBenchmarkSetup() {
+
+	var err error
+
+	bDbName = "benchmark"
+	bTableName = "benchmarks"
+
+	bSess, err = Connect(ConnectOpts{
+		Address:  url,
+		Database: bDbName,
+		MaxIdle:  50,
+		MaxOpen:  50,
+	})
+
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+
+	DbDrop(bDbName).Exec(bSess)
+	DbCreate(bDbName).Exec(bSess)
+
+	Db(bDbName).TableDrop(bTableName).Run(bSess)
+	Db(bDbName).TableCreate(bTableName).Run(bSess)
+
+}
+
+func testBenchmarkTeardown() {
+	Db(bDbName).TableDrop(bTableName).Run(bSess)
+	bSess.Close()
+}
+
+// stubs
+func testSetup()    {}
+func testTeardown() {}
+
+func TestMain(m *testing.M) {
+	// seed randomness for use with tests
+	rand.Seed(time.Now().UTC().UnixNano())
+	testSetup()
+	testBenchmarkSetup()
+	res := m.Run()
+	testTeardown()
+	testBenchmarkTeardown()
+	os.Exit(res)
+}
+
+//
+// End TestMain(), Setup, Teardown
+//
+
 // Hook up gocheck into the gotest runner.
 func Test(t *testing.T) { test.TestingT(t) }
 
@@ -53,32 +106,6 @@ func (s *RethinkSuite) SetUpSuite(c *test.C) {
 
 func (s *RethinkSuite) TearDownSuite(c *test.C) {
 	sess.Close()
-}
-
-type jsonChecker struct {
-	info *test.CheckerInfo
-}
-
-func (j jsonChecker) Info() *test.CheckerInfo {
-	return j.info
-}
-
-func (j jsonChecker) Check(params []interface{}, names []string) (result bool, error string) {
-	var jsonParams []interface{}
-	for _, param := range params {
-		jsonParam, err := json.Marshal(param)
-		if err != nil {
-			return false, err.Error()
-		}
-		jsonParams = append(jsonParams, jsonParam)
-	}
-	return test.DeepEquals.Check(jsonParams, names)
-}
-
-// jsonEquals compares two interface{} objects by converting them to JSON and
-// seeing if the strings match
-var jsonEquals = &jsonChecker{
-	&test.CheckerInfo{Name: "jsonEquals", Params: []string{"obtained", "expected"}},
 }
 
 // Expressions used in tests
