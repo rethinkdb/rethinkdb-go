@@ -46,7 +46,7 @@ func testBenchmarkSetup() {
 	bTableName = "benchmarks"
 
 	bSess, err = Connect(ConnectOpts{
-		Address:  "localhost:28015",
+		Address:  url,
 		Database: bDbName,
 		MaxIdle:  50,
 		MaxOpen:  50,
