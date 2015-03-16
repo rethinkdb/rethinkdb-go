@@ -211,6 +211,8 @@ func (a A) FieldMap() map[string]string {
 
 Everyone wants their project's benchmarks to be speedy. And while we know that rethinkDb and the gorethink driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please. 
 
+Thanks to @jaredfolkins for the contribution.
+
 | Type    |  Value   |
 | --- | --- |
 | **Model Name** | MacBook Pro |
