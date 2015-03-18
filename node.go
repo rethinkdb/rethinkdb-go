@@ -2,6 +2,8 @@ package gorethink
 
 import (
 	"sync"
+	"sync/atomic"
+	"time"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -12,11 +14,13 @@ type Node struct {
 	Host    Host
 	aliases []Host
 
-	cluster *Cluster
-	pool    *Pool
+	cluster       *Cluster
+	pool          *Pool
+	refreshTicker *time.Ticker
 
 	mu     sync.RWMutex
 	closed bool
+	health int64
 }
 
 // Closed returns true if the node is closed
@@ -42,6 +46,7 @@ func (n *Node) Close(optArgs ...CloseOpts) error {
 		}
 	}
 
+	n.refreshTicker.Stop()
 	if n.pool != nil {
 		n.pool.Close()
 	}
@@ -87,6 +92,45 @@ func (n *Node) Exec(q Query) (err error) {
 
 	err = n.pool.Exec(q)
 	return
+}
+
+func (n *Node) Refresh() {
+	cursor, err := n.pool.Query(newQuery(
+		Db("rethinkdb").Table("server_status").Get(n.ID),
+		map[string]interface{}{},
+		n.cluster.opts,
+	))
+	if err != nil {
+		n.DecrementHealth()
+		return
+	}
+	defer cursor.Close()
+
+	var status nodeStatus
+	err = cursor.One(&status)
+	if err != nil {
+		return
+	}
+
+	if status.Status != "connected" {
+		n.DecrementHealth()
+		return
+	}
+
+	// If status check was successful reset health
+	n.ResetHealth()
+}
+
+func (n *Node) DecrementHealth() {
+	atomic.AddInt64(&n.health, -1)
+}
+
+func (n *Node) ResetHealth() {
+	atomic.StoreInt64(&n.health, 100)
+}
+
+func (n *Node) IsHealthy() bool {
+	return n.health > 0
 }
 
 type nodeStatus struct {

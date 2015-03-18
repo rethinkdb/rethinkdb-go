@@ -33,9 +33,9 @@ type ConnectOpts struct {
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	MaxOpen int `gorethink:"max_open,omitempty"`
 
-	DiscoverHosts      bool          `gorethink:"discover_hosts,omitempty"`
-	HostDecayDuration  time.Duration `gorethink:"host_decay_duration,omitempty"`
-	ErrorSleepDuration time.Duration `gorethink:"error_sleep_duration,omitempty"`
+	DiscoverHosts       bool          `gorethink:"discover_hosts,omitempty"`
+	NodeRefreshInterval time.Duration `gorethink:"node_refresh_interval,omitempty"`
+	ErrorSleepDuration  time.Duration `gorethink:"error_sleep_duration,omitempty"`
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {

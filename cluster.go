@@ -153,58 +153,66 @@ func (c *Cluster) seedNodes() {
 
 // discover attempts to find new nodes in the cluster using the current nodes
 func (c *Cluster) discover() {
-	for {
-		node, err := c.GetRandomNode()
-		if err != nil {
-			time.Sleep(c.opts.ErrorSleepDuration)
-			continue
-		}
-
-		cursor, err := node.Query(newQuery(
-			Db("rethinkdb").Table("server_status").Changes(),
-			map[string]interface{}{},
-			c.opts,
-		))
-
-		if err != nil {
-			log.Printf("Error discovering hosts, %s", err)
-		}
-
-		var result struct {
-			NewVal nodeStatus `gorethink:"new_val"`
-			OldVal nodeStatus `gorethink:"old_val"`
-		}
-
-		for cursor.Next(&result) {
-			addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
-			addr = strings.ToLower(addr)
-
-			switch result.NewVal.Status {
-			case "connected":
-				node, err := c.connectNode(result.NewVal)
-				if !c.nodeExists(node) {
-					if err == nil {
-						c.addNode(node)
-					}
-				}
-			case "disconnected":
-				c.removeNode(result.OldVal.ID)
-			default:
-				continue
-			}
-
-			// If all hosts have been removed then return
-			if len(c.GetNodes()) <= 0 {
-				return
-			}
-		}
-		if cursor.Err() != nil {
-			log.Printf("Error discovering hosts %s, retrying in %d", err, c.opts.ErrorSleepDuration)
-		}
-
-		// If an error occurs sleep and setup changefeed again
-		time.Sleep(c.opts.ErrorSleepDuration)
+	errSleepDuration := c.opts.ErrorSleepDuration
+	if errSleepDuration <= 0 {
+		errSleepDuration = time.Millisecond * 10
 	}
+
+	for {
+		// If no hosts try seeding nodes
+		if len(c.GetNodes()) == 0 {
+			c.seedNodes()
+		}
+
+		err := c.listenForNodeChanges()
+		if err != nil {
+			log.Printf("Error discovering hosts %s, retrying in %d", err, errSleepDuration)
+			time.Sleep(errSleepDuration)
+		}
+	}
+}
+
+// listenForNodeChanges listens for changes to node status using change feeds.
+// This function will block until the query fails
+func (c *Cluster) listenForNodeChanges() error {
+	node, err := c.GetRandomNode()
+	if err != nil {
+		return err
+	}
+
+	cursor, err := node.Query(newQuery(
+		Db("rethinkdb").Table("server_status").Changes(),
+		map[string]interface{}{},
+		c.opts,
+	))
+
+	if err != nil {
+		log.Printf("Error discovering hosts, %s", err)
+	}
+
+	var result struct {
+		NewVal nodeStatus `gorethink:"new_val"`
+		OldVal nodeStatus `gorethink:"old_val"`
+	}
+
+	for cursor.Next(&result) {
+		addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
+		addr = strings.ToLower(addr)
+
+		switch result.NewVal.Status {
+		case "connected":
+			node, err := c.connectNode(result.NewVal)
+			if !c.nodeExists(node) {
+				if err == nil {
+					c.addNode(node)
+				}
+			}
+		case "disconnected":
+			c.removeNode(result.OldVal.ID)
+		}
+	}
+
+	return cursor.Err()
 }
 
 func (c *Cluster) connectNode(s nodeStatus) (*Node, error) {
@@ -241,13 +249,29 @@ func (c *Cluster) connectNode(s nodeStatus) (*Node, error) {
 		return nil, err
 	}
 
-	return &Node{
+	node := &Node{
 		ID:      s.ID,
 		Host:    aliases[0],
 		aliases: aliases,
 		cluster: c,
 		pool:    pool,
-	}, nil
+	}
+
+	// Start node refresh loop
+	refreshInterval := c.opts.NodeRefreshInterval
+	if refreshInterval <= 0 {
+		// Default to refresh every 30 seconds
+		refreshInterval = time.Second * 30
+	}
+
+	go func() {
+		node.refreshTicker = time.NewTicker(refreshInterval)
+		for _ = range node.refreshTicker.C {
+			node.Refresh()
+		}
+	}()
+
+	return node, nil
 }
 
 // IsConnected returns true if cluster has nodes and is not already closed.
