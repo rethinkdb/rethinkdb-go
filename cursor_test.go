@@ -263,6 +263,66 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestCursorListen(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").Exec(sess)
+	Db("test").TableDrop("Table3").Exec(sess)
+	Db("test").TableCreate("Table3").Exec(sess)
+	Db("test").Table("Table3").IndexCreate("num").Exec(sess)
+
+	// Insert rows
+	Db("test").Table("Table3").Insert([]interface{}{
+		map[string]interface{}{
+			"id":   2,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		},
+		map[string]interface{}{
+			"id":   3,
+			"name": "Object 2",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		},
+	}).Exec(sess)
+
+	// Test query
+	query := Db("test").Table("Table3").OrderBy("id")
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	ch := make(chan object)
+	res.Listen(ch)
+	var response []object
+	for v := range ch {
+		response = append(response, v)
+	}
+
+	c.Assert(response, test.HasLen, 2)
+	c.Assert(response, test.DeepEquals, []object{
+		object{
+			Id:   2,
+			Name: "Object 1",
+			Attrs: []attr{attr{
+				Name:  "attr 1",
+				Value: "value 1",
+			}},
+		},
+		object{
+			Id:   3,
+			Name: "Object 2",
+			Attrs: []attr{attr{
+				Name:  "attr 1",
+				Value: "value 1",
+			}},
+		},
+	})
+}
+
 func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
 	// Test query
 	query := Expr([]interface{}{
