@@ -20,6 +20,7 @@ type attr struct {
 func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
 	res, err := Expr(5).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response interface{}
 	err = res.One(&response)
@@ -30,6 +31,7 @@ func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
 func (s *RethinkSuite) TestCursorSlice(c *test.C) {
 	res, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response []interface{}
 	err = res.All(&response)
@@ -45,6 +47,7 @@ func (s *RethinkSuite) TestCursorPartiallyNilSlice(c *test.C) {
 		},
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response map[string]interface{}
 	err = res.One(&response)
@@ -63,6 +66,7 @@ func (s *RethinkSuite) TestCursorMap(c *test.C) {
 		"name": "Object 1",
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response map[string]interface{}
 	err = res.One(&response)
@@ -79,6 +83,7 @@ func (s *RethinkSuite) TestCursorMapIntoInterface(c *test.C) {
 		"name": "Object 1",
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response interface{}
 	err = res.One(&response)
@@ -99,6 +104,7 @@ func (s *RethinkSuite) TestCursorMapNested(c *test.C) {
 		}},
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response interface{}
 	err = res.One(&response)
@@ -123,6 +129,7 @@ func (s *RethinkSuite) TestCursorStruct(c *test.C) {
 		}},
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response object
 	err = res.One(&response)
@@ -149,6 +156,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 	var response PseudoTypes
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	c.Assert(response.T.Equal(time.Unix(t.Unix(), 0)), test.Equals, true)
 	c.Assert(response.B, jsonEquals, []byte("hello"))
@@ -157,6 +165,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 func (s *RethinkSuite) TestCursorAtomString(c *test.C) {
 	res, err := Expr("a").Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response string
 	err = res.One(&response)
@@ -167,6 +176,7 @@ func (s *RethinkSuite) TestCursorAtomString(c *test.C) {
 func (s *RethinkSuite) TestCursorAtomArray(c *test.C) {
 	res, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response []int
 	err = res.All(&response)
