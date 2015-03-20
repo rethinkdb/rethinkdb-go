@@ -207,8 +207,6 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 		return c.processErrorResponse(q, response, RqlRuntimeError{rqlResponseError{response, q.Term}})
 	case p.Response_SUCCESS_ATOM:
 		return c.processAtomResponse(q, response)
-	case p.Response_SUCCESS_FEED, p.Response_SUCCESS_ATOM_FEED:
-		return c.processFeedResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
 		return c.processPartialResponse(q, response)
 	case p.Response_SUCCESS_SEQUENCE:
@@ -233,22 +231,6 @@ func (c *Connection) processAtomResponse(q Query, response *Response) (*Response
 	// Create cursor
 	cursor := newCursor(c, response.Token, q.Term, q.Opts)
 	cursor.profile = response.Profile
-
-	cursor.extend(response)
-
-	return response, cursor, nil
-}
-
-func (c *Connection) processFeedResponse(q Query, response *Response) (*Response, *Cursor, error) {
-	var cursor *Cursor
-	if _, ok := c.cursors[response.Token]; !ok {
-		// Create a new cursor if needed
-		cursor = newCursor(c, response.Token, q.Term, q.Opts)
-		cursor.profile = response.Profile
-		c.cursors[response.Token] = cursor
-	} else {
-		cursor = c.cursors[response.Token]
-	}
 
 	cursor.extend(response)
 
