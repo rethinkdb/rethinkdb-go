@@ -27,7 +27,7 @@ type Response struct {
 // safe and should only be accessed be a single goroutine
 type Connection struct {
 	address string
-	opts    ConnectOpts
+	opts    *ConnectOpts
 	conn    net.Conn
 	_       [4]byte
 	token   int64
@@ -39,9 +39,8 @@ type Connection struct {
 }
 
 // NewConnection creates a new connection to the database server
-func NewConnection(address string, opts ConnectOpts) (*Connection, error) {
+func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	var err error
-	// New mysqlConn
 	c := &Connection{
 		address: address,
 		opts:    opts,

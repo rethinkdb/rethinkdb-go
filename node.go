@@ -23,6 +23,33 @@ type Node struct {
 	health int64
 }
 
+func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
+	node := &Node{
+		ID:      id,
+		Host:    aliases[0],
+		aliases: aliases,
+		cluster: cluster,
+		pool:    pool,
+		health:  100,
+	}
+
+	// Start node refresh loop
+	refreshInterval := cluster.opts.NodeRefreshInterval
+	if refreshInterval <= 0 {
+		// Default to refresh every 30 seconds
+		refreshInterval = time.Second * 30
+	}
+
+	go func() {
+		node.refreshTicker = time.NewTicker(refreshInterval)
+		for _ = range node.refreshTicker.C {
+			node.Refresh()
+		}
+	}()
+
+	return node
+}
+
 // Closed returns true if the node is closed
 func (n *Node) Closed() bool {
 	n.mu.RLock()
@@ -82,6 +109,10 @@ func (n *Node) Query(q Query) (cursor *Cursor, err error) {
 	}
 
 	cursor, err = n.pool.Query(q)
+	if err != nil {
+		n.DecrementHealth()
+	}
+
 	return
 }
 
@@ -91,6 +122,10 @@ func (n *Node) Exec(q Query) (err error) {
 	}
 
 	err = n.pool.Exec(q)
+	if err != nil {
+		n.DecrementHealth()
+	}
+
 	return
 }
 

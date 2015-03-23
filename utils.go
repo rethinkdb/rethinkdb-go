@@ -43,7 +43,7 @@ func constructMethodTerm(prevVal Term, name string, termType p.Term_TermType, ar
 
 // Helper functions for creating internal RQL types
 
-func newQuery(t Term, qopts map[string]interface{}, copts ConnectOpts) Query {
+func newQuery(t Term, qopts map[string]interface{}, copts *ConnectOpts) Query {
 	queryOpts := map[string]interface{}{}
 	for k, v := range qopts {
 		queryOpts[k] = Expr(v).build()

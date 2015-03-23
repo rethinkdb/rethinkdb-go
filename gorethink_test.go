@@ -19,6 +19,7 @@ var url, url2, url3, db, authKey string
 
 func init() {
 	flag.Parse()
+	SetDebug(true)
 
 	// If the test is being run by wercker look for the rethink url
 	url = os.Getenv("RETHINKDB_URL")

@@ -1,9 +1,9 @@
 package gorethink
 
 import (
-	"errors"
 	"fmt"
-	"log"
+	"github.com/Sirupsen/logrus"
+	"github.com/cenkalti/backoff"
 	"math"
 	"strings"
 	"sync"
@@ -11,50 +11,35 @@ import (
 	"time"
 )
 
-var (
-	ErrNoHosts              = errors.New("no hosts provided")
-	ErrNoConnectionsStarted = errors.New("no connections were made when creating the session")
-	ErrHostQueryFailed      = errors.New("unable to populate hosts")
-	ErrInvalidNode          = errors.New("invalid node")
-	ErrClusterClosed        = errors.New("cluster closed")
-)
-
+// A Cluster represents a connection to a RethinkDB cluster, a cluster is created
+// by the Session and should rarely be created manually.
+//
+// The cluster keeps track of all nodes in the cluster and if requested can listen
+// for cluster changes and start tracking a new node if one appears. Currently
+// nodes are removed from the pool if they become unhealthy (100 failed queries).
+// This should hopefully soon be replaced by a backoff system.
 type Cluster struct {
-	opts ConnectOpts
+	opts *ConnectOpts
 
-	mu sync.RWMutex
-	// Initial host nodes specified by user.
-	seeds []Host
-	// Active nodes in cluster.
-	nodes  []*Node
+	mu     sync.RWMutex
+	seeds  []Host  // Initial host nodes specified by user.
+	nodes  []*Node // Active nodes in cluster.
 	closed bool
 
 	nodeIndex int64
 }
 
-func ConnectCluster(addresses ...string) (*Cluster, error) {
-	return ConnectClusterWithOpts(ConnectOpts{}, addresses...)
-}
-
-func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Cluster, error) {
-	hosts := make([]Host, len(addresses))
-	for i, address := range addresses {
-		hostname, port := splitAddress(address)
-		hosts[i] = NewHost(hostname, port)
-	}
-	if len(hosts) <= 0 {
-		return nil, ErrNoHosts
-	}
-
+// NewCluster creates a new cluster by connecting to the given hosts.
+func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
 	c := &Cluster{
 		seeds: hosts,
 		opts:  opts,
 	}
 
 	//Check that hosts in the ClusterConfig is not empty
-	c.seedNodes()
+	c.connectNodes(c.getSeeds())
 	if !c.IsConnected() {
-		return nil, ErrNoHosts
+		return nil, ErrNoConnectionsStarted
 	}
 
 	if opts.DiscoverHosts {
@@ -64,6 +49,7 @@ func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Cluster, er
 	return c, nil
 }
 
+// Query executes a ReQL query using the cluster to connect to the database
 func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
 	node, err := c.GetRandomNode()
 	if err != nil {
@@ -73,6 +59,7 @@ func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
 	return node.Query(q)
 }
 
+// Exec executes a ReQL query using the cluster to connect to the database
 func (c *Cluster) Exec(q Query) (err error) {
 	node, err := c.GetRandomNode()
 	if err != nil {
@@ -82,8 +69,19 @@ func (c *Cluster) Exec(q Query) (err error) {
 	return node.Exec(q)
 }
 
-func (c *Cluster) newQuery(t Term, opts map[string]interface{}) Query {
-	return newQuery(t, opts, c.opts)
+// SetMaxIdleConns sets the maximum number of connections in the idle
+// connection pool.
+func (c *Cluster) SetMaxIdleConns(n int) {
+	for _, node := range c.GetNodes() {
+		node.SetMaxIdleConns(n)
+	}
+}
+
+// SetMaxOpenConns sets the maximum number of open connections to the database.
+func (c *Cluster) SetMaxOpenConns(n int) {
+	for _, node := range c.GetNodes() {
+		node.SetMaxOpenConns(n)
+	}
 }
 
 // Close closes the cluster
@@ -104,15 +102,89 @@ func (c *Cluster) Close(optArgs ...CloseOpts) error {
 	return nil
 }
 
-func (c *Cluster) seedNodes() {
-	// Add existing nodes to map
-	nodesMap := map[string]*Node{}
-	for _, node := range c.GetNodes() {
-		nodesMap[node.ID] = node
+// discover attempts to find new nodes in the cluster using the current nodes
+func (c *Cluster) discover() {
+	// Keep retrying with exponential backoff.
+	b := backoff.NewExponentialBackOff()
+	// Never finish retrying (max wait time is still 60s)
+	b.MaxElapsedTime = 0
+
+	backoff.RetryNotify(func() error {
+		// If no hosts try seeding nodes
+		if len(c.GetNodes()) == 0 {
+			c.connectNodes(c.getSeeds())
+		}
+
+		return c.listenForNodeChanges()
+	}, b, func(err error, wait time.Duration) {
+		log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
+	})
+}
+
+// listenForNodeChanges listens for changes to node status using change feeds.
+// This function will block until the query fails
+func (c *Cluster) listenForNodeChanges() error {
+	node, err := c.GetRandomNode()
+	if err != nil {
+		return err
 	}
 
-	for _, seedHost := range c.seeds {
-		conn, err := NewConnection(seedHost.String(), ConnectOpts{})
+	cursor, err := node.Query(newQuery(
+		Db("rethinkdb").Table("server_status").Changes(),
+		map[string]interface{}{},
+		c.opts,
+	))
+	if err != nil {
+		return err
+	}
+
+	var result struct {
+		NewVal nodeStatus `gorethink:"new_val"`
+		OldVal nodeStatus `gorethink:"old_val"`
+	}
+
+	for cursor.Next(&result) {
+		addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
+		addr = strings.ToLower(addr)
+
+		switch result.NewVal.Status {
+		case "connected":
+			// Connect to node using exponential backoff (give up after waiting 5s)
+			// to give the node time to start-up.
+			b := backoff.NewExponentialBackOff()
+			b.MaxElapsedTime = time.Second * 5
+
+			backoff.Retry(func() error {
+				node, err := c.connectNode(result.NewVal)
+				if err == nil {
+					if !c.nodeExists(node) {
+						c.addNode(node)
+
+						log.WithFields(logrus.Fields{
+							"id":   node.ID,
+							"host": node.Host.String(),
+						}).Debug("Connected to node")
+					}
+				}
+
+				return err
+			}, b)
+		}
+	}
+
+	return cursor.Err()
+}
+
+func (c *Cluster) connectNodes(hosts []Host) {
+	// Add existing nodes to map
+	nodeSet := map[string]*Node{}
+	for _, node := range c.GetNodes() {
+		nodeSet[node.ID] = node
+	}
+
+	// Attempt to connect to each seed host
+	for _, host := range hosts {
+		conn, err := NewConnection(host.String(), c.opts)
 		if err != nil {
 			continue
 		}
@@ -136,83 +208,23 @@ func (c *Cluster) seedNodes() {
 		for _, result := range results {
 			node, err := c.connectNode(result)
 			if err == nil {
-				if _, ok := nodesMap[node.ID]; !ok {
-					nodesMap[node.ID] = node
+				if _, ok := nodeSet[node.ID]; !ok {
+					log.WithFields(logrus.Fields{
+						"id":   node.ID,
+						"host": node.Host.String(),
+					}).Debug("Connected to node")
+					nodeSet[node.ID] = node
 				}
 			}
 		}
 	}
 
 	nodes := []*Node{}
-	for _, node := range nodesMap {
+	for _, node := range nodeSet {
 		nodes = append(nodes, node)
 	}
 
 	c.setNodes(nodes)
-}
-
-// discover attempts to find new nodes in the cluster using the current nodes
-func (c *Cluster) discover() {
-	errSleepDuration := c.opts.ErrorSleepDuration
-	if errSleepDuration <= 0 {
-		errSleepDuration = time.Millisecond * 10
-	}
-
-	for {
-		// If no hosts try seeding nodes
-		if len(c.GetNodes()) == 0 {
-			c.seedNodes()
-		}
-
-		err := c.listenForNodeChanges()
-		if err != nil {
-			log.Printf("Error discovering hosts %s, retrying in %d", err, errSleepDuration)
-			time.Sleep(errSleepDuration)
-		}
-	}
-}
-
-// listenForNodeChanges listens for changes to node status using change feeds.
-// This function will block until the query fails
-func (c *Cluster) listenForNodeChanges() error {
-	node, err := c.GetRandomNode()
-	if err != nil {
-		return err
-	}
-
-	cursor, err := node.Query(newQuery(
-		Db("rethinkdb").Table("server_status").Changes(),
-		map[string]interface{}{},
-		c.opts,
-	))
-
-	if err != nil {
-		log.Printf("Error discovering hosts, %s", err)
-	}
-
-	var result struct {
-		NewVal nodeStatus `gorethink:"new_val"`
-		OldVal nodeStatus `gorethink:"old_val"`
-	}
-
-	for cursor.Next(&result) {
-		addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
-		addr = strings.ToLower(addr)
-
-		switch result.NewVal.Status {
-		case "connected":
-			node, err := c.connectNode(result.NewVal)
-			if !c.nodeExists(node) {
-				if err == nil {
-					c.addNode(node)
-				}
-			}
-		case "disconnected":
-			c.removeNode(result.OldVal.ID)
-		}
-	}
-
-	return cursor.Err()
 }
 
 func (c *Cluster) connectNode(s nodeStatus) (*Node, error) {
@@ -242,36 +254,14 @@ func (c *Cluster) connectNode(s nodeStatus) (*Node, error) {
 		break
 	}
 
-	if len(aliases) == 0 {
-		return nil, ErrInvalidNode
-	}
 	if err != nil {
 		return nil, err
 	}
-
-	node := &Node{
-		ID:      s.ID,
-		Host:    aliases[0],
-		aliases: aliases,
-		cluster: c,
-		pool:    pool,
+	if len(aliases) == 0 {
+		return nil, ErrInvalidNode
 	}
 
-	// Start node refresh loop
-	refreshInterval := c.opts.NodeRefreshInterval
-	if refreshInterval <= 0 {
-		// Default to refresh every 30 seconds
-		refreshInterval = time.Second * 30
-	}
-
-	go func() {
-		node.refreshTicker = time.NewTicker(refreshInterval)
-		for _ = range node.refreshTicker.C {
-			node.Refresh()
-		}
-	}()
-
-	return node, nil
+	return newNode(s.ID, aliases, c, pool), nil
 }
 
 // IsConnected returns true if cluster has nodes and is not already closed.
@@ -283,8 +273,7 @@ func (c *Cluster) IsConnected() bool {
 	return (len(c.GetNodes()) > 0) && !closed
 }
 
-// AddSeeds adds new hosts to the cluster.
-// They will be added to the cluster on next tend call.
+// AddSeeds adds new seed hosts to the cluster.
 func (c *Cluster) AddSeeds(hosts []Host) {
 	c.mu.Lock()
 	c.seeds = append(c.seeds, hosts...)
@@ -313,17 +302,31 @@ func (c *Cluster) GetRandomNode() (*Node, error) {
 		index := int(math.Abs(float64(c.nextNodeIndex() % int64(length))))
 		node := nodeArray[index]
 
-		if !node.Closed() {
+		if !node.Closed() && node.IsHealthy() {
 			return node, nil
 		}
 	}
-	return nil, ErrNoHosts
+	return nil, ErrNoConnections
 }
 
 // GetNodes returns a list of all nodes in the cluster
 func (c *Cluster) GetNodes() []*Node {
 	c.mu.RLock()
 	nodes := c.nodes
+	c.mu.RUnlock()
+
+	return nodes
+}
+
+// GetHealthyNodes returns a list of all healthy nodes in the cluster
+func (c *Cluster) GetHealthyNodes() []*Node {
+	c.mu.RLock()
+	nodes := []*Node{}
+	for _, node := range c.nodes {
+		if node.IsHealthy() {
+			nodes = append(nodes, node)
+		}
+	}
 	c.mu.RUnlock()
 
 	return nodes

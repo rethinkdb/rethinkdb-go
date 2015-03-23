@@ -34,7 +34,7 @@ type finalCloser interface {
 
 type Pool struct {
 	host Host
-	opts ConnectOpts
+	opts *ConnectOpts
 
 	mu           sync.Mutex // protects following fields
 	err          error      // the last error that occurred
@@ -56,7 +56,7 @@ type Pool struct {
 }
 
 // NewPool creates a new connection pool for the given host
-func NewPool(host Host, opts ConnectOpts) (*Pool, error) {
+func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 	p := &Pool{
 		host:     host,
 		opts:     opts,

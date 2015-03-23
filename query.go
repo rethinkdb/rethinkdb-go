@@ -186,23 +186,23 @@ func (o *RunOpts) toMap() map[string]interface{} {
 //	for rows.Next(&doc) {
 //      // Do something with document
 //	}
-func (t Term) Run(e executor, optArgs ...RunOpts) (*Cursor, error) {
+func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
 
-	return e.Query(e.newQuery(t, opts))
+	return s.Query(s.newQuery(t, opts))
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
-// scans the result into a variable of type WriteResponse. This function should be used
+// scans the result into a variable of type WriteResponss. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
 //
 //	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
-func (t Term) RunWrite(e executor, optArgs ...RunOpts) (WriteResponse, error) {
+func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	var response WriteResponse
-	res, err := t.Run(e, optArgs...)
+	res, err := t.Run(s, optArgs...)
 	if err == nil {
 		err = res.One(&response)
 	}
@@ -243,11 +243,11 @@ func (o *ExecOpts) toMap() map[string]interface{} {
 //	res, err := r.Db("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
 //		NoReply: true,
 //	})
-func (t Term) Exec(e executor, optArgs ...ExecOpts) error {
+func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
 	}
 
-	return e.Exec(e.newQuery(t, opts))
+	return s.Exec(s.newQuery(t, opts))
 }
