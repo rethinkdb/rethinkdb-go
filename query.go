@@ -192,13 +192,11 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 		opts = optArgs[0].toMap()
 	}
 
-	q := newStartQuery(s, t, opts)
-
-	return s.pool.Query(q)
+	return s.Query(s.newQuery(t, opts))
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
-// scans the result into a variable of type WriteResponse. This function should be used
+// scans the result into a variable of type WriteResponss. This function should be used
 // if you are running a write query (such as Insert,  Update, TableCreate, etc...)
 //
 //	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
@@ -251,24 +249,5 @@ func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
 		opts = optArgs[0].toMap()
 	}
 
-	q := newStartQuery(s, t, opts)
-
-	return s.pool.Exec(q)
-}
-
-func newStartQuery(s *Session, t Term, opts map[string]interface{}) Query {
-	queryOpts := map[string]interface{}{}
-	for k, v := range opts {
-		queryOpts[k] = Expr(v).build()
-	}
-	if s.opts.Database != "" {
-		queryOpts["db"] = Db(s.opts.Database).build()
-	}
-
-	// Construct query
-	return Query{
-		Type: p.Query_START,
-		Term: &t,
-		Opts: queryOpts,
-	}
+	return s.Exec(s.newQuery(t, opts))
 }

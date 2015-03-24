@@ -4,7 +4,7 @@
 
 package ql2
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import json "encoding/json"
 import math "math"
 
@@ -19,17 +19,20 @@ const (
 	VersionDummy_V0_1 VersionDummy_Version = 1063369270
 	VersionDummy_V0_2 VersionDummy_Version = 1915781601
 	VersionDummy_V0_3 VersionDummy_Version = 1601562686
+	VersionDummy_V0_4 VersionDummy_Version = 1074539808
 )
 
 var VersionDummy_Version_name = map[int32]string{
 	1063369270: "V0_1",
 	1915781601: "V0_2",
 	1601562686: "V0_3",
+	1074539808: "V0_4",
 }
 var VersionDummy_Version_value = map[string]int32{
 	"V0_1": 1063369270,
 	"V0_2": 1915781601,
 	"V0_3": 1601562686,
+	"V0_4": 1074539808,
 }
 
 func (x VersionDummy_Version) Enum() *VersionDummy_Version {
@@ -169,38 +172,32 @@ func (x *Frame_FrameType) UnmarshalJSON(data []byte) error {
 type Response_ResponseType int32
 
 const (
-	Response_SUCCESS_ATOM      Response_ResponseType = 1
-	Response_SUCCESS_SEQUENCE  Response_ResponseType = 2
-	Response_SUCCESS_PARTIAL   Response_ResponseType = 3
-	Response_SUCCESS_FEED      Response_ResponseType = 5
-	Response_WAIT_COMPLETE     Response_ResponseType = 4
-	Response_SUCCESS_ATOM_FEED Response_ResponseType = 6
-	Response_CLIENT_ERROR      Response_ResponseType = 16
-	Response_COMPILE_ERROR     Response_ResponseType = 17
-	Response_RUNTIME_ERROR     Response_ResponseType = 18
+	Response_SUCCESS_ATOM     Response_ResponseType = 1
+	Response_SUCCESS_SEQUENCE Response_ResponseType = 2
+	Response_SUCCESS_PARTIAL  Response_ResponseType = 3
+	Response_WAIT_COMPLETE    Response_ResponseType = 4
+	Response_CLIENT_ERROR     Response_ResponseType = 16
+	Response_COMPILE_ERROR    Response_ResponseType = 17
+	Response_RUNTIME_ERROR    Response_ResponseType = 18
 )
 
 var Response_ResponseType_name = map[int32]string{
 	1:  "SUCCESS_ATOM",
 	2:  "SUCCESS_SEQUENCE",
 	3:  "SUCCESS_PARTIAL",
-	5:  "SUCCESS_FEED",
 	4:  "WAIT_COMPLETE",
-	6:  "SUCCESS_ATOM_FEED",
 	16: "CLIENT_ERROR",
 	17: "COMPILE_ERROR",
 	18: "RUNTIME_ERROR",
 }
 var Response_ResponseType_value = map[string]int32{
-	"SUCCESS_ATOM":      1,
-	"SUCCESS_SEQUENCE":  2,
-	"SUCCESS_PARTIAL":   3,
-	"SUCCESS_FEED":      5,
-	"WAIT_COMPLETE":     4,
-	"SUCCESS_ATOM_FEED": 6,
-	"CLIENT_ERROR":      16,
-	"COMPILE_ERROR":     17,
-	"RUNTIME_ERROR":     18,
+	"SUCCESS_ATOM":     1,
+	"SUCCESS_SEQUENCE": 2,
+	"SUCCESS_PARTIAL":  3,
+	"WAIT_COMPLETE":    4,
+	"CLIENT_ERROR":     16,
+	"COMPILE_ERROR":    17,
+	"RUNTIME_ERROR":    18,
 }
 
 func (x Response_ResponseType) Enum() *Response_ResponseType {
@@ -220,6 +217,51 @@ func (x *Response_ResponseType) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	*x = Response_ResponseType(value)
+	return nil
+}
+
+type Response_ResponseNote int32
+
+const (
+	Response_SEQUENCE_FEED       Response_ResponseNote = 1
+	Response_ATOM_FEED           Response_ResponseNote = 2
+	Response_ORDER_BY_LIMIT_FEED Response_ResponseNote = 3
+	Response_UNIONED_FEED        Response_ResponseNote = 4
+	Response_INCLUDES_STATES     Response_ResponseNote = 5
+)
+
+var Response_ResponseNote_name = map[int32]string{
+	1: "SEQUENCE_FEED",
+	2: "ATOM_FEED",
+	3: "ORDER_BY_LIMIT_FEED",
+	4: "UNIONED_FEED",
+	5: "INCLUDES_STATES",
+}
+var Response_ResponseNote_value = map[string]int32{
+	"SEQUENCE_FEED":       1,
+	"ATOM_FEED":           2,
+	"ORDER_BY_LIMIT_FEED": 3,
+	"UNIONED_FEED":        4,
+	"INCLUDES_STATES":     5,
+}
+
+func (x Response_ResponseNote) Enum() *Response_ResponseNote {
+	p := new(Response_ResponseNote)
+	*p = x
+	return p
+}
+func (x Response_ResponseNote) String() string {
+	return proto.EnumName(Response_ResponseNote_name, int32(x))
+}
+func (x Response_ResponseNote) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
+}
+func (x *Response_ResponseNote) UnmarshalJSON(data []byte) error {
+	value, err := proto.UnmarshalJSONEnum(Response_ResponseNote_value, data, "Response_ResponseNote")
+	if err != nil {
+		return err
+	}
+	*x = Response_ResponseNote(value)
 	return nil
 }
 
@@ -277,175 +319,178 @@ func (x *Datum_DatumType) UnmarshalJSON(data []byte) error {
 type Term_TermType int32
 
 const (
-	Term_DATUM            Term_TermType = 1
-	Term_MAKE_ARRAY       Term_TermType = 2
-	Term_MAKE_OBJ         Term_TermType = 3
-	Term_VAR              Term_TermType = 10
-	Term_JAVASCRIPT       Term_TermType = 11
-	Term_UUID             Term_TermType = 169
-	Term_HTTP             Term_TermType = 153
-	Term_ERROR            Term_TermType = 12
-	Term_IMPLICIT_VAR     Term_TermType = 13
-	Term_DB               Term_TermType = 14
-	Term_TABLE            Term_TermType = 15
-	Term_GET              Term_TermType = 16
-	Term_GET_ALL          Term_TermType = 78
-	Term_EQ               Term_TermType = 17
-	Term_NE               Term_TermType = 18
-	Term_LT               Term_TermType = 19
-	Term_LE               Term_TermType = 20
-	Term_GT               Term_TermType = 21
-	Term_GE               Term_TermType = 22
-	Term_NOT              Term_TermType = 23
-	Term_ADD              Term_TermType = 24
-	Term_SUB              Term_TermType = 25
-	Term_MUL              Term_TermType = 26
-	Term_DIV              Term_TermType = 27
-	Term_MOD              Term_TermType = 28
-	Term_APPEND           Term_TermType = 29
-	Term_PREPEND          Term_TermType = 80
-	Term_DIFFERENCE       Term_TermType = 95
-	Term_SET_INSERT       Term_TermType = 88
-	Term_SET_INTERSECTION Term_TermType = 89
-	Term_SET_UNION        Term_TermType = 90
-	Term_SET_DIFFERENCE   Term_TermType = 91
-	Term_SLICE            Term_TermType = 30
-	Term_SKIP             Term_TermType = 70
-	Term_LIMIT            Term_TermType = 71
-	Term_INDEXES_OF       Term_TermType = 87
-	Term_CONTAINS         Term_TermType = 93
-	Term_GET_FIELD        Term_TermType = 31
-	Term_KEYS             Term_TermType = 94
-	Term_OBJECT           Term_TermType = 143
-	Term_HAS_FIELDS       Term_TermType = 32
-	Term_WITH_FIELDS      Term_TermType = 96
-	Term_PLUCK            Term_TermType = 33
-	Term_WITHOUT          Term_TermType = 34
-	Term_MERGE            Term_TermType = 35
-	Term_BETWEEN          Term_TermType = 36
-	Term_REDUCE           Term_TermType = 37
-	Term_MAP              Term_TermType = 38
-	Term_FILTER           Term_TermType = 39
-	Term_CONCAT_MAP       Term_TermType = 40
-	Term_ORDER_BY         Term_TermType = 41
-	Term_DISTINCT         Term_TermType = 42
-	Term_COUNT            Term_TermType = 43
-	Term_IS_EMPTY         Term_TermType = 86
-	Term_UNION            Term_TermType = 44
-	Term_NTH              Term_TermType = 45
-	Term_BRACKET          Term_TermType = 170
-	Term_INNER_JOIN       Term_TermType = 48
-	Term_OUTER_JOIN       Term_TermType = 49
-	Term_EQ_JOIN          Term_TermType = 50
-	Term_ZIP              Term_TermType = 72
-	Term_RANGE            Term_TermType = 173
-	Term_INSERT_AT        Term_TermType = 82
-	Term_DELETE_AT        Term_TermType = 83
-	Term_CHANGE_AT        Term_TermType = 84
-	Term_SPLICE_AT        Term_TermType = 85
-	Term_COERCE_TO        Term_TermType = 51
-	Term_TYPE_OF          Term_TermType = 52
-	Term_UPDATE           Term_TermType = 53
-	Term_DELETE           Term_TermType = 54
-	Term_REPLACE          Term_TermType = 55
-	Term_INSERT           Term_TermType = 56
-	Term_DB_CREATE        Term_TermType = 57
-	Term_DB_DROP          Term_TermType = 58
-	Term_DB_LIST          Term_TermType = 59
-	Term_TABLE_CREATE     Term_TermType = 60
-	Term_TABLE_DROP       Term_TermType = 61
-	Term_TABLE_LIST       Term_TermType = 62
-	Term_CONFIG           Term_TermType = 174
-	Term_STATUS           Term_TermType = 175
-	Term_WAIT             Term_TermType = 177
-	Term_RECONFIGURE      Term_TermType = 176
-	Term_REBALANCE        Term_TermType = 179
-	Term_SYNC             Term_TermType = 138
-	Term_INDEX_CREATE     Term_TermType = 75
-	Term_INDEX_DROP       Term_TermType = 76
-	Term_INDEX_LIST       Term_TermType = 77
-	Term_INDEX_STATUS     Term_TermType = 139
-	Term_INDEX_WAIT       Term_TermType = 140
-	Term_INDEX_RENAME     Term_TermType = 156
-	Term_FUNCALL          Term_TermType = 64
-	Term_BRANCH           Term_TermType = 65
-	Term_ANY              Term_TermType = 66
-	Term_ALL              Term_TermType = 67
-	Term_FOR_EACH         Term_TermType = 68
-	Term_FUNC             Term_TermType = 69
-	Term_ASC              Term_TermType = 73
-	Term_DESC             Term_TermType = 74
-	Term_INFO             Term_TermType = 79
-	Term_MATCH            Term_TermType = 97
-	Term_UPCASE           Term_TermType = 141
-	Term_DOWNCASE         Term_TermType = 142
-	Term_SAMPLE           Term_TermType = 81
-	Term_DEFAULT          Term_TermType = 92
-	Term_JSON             Term_TermType = 98
-	Term_TO_JSON_STRING   Term_TermType = 172
-	Term_ISO8601          Term_TermType = 99
-	Term_TO_ISO8601       Term_TermType = 100
-	Term_EPOCH_TIME       Term_TermType = 101
-	Term_TO_EPOCH_TIME    Term_TermType = 102
-	Term_NOW              Term_TermType = 103
-	Term_IN_TIMEZONE      Term_TermType = 104
-	Term_DURING           Term_TermType = 105
-	Term_DATE             Term_TermType = 106
-	Term_TIME_OF_DAY      Term_TermType = 126
-	Term_TIMEZONE         Term_TermType = 127
-	Term_YEAR             Term_TermType = 128
-	Term_MONTH            Term_TermType = 129
-	Term_DAY              Term_TermType = 130
-	Term_DAY_OF_WEEK      Term_TermType = 131
-	Term_DAY_OF_YEAR      Term_TermType = 132
-	Term_HOURS            Term_TermType = 133
-	Term_MINUTES          Term_TermType = 134
-	Term_SECONDS          Term_TermType = 135
-	Term_TIME             Term_TermType = 136
-	Term_MONDAY           Term_TermType = 107
-	Term_TUESDAY          Term_TermType = 108
-	Term_WEDNESDAY        Term_TermType = 109
-	Term_THURSDAY         Term_TermType = 110
-	Term_FRIDAY           Term_TermType = 111
-	Term_SATURDAY         Term_TermType = 112
-	Term_SUNDAY           Term_TermType = 113
-	Term_JANUARY          Term_TermType = 114
-	Term_FEBRUARY         Term_TermType = 115
-	Term_MARCH            Term_TermType = 116
-	Term_APRIL            Term_TermType = 117
-	Term_MAY              Term_TermType = 118
-	Term_JUNE             Term_TermType = 119
-	Term_JULY             Term_TermType = 120
-	Term_AUGUST           Term_TermType = 121
-	Term_SEPTEMBER        Term_TermType = 122
-	Term_OCTOBER          Term_TermType = 123
-	Term_NOVEMBER         Term_TermType = 124
-	Term_DECEMBER         Term_TermType = 125
-	Term_LITERAL          Term_TermType = 137
-	Term_GROUP            Term_TermType = 144
-	Term_SUM              Term_TermType = 145
-	Term_AVG              Term_TermType = 146
-	Term_MIN              Term_TermType = 147
-	Term_MAX              Term_TermType = 148
-	Term_SPLIT            Term_TermType = 149
-	Term_UNGROUP          Term_TermType = 150
-	Term_RANDOM           Term_TermType = 151
-	Term_CHANGES          Term_TermType = 152
-	Term_ARGS             Term_TermType = 154
-	Term_BINARY           Term_TermType = 155
-	Term_GEOJSON          Term_TermType = 157
-	Term_TO_GEOJSON       Term_TermType = 158
-	Term_POINT            Term_TermType = 159
-	Term_LINE             Term_TermType = 160
-	Term_POLYGON          Term_TermType = 161
-	Term_DISTANCE         Term_TermType = 162
-	Term_INTERSECTS       Term_TermType = 163
-	Term_INCLUDES         Term_TermType = 164
-	Term_CIRCLE           Term_TermType = 165
-	Term_GET_INTERSECTING Term_TermType = 166
-	Term_FILL             Term_TermType = 167
-	Term_GET_NEAREST      Term_TermType = 168
-	Term_POLYGON_SUB      Term_TermType = 171
+	Term_DATUM              Term_TermType = 1
+	Term_MAKE_ARRAY         Term_TermType = 2
+	Term_MAKE_OBJ           Term_TermType = 3
+	Term_VAR                Term_TermType = 10
+	Term_JAVASCRIPT         Term_TermType = 11
+	Term_UUID               Term_TermType = 169
+	Term_HTTP               Term_TermType = 153
+	Term_ERROR              Term_TermType = 12
+	Term_IMPLICIT_VAR       Term_TermType = 13
+	Term_DB                 Term_TermType = 14
+	Term_TABLE              Term_TermType = 15
+	Term_GET                Term_TermType = 16
+	Term_GET_ALL            Term_TermType = 78
+	Term_EQ                 Term_TermType = 17
+	Term_NE                 Term_TermType = 18
+	Term_LT                 Term_TermType = 19
+	Term_LE                 Term_TermType = 20
+	Term_GT                 Term_TermType = 21
+	Term_GE                 Term_TermType = 22
+	Term_NOT                Term_TermType = 23
+	Term_ADD                Term_TermType = 24
+	Term_SUB                Term_TermType = 25
+	Term_MUL                Term_TermType = 26
+	Term_DIV                Term_TermType = 27
+	Term_MOD                Term_TermType = 28
+	Term_APPEND             Term_TermType = 29
+	Term_PREPEND            Term_TermType = 80
+	Term_DIFFERENCE         Term_TermType = 95
+	Term_SET_INSERT         Term_TermType = 88
+	Term_SET_INTERSECTION   Term_TermType = 89
+	Term_SET_UNION          Term_TermType = 90
+	Term_SET_DIFFERENCE     Term_TermType = 91
+	Term_SLICE              Term_TermType = 30
+	Term_SKIP               Term_TermType = 70
+	Term_LIMIT              Term_TermType = 71
+	Term_OFFSETS_OF         Term_TermType = 87
+	Term_CONTAINS           Term_TermType = 93
+	Term_GET_FIELD          Term_TermType = 31
+	Term_KEYS               Term_TermType = 94
+	Term_OBJECT             Term_TermType = 143
+	Term_HAS_FIELDS         Term_TermType = 32
+	Term_WITH_FIELDS        Term_TermType = 96
+	Term_PLUCK              Term_TermType = 33
+	Term_WITHOUT            Term_TermType = 34
+	Term_MERGE              Term_TermType = 35
+	Term_BETWEEN_DEPRECATED Term_TermType = 36
+	Term_BETWEEN            Term_TermType = 182
+	Term_REDUCE             Term_TermType = 37
+	Term_MAP                Term_TermType = 38
+	Term_FILTER             Term_TermType = 39
+	Term_CONCAT_MAP         Term_TermType = 40
+	Term_ORDER_BY           Term_TermType = 41
+	Term_DISTINCT           Term_TermType = 42
+	Term_COUNT              Term_TermType = 43
+	Term_IS_EMPTY           Term_TermType = 86
+	Term_UNION              Term_TermType = 44
+	Term_NTH                Term_TermType = 45
+	Term_BRACKET            Term_TermType = 170
+	Term_INNER_JOIN         Term_TermType = 48
+	Term_OUTER_JOIN         Term_TermType = 49
+	Term_EQ_JOIN            Term_TermType = 50
+	Term_ZIP                Term_TermType = 72
+	Term_RANGE              Term_TermType = 173
+	Term_INSERT_AT          Term_TermType = 82
+	Term_DELETE_AT          Term_TermType = 83
+	Term_CHANGE_AT          Term_TermType = 84
+	Term_SPLICE_AT          Term_TermType = 85
+	Term_COERCE_TO          Term_TermType = 51
+	Term_TYPE_OF            Term_TermType = 52
+	Term_UPDATE             Term_TermType = 53
+	Term_DELETE             Term_TermType = 54
+	Term_REPLACE            Term_TermType = 55
+	Term_INSERT             Term_TermType = 56
+	Term_DB_CREATE          Term_TermType = 57
+	Term_DB_DROP            Term_TermType = 58
+	Term_DB_LIST            Term_TermType = 59
+	Term_TABLE_CREATE       Term_TermType = 60
+	Term_TABLE_DROP         Term_TermType = 61
+	Term_TABLE_LIST         Term_TermType = 62
+	Term_CONFIG             Term_TermType = 174
+	Term_STATUS             Term_TermType = 175
+	Term_WAIT               Term_TermType = 177
+	Term_RECONFIGURE        Term_TermType = 176
+	Term_REBALANCE          Term_TermType = 179
+	Term_SYNC               Term_TermType = 138
+	Term_INDEX_CREATE       Term_TermType = 75
+	Term_INDEX_DROP         Term_TermType = 76
+	Term_INDEX_LIST         Term_TermType = 77
+	Term_INDEX_STATUS       Term_TermType = 139
+	Term_INDEX_WAIT         Term_TermType = 140
+	Term_INDEX_RENAME       Term_TermType = 156
+	Term_FUNCALL            Term_TermType = 64
+	Term_BRANCH             Term_TermType = 65
+	Term_OR                 Term_TermType = 66
+	Term_AND                Term_TermType = 67
+	Term_FOR_EACH           Term_TermType = 68
+	Term_FUNC               Term_TermType = 69
+	Term_ASC                Term_TermType = 73
+	Term_DESC               Term_TermType = 74
+	Term_INFO               Term_TermType = 79
+	Term_MATCH              Term_TermType = 97
+	Term_UPCASE             Term_TermType = 141
+	Term_DOWNCASE           Term_TermType = 142
+	Term_SAMPLE             Term_TermType = 81
+	Term_DEFAULT            Term_TermType = 92
+	Term_JSON               Term_TermType = 98
+	Term_TO_JSON_STRING     Term_TermType = 172
+	Term_ISO8601            Term_TermType = 99
+	Term_TO_ISO8601         Term_TermType = 100
+	Term_EPOCH_TIME         Term_TermType = 101
+	Term_TO_EPOCH_TIME      Term_TermType = 102
+	Term_NOW                Term_TermType = 103
+	Term_IN_TIMEZONE        Term_TermType = 104
+	Term_DURING             Term_TermType = 105
+	Term_DATE               Term_TermType = 106
+	Term_TIME_OF_DAY        Term_TermType = 126
+	Term_TIMEZONE           Term_TermType = 127
+	Term_YEAR               Term_TermType = 128
+	Term_MONTH              Term_TermType = 129
+	Term_DAY                Term_TermType = 130
+	Term_DAY_OF_WEEK        Term_TermType = 131
+	Term_DAY_OF_YEAR        Term_TermType = 132
+	Term_HOURS              Term_TermType = 133
+	Term_MINUTES            Term_TermType = 134
+	Term_SECONDS            Term_TermType = 135
+	Term_TIME               Term_TermType = 136
+	Term_MONDAY             Term_TermType = 107
+	Term_TUESDAY            Term_TermType = 108
+	Term_WEDNESDAY          Term_TermType = 109
+	Term_THURSDAY           Term_TermType = 110
+	Term_FRIDAY             Term_TermType = 111
+	Term_SATURDAY           Term_TermType = 112
+	Term_SUNDAY             Term_TermType = 113
+	Term_JANUARY            Term_TermType = 114
+	Term_FEBRUARY           Term_TermType = 115
+	Term_MARCH              Term_TermType = 116
+	Term_APRIL              Term_TermType = 117
+	Term_MAY                Term_TermType = 118
+	Term_JUNE               Term_TermType = 119
+	Term_JULY               Term_TermType = 120
+	Term_AUGUST             Term_TermType = 121
+	Term_SEPTEMBER          Term_TermType = 122
+	Term_OCTOBER            Term_TermType = 123
+	Term_NOVEMBER           Term_TermType = 124
+	Term_DECEMBER           Term_TermType = 125
+	Term_LITERAL            Term_TermType = 137
+	Term_GROUP              Term_TermType = 144
+	Term_SUM                Term_TermType = 145
+	Term_AVG                Term_TermType = 146
+	Term_MIN                Term_TermType = 147
+	Term_MAX                Term_TermType = 148
+	Term_SPLIT              Term_TermType = 149
+	Term_UNGROUP            Term_TermType = 150
+	Term_RANDOM             Term_TermType = 151
+	Term_CHANGES            Term_TermType = 152
+	Term_ARGS               Term_TermType = 154
+	Term_BINARY             Term_TermType = 155
+	Term_GEOJSON            Term_TermType = 157
+	Term_TO_GEOJSON         Term_TermType = 158
+	Term_POINT              Term_TermType = 159
+	Term_LINE               Term_TermType = 160
+	Term_POLYGON            Term_TermType = 161
+	Term_DISTANCE           Term_TermType = 162
+	Term_INTERSECTS         Term_TermType = 163
+	Term_INCLUDES           Term_TermType = 164
+	Term_CIRCLE             Term_TermType = 165
+	Term_GET_INTERSECTING   Term_TermType = 166
+	Term_FILL               Term_TermType = 167
+	Term_GET_NEAREST        Term_TermType = 168
+	Term_POLYGON_SUB        Term_TermType = 171
+	Term_MINVAL             Term_TermType = 180
+	Term_MAXVAL             Term_TermType = 181
 )
 
 var Term_TermType_name = map[int32]string{
@@ -484,7 +529,7 @@ var Term_TermType_name = map[int32]string{
 	30:  "SLICE",
 	70:  "SKIP",
 	71:  "LIMIT",
-	87:  "INDEXES_OF",
+	87:  "OFFSETS_OF",
 	93:  "CONTAINS",
 	31:  "GET_FIELD",
 	94:  "KEYS",
@@ -494,7 +539,8 @@ var Term_TermType_name = map[int32]string{
 	33:  "PLUCK",
 	34:  "WITHOUT",
 	35:  "MERGE",
-	36:  "BETWEEN",
+	36:  "BETWEEN_DEPRECATED",
+	182: "BETWEEN",
 	37:  "REDUCE",
 	38:  "MAP",
 	39:  "FILTER",
@@ -541,8 +587,8 @@ var Term_TermType_name = map[int32]string{
 	156: "INDEX_RENAME",
 	64:  "FUNCALL",
 	65:  "BRANCH",
-	66:  "ANY",
-	67:  "ALL",
+	66:  "OR",
+	67:  "AND",
 	68:  "FOR_EACH",
 	69:  "FUNC",
 	73:  "ASC",
@@ -618,177 +664,182 @@ var Term_TermType_name = map[int32]string{
 	167: "FILL",
 	168: "GET_NEAREST",
 	171: "POLYGON_SUB",
+	180: "MINVAL",
+	181: "MAXVAL",
 }
 var Term_TermType_value = map[string]int32{
-	"DATUM":            1,
-	"MAKE_ARRAY":       2,
-	"MAKE_OBJ":         3,
-	"VAR":              10,
-	"JAVASCRIPT":       11,
-	"UUID":             169,
-	"HTTP":             153,
-	"ERROR":            12,
-	"IMPLICIT_VAR":     13,
-	"DB":               14,
-	"TABLE":            15,
-	"GET":              16,
-	"GET_ALL":          78,
-	"EQ":               17,
-	"NE":               18,
-	"LT":               19,
-	"LE":               20,
-	"GT":               21,
-	"GE":               22,
-	"NOT":              23,
-	"ADD":              24,
-	"SUB":              25,
-	"MUL":              26,
-	"DIV":              27,
-	"MOD":              28,
-	"APPEND":           29,
-	"PREPEND":          80,
-	"DIFFERENCE":       95,
-	"SET_INSERT":       88,
-	"SET_INTERSECTION": 89,
-	"SET_UNION":        90,
-	"SET_DIFFERENCE":   91,
-	"SLICE":            30,
-	"SKIP":             70,
-	"LIMIT":            71,
-	"INDEXES_OF":       87,
-	"CONTAINS":         93,
-	"GET_FIELD":        31,
-	"KEYS":             94,
-	"OBJECT":           143,
-	"HAS_FIELDS":       32,
-	"WITH_FIELDS":      96,
-	"PLUCK":            33,
-	"WITHOUT":          34,
-	"MERGE":            35,
-	"BETWEEN":          36,
-	"REDUCE":           37,
-	"MAP":              38,
-	"FILTER":           39,
-	"CONCAT_MAP":       40,
-	"ORDER_BY":         41,
-	"DISTINCT":         42,
-	"COUNT":            43,
-	"IS_EMPTY":         86,
-	"UNION":            44,
-	"NTH":              45,
-	"BRACKET":          170,
-	"INNER_JOIN":       48,
-	"OUTER_JOIN":       49,
-	"EQ_JOIN":          50,
-	"ZIP":              72,
-	"RANGE":            173,
-	"INSERT_AT":        82,
-	"DELETE_AT":        83,
-	"CHANGE_AT":        84,
-	"SPLICE_AT":        85,
-	"COERCE_TO":        51,
-	"TYPE_OF":          52,
-	"UPDATE":           53,
-	"DELETE":           54,
-	"REPLACE":          55,
-	"INSERT":           56,
-	"DB_CREATE":        57,
-	"DB_DROP":          58,
-	"DB_LIST":          59,
-	"TABLE_CREATE":     60,
-	"TABLE_DROP":       61,
-	"TABLE_LIST":       62,
-	"CONFIG":           174,
-	"STATUS":           175,
-	"WAIT":             177,
-	"RECONFIGURE":      176,
-	"REBALANCE":        179,
-	"SYNC":             138,
-	"INDEX_CREATE":     75,
-	"INDEX_DROP":       76,
-	"INDEX_LIST":       77,
-	"INDEX_STATUS":     139,
-	"INDEX_WAIT":       140,
-	"INDEX_RENAME":     156,
-	"FUNCALL":          64,
-	"BRANCH":           65,
-	"ANY":              66,
-	"ALL":              67,
-	"FOR_EACH":         68,
-	"FUNC":             69,
-	"ASC":              73,
-	"DESC":             74,
-	"INFO":             79,
-	"MATCH":            97,
-	"UPCASE":           141,
-	"DOWNCASE":         142,
-	"SAMPLE":           81,
-	"DEFAULT":          92,
-	"JSON":             98,
-	"TO_JSON_STRING":   172,
-	"ISO8601":          99,
-	"TO_ISO8601":       100,
-	"EPOCH_TIME":       101,
-	"TO_EPOCH_TIME":    102,
-	"NOW":              103,
-	"IN_TIMEZONE":      104,
-	"DURING":           105,
-	"DATE":             106,
-	"TIME_OF_DAY":      126,
-	"TIMEZONE":         127,
-	"YEAR":             128,
-	"MONTH":            129,
-	"DAY":              130,
-	"DAY_OF_WEEK":      131,
-	"DAY_OF_YEAR":      132,
-	"HOURS":            133,
-	"MINUTES":          134,
-	"SECONDS":          135,
-	"TIME":             136,
-	"MONDAY":           107,
-	"TUESDAY":          108,
-	"WEDNESDAY":        109,
-	"THURSDAY":         110,
-	"FRIDAY":           111,
-	"SATURDAY":         112,
-	"SUNDAY":           113,
-	"JANUARY":          114,
-	"FEBRUARY":         115,
-	"MARCH":            116,
-	"APRIL":            117,
-	"MAY":              118,
-	"JUNE":             119,
-	"JULY":             120,
-	"AUGUST":           121,
-	"SEPTEMBER":        122,
-	"OCTOBER":          123,
-	"NOVEMBER":         124,
-	"DECEMBER":         125,
-	"LITERAL":          137,
-	"GROUP":            144,
-	"SUM":              145,
-	"AVG":              146,
-	"MIN":              147,
-	"MAX":              148,
-	"SPLIT":            149,
-	"UNGROUP":          150,
-	"RANDOM":           151,
-	"CHANGES":          152,
-	"ARGS":             154,
-	"BINARY":           155,
-	"GEOJSON":          157,
-	"TO_GEOJSON":       158,
-	"POINT":            159,
-	"LINE":             160,
-	"POLYGON":          161,
-	"DISTANCE":         162,
-	"INTERSECTS":       163,
-	"INCLUDES":         164,
-	"CIRCLE":           165,
-	"GET_INTERSECTING": 166,
-	"FILL":             167,
-	"GET_NEAREST":      168,
-	"POLYGON_SUB":      171,
+	"DATUM":              1,
+	"MAKE_ARRAY":         2,
+	"MAKE_OBJ":           3,
+	"VAR":                10,
+	"JAVASCRIPT":         11,
+	"UUID":               169,
+	"HTTP":               153,
+	"ERROR":              12,
+	"IMPLICIT_VAR":       13,
+	"DB":                 14,
+	"TABLE":              15,
+	"GET":                16,
+	"GET_ALL":            78,
+	"EQ":                 17,
+	"NE":                 18,
+	"LT":                 19,
+	"LE":                 20,
+	"GT":                 21,
+	"GE":                 22,
+	"NOT":                23,
+	"ADD":                24,
+	"SUB":                25,
+	"MUL":                26,
+	"DIV":                27,
+	"MOD":                28,
+	"APPEND":             29,
+	"PREPEND":            80,
+	"DIFFERENCE":         95,
+	"SET_INSERT":         88,
+	"SET_INTERSECTION":   89,
+	"SET_UNION":          90,
+	"SET_DIFFERENCE":     91,
+	"SLICE":              30,
+	"SKIP":               70,
+	"LIMIT":              71,
+	"OFFSETS_OF":         87,
+	"CONTAINS":           93,
+	"GET_FIELD":          31,
+	"KEYS":               94,
+	"OBJECT":             143,
+	"HAS_FIELDS":         32,
+	"WITH_FIELDS":        96,
+	"PLUCK":              33,
+	"WITHOUT":            34,
+	"MERGE":              35,
+	"BETWEEN_DEPRECATED": 36,
+	"BETWEEN":            182,
+	"REDUCE":             37,
+	"MAP":                38,
+	"FILTER":             39,
+	"CONCAT_MAP":         40,
+	"ORDER_BY":           41,
+	"DISTINCT":           42,
+	"COUNT":              43,
+	"IS_EMPTY":           86,
+	"UNION":              44,
+	"NTH":                45,
+	"BRACKET":            170,
+	"INNER_JOIN":         48,
+	"OUTER_JOIN":         49,
+	"EQ_JOIN":            50,
+	"ZIP":                72,
+	"RANGE":              173,
+	"INSERT_AT":          82,
+	"DELETE_AT":          83,
+	"CHANGE_AT":          84,
+	"SPLICE_AT":          85,
+	"COERCE_TO":          51,
+	"TYPE_OF":            52,
+	"UPDATE":             53,
+	"DELETE":             54,
+	"REPLACE":            55,
+	"INSERT":             56,
+	"DB_CREATE":          57,
+	"DB_DROP":            58,
+	"DB_LIST":            59,
+	"TABLE_CREATE":       60,
+	"TABLE_DROP":         61,
+	"TABLE_LIST":         62,
+	"CONFIG":             174,
+	"STATUS":             175,
+	"WAIT":               177,
+	"RECONFIGURE":        176,
+	"REBALANCE":          179,
+	"SYNC":               138,
+	"INDEX_CREATE":       75,
+	"INDEX_DROP":         76,
+	"INDEX_LIST":         77,
+	"INDEX_STATUS":       139,
+	"INDEX_WAIT":         140,
+	"INDEX_RENAME":       156,
+	"FUNCALL":            64,
+	"BRANCH":             65,
+	"OR":                 66,
+	"AND":                67,
+	"FOR_EACH":           68,
+	"FUNC":               69,
+	"ASC":                73,
+	"DESC":               74,
+	"INFO":               79,
+	"MATCH":              97,
+	"UPCASE":             141,
+	"DOWNCASE":           142,
+	"SAMPLE":             81,
+	"DEFAULT":            92,
+	"JSON":               98,
+	"TO_JSON_STRING":     172,
+	"ISO8601":            99,
+	"TO_ISO8601":         100,
+	"EPOCH_TIME":         101,
+	"TO_EPOCH_TIME":      102,
+	"NOW":                103,
+	"IN_TIMEZONE":        104,
+	"DURING":             105,
+	"DATE":               106,
+	"TIME_OF_DAY":        126,
+	"TIMEZONE":           127,
+	"YEAR":               128,
+	"MONTH":              129,
+	"DAY":                130,
+	"DAY_OF_WEEK":        131,
+	"DAY_OF_YEAR":        132,
+	"HOURS":              133,
+	"MINUTES":            134,
+	"SECONDS":            135,
+	"TIME":               136,
+	"MONDAY":             107,
+	"TUESDAY":            108,
+	"WEDNESDAY":          109,
+	"THURSDAY":           110,
+	"FRIDAY":             111,
+	"SATURDAY":           112,
+	"SUNDAY":             113,
+	"JANUARY":            114,
+	"FEBRUARY":           115,
+	"MARCH":              116,
+	"APRIL":              117,
+	"MAY":                118,
+	"JUNE":               119,
+	"JULY":               120,
+	"AUGUST":             121,
+	"SEPTEMBER":          122,
+	"OCTOBER":            123,
+	"NOVEMBER":           124,
+	"DECEMBER":           125,
+	"LITERAL":            137,
+	"GROUP":              144,
+	"SUM":                145,
+	"AVG":                146,
+	"MIN":                147,
+	"MAX":                148,
+	"SPLIT":              149,
+	"UNGROUP":            150,
+	"RANDOM":             151,
+	"CHANGES":            152,
+	"ARGS":               154,
+	"BINARY":             155,
+	"GEOJSON":            157,
+	"TO_GEOJSON":         158,
+	"POINT":              159,
+	"LINE":               160,
+	"POLYGON":            161,
+	"DISTANCE":           162,
+	"INTERSECTS":         163,
+	"INCLUDES":           164,
+	"CIRCLE":             165,
+	"GET_INTERSECTING":   166,
+	"FILL":               167,
+	"GET_NEAREST":        168,
+	"POLYGON_SUB":        171,
+	"MINVAL":             180,
+	"MAXVAL":             181,
 }
 
 func (x Term_TermType) Enum() *Term_TermType {
@@ -951,12 +1002,13 @@ func (m *Backtrace) GetFrames() []*Frame {
 }
 
 type Response struct {
-	Type             *Response_ResponseType `protobuf:"varint,1,opt,name=type,enum=Response_ResponseType" json:"type,omitempty"`
-	Token            *int64                 `protobuf:"varint,2,opt,name=token" json:"token,omitempty"`
-	Response         []*Datum               `protobuf:"bytes,3,rep,name=response" json:"response,omitempty"`
-	Backtrace        *Backtrace             `protobuf:"bytes,4,opt,name=backtrace" json:"backtrace,omitempty"`
-	Profile          *Datum                 `protobuf:"bytes,5,opt,name=profile" json:"profile,omitempty"`
-	XXX_unrecognized []byte                 `json:"-"`
+	Type             *Response_ResponseType  `protobuf:"varint,1,opt,name=type,enum=Response_ResponseType" json:"type,omitempty"`
+	Notes            []Response_ResponseNote `protobuf:"varint,6,rep,name=notes,enum=Response_ResponseNote" json:"notes,omitempty"`
+	Token            *int64                  `protobuf:"varint,2,opt,name=token" json:"token,omitempty"`
+	Response         []*Datum                `protobuf:"bytes,3,rep,name=response" json:"response,omitempty"`
+	Backtrace        *Backtrace              `protobuf:"bytes,4,opt,name=backtrace" json:"backtrace,omitempty"`
+	Profile          *Datum                  `protobuf:"bytes,5,opt,name=profile" json:"profile,omitempty"`
+	XXX_unrecognized []byte                  `json:"-"`
 }
 
 func (m *Response) Reset()         { *m = Response{} }
@@ -968,6 +1020,13 @@ func (m *Response) GetType() Response_ResponseType {
 		return *m.Type
 	}
 	return 0
+}
+
+func (m *Response) GetNotes() []Response_ResponseNote {
+	if m != nil {
+		return m.Notes
+	}
+	return nil
 }
 
 func (m *Response) GetToken() int64 {
@@ -1178,6 +1237,7 @@ func init() {
 	proto.RegisterEnum("Query_QueryType", Query_QueryType_name, Query_QueryType_value)
 	proto.RegisterEnum("Frame_FrameType", Frame_FrameType_name, Frame_FrameType_value)
 	proto.RegisterEnum("Response_ResponseType", Response_ResponseType_name, Response_ResponseType_value)
+	proto.RegisterEnum("Response_ResponseNote", Response_ResponseNote_name, Response_ResponseNote_value)
 	proto.RegisterEnum("Datum_DatumType", Datum_DatumType_name, Datum_DatumType_value)
 	proto.RegisterEnum("Term_TermType", Term_TermType_name, Term_TermType_value)
 }

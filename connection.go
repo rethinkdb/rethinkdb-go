@@ -17,17 +17,19 @@ const (
 
 type Response struct {
 	Token     int64
-	Type      p.Response_ResponseType `json:"t"`
-	Responses []json.RawMessage       `json:"r"`
-	Backtrace []interface{}           `json:"b"`
-	Profile   interface{}             `json:"p"`
+	Type      p.Response_ResponseType   `json:"t"`
+	Notes     []p.Response_ResponseNote `json:"n"`
+	Responses []json.RawMessage         `json:"r"`
+	Backtrace []interface{}             `json:"b"`
+	Profile   interface{}               `json:"p"`
 }
 
 // Connection is a connection to a rethinkdb database. Connection is not thread
 // safe and should only be accessed be a single goroutine
 type Connection struct {
-	conn    net.Conn
+	address string
 	opts    *ConnectOpts
+	conn    net.Conn
 	_       [4]byte
 	token   int64
 	cursors map[int64]*Cursor
@@ -37,23 +39,20 @@ type Connection struct {
 	buf       buffer
 }
 
-// Dial closes the previous connection and attempts to connect again.
-func NewConnection(opts *ConnectOpts) (*Connection, error) {
+// NewConnection creates a new connection to the database server
+func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	var err error
-
-	// New mysqlConn
 	c := &Connection{
+		address: address,
 		opts:    opts,
 		cursors: make(map[int64]*Cursor),
 	}
-
 	// Connect to Server
 	nd := net.Dialer{Timeout: c.opts.Timeout}
-	c.conn, err = nd.Dial("tcp", c.opts.Address)
+	c.conn, err = nd.Dial("tcp", address)
 	if err != nil {
 		return nil, err
 	}
-
 	// Enable TCP Keepalives on TCP connections
 	if tc, ok := c.conn.(*net.TCPConn); ok {
 		if err := tc.SetKeepAlive(true); err != nil {
@@ -63,15 +62,12 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 			return nil, err
 		}
 	}
-
 	c.buf = newBuffer(c.conn)
-
 	// Send handshake request
 	if err = c.writeHandshakeReq(); err != nil {
 		c.Close()
 		return nil, err
 	}
-
 	// Read handshake response
 	err = c.readHandshakeSuccess()
 	if err != nil {
@@ -90,7 +86,6 @@ func (c *Connection) Close() error {
 	}
 
 	c.cursors = nil
-	c.opts = nil
 
 	return nil
 }
@@ -207,8 +202,6 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 		return c.processErrorResponse(q, response, RqlRuntimeError{rqlResponseError{response, q.Term}})
 	case p.Response_SUCCESS_ATOM:
 		return c.processAtomResponse(q, response)
-	case p.Response_SUCCESS_FEED, p.Response_SUCCESS_ATOM_FEED:
-		return c.processFeedResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
 		return c.processPartialResponse(q, response)
 	case p.Response_SUCCESS_SEQUENCE:
@@ -231,7 +224,7 @@ func (c *Connection) processErrorResponse(q Query, response *Response, err error
 
 func (c *Connection) processAtomResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	// Create cursor
-	cursor := newCursor(c, response.Token, q.Term, q.Opts)
+	cursor := newCursor(c, "Cursor", response.Token, q.Term, q.Opts)
 	cursor.profile = response.Profile
 
 	cursor.extend(response)
@@ -239,27 +232,27 @@ func (c *Connection) processAtomResponse(q Query, response *Response) (*Response
 	return response, cursor, nil
 }
 
-func (c *Connection) processFeedResponse(q Query, response *Response) (*Response, *Cursor, error) {
-	var cursor *Cursor
-	if _, ok := c.cursors[response.Token]; !ok {
-		// Create a new cursor if needed
-		cursor = newCursor(c, response.Token, q.Term, q.Opts)
-		cursor.profile = response.Profile
-		c.cursors[response.Token] = cursor
-	} else {
-		cursor = c.cursors[response.Token]
+func (c *Connection) processPartialResponse(q Query, response *Response) (*Response, *Cursor, error) {
+	cursorType := "Cursor"
+	if len(response.Notes) > 0 {
+		switch response.Notes[0] {
+		case p.Response_SEQUENCE_FEED:
+			cursorType = "Feed"
+		case p.Response_ATOM_FEED:
+			cursorType = "AtomFeed"
+		case p.Response_ORDER_BY_LIMIT_FEED:
+			cursorType = "OrderByLimitFeed"
+		case p.Response_UNIONED_FEED:
+			cursorType = "UnionedFeed"
+		case p.Response_INCLUDES_STATES:
+			cursorType = "IncludesFeed"
+		}
 	}
 
-	cursor.extend(response)
-
-	return response, cursor, nil
-}
-
-func (c *Connection) processPartialResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c, response.Token, q.Term, q.Opts)
+		cursor = newCursor(c, cursorType, response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 
 		c.cursors[response.Token] = cursor
@@ -274,7 +267,7 @@ func (c *Connection) processSequenceResponse(q Query, response *Response) (*Resp
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c, response.Token, q.Term, q.Opts)
+		cursor = newCursor(c, "Cursor", response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 	}
 
