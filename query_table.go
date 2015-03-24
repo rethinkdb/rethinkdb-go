@@ -123,7 +123,8 @@ func (t Term) IndexWait(args ...interface{}) Term {
 }
 
 type ChangesOpts struct {
-	Squash interface{} `gorethink:"squash,omitempty"`
+	Squash        interface{} `gorethink:"squash,omitempty"`
+	IncludeStates interface{} `gorethink:"include_states,omitempty"`
 }
 
 func (o *ChangesOpts) toMap() map[string]interface{} {

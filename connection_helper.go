@@ -29,7 +29,7 @@ func (c *Connection) writeHandshakeReq() error {
 	}
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
-	binary.LittleEndian.PutUint32(data[pos:], uint32(p.VersionDummy_V0_3))
+	binary.LittleEndian.PutUint32(data[pos:], uint32(p.VersionDummy_V0_4))
 	pos += 4
 
 	// Send the length of the auth key to the server as a 4-byte little-endian-encoded integer

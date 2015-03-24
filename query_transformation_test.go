@@ -386,8 +386,8 @@ func (s *RethinkSuite) TestTransformationAtIndexArrayField(c *test.C) {
 	c.Assert(err, test.NotNil)
 }
 
-func (s *RethinkSuite) TestTransformationIndexesOf(c *test.C) {
-	query := Expr(arr).IndexesOf(2)
+func (s *RethinkSuite) TestTransformationOffsetsOf(c *test.C) {
+	query := Expr(arr).OffsetsOf(2)
 
 	var response []interface{}
 	res, err := query.Run(sess)

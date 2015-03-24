@@ -13,12 +13,17 @@ var (
 	errCursorClosed = errors.New("connection closed, cannot read cursor")
 )
 
-func newCursor(conn *Connection, token int64, term *Term, opts map[string]interface{}) *Cursor {
+func newCursor(conn *Connection, cursorType string, token int64, term *Term, opts map[string]interface{}) *Cursor {
+	if cursorType == "" {
+		cursorType = "Cursor"
+	}
+
 	cursor := &Cursor{
-		conn:  conn,
-		token: token,
-		term:  term,
-		opts:  opts,
+		conn:       conn,
+		token:      token,
+		cursorType: cursorType,
+		term:       term,
+		opts:       opts,
 	}
 
 	return cursor
@@ -43,11 +48,12 @@ type Cursor struct {
 	pc          *poolConn
 	releaseConn func(error)
 
-	conn  *Connection
-	token int64
-	query Query
-	term  *Term
-	opts  map[string]interface{}
+	conn       *Connection
+	token      int64
+	cursorType string
+	query      Query
+	term       *Term
+	opts       map[string]interface{}
 
 	lastErr   error
 	fetching  bool
@@ -62,6 +68,11 @@ type Cursor struct {
 // Profile returns the information returned from the query profiler.
 func (c *Cursor) Profile() interface{} {
 	return c.profile
+}
+
+// Type returns the cursor type (by default "Cursor")
+func (c *Cursor) Type() string {
+	return c.cursorType
 }
 
 // Err returns nil if no errors happened during iteration, or the actual
@@ -347,9 +358,7 @@ func (c *Cursor) extend(response *Response) {
 		c.responses.Push(response)
 	}
 
-	c.finished = response.Type != p.Response_SUCCESS_PARTIAL &&
-		response.Type != p.Response_SUCCESS_FEED &&
-		response.Type != p.Response_SUCCESS_ATOM_FEED
+	c.finished = response.Type != p.Response_SUCCESS_PARTIAL
 	c.fetching = false
 	c.isAtom = response.Type == p.Response_SUCCESS_ATOM
 

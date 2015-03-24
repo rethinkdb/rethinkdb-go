@@ -179,6 +179,7 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	if err != nil {
 		c.Fatal(err.Error())
 	}
+	c.Assert(res.Type(), test.Equals, "Feed")
 
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
