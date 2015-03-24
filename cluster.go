@@ -2,13 +2,14 @@ package gorethink
 
 import (
 	"fmt"
-	"github.com/Sirupsen/logrus"
-	"github.com/cenkalti/backoff"
 	"math"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/cenkalti/backoff"
 )
 
 // A Cluster represents a connection to a RethinkDB cluster, a cluster is created
@@ -106,24 +107,28 @@ func (c *Cluster) Close(optArgs ...CloseOpts) error {
 func (c *Cluster) discover() {
 	// Keep retrying with exponential backoff.
 	b := backoff.NewExponentialBackOff()
-	// Never finish retrying (max wait time is still 60s)
+	// Never finish retrying (max interval is still 60s)
 	b.MaxElapsedTime = 0
 
-	backoff.RetryNotify(func() error {
-		// If no hosts try seeding nodes
-		if len(c.GetNodes()) == 0 {
-			c.connectNodes(c.getSeeds())
-		}
+	// Keep trying to discover new nodes
+	for {
+		backoff.RetryNotify(func() error {
+			// If no hosts try seeding nodes
+			if len(c.GetNodes()) == 0 {
+				c.connectNodes(c.getSeeds())
+			}
 
-		return c.listenForNodeChanges()
-	}, b, func(err error, wait time.Duration) {
-		log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
-	})
+			return c.listenForNodeChanges()
+		}, b, func(err error, wait time.Duration) {
+			log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
+		})
+	}
 }
 
 // listenForNodeChanges listens for changes to node status using change feeds.
 // This function will block until the query fails
 func (c *Cluster) listenForNodeChanges() error {
+	// Start listening to changes from a random active node
 	node, err := c.GetRandomNode()
 	if err != nil {
 		return err
@@ -138,11 +143,11 @@ func (c *Cluster) listenForNodeChanges() error {
 		return err
 	}
 
+	// Keep reading node status updates from changefeed
 	var result struct {
 		NewVal nodeStatus `gorethink:"new_val"`
 		OldVal nodeStatus `gorethink:"old_val"`
 	}
-
 	for cursor.Next(&result) {
 		addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
 		addr = strings.ToLower(addr)

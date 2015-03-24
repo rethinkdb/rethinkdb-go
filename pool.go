@@ -32,6 +32,7 @@ type finalCloser interface {
 	finalClose() error
 }
 
+// A Pool is used to store a pool of connections to a single RethinkDB server
 type Pool struct {
 	host Host
 	opts *ConnectOpts

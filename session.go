@@ -42,7 +42,7 @@ func Connect(address string) (*Session, error) {
 	return ConnectWithOpts(ConnectOpts{}, address)
 }
 
-// Connect creates a new database session with the given options.
+// ConnectWithOpts creates a new database session with the given options.
 //
 // Supported arguments include Database, Timeout, Authkey. Pool
 // options include MaxIdle, MaxOpen.
@@ -113,6 +113,7 @@ func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Session, er
 	return s, nil
 }
 
+// CloseOpts allows calls to the Close function to be configured.
 type CloseOpts struct {
 	NoReplyWait bool `gorethink:"noreplyWait,omitempty"`
 }

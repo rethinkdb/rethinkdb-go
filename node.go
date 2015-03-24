@@ -103,6 +103,7 @@ func (n *Node) NoReplyWait() error {
 	})
 }
 
+// Query executes a ReQL query using this nodes connection pool.
 func (n *Node) Query(q Query) (cursor *Cursor, err error) {
 	if n.Closed() {
 		return nil, ErrInvalidNode
@@ -116,6 +117,7 @@ func (n *Node) Query(q Query) (cursor *Cursor, err error) {
 	return
 }
 
+// Exec executes a ReQL query using this nodes connection pool.
 func (n *Node) Exec(q Query) (err error) {
 	if n.Closed() {
 		return ErrInvalidNode
@@ -129,6 +131,12 @@ func (n *Node) Exec(q Query) (err error) {
 	return
 }
 
+// Refresh attempts to connect to the node and check that it is still connected
+// to the cluster.
+//
+// If an error occurred or the node is no longer connected then
+// the nodes health is decrease, if there were no issues then the node is marked
+// as being healthy.
 func (n *Node) Refresh() {
 	cursor, err := n.pool.Query(newQuery(
 		Db("rethinkdb").Table("server_status").Get(n.ID),
@@ -156,14 +164,17 @@ func (n *Node) Refresh() {
 	n.ResetHealth()
 }
 
+// DecrementHealth decreases the nodes health by 1 (the nodes health starts at 100)
 func (n *Node) DecrementHealth() {
 	atomic.AddInt64(&n.health, -1)
 }
 
+// ResetHealth sets the nodes health back to 100 (fully healthy)
 func (n *Node) ResetHealth() {
 	atomic.StoreInt64(&n.health, 100)
 }
 
+// IsHealthy checks the nodes health by ensuring that the health counter is above 0.
 func (n *Node) IsHealthy() bool {
 	return n.health > 0
 }

@@ -1,8 +1,9 @@
 package gorethink
 
 import (
-	"github.com/Sirupsen/logrus"
 	"reflect"
+
+	"github.com/Sirupsen/logrus"
 
 	"github.com/dancannon/gorethink/encoding"
 )
@@ -18,11 +19,13 @@ func init() {
 	log = logrus.New()
 }
 
-func SetDebug(debug bool) {
-	level := logrus.InfoLevel
-	if debug {
-		level = logrus.DebugLevel
+// SetVerbose allows the driver logging level to be set. If true is passed then
+// the log level is set to Debug otherwise it defaults to Info.
+func SetVerbose(verbose bool) {
+	if verbose {
+		log.Level = logrus.DebugLevel
+		return
 	}
 
-	log.Level = level
+	log.Level = logrus.InfoLevel
 }
