@@ -73,6 +73,25 @@ func (s *RethinkSuite) TestAdminWait(c *test.C) {
 	c.Assert(response["ready"].(float64) > 0, test.Equals, true)
 }
 
+func (s *RethinkSuite) TestAdminWaitOpts(c *test.C) {
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
+
+	query := Db("test").Table("test").Wait(WaitOpts{
+		WaitFor: "all_replicas_ready",
+		Timeout: 10,
+	})
+
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var response map[string]interface{}
+	err = res.One(&response)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(response["ready"].(float64) > 0, test.Equals, true)
+}
+
 func (s *RethinkSuite) TestAdminStatus(c *test.C) {
 	Db("test").TableDrop("test").Exec(sess)
 	Db("test").TableCreate("test").Exec(sess)
