@@ -284,6 +284,43 @@ func (c *Cursor) One(result interface{}) error {
 	return nil
 }
 
+// Listen listens for rows from the database and sends the result onto the given
+// channel. The type that the row is scanned into is determined by the element
+// type of the channel.
+//
+// Also note that this function returns immediately.
+//
+//     cursor, err := r.Expr([]int{1,2,3}).Run(session)
+//     if err != nil {
+//         panic(err)
+//     }
+//
+//     ch := make(chan int)
+//     cursor.Listen(ch)
+//     <- ch // 1
+//     <- ch // 2
+//     <- ch // 3
+func (c *Cursor) Listen(channel interface{}) {
+	go func() {
+		channelv := reflect.ValueOf(channel)
+		if channelv.Kind() != reflect.Chan {
+			panic("input argument must be a channel")
+		}
+		elemt := channelv.Type().Elem()
+		for {
+			elemp := reflect.New(elemt)
+			if !c.Next(elemp.Interface()) {
+				break
+			}
+
+			channelv.Send(elemp.Elem())
+		}
+
+		c.Close()
+		channelv.Close()
+	}()
+}
+
 // IsNil tests if the current row is nil.
 func (c *Cursor) IsNil() bool {
 	if c.buffer.Len() > 0 {
