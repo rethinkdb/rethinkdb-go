@@ -135,7 +135,7 @@ Cursors have a number of methods available for accessing the query results
 
 - `Next` retrieves the next document from the result set, blocking if necessary.
 - `All` retrieves all documents from the result set into the provided slice.
-- `One` retrieves the first document from the result se.
+- `One` retrieves the first document from the result set.
 
 Examples:
 
