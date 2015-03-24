@@ -32,11 +32,7 @@ import (
 
 var session *r.Session
 
-session, err := r.Connect(r.ConnectOpts{
-    Address:  "localhost:28015",
-    Database: "test",
-})
-
+session, err := Connect(address)
 if err != nil {
     log.Fatalln(err.Error())
 }
@@ -57,12 +53,11 @@ import (
 
 var session *r.Session
 
-session, err := r.Connect(r.ConnectOpts{
-    Address:  "localhost:28015",
+session, err := r.ConnectWithOpts(r.ConnectOpts{
     Database: "test",
     MaxIdle: 10,
     MaxOpen: 10,
-})
+}, "localhost:28015")
 if err != nil {
     log.Fatalln(err.Error())
 }

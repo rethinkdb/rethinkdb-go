@@ -26,8 +26,9 @@ type Response struct {
 // Connection is a connection to a rethinkdb database. Connection is not thread
 // safe and should only be accessed be a single goroutine
 type Connection struct {
-	conn    net.Conn
+	address string
 	opts    *ConnectOpts
+	conn    net.Conn
 	_       [4]byte
 	token   int64
 	cursors map[int64]*Cursor
@@ -37,23 +38,20 @@ type Connection struct {
 	buf       buffer
 }
 
-// Dial closes the previous connection and attempts to connect again.
-func NewConnection(opts *ConnectOpts) (*Connection, error) {
+// NewConnection creates a new connection to the database server
+func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	var err error
-
-	// New mysqlConn
 	c := &Connection{
+		address: address,
 		opts:    opts,
 		cursors: make(map[int64]*Cursor),
 	}
-
 	// Connect to Server
 	nd := net.Dialer{Timeout: c.opts.Timeout}
-	c.conn, err = nd.Dial("tcp", c.opts.Address)
+	c.conn, err = nd.Dial("tcp", address)
 	if err != nil {
 		return nil, err
 	}
-
 	// Enable TCP Keepalives on TCP connections
 	if tc, ok := c.conn.(*net.TCPConn); ok {
 		if err := tc.SetKeepAlive(true); err != nil {
@@ -63,15 +61,12 @@ func NewConnection(opts *ConnectOpts) (*Connection, error) {
 			return nil, err
 		}
 	}
-
 	c.buf = newBuffer(c.conn)
-
 	// Send handshake request
 	if err = c.writeHandshakeReq(); err != nil {
 		c.Close()
 		return nil, err
 	}
-
 	// Read handshake response
 	err = c.readHandshakeSuccess()
 	if err != nil {
@@ -90,7 +85,6 @@ func (c *Connection) Close() error {
 	}
 
 	c.cursors = nil
-	c.opts = nil
 
 	return nil
 }

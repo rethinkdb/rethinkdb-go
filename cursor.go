@@ -97,7 +97,9 @@ func (c *Cursor) Close() error {
 		_, _, err = conn.Query(q)
 	}
 
-	c.releaseConn(err)
+	if c.releaseConn != nil {
+		c.releaseConn(err)
+	}
 
 	c.closed = true
 	c.conn = nil

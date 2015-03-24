@@ -10,7 +10,7 @@ func Db(args ...interface{}) Term {
 }
 
 type TableOpts struct {
-	UseOutdated interface{} `gorethink:"use_outdated,omitempty"`
+	UseOutdated      interface{} `gorethink:"use_outdated,omitempty"`
 	IdentifierFormat interface{} `gorethink:"identifier_format,omitempty"`
 }
 

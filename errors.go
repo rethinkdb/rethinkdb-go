@@ -10,7 +10,13 @@ import (
 )
 
 var (
-	ErrNoConnections    = errors.New("gorethink: no connections were made when creating the session")
+	ErrNoHosts              = errors.New("no hosts provided")
+	ErrNoConnectionsStarted = errors.New("no connections were made when creating the session")
+	ErrHostQueryFailed      = errors.New("unable to populate hosts")
+	ErrInvalidNode          = errors.New("invalid node")
+	ErrClusterClosed        = errors.New("cluster closed")
+
+	ErrNoConnections    = errors.New("gorethink: no connections were available")
 	ErrConnectionClosed = errors.New("gorethink: the connection is closed")
 
 	ErrBusyBuffer = errors.New("Busy buffer")

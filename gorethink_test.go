@@ -15,15 +15,26 @@ import (
 
 var sess *Session
 var debug = flag.Bool("gorethink.debug", false, "print query trees")
-var url, db, authKey string
+var url, url2, url3, db, authKey string
 
 func init() {
 	flag.Parse()
+	SetVerbose(true)
 
 	// If the test is being run by wercker look for the rethink url
 	url = os.Getenv("RETHINKDB_URL")
 	if url == "" {
 		url = "localhost:28015"
+	}
+
+	url2 = os.Getenv("RETHINKDB_URL_2")
+	if url2 == "" {
+		url2 = "localhost:28016"
+	}
+
+	url3 = os.Getenv("RETHINKDB_URL_3")
+	if url3 == "" {
+		url3 = "localhost:28017"
 	}
 
 	db = os.Getenv("RETHINKDB_DB")
@@ -97,10 +108,9 @@ var _ = test.Suite(&RethinkSuite{})
 
 func (s *RethinkSuite) SetUpSuite(c *test.C) {
 	var err error
-	sess, err = Connect(ConnectOpts{
-		Address: url,
+	sess, err = ConnectWithOpts(ConnectOpts{
 		AuthKey: authKey,
-	})
+	}, url)
 	c.Assert(err, test.IsNil)
 }
 
