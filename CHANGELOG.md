@@ -2,6 +2,48 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.7.0 - 2015-03-30
+
+This release includes support for RethinkDB 2.0 and connecting to clusters. All sessions will now attempt to connect to a cluster even if only one node was specified, because of this the way of connecting to a database has slightly changed (hopefully it now also slightly easier), the new method of connecting to a database is as follows:
+
+```go
+session, err := Connect("localhost:28015")
+if err != nil {
+    log.Fatalln(err.Error())
+}
+```
+
+If you wish to specify any of the optional arguments you can now use `ConnectWithOpts`
+
+```go
+session, err := ConnectWithOpts("localhost:28015")
+if err != nil {
+    log.Fatalln(err.Error())
+}
+```
+
+Also added was the ability to read from a cursor using a channel, this is especially useful when using changefeeds. For more information see this [gist](https://gist.github.com/dancannon/2865686d163ed78bbc3c)
+
+```go
+cursor, err := r.Table("items").Changes()
+ch := make(chan map[string]interface{})
+cursor.Listen(ch)
+```
+
+For more details checkout the [README](https://github.com/dancannon/gorethink/blob/master/README.md) and [godoc](https://godoc.org/github.com/dancannon/gorethink). As always if you have any further questions send me a message on [Gitter](https://gitter.im/dancannon/gorethink).
+
+- Added the ability to connect to multiple nodes, queries are then distributed between these nodes. If a node stops responding then queries stop being sent to this node.
+- Added the `DiscoverHosts` optional argument to `ConnectOpts`, when this value is `true` the driver will listen for new nodes added to the cluster.
+- Added the `IncludeStates` optional argument to `Changes`.
+- Added `MinVal` and `MaxVal` which represent the smallest and largest possible values.
+- Added the `Listen` cursor helper function which publishes database results to a channel.
+- Added support for optional  arguments for the `Wait` function.
+- Added the `Type` function to the `Cursor`, by default this value will be "Cursor" unless using a changefeed.
+- Changed the `IndexesOf` function to `OffsetsOf` .
+- Changed driver to use the v0.4 protocol (used to use v0.3).
+- Changed the arguments for`Connect` and added the `ConnectWithOpts` function.
+- Fixed geometry tests not properly checking the expected results.
+- Fixed bug causing nil pointer panics when using an `Unmarshaler`
 
 ## v0.6.3 - 2015-03-04
 ### Added

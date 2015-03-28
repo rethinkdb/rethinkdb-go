@@ -31,28 +31,6 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 	}
 }
 
-func (s *RethinkSuite) TestClusterDetectRemovedNode(c *test.C) {
-	session, err := ConnectClusterWithOpts(ConnectOpts{
-		DiscoverHosts:       true,
-		NodeRefreshInterval: time.Second,
-	}, url, url2, url3)
-	c.Assert(err, test.IsNil)
-
-	t := time.NewTimer(time.Minute * 5)
-	for {
-		select {
-		// Fail if deadline has passed
-		case <-t.C:
-			c.Fatal("No node was removed from the cluster")
-		default:
-			// Pass if another node was added
-			if len(session.cluster.GetNodes()) < 3 {
-				return
-			}
-		}
-	}
-}
-
 func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
 	session, err := ConnectClusterWithOpts(ConnectOpts{
 		DiscoverHosts:       true,
