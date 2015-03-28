@@ -1,0 +1,16 @@
+language: go
+
+go:
+  - 1.3
+  - 1.4
+  - tip
+
+before_install:
+  - wget http://download.rethinkdb.com/dev/2.0.0-0RC1/rethinkdb_2.0.0%2b0RC1~0precise_amd64.deb
+  - sudo dpkg -i rethinkdb_2.0.0%2b0RC1~0precise_amd64.deb
+
+before_script:
+#   - sudo add-apt-repository ppa:rethinkdb/ppa -y
+#   - sudo apt-get update -q
+#   - sudo apt-get install rethinkdb
+  - rethinkdb --bind all &
