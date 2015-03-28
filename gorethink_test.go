@@ -2,7 +2,6 @@ package gorethink
 
 import (
 	"flag"
-	"log"
 	"math/rand"
 	"os"
 	"runtime"
@@ -56,12 +55,11 @@ func testBenchmarkSetup() {
 	bDbName = "benchmark"
 	bTableName = "benchmarks"
 
-	bSess, err = Connect(ConnectOpts{
-		Address:  url,
+	bSess, err = ConnectWithOpts(ConnectOpts{
 		Database: bDbName,
 		MaxIdle:  50,
 		MaxOpen:  50,
-	})
+	}, url)
 
 	if err != nil {
 		log.Fatalln(err.Error())
