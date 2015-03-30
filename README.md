@@ -2,7 +2,7 @@
 
 [![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)]()
 [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
-[![wercker status](https://app.wercker.com/status/e315e764041af8e80f0c68280d4b4de2/s/master "wercker status")](https://app.wercker.com/project/bykey/e315e764041af8e80f0c68280d4b4de2) 
+[![build status](https://img.shields.io/travis/dancannon/gorethink/master.svg "build status")](https://travis-ci.org/dancannon/gorethink) 
 
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
 
