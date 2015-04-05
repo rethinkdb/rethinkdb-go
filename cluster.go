@@ -160,7 +160,7 @@ func (c *Cluster) listenForNodeChanges() error {
 			b.MaxElapsedTime = time.Second * 5
 
 			backoff.Retry(func() error {
-				node, err := c.connectNode(result.NewVal)
+				node, err := c.connectNodeWithStatus(result.NewVal)
 				if err == nil {
 					if !c.nodeExists(node) {
 						c.addNode(node)
@@ -204,14 +204,27 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			continue
 		}
 
-		var results []nodeStatus
-		err = cursor.All(&results)
-		if err != nil {
-			continue
-		}
+		if c.opts.DiscoverHosts {
+			var results []nodeStatus
+			err = cursor.All(&results)
+			if err != nil {
+				continue
+			}
 
-		for _, result := range results {
-			node, err := c.connectNode(result)
+			for _, result := range results {
+				node, err := c.connectNodeWithStatus(result)
+				if err == nil {
+					if _, ok := nodeSet[node.ID]; !ok {
+						log.WithFields(logrus.Fields{
+							"id":   node.ID,
+							"host": node.Host.String(),
+						}).Debug("Connected to node")
+						nodeSet[node.ID] = node
+					}
+				}
+			}
+		} else {
+			node, err := c.connectNode(host.String(), []Host{host})
 			if err == nil {
 				if _, ok := nodeSet[node.ID]; !ok {
 					log.WithFields(logrus.Fields{
@@ -232,13 +245,16 @@ func (c *Cluster) connectNodes(hosts []Host) {
 	c.setNodes(nodes)
 }
 
-func (c *Cluster) connectNode(s nodeStatus) (*Node, error) {
+func (c *Cluster) connectNodeWithStatus(s nodeStatus) (*Node, error) {
 	aliases := make([]Host, len(s.Network.CanonicalAddresses))
 	for i, aliasAddress := range s.Network.CanonicalAddresses {
 		aliases[i] = NewHost(aliasAddress.Host, int(s.Network.ReqlPort))
 	}
 
-	// Keep trying to connect to one of the host aliases
+	return c.connectNode(s.ID, aliases)
+}
+
+func (c *Cluster) connectNode(id string, aliases []Host) (*Node, error) {
 	var pool *Pool
 	var err error
 
@@ -266,7 +282,7 @@ func (c *Cluster) connectNode(s nodeStatus) (*Node, error) {
 		return nil, ErrInvalidNode
 	}
 
-	return newNode(s.ID, aliases, c, pool), nil
+	return newNode(id, aliases, c, pool), nil
 }
 
 // IsConnected returns true if cluster has nodes and is not already closed.
