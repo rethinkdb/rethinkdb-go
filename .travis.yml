@@ -1,5 +1,7 @@
 language: go
 
+gobuild_args: -tags='cluster'
+
 go:
   - 1.4
   # - tip
@@ -13,3 +15,5 @@ before_script:
 #   - sudo apt-get update -q
 #   - sudo apt-get install rethinkdb
   - rethinkdb --bind all &
+  - rethinkdb --port-offset 1 --directory rethinkdb_data1 --join localhost:29015 --bind all &
+  - rethinkdb --port-offset 2 --directory rethinkdb_data2 --join localhost:29015 --bind all &
