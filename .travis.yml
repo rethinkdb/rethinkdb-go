@@ -4,7 +4,7 @@ gobuild_args: -tags='cluster'
 
 go:
   - 1.4
-  # - tip
+  - tip
 
 before_install:
   - wget http://download.rethinkdb.com/dev/2.0.0-0RC1/rethinkdb_2.0.0%2b0RC1~0precise_amd64.deb
@@ -14,6 +14,6 @@ before_script:
 #   - sudo add-apt-repository ppa:rethinkdb/ppa -y
 #   - sudo apt-get update -q
 #   - sudo apt-get install rethinkdb
-  - rethinkdb --bind all &
-  - rethinkdb --port-offset 1 --directory rethinkdb_data1 --join localhost:29015 --bind all &
-  - rethinkdb --port-offset 2 --directory rethinkdb_data2 --join localhost:29015 --bind all &
+  - rethinkdb --bind all > /dev/null 2>&1 &
+  - rethinkdb --port-offset 1 --directory rethinkdb_data1 --join localhost:29015 --bind all > /dev/null 2>&1 &
+  - rethinkdb --port-offset 2 --directory rethinkdb_data2 --join localhost:29015 --bind all > /dev/null 2>&1 &
