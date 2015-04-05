@@ -47,19 +47,18 @@ To configure the connection pool `MaxIdle`, `MaxOpen` and `IdleTimeout` can be s
 ```go
 var session *r.Session
 
-session, err := r.ConnectWithOpts(r.ConnectOpts{
+session, err := r.Connect(r.ConnectOpts{
+    Address: "localhost:28015",
     Database: "test",
     MaxIdle: 10,
     MaxOpen: 10,
-}, "localhost:28015")
+})
 if err != nil {
     log.Fatalln(err.Error())
 }
 
 session.SetMaxOpenConns(5)
 ```
-
-A pre-configured [Pool](http://godoc.org/github.com/dancannon/gorethink#Pool) instance can also be passed to Connect().
 
 ### Connect to a cluster
 
@@ -68,16 +67,18 @@ To connect to a RethinkDB cluster which has multiple nodes you can use the follo
 ```go
 var session *r.Session
 
-session, err := r.ConnectWithOpts(r.ConnectOpts{
+session, err := r.Conenct(r.ConnectOpts{
+    Addresses: []string{"localhost:28015", "localhost:28016"},
     Database: "test",
     AuthKey:  "14daak1cad13dj",
+    DiscoverHosts: true,
 }, "localhost:28015")
 if err != nil {
     log.Fatalln(err.Error())
 }
 ```
 
-When using `ConnectCluster` host discovery is automatically enabled, this means that if any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by GoRethink.
+When `DiscoverHosts` is true any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by GoRethink.
 
 
 ## Query Functions

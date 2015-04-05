@@ -10,7 +10,7 @@ import (
 )
 
 func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
-	session, err := ConnectClusterWithOpts(ConnectOpts{
+	session, err := Connect(ConnectOpts{
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
 	}, url, url2)
@@ -32,7 +32,7 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 }
 
 func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
-	session, err := ConnectClusterWithOpts(ConnectOpts{
+	session, err := Connect(ConnectOpts{
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
 		MaxIdle:             50,

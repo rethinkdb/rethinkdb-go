@@ -55,11 +55,12 @@ func testBenchmarkSetup() {
 	bDbName = "benchmark"
 	bTableName = "benchmarks"
 
-	bSess, err = ConnectWithOpts(ConnectOpts{
+	bSess, err = Connect(ConnectOpts{
+		Address:  url,
 		Database: bDbName,
 		MaxIdle:  50,
 		MaxOpen:  50,
-	}, url)
+	})
 
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -106,9 +107,10 @@ var _ = test.Suite(&RethinkSuite{})
 
 func (s *RethinkSuite) SetUpSuite(c *test.C) {
 	var err error
-	sess, err = ConnectWithOpts(ConnectOpts{
+	sess, err = Connect(ConnectOpts{
+		Address: url,
 		AuthKey: authKey,
-	}, url)
+	})
 	c.Assert(err, test.IsNil)
 }
 
