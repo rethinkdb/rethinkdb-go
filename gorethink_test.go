@@ -14,7 +14,7 @@ import (
 
 var sess *Session
 var debug = flag.Bool("gorethink.debug", false, "print query trees")
-var url, url2, url3, db, authKey string
+var url, url1, url2, url3, db, authKey string
 
 func init() {
 	flag.Parse()
@@ -26,14 +26,19 @@ func init() {
 		url = "localhost:28015"
 	}
 
-	url2 = os.Getenv("RETHINKDB_URL_2")
+	url2 = os.Getenv("RETHINKDB_URL_1")
 	if url2 == "" {
 		url2 = "localhost:28016"
 	}
 
+	url2 = os.Getenv("RETHINKDB_URL_2")
+	if url2 == "" {
+		url2 = "localhost:28017"
+	}
+
 	url3 = os.Getenv("RETHINKDB_URL_3")
 	if url3 == "" {
-		url3 = "localhost:28017"
+		url3 = "localhost:28018"
 	}
 
 	db = os.Getenv("RETHINKDB_DB")

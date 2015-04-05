@@ -11,7 +11,7 @@ import (
 
 func (s *RethinkSuite) TestClusterConnect(c *test.C) {
 	session, err := Connect(ConnectOpts{
-		Addresses: []string{url, url2, url3},
+		Addresses: []string{url1, url2, url3},
 	})
 	c.Assert(err, test.IsNil)
 
@@ -26,7 +26,7 @@ func (s *RethinkSuite) TestClusterConnect(c *test.C) {
 
 func (s *RethinkSuite) TestClusterMultipleQueries(c *test.C) {
 	session, err := Connect(ConnectOpts{
-		Addresses: []string{url, url2, url3},
+		Addresses: []string{url1, url2, url3},
 	})
 	c.Assert(err, test.IsNil)
 
@@ -52,7 +52,7 @@ func (s *RethinkSuite) TestClusterConnectError(c *test.C) {
 
 func (s *RethinkSuite) TestClusterConnectDatabase(c *test.C) {
 	session, err := Connect(ConnectOpts{
-		Addresses: []string{url, url2, url3},
+		Addresses: []string{url1, url2, url3},
 		Database:  "test2",
 	})
 	c.Assert(err, test.IsNil)
