@@ -61,6 +61,7 @@ func NewPool(opts *ConnectOpts) (*Pool, error) {
 		openerCh: make(chan struct{}, connectionRequestQueueSize),
 		lastPut:  make(map[*poolConn]string),
 		maxIdle:  opts.MaxIdle,
+		maxOpen:  opts.MaxOpen,
 	}
 	go p.connectionOpener()
 	return p, nil
