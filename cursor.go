@@ -130,6 +130,10 @@ func (c *Cursor) Next(dest interface{}) bool {
 		return false
 	}
 
+	if !hasMore {
+		c.Close()
+	}
+
 	return hasMore
 }
 
@@ -137,12 +141,10 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 	for c.lastErr == nil {
 		// Check if response is closed/finished
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed {
-
 			return false, errCursorClosed
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && !c.finished {
-
 			err := c.fetchMore()
 			if err != nil {
 				return false, err
@@ -150,7 +152,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
-
 			return false, nil
 		}
 
@@ -250,6 +251,7 @@ func (c *Cursor) All(result interface{}) error {
 // `One` zeroes the value before scanning in the result.
 func (c *Cursor) One(result interface{}) error {
 	if c.IsNil() {
+		c.Close()
 		return ErrEmptyResult
 	}
 

@@ -381,6 +381,9 @@ func (p *Pool) putConn(pc *poolConn, err error) {
 // If a connRequest was fulfilled or the *poolConn was placed in the
 // freeConn list, then true is returned, otherwise false is returned.
 func (p *Pool) putConnPoolLocked(pc *poolConn, err error) bool {
+	if p.maxOpen > 0 && p.numOpen > p.maxOpen {
+		return false
+	}
 	if c := len(p.connRequests); c > 0 {
 		req := p.connRequests[0]
 		// This copy is O(n) but in practice faster than a linked list.
