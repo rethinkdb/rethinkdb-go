@@ -145,10 +145,12 @@ func (s *RethinkSuite) TestCursorStruct(c *test.C) {
 }
 
 func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
+	var zeroTime time.Time
 	t := time.Now()
 
 	res, err := Expr(map[string]interface{}{
 		"T": time.Unix(t.Unix(), 0).In(time.UTC),
+		"Z": zeroTime,
 		"B": []byte("hello"),
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
@@ -159,6 +161,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	c.Assert(response.T.Equal(time.Unix(t.Unix(), 0)), test.Equals, true)
+	c.Assert(response.Z.Equal(zeroTime), test.Equals, true)
 	c.Assert(response.B, jsonEquals, []byte("hello"))
 }
 
