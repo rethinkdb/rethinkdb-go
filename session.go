@@ -22,6 +22,8 @@ type ConnectOpts struct {
 	Database  string        `gorethink:"database,omitempty"`
 	AuthKey   string        `gorethink:"authkey,omitempty"`
 	Timeout   time.Duration `gorethink:"timeout,omitempty"`
+	SSL       bool          `gorethink:"ssl",omitempty"`
+	CaCert    string        `gorethink:"cacert",omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	MaxOpen int `gorethink:"max_open,omitempty"`

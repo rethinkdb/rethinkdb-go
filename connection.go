@@ -1,10 +1,13 @@
 package gorethink
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/binary"
 	"encoding/json"
 	"io"
 	"net"
+	"strings"
 	"sync/atomic"
 	"time"
 
@@ -49,7 +52,19 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	}
 	// Connect to Server
 	nd := net.Dialer{Timeout: c.opts.Timeout}
-	c.conn, err = nd.Dial("tcp", address)
+	if !c.opts.SSL {
+		c.conn, err = nd.Dial("tcp", address)
+	} else {
+		roots := x509.NewCertPool()
+		ok := roots.AppendCertsFromPEM([]byte(c.opts.CaCert))
+		if !ok {
+			panic("failed to parse root certificate")
+		}
+		c.conn, err = tls.DialWithDialer(&nd, "tcp", address, &tls.Config{
+			RootCAs:    roots,
+			ServerName: strings.Split(address, ":")[0],
+		})
+	}
 	if err != nil {
 		return nil, err
 	}

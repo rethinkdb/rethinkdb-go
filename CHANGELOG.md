@@ -37,6 +37,7 @@ For more details checkout the [README](https://github.com/dancannon/gorethink/bl
 - Changed driver to use the v0.4 protocol (used to use v0.3).
 - Fixed geometry tests not properly checking the expected results.
 - Fixed bug causing nil pointer panics when using an `Unmarshaler`
+- Fixed dropped millisecond precision if given value is too old
 
 ## v0.6.3 - 2015-03-04
 ### Added
