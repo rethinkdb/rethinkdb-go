@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"os"
+	"time"
 
 	test "gopkg.in/check.v1"
 )
@@ -52,6 +53,7 @@ func (s *RethinkSuite) TestSessionConnectError(c *test.C) {
 	var err error
 	_, err = Connect(ConnectOpts{
 		Address: "nonexistanturl",
+		Timeout: time.Second,
 	})
 	c.Assert(err, test.NotNil)
 }

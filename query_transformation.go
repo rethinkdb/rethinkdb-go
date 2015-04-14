@@ -138,8 +138,8 @@ func (t Term) Nth(args ...interface{}) Term {
 
 // Get the indexes of an element in a sequence. If the argument is a predicate,
 // get the indexes of all elements matching it.
-func (t Term) IndexesOf(args ...interface{}) Term {
-	return constructMethodTerm(t, "IndexesOf", p.Term_INDEXES_OF, funcWrapArgs(args), map[string]interface{}{})
+func (t Term) OffsetsOf(args ...interface{}) Term {
+	return constructMethodTerm(t, "OffsetsOf", p.Term_OFFSETS_OF, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Test if a sequence is empty.

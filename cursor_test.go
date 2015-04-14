@@ -20,6 +20,7 @@ type attr struct {
 func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
 	res, err := Expr(5).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response interface{}
 	err = res.One(&response)
@@ -30,6 +31,7 @@ func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
 func (s *RethinkSuite) TestCursorSlice(c *test.C) {
 	res, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response []interface{}
 	err = res.All(&response)
@@ -45,6 +47,7 @@ func (s *RethinkSuite) TestCursorPartiallyNilSlice(c *test.C) {
 		},
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response map[string]interface{}
 	err = res.One(&response)
@@ -63,6 +66,7 @@ func (s *RethinkSuite) TestCursorMap(c *test.C) {
 		"name": "Object 1",
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response map[string]interface{}
 	err = res.One(&response)
@@ -79,6 +83,7 @@ func (s *RethinkSuite) TestCursorMapIntoInterface(c *test.C) {
 		"name": "Object 1",
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response interface{}
 	err = res.One(&response)
@@ -99,6 +104,7 @@ func (s *RethinkSuite) TestCursorMapNested(c *test.C) {
 		}},
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response interface{}
 	err = res.One(&response)
@@ -123,6 +129,7 @@ func (s *RethinkSuite) TestCursorStruct(c *test.C) {
 		}},
 	}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response object
 	err = res.One(&response)
@@ -149,6 +156,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 	var response PseudoTypes
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	c.Assert(response.T.Equal(time.Unix(t.Unix(), 0)), test.Equals, true)
 	c.Assert(response.B, jsonEquals, []byte("hello"))
@@ -157,6 +165,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 func (s *RethinkSuite) TestCursorAtomString(c *test.C) {
 	res, err := Expr("a").Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response string
 	err = res.One(&response)
@@ -167,6 +176,7 @@ func (s *RethinkSuite) TestCursorAtomString(c *test.C) {
 func (s *RethinkSuite) TestCursorAtomArray(c *test.C) {
 	res, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
 	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
 
 	var response []int
 	err = res.All(&response)
@@ -242,6 +252,66 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	var response []object
 	err = res.All(&response)
 	c.Assert(err, test.IsNil)
+	c.Assert(response, test.HasLen, 2)
+	c.Assert(response, test.DeepEquals, []object{
+		object{
+			Id:   2,
+			Name: "Object 1",
+			Attrs: []attr{attr{
+				Name:  "attr 1",
+				Value: "value 1",
+			}},
+		},
+		object{
+			Id:   3,
+			Name: "Object 2",
+			Attrs: []attr{attr{
+				Name:  "attr 1",
+				Value: "value 1",
+			}},
+		},
+	})
+}
+
+func (s *RethinkSuite) TestCursorListen(c *test.C) {
+	// Ensure table + database exist
+	DbCreate("test").Exec(sess)
+	Db("test").TableDrop("Table3").Exec(sess)
+	Db("test").TableCreate("Table3").Exec(sess)
+	Db("test").Table("Table3").IndexCreate("num").Exec(sess)
+
+	// Insert rows
+	Db("test").Table("Table3").Insert([]interface{}{
+		map[string]interface{}{
+			"id":   2,
+			"name": "Object 1",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		},
+		map[string]interface{}{
+			"id":   3,
+			"name": "Object 2",
+			"Attrs": []interface{}{map[string]interface{}{
+				"Name":  "attr 1",
+				"Value": "value 1",
+			}},
+		},
+	}).Exec(sess)
+
+	// Test query
+	query := Db("test").Table("Table3").OrderBy("id")
+	res, err := query.Run(sess)
+	c.Assert(err, test.IsNil)
+
+	ch := make(chan object)
+	res.Listen(ch)
+	var response []object
+	for v := range ch {
+		response = append(response, v)
+	}
+
 	c.Assert(response, test.HasLen, 2)
 	c.Assert(response, test.DeepEquals, []object{
 		object{

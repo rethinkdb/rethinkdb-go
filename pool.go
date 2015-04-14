@@ -32,7 +32,9 @@ type finalCloser interface {
 	finalClose() error
 }
 
+// A Pool is used to store a pool of connections to a single RethinkDB server
 type Pool struct {
+	host Host
 	opts *ConnectOpts
 
 	mu           sync.Mutex // protects following fields
@@ -54,15 +56,18 @@ type Pool struct {
 	maxOpen  int                  // <= 0 means unlimited
 }
 
-func NewPool(opts *ConnectOpts) (*Pool, error) {
+// NewPool creates a new connection pool for the given host
+func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 	p := &Pool{
-		opts: opts,
-
+		host:     host,
+		opts:     opts,
 		openerCh: make(chan struct{}, connectionRequestQueueSize),
 		lastPut:  make(map[*poolConn]string),
-		maxIdle:  opts.MaxIdle,
-		maxOpen:  opts.MaxOpen,
 	}
+
+	p.SetMaxIdleConns(opts.MaxIdle)
+	p.SetMaxOpenConns(opts.MaxOpen)
+
 	go p.connectionOpener()
 	return p, nil
 }
@@ -201,7 +206,7 @@ func (p *Pool) connectionOpener() {
 
 // Open one new connection
 func (p *Pool) openNewConnection() {
-	ci, err := NewConnection(p.opts)
+	ci, err := NewConnection(p.host.String(), p.opts)
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	if p.closed {
@@ -263,7 +268,7 @@ func (p *Pool) conn() (*poolConn, error) {
 	}
 	p.numOpen++ // optimistically
 	p.mu.Unlock()
-	ci, err := NewConnection(p.opts)
+	ci, err := NewConnection(p.host.String(), p.opts)
 	if err != nil {
 		p.mu.Lock()
 		p.numOpen-- // correct for earlier optimism
@@ -381,6 +386,9 @@ func (p *Pool) putConn(pc *poolConn, err error) {
 // If a connRequest was fulfilled or the *poolConn was placed in the
 // freeConn list, then true is returned, otherwise false is returned.
 func (p *Pool) putConnPoolLocked(pc *poolConn, err error) bool {
+	if p.maxOpen > 0 && p.numOpen > p.maxOpen {
+		return false
+	}
 	if c := len(p.connRequests); c > 0 {
 		req := p.connRequests[0]
 		// This copy is O(n) but in practice faster than a linked list.

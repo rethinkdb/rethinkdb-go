@@ -27,6 +27,8 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, jsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
@@ -50,6 +52,8 @@ func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
 	c.Assert(response, jsonEquals, []interface{}{
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
 	})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
@@ -75,6 +79,8 @@ func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 		map[string]interface{}{"num": 10, "id": 3, "g2": 2, "g1": 3},
 	})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
@@ -96,6 +102,8 @@ func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, jsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
@@ -117,6 +125,8 @@ func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, jsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
@@ -143,6 +153,8 @@ func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, jsonEquals, map[string]interface{}{"id": 1, "first_name": "John", "last_name": "Smith", "gender": "M"})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectBetween(c *test.C) {
@@ -166,6 +178,8 @@ func (s *RethinkSuite) TestSelectBetween(c *test.C) {
 		map[string]interface{}{"num": 0, "id": 1, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 5, "id": 2, "g2": 2, "g1": 2},
 	})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
@@ -193,6 +207,8 @@ func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 		map[string]interface{}{"num": 15, "id": 6, "g2": 1, "g1": 1},
 		map[string]interface{}{"num": 25, "id": 9, "g2": 3, "g1": 2},
 	})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
@@ -222,6 +238,8 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 		map[string]interface{}{"num": 25, "id": 9, "g2": 3, "g1": 2},
 	})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
@@ -245,6 +263,8 @@ func (s *RethinkSuite) TestSelectFilterImplicit(c *test.C) {
 		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 	})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
@@ -270,6 +290,8 @@ func (s *RethinkSuite) TestSelectFilterFunc(c *test.C) {
 		map[string]interface{}{"num": 100, "id": 5, "g2": 3, "g1": 2},
 		map[string]interface{}{"num": 50, "id": 8, "g2": 2, "g1": 4},
 	})
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
@@ -289,7 +311,7 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 			})
 		}
 
-		Db("test").Table("TestMany").Insert(data).Run(sess)
+		Db("test").Table("TestMany").Insert(data).RunWrite(sess)
 	}
 
 	// Test query
@@ -306,6 +328,8 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 
 	c.Assert(res.Err(), test.IsNil)
 	c.Assert(n, test.Equals, 10000)
+
+	res.Close()
 }
 
 func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
@@ -317,7 +341,6 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 	sess, _ := Connect(ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
-
 		MaxOpen: 200,
 		MaxIdle: 200,
 	})
@@ -334,11 +357,11 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 		Db("test").Table("TestConcurrent").Insert(map[string]interface{}{
 			"id": j,
 			"i":  j,
-		}).Run(sess)
+		}).Exec(sess)
 		Db("test").Table("TestConcurrent2").Insert(map[string]interface{}{
 			"j": j,
 			"k": j * 2,
-		}).Run(sess)
+		}).Exec(sess)
 	}
 
 	// Test queries concurrently
@@ -427,7 +450,7 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 	for i := 0; i < 100; i++ {
 		Db("test").Table("TestMany").Insert(map[string]interface{}{
 			"i": i,
-		}).Run(sess)
+		}).Exec(sess)
 	}
 
 	// Test queries concurrently
@@ -453,6 +476,8 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 				c <- fmt.Errorf("expected response length 100, received %d", len(response))
 				return
 			}
+
+			res.Close()
 
 			c <- nil
 		}(i, waitChannel)

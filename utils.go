@@ -2,14 +2,15 @@ package gorethink
 
 import (
 	"reflect"
+	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
 
 	"github.com/dancannon/gorethink/encoding"
 
-	"code.google.com/p/goprotobuf/proto"
 	p "github.com/dancannon/gorethink/ql2"
+	"github.com/golang/protobuf/proto"
 )
 
 // Helper functions for constructing terms
@@ -41,6 +42,23 @@ func constructMethodTerm(prevVal Term, name string, termType p.Term_TermType, ar
 }
 
 // Helper functions for creating internal RQL types
+
+func newQuery(t Term, qopts map[string]interface{}, copts *ConnectOpts) Query {
+	queryOpts := map[string]interface{}{}
+	for k, v := range qopts {
+		queryOpts[k] = Expr(v).build()
+	}
+	if copts.Database != "" {
+		queryOpts["db"] = Db(copts.Database).build()
+	}
+
+	// Construct query
+	return Query{
+		Type: p.Query_START,
+		Term: &t,
+		Opts: queryOpts,
+	}
+}
 
 // makeArray takes a slice of terms and produces a single MAKE_ARRAY term
 func makeArray(args termsList) Term {
@@ -222,6 +240,22 @@ func prefixLines(s string, prefix string) (result string) {
 	for _, line := range strings.Split(s, "\n") {
 		result += prefix + line + "\n"
 	}
+	return
+}
+
+func splitAddress(address string) (hostname string, port int) {
+	hostname = "localhost"
+	port = 28015
+
+	addrParts := strings.Split(address, ":")
+
+	if len(addrParts) >= 1 {
+		hostname = addrParts[0]
+	}
+	if len(addrParts) >= 2 {
+		port, _ = strconv.Atoi(addrParts[1])
+	}
+
 	return
 }
 
