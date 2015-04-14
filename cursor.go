@@ -412,6 +412,10 @@ type queue struct {
 }
 
 func (q *queue) Len() int {
+	if len(q.elems) == 0 {
+		return 0
+	}
+
 	return q.nelems
 }
 func (q *queue) Push(elem interface{}) {

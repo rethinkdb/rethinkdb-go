@@ -17,9 +17,11 @@ type Session struct {
 
 // ConnectOpts is used to specify optional arguments when connecting to a cluster.
 type ConnectOpts struct {
-	Database string        `gorethink:"database,omitempty"`
-	AuthKey  string        `gorethink:"authkey,omitempty"`
-	Timeout  time.Duration `gorethink:"timeout,omitempty"`
+	Address   string        `gorethink:"address,omitempty"`
+	Addresses []string      `gorethink:"addresses,omitempty"`
+	Database  string        `gorethink:"database,omitempty"`
+	AuthKey   string        `gorethink:"authkey,omitempty"`
+	Timeout   time.Duration `gorethink:"timeout,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	MaxOpen int `gorethink:"max_open,omitempty"`
@@ -27,7 +29,12 @@ type ConnectOpts struct {
 	// Below options are for cluster discovery, please note there is a high
 	// probability of these changing as the API is still being worked on.
 
-	DiscoverHosts       bool          `gorethink:"discover_hosts,omitempty"`
+	// DiscoverHosts is used to enable host discovery, when true the driver
+	// will attempt to discover any new nodes added to the cluster and then
+	// start sending queries to these new nodes.
+	DiscoverHosts bool `gorethink:"discover_hosts,omitempty"`
+	// NodeRefreshInterval is used to determine how often the driver should
+	// refresh the status of a node.
 	NodeRefreshInterval time.Duration `gorethink:"node_refresh_interval,omitempty"`
 }
 
@@ -35,17 +42,8 @@ func (o *ConnectOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
-// Connect creates a new database session.
-//
-// 	session, err := r.Connect("localhost:28015")
-func Connect(address string) (*Session, error) {
-	return ConnectWithOpts(ConnectOpts{}, address)
-}
-
-// ConnectWithOpts creates a new database session with the given options.
-//
-// Supported arguments include Database, Timeout, Authkey. Pool
-// options include MaxIdle, MaxOpen.
+// Connect creates a new database session. To view the available connection
+// options see ConnectOpts.
 //
 // By default maxIdle and maxOpen are set to 1: passing values greater
 // than the default (e.g. MaxIdle: "10", MaxOpen: "20") will provide a
@@ -53,43 +51,25 @@ func Connect(address string) (*Session, error) {
 //
 // Basic connection example:
 //
-// 	session, err := r.ConnectWithOpts(r.ConnectOpts{
+// 	session, err := r.Connect(r.ConnectOpts{
+// 		Host: "localhost:28015",
 // 		Database: "test",
 // 		AuthKey:  "14daak1cad13dj",
-// 	}, "localhost:28015")
-func ConnectWithOpts(opts ConnectOpts, address string) (*Session, error) {
-	return ConnectClusterWithOpts(opts, address)
-}
-
-// ConnectCluster creates a new database session using the given hosts as seeds
-// to discover the rest of the cluster.
+// 	})
 //
-// 	session, err := r.Connect("localhost:28015", "localhost:28016")
-func ConnectCluster(addresses ...string) (*Session, error) {
-	// We assume that if using this function the user wants host discovery
-	opts := ConnectOpts{
-		DiscoverHosts: true,
+// Cluster connection example:
+//
+// 	session, err := r.Connect(r.ConnectOpts{
+// 		Hosts: []string{"localhost:28015", "localhost:28016"},
+// 		Database: "test",
+// 		AuthKey:  "14daak1cad13dj",
+// 	})
+func Connect(opts ConnectOpts) (*Session, error) {
+	var addresses = opts.Addresses
+	if len(addresses) == 0 {
+		addresses = []string{opts.Address}
 	}
 
-	return ConnectClusterWithOpts(opts, addresses...)
-}
-
-// ConnectClusterWithOpts creates a new database session using the given hosts as seeds
-// to discover the rest of the cluster.
-// Supported arguments include Database, Timeout, Authkey. Pool
-// options include MaxIdle, MaxOpen.
-//
-// By default maxIdle and maxOpen are set to 1: passing values greater
-// than the default (e.g. MaxIdle: "10", MaxOpen: "20") will provide a
-// pool of re-usable connections.
-//
-// Basic connection example:
-//
-// 	session, err := r.ConnectWithOpts(r.ConnectOpts{
-// 		Database: "test",
-// 		AuthKey:  "14daak1cad13dj",
-// 	}, "localhost:28015", "localhost:28016")
-func ConnectClusterWithOpts(opts ConnectOpts, addresses ...string) (*Session, error) {
 	hosts := make([]Host, len(addresses))
 	for i, address := range addresses {
 		hostname, port := splitAddress(address)

@@ -23,9 +23,10 @@ func init() {
 }
 
 func Example() {
-	session, err := r.ConnectWithOpts(r.ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
+		Address: url,
 		AuthKey: authKey,
-	}, url)
+	})
 	if err != nil {
 		log.Fatalf("Error connecting to DB: %s", err)
 	}

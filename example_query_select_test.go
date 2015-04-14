@@ -15,9 +15,10 @@ func Example_Get() {
 		Gender    string `gorethink:"gender"`
 	}
 
-	sess, err := r.ConnectWithOpts(r.ConnectOpts{
+	sess, err := r.Connect(r.ConnectOpts{
+		Address: url,
 		AuthKey: authKey,
-	}, url)
+	})
 	if err != nil {
 		log.Fatalf("Error connecting to DB: %s", err)
 	}
@@ -57,9 +58,10 @@ func Example_GetAll_Compound() {
 		Gender    string `gorethink:"gender"`
 	}
 
-	sess, err := r.ConnectWithOpts(r.ConnectOpts{
+	sess, err := r.Connect(r.ConnectOpts{
+		Address: url,
 		AuthKey: authKey,
-	}, url)
+	})
 	if err != nil {
 		log.Fatalf("Error connecting to DB: %s", err)
 	}
