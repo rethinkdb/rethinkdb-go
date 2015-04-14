@@ -2,6 +2,7 @@ package encoding
 
 import (
 	"encoding/base64"
+	"math"
 	"reflect"
 	"time"
 )
@@ -262,9 +263,17 @@ func newCondAddrEncoder(canAddrEnc, elseEnc encoderFunc) encoderFunc {
 func timePseudoTypeEncoder(v reflect.Value) interface{} {
 	t := v.Interface().(time.Time)
 
+	timeVal := float64(t.UnixNano()) / float64(time.Second)
+
+	// use seconds-since-epoch precision if time.Time `t`
+	// is before the oldest nanosecond time
+	if t.Before(time.Unix(0, math.MinInt64)) {
+		timeVal = float64(t.Unix())
+	}
+
 	return map[string]interface{}{
 		"$reql_type$": "TIME",
-		"epoch_time":  float64(t.UnixNano()) / 1000 / 1000 / 1000, //milliseconds
+		"epoch_time":  timeVal,
 		"timezone":    "+00:00",
 	}
 }

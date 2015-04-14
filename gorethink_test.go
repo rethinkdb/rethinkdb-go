@@ -218,6 +218,7 @@ type Y struct {
 
 type PseudoTypes struct {
 	T time.Time
+	Z time.Time
 	B []byte
 }
 
