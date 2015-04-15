@@ -49,7 +49,7 @@ func newQuery(t Term, qopts map[string]interface{}, copts *ConnectOpts) Query {
 		queryOpts[k] = Expr(v).build()
 	}
 	if copts.Database != "" {
-		queryOpts["db"] = DB(copts.Database).build()
+		queryOpts["db"] = Db(copts.Database).build()
 	}
 
 	// Construct query

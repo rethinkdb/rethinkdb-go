@@ -11,7 +11,7 @@ import (
 // with the same name already exists the operation throws RqlRuntimeError.
 //
 // Note: that you can only use alphanumeric characters and underscores for the database name.
-func DBCreate(args ...interface{}) Term {
+func DbCreate(args ...interface{}) Term {
 	return constructRootTerm("DbCreate", p.Term_DB_CREATE, args, map[string]interface{}{})
 }
 
@@ -20,7 +20,7 @@ func DBCreate(args ...interface{}) Term {
 //
 // If successful, the operation returns the object {dropped: 1}. If the specified
 // database doesn't exist a RqlRuntimeError is thrown.
-func DBDrop(args ...interface{}) Term {
+func DbDrop(args ...interface{}) Term {
 	return constructRootTerm("DbDrop", p.Term_DB_DROP, args, map[string]interface{}{})
 }
 

@@ -17,9 +17,9 @@ func Example_TableCreate() {
 	}
 
 	// Setup database
-	r.DB("test").TableDrop("table").Run(sess)
+	r.Db("test").TableDrop("table").Run(sess)
 
-	response, err := r.DB("test").TableCreate("table").RunWrite(sess)
+	response, err := r.Db("test").TableCreate("table").RunWrite(sess)
 	if err != nil {
 		log.Fatalf("Error creating table: %s", err)
 	}
@@ -40,10 +40,10 @@ func Example_IndexCreate() {
 	}
 
 	// Setup database
-	r.DB("test").TableDrop("table").Run(sess)
-	r.DB("test").TableCreate("table").Run(sess)
+	r.Db("test").TableDrop("table").Run(sess)
+	r.Db("test").TableCreate("table").Run(sess)
 
-	response, err := r.DB("test").Table("table").IndexCreate("name").RunWrite(sess)
+	response, err := r.Db("test").Table("table").IndexCreate("name").RunWrite(sess)
 	if err != nil {
 		log.Fatalf("Error creating index: %s", err)
 	}
@@ -64,10 +64,10 @@ func Example_IndexCreate_compound() {
 	}
 
 	// Setup database
-	r.DB("test").TableDrop("table").Run(sess)
-	r.DB("test").TableCreate("table").Run(sess)
+	r.Db("test").TableDrop("table").Run(sess)
+	r.Db("test").TableCreate("table").Run(sess)
 
-	response, err := r.DB("test").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
+	response, err := r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(sess)
 	if err != nil {

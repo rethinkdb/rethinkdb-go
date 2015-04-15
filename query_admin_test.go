@@ -5,11 +5,11 @@ import (
 )
 
 func (s *RethinkSuite) TestAdminDbConfig(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
-	DB("test").TableCreate("test").Exec(sess)
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
 
 	// Test index rename
-	query := DB("test").Table("test").Config()
+	query := Db("test").Table("test").Config()
 
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
@@ -22,11 +22,11 @@ func (s *RethinkSuite) TestAdminDbConfig(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAdminTableConfig(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
-	DB("test").TableCreate("test").Exec(sess)
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
 
 	// Test index rename
-	query := DB("test").Config()
+	query := Db("test").Config()
 
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
@@ -39,11 +39,11 @@ func (s *RethinkSuite) TestAdminTableConfig(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAdminTableStatus(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
-	DB("test").TableCreate("test").Exec(sess)
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
 
 	// Test index rename
-	query := DB("test").Table("test").Status()
+	query := Db("test").Table("test").Status()
 
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
@@ -57,8 +57,8 @@ func (s *RethinkSuite) TestAdminTableStatus(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAdminWait(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
-	DB("test").TableCreate("test").Exec(sess)
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
 
 	// Test index rename
 	query := Wait()
@@ -74,10 +74,10 @@ func (s *RethinkSuite) TestAdminWait(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAdminWaitOpts(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
-	DB("test").TableCreate("test").Exec(sess)
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
 
-	query := DB("test").Table("test").Wait(WaitOpts{
+	query := Db("test").Table("test").Wait(WaitOpts{
 		WaitFor: "all_replicas_ready",
 		Timeout: 10,
 	})
@@ -93,11 +93,11 @@ func (s *RethinkSuite) TestAdminWaitOpts(c *test.C) {
 }
 
 func (s *RethinkSuite) TestAdminStatus(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
-	DB("test").TableCreate("test").Exec(sess)
+	Db("test").TableDrop("test").Exec(sess)
+	Db("test").TableCreate("test").Exec(sess)
 
 	// Test index rename
-	query := DB("test").Table("test").Wait()
+	query := Db("test").Table("test").Wait()
 
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
