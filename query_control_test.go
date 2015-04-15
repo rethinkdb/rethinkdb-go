@@ -189,7 +189,7 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 	c.Assert(err, test.NotNil)
 
 	c.Assert(err, test.NotNil)
-	c.Assert(err, test.FitsTypeOf, RqlRuntimeError{})
+	c.Assert(err, test.FitsTypeOf, RQLRuntimeError{})
 
 	c.Assert(err.Error(), test.Equals, "gorethink: An error occurred in: \nr.Error(\"An error occurred\")")
 }
