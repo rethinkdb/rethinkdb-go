@@ -5,7 +5,7 @@ import (
 )
 
 // Reference a database.
-func Db(args ...interface{}) Term {
+func DB(args ...interface{}) Term {
 	return constructRootTerm("Db", p.Term_DB, args, map[string]interface{}{})
 }
 

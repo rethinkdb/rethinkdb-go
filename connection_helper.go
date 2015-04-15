@@ -13,7 +13,7 @@ import (
 func (c *Connection) writeData(data []byte) error {
 	_, err := c.conn.Write(data[:])
 	if err != nil {
-		return RqlConnectionError{err.Error()}
+		return ErrRQLConnection{err.Error()}
 	}
 
 	return nil
@@ -25,7 +25,7 @@ func (c *Connection) writeHandshakeReq() error {
 
 	data := c.buf.takeSmallBuffer(dataLen)
 	if data == nil {
-		return RqlDriverError{ErrBusyBuffer.Error()}
+		return ErrRQLDriver{ErrBusyBuffer.Error()}
 	}
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
@@ -55,13 +55,13 @@ func (c *Connection) readHandshakeSuccess() error {
 		if err == io.EOF {
 			return fmt.Errorf("Unexpected EOF: %s", string(line))
 		}
-		return RqlConnectionError{err.Error()}
+		return ErrRQLConnection{err.Error()}
 	}
 	// convert to string and remove trailing NUL byte
 	response := string(line[:len(line)-1])
 	if response != "SUCCESS" {
 		// we failed authorization or something else terrible happened
-		return RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
+		return ErrRQLDriver{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
 
 	return nil
@@ -73,7 +73,7 @@ func (c *Connection) writeQuery(token int64, q []byte) error {
 
 	data := c.buf.takeBuffer(dataLen)
 	if data == nil {
-		return RqlDriverError{ErrBusyBuffer.Error()}
+		return ErrRQLDriver{ErrBusyBuffer.Error()}
 	}
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
