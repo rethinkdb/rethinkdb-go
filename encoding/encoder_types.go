@@ -133,7 +133,7 @@ func (se *structEncoder) encode(v reflect.Value) interface{} {
 
 	for i, f := range se.fields {
 		fv := fieldByIndex(v, f.index)
-		if !fv.IsValid() || f.omitEmpty && isEmptyValue(fv) {
+		if !fv.IsValid() || f.omitEmpty && se.isEmptyValue(fv) {
 			continue
 		}
 
@@ -141,6 +141,14 @@ func (se *structEncoder) encode(v reflect.Value) interface{} {
 	}
 
 	return m
+}
+
+func (se *structEncoder) isEmptyValue(v reflect.Value) bool {
+	if v.Type() == timeType {
+		return v.Interface().(time.Time) == time.Time{}
+	}
+
+	return isEmptyValue(v)
 }
 
 func newStructEncoder(t reflect.Type) encoderFunc {

@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed
+- Fixed bug causing empty times to be inserted into the DB even when the omitempty tag was set.
+
 ## v0.7.0 - 2015-03-30
 
 This release includes support for RethinkDB 2.0 and connecting to clusters. To connect to a cluster you should use the new `Addresses` field in `ConnectOpts`, for example:
