@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+### Changed
+- Improved logging of connection errors
+
 ### Fixed
 - Fixed bug causing empty times to be inserted into the DB even when the omitempty tag was set.
 
