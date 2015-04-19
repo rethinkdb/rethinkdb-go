@@ -4,10 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 ### Changed
-- Improved logging of connection errors
+- Improved logging of connection errors.
 
 ### Fixed
 - Fixed bug causing empty times to be inserted into the DB even when the omitempty tag was set.
+- Fixed node status refresh loop leaking goroutines.
 
 ## v0.7.0 - 2015-03-30
 
