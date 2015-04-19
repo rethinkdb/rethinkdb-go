@@ -28,9 +28,10 @@ import (
     r "github.com/dancannon/gorethink"
 )
 
+address := "localhost:28015"
 var session *r.Session
 
-session, err := Connect(address)
+session, err := r.Connect(address)
 if err != nil {
     log.Fatalln(err.Error())
 }
