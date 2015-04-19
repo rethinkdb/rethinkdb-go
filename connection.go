@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"io"
 	"net"
 	"strings"
@@ -56,9 +57,9 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		c.conn, err = nd.Dial("tcp", address)
 	} else {
 		roots := x509.NewCertPool()
-		ok := roots.AppendCertsFromPEM([]byte(c.opts.CaCert))
+		ok := roots.AppendCertsFromPEM([]byte(c.opts.CACert))
 		if !ok {
-			panic("failed to parse root certificate")
+			return nil, errors.New("failed to parse root certificate")
 		}
 		c.conn, err = tls.DialWithDialer(&nd, "tcp", address, &tls.Config{
 			RootCAs:    roots,
