@@ -191,6 +191,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 	for _, host := range hosts {
 		conn, err := NewConnection(host.String(), c.opts)
 		if err != nil {
+			log.Warnf("Error creating connection %s", err.Error())
 			continue
 		}
 		defer conn.Close()
@@ -201,6 +202,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			c.opts,
 		))
 		if err != nil {
+			log.Warnf("Error fetching cluster status %s", err)
 			continue
 		}
 

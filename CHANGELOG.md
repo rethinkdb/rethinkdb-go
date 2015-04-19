@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v0.7.1 - 2015-04-19
+### Changed
+- Improved logging of connection errors.
+
+### Fixed
+- Fixed bug causing empty times to be inserted into the DB even when the omitempty tag was set.
+- Fixed node status refresh loop leaking goroutines.
+
 ## v0.7.0 - 2015-03-30
 
 This release includes support for RethinkDB 2.0 and connecting to clusters. To connect to a cluster you should use the new `Addresses` field in `ConnectOpts`, for example:

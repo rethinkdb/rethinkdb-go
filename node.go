@@ -14,9 +14,9 @@ type Node struct {
 	Host    Host
 	aliases []Host
 
-	cluster       *Cluster
-	pool          *Pool
-	refreshTicker *time.Ticker
+	cluster         *Cluster
+	pool            *Pool
+	refreshDoneChan chan struct{}
 
 	mu     sync.RWMutex
 	closed bool
@@ -25,14 +25,14 @@ type Node struct {
 
 func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
 	node := &Node{
-		ID:      id,
-		Host:    aliases[0],
-		aliases: aliases,
-		cluster: cluster,
-		pool:    pool,
-		health:  100,
+		ID:              id,
+		Host:            aliases[0],
+		aliases:         aliases,
+		cluster:         cluster,
+		pool:            pool,
+		health:          100,
+		refreshDoneChan: make(chan struct{}),
 	}
-
 	// Start node refresh loop
 	refreshInterval := cluster.opts.NodeRefreshInterval
 	if refreshInterval <= 0 {
@@ -41,9 +41,15 @@ func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
 	}
 
 	go func() {
-		node.refreshTicker = time.NewTicker(refreshInterval)
-		for _ = range node.refreshTicker.C {
-			node.Refresh()
+
+		refreshTicker := time.NewTicker(refreshInterval)
+		for {
+			select {
+			case <-refreshTicker.C:
+				node.Refresh()
+			case <-node.refreshDoneChan:
+				return
+			}
 		}
 	}()
 
@@ -73,7 +79,7 @@ func (n *Node) Close(optArgs ...CloseOpts) error {
 		}
 	}
 
-	n.refreshTicker.Stop()
+	n.refreshDoneChan <- struct{}{}
 	if n.pool != nil {
 		n.pool.Close()
 	}
