@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"strings"
 
 	p "github.com/dancannon/gorethink/ql2"
 )
@@ -60,6 +61,7 @@ func (c *Connection) readHandshakeSuccess() error {
 	// convert to string and remove trailing NUL byte
 	response := string(line[:len(line)-1])
 	if response != "SUCCESS" {
+		response = strings.TrimSpace(response)
 		// we failed authorization or something else terrible happened
 		return RqlDriverError{fmt.Sprintf("Server dropped connection with message: \"%s\"", response)}
 	}
