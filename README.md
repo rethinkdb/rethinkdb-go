@@ -9,6 +9,8 @@
 
 Current version: v0.7.0 (RethinkDB v2.0) 
 
+Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
+
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dancannon/gorethink?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
 ## Installation
@@ -30,7 +32,9 @@ import (
 
 var session *r.Session
 
-session, err := Connect(address)
+session, err := r.Connect(r.ConnectOpts{
+    Address: "localhost:28015",
+})
 if err != nil {
     log.Fatalln(err.Error())
 }
@@ -62,12 +66,12 @@ session.SetMaxOpenConns(5)
 
 ### Connect to a cluster
 
-To connect to a RethinkDB cluster which has multiple nodes you can use the following syntax. 
+To connect to a RethinkDB cluster which has multiple nodes you can use the following syntax. When connecting to a cluster with multiple nodes queries will be distributed between these nodes.
 
 ```go
 var session *r.Session
 
-session, err := r.Conenct(r.ConnectOpts{
+session, err := r.Connect(r.ConnectOpts{
     Addresses: []string{"localhost:28015", "localhost:28016"},
     Database: "test",
     AuthKey:  "14daak1cad13dj",
@@ -116,7 +120,6 @@ r.Db("database").Table("table").Between(1, 10, r.BetweenOpts{
     RightBound: "closed",
 }).Run(session)
 ```
-
 
 ### Optional Arguments
 
