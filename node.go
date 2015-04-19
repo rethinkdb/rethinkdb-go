@@ -16,7 +16,7 @@ type Node struct {
 
 	cluster         *Cluster
 	pool            *Pool
-	refreshDoneChan chan bool
+	refreshDoneChan chan struct{}
 
 	mu     sync.RWMutex
 	closed bool
@@ -31,7 +31,7 @@ func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
 		cluster:         cluster,
 		pool:            pool,
 		health:          100,
-		refreshDoneChan: make(chan bool),
+		refreshDoneChan: make(chan struct{}),
 	}
 	// Start node refresh loop
 	refreshInterval := cluster.opts.NodeRefreshInterval
@@ -79,7 +79,7 @@ func (n *Node) Close(optArgs ...CloseOpts) error {
 		}
 	}
 
-	n.refreshDoneChan <- true
+	n.refreshDoneChan <- struct{}{}
 	if n.pool != nil {
 		n.pool.Close()
 	}
