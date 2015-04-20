@@ -4,10 +4,8 @@ import (
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
-	"errors"
 	"io"
 	"net"
-	"strings"
 	"sync/atomic"
 	"time"
 
