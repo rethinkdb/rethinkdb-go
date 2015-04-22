@@ -76,7 +76,7 @@ session, err := r.Connect(r.ConnectOpts{
     Database: "test",
     AuthKey:  "14daak1cad13dj",
     DiscoverHosts: true,
-}, "localhost:28015")
+})
 if err != nil {
     log.Fatalln(err.Error())
 }
