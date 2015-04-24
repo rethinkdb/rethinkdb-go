@@ -137,6 +137,7 @@ Example:
 
 ```go
 res, err := r.Db("database").Table("tablename").Get(key).Run(session)
+defer res.Close()
 if err != nil {
     // error
 }
