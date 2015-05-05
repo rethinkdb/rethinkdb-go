@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v0.7.2 - 2015-05-05
 ### Added
  - Added support for connecting to a server using TLS (#179)
 
