@@ -250,7 +250,7 @@ func (o *ExecOpts) toMap() map[string]interface{} {
 // Exec runs the query but does not return the result. Exec will still wait for
 // the response to be received unless the NoReply field is true.
 //
-//	res, err := r.Db("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
+//	err := r.Db("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
 //		NoReply: true,
 //	})
 func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
