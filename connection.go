@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
 	"io"
@@ -49,7 +50,11 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	}
 	// Connect to Server
 	nd := net.Dialer{Timeout: c.opts.Timeout}
-	c.conn, err = nd.Dial("tcp", address)
+	if c.opts.TLSConfig == nil {
+		c.conn, err = nd.Dial("tcp", address)
+	} else {
+		c.conn, err = tls.DialWithDialer(&nd, "tcp", address, c.opts.TLSConfig)
+	}
 	if err != nil {
 		return nil, err
 	}

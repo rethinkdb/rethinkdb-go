@@ -191,7 +191,6 @@ type nodeStatus struct {
 	Status  string `gorethink:"status"`
 	Network struct {
 		Hostname           string `gorethink:"hostname"`
-		HTTPAdminPort      int64  `gorethink:"http_admin_port"`
 		ClusterPort        int64  `gorethink:"cluster_port"`
 		ReqlPort           int64  `gorethink:"reql_port"`
 		CanonicalAddresses []struct {

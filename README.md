@@ -7,7 +7,7 @@
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
 
 
-Current version: v0.7.1 (RethinkDB v2.0) 
+Current version: v0.7.2 (RethinkDB v2.0) 
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -76,7 +76,7 @@ session, err := r.Connect(r.ConnectOpts{
     Database: "test",
     AuthKey:  "14daak1cad13dj",
     DiscoverHosts: true,
-}, "localhost:28015")
+})
 if err != nil {
     log.Fatalln(err.Error())
 }
@@ -140,6 +140,7 @@ res, err := r.Db("database").Table("tablename").Get(key).Run(session)
 if err != nil {
     // error
 }
+defer res.Close() // Always ensure you close the cursor to ensure connections are not leaked
 ```
 
 Cursors have a number of methods available for accessing the query results
