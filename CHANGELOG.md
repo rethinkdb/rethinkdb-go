@@ -8,7 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Fixed issue causing driver to fail to connect to servers with the HTTP admin interface disabled (#181)
- - Fixed errors in documentation (#182)
+ - Fixed errors in documentation (#182, #184)
  - Fixed RunWrite not closing the cursor (#185)
 
 ## v0.7.1 - 2015-04-19
