@@ -201,17 +201,22 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 //
 //	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
 func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
-  var err error
-  var res *Cursor
 	var response WriteResponse
 
-  res, err = t.Run(s, optArgs...)
-	if err == nil {
-		err = res.One(&response)
-    defer res.Close()
+	res, err := t.Run(s, optArgs...)
+	if err != nil {
+		return response, err
 	}
 
-	return response, err
+	if err = res.One(&response); err != nil {
+		return response, err
+	}
+
+	if err = res.Close(); err != nil {
+		return response, err
+	}
+
+	return response, nil
 }
 
 // ExecOpts inherits its options from RunOpts, the only difference is the

@@ -4,11 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 ### Added
- - Added support for connecting to a server using TLS
+ - Added support for connecting to a server using TLS (#179)
 
 ### Fixed
  - Fixed issue causing driver to fail to connect to servers with the HTTP admin interface disabled (#181)
- - Fixed errors in documentationg
+ - Fixed errors in documentation (#182)
+ - Fixed RunWrite not closing the cursor (#185)
 
 ## v0.7.1 - 2015-04-19
 ### Changed
