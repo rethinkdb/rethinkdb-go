@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Added
+ - Added support for connecting to a server using TLS
+
+### Fixed
+ - Fixed issue causing driver to fail to connect to servers with the HTTP admin interface disabled (#181)
+ - Fixed errors in documentationg
+
 ## v0.7.1 - 2015-04-19
 ### Changed
 - Improved logging of connection errors.
