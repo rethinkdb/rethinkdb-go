@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"crypto/tls"
 	"time"
 
 	p "github.com/dancannon/gorethink/ql2"
@@ -22,6 +23,7 @@ type ConnectOpts struct {
 	Database  string        `gorethink:"database,omitempty"`
 	AuthKey   string        `gorethink:"authkey,omitempty"`
 	Timeout   time.Duration `gorethink:"timeout,omitempty"`
+	TLSConfig *tls.Config   `gorethink:"tlsconfig,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	MaxOpen int `gorethink:"max_open,omitempty"`
