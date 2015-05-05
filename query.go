@@ -201,11 +201,16 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 //
 //	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
 func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
+  var err error
+  var res *Cursor
 	var response WriteResponse
-	res, err := t.Run(s, optArgs...)
+
+  res, err = t.Run(s, optArgs...)
 	if err == nil {
 		err = res.One(&response)
+    defer res.Close()
 	}
+
 	return response, err
 }
 
