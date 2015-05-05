@@ -140,6 +140,7 @@ res, err := r.Db("database").Table("tablename").Get(key).Run(session)
 if err != nil {
     // error
 }
+defer res.Close() // Always ensure you close the cursor to ensure connections are not leaked
 ```
 
 Cursors have a number of methods available for accessing the query results
