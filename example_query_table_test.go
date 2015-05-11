@@ -7,7 +7,7 @@ import (
 	r "github.com/dancannon/gorethink"
 )
 
-func Example_TableCreate() {
+func ExampleTerm_TableCreate() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
@@ -30,7 +30,7 @@ func Example_TableCreate() {
 	// 1 table created
 }
 
-func Example_IndexCreate() {
+func ExampleTerm_IndexCreate() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
@@ -54,7 +54,7 @@ func Example_IndexCreate() {
 	// 1 index created
 }
 
-func Example_IndexCreate_compound() {
+func ExampleTerm_IndexCreate_compound() {
 	sess, err := r.Connect(r.ConnectOpts{
 		Address: url,
 		AuthKey: authKey,

@@ -7,9 +7,9 @@ import (
 	r "github.com/dancannon/gorethink"
 )
 
-func Example_Get() {
+func ExampleTerm_Get() {
 	type Person struct {
-		Id        string `gorethink:"id, omitempty"`
+		ID        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
 		LastName  string `gorethink:"last_name"`
 		Gender    string `gorethink:"gender"`
@@ -50,9 +50,9 @@ func Example_Get() {
 	// John Smith (M)
 }
 
-func Example_GetAll_Compound() {
+func ExampleTerm_GetAll_compound() {
 	type Person struct {
-		Id        string `gorethink:"id, omitempty"`
+		ID        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
 		LastName  string `gorethink:"last_name"`
 		Gender    string `gorethink:"gender"`

@@ -20,9 +20,6 @@ func (o *InsertOpts) toMap() map[string]interface{} {
 // 'hard' or 'soft', to override the table or query's default durability setting,
 // or the optional argument return_changes, which will return the value of the row
 // you're inserting when set to true.
-//
-//	table.Insert(map[string]interface{}{"name": "Joe", "email": "joe@example.com"}).RunWrite(sess)
-//	table.Insert([]interface{}{map[string]interface{}{"name": "Joe"}, map[string]interface{}{"name": "Paul"}}).RunWrite(sess)
 func (t Term) Insert(arg interface{}, optArgs ...InsertOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
