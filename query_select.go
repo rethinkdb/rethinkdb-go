@@ -4,9 +4,9 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-// Reference a database.
+// DB references a database.
 func DB(args ...interface{}) Term {
-	return constructRootTerm("Db", p.Term_DB, args, map[string]interface{}{})
+	return constructRootTerm("DB", p.Term_DB, args, map[string]interface{}{})
 }
 
 type TableOpts struct {

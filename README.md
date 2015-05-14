@@ -205,20 +205,6 @@ Field int `gorethink:"myName,omitempty"`
 Field int `gorethink:",omitempty"`
 ```
 
-Alternatively you can implement the FieldMapper interface  by providing the FieldMap function which returns a map of strings in the form of `"FieldName": "NewName"`. For example:
-
-```go
-type A struct {
-    Field int
-}
-
-func (a A) FieldMap() map[string]string {
-    return map[string]string{
-        "Field": "myName",
-    }
-}
-```
-
 ## Benchmarks
 
 Everyone wants their project's benchmarks to be speedy. And while we know that rethinkDb and the gorethink driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please. 

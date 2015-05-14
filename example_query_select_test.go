@@ -1,21 +1,18 @@
-package gorethink_test
+package gorethink
 
 import (
 	"fmt"
-	"log"
-
-	r "github.com/dancannon/gorethink"
 )
 
 func Example_Get() {
 	type Person struct {
-		Id        string `gorethink:"id, omitempty"`
+		ID        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
 		LastName  string `gorethink:"last_name"`
 		Gender    string `gorethink:"gender"`
 	}
 
-	sess, err := r.Connect(r.ConnectOpts{
+	sess, err := Connect(ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
 	})
@@ -24,12 +21,12 @@ func Example_Get() {
 	}
 
 	// Setup table
-	r.DB("test").TableDrop("table").Run(sess)
-	r.DB("test").TableCreate("table").Run(sess)
-	r.DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
+	DB("test").TableDrop("table").Run(sess)
+	DB("test").TableCreate("table").Run(sess)
+	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
 
 	// Fetch the row from the database
-	res, err := r.DB("test").Table("table").Get("1").Run(sess)
+	res, err := DB("test").Table("table").Get("1").Run(sess)
 	if err != nil {
 		log.Fatalf("Error finding person: %s", err)
 	}
@@ -52,13 +49,13 @@ func Example_Get() {
 
 func Example_GetAll_Compound() {
 	type Person struct {
-		Id        string `gorethink:"id, omitempty"`
+		ID        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
 		LastName  string `gorethink:"last_name"`
 		Gender    string `gorethink:"gender"`
 	}
 
-	sess, err := r.Connect(r.ConnectOpts{
+	sess, err := Connect(ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
 	})
@@ -67,16 +64,16 @@ func Example_GetAll_Compound() {
 	}
 
 	// Setup table
-	r.DB("test").TableDrop("table").Run(sess)
-	r.DB("test").TableCreate("table").Run(sess)
-	r.DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
-	r.DB("test").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
+	DB("test").TableDrop("table").Run(sess)
+	DB("test").TableCreate("table").Run(sess)
+	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
+	DB("test").Table("table").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).Run(sess)
-	r.DB("test").Table("table").IndexWait().Run(sess)
+	DB("test").Table("table").IndexWait().Run(sess)
 
 	// Fetch the row from the database
-	res, err := r.DB("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).Run(sess)
+	res, err := DB("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).Run(sess)
 	if err != nil {
 		log.Fatalf("Error finding person: %s", err)
 	}
@@ -88,7 +85,7 @@ func Example_GetAll_Compound() {
 	// Scan query result into the person variable
 	var person Person
 	err = res.One(&person)
-	if err == r.ErrEmptyResult {
+	if err == ErrEmptyResult {
 		log.Fatalf("Person not found")
 	} else if err != nil {
 		log.Fatalf("Error scanning database result: %s", err)

@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes see below.
 
+## Added
+ - Added more documentation.
+
 ### Changed 
  - Renamed `Db` to `DB`
  - Renamed `DbCreate` to `DBCreate`
@@ -15,6 +18,9 @@ In an attempt to make this library more "idiomatic" some functions have been ren
  - Renamed `RqlClientError` to `RQLClientError`
  - Renamed `RqlRuntimeError` to `RQLRuntimeError`
  - Renamed `RqlCompileError` to `RQLCompileError`
+ - Renamed `Js` to `JS`
+ - Renamed `Json` to `JSON`
+ - Renamed `Http` to `HTTP`
 
 ## v0.7.2 - 2015-05-05
 ### Added

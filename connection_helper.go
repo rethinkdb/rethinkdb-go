@@ -26,7 +26,7 @@ func (c *Connection) writeHandshakeReq() error {
 
 	data := c.buf.takeSmallBuffer(dataLen)
 	if data == nil {
-		return RQLDriverError{ErrBusyBuffer.Error()}
+		return RQLDriverError{"Busy buffer"}
 	}
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
@@ -75,7 +75,7 @@ func (c *Connection) writeQuery(token int64, q []byte) error {
 
 	data := c.buf.takeBuffer(dataLen)
 	if data == nil {
-		return RQLDriverError{ErrBusyBuffer.Error()}
+		return RQLDriverError{"Busy Buffer"}
 	}
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer

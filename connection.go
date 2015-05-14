@@ -16,6 +16,8 @@ const (
 	respHeaderLen = 12
 )
 
+// Response represents the raw response from a query, most of the time you
+// should instead use a Cursor when reading from the database.
 type Response struct {
 	Token     int64
 	Type      p.Response_ResponseType   `json:"t"`
@@ -95,6 +97,10 @@ func (c *Connection) Close() error {
 	return nil
 }
 
+// Query sends a Query to the database, returning both the raw Response and a
+// Cursor which should be used to view the query's response.
+//
+// This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	if c == nil {
 		return nil, nil, nil
@@ -139,6 +145,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	}
 }
 
+// sendQuery marshals the Query and sends the JSON to the server.
 func (c *Connection) sendQuery(q Query) error {
 	// Build query
 	b, err := json.Marshal(q.build())
@@ -169,6 +176,8 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
 }
 
+// readResponse attempts to read a Response from the server, if no response
+// could be read then an error is returned.
 func (c *Connection) readResponse() (*Response, error) {
 	// Set timeout
 	if c.opts.Timeout == 0 {

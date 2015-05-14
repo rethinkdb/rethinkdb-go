@@ -10,16 +10,23 @@ import (
 )
 
 var (
-	ErrNoHosts              = errors.New("no hosts provided")
+	// ErrNoHosts is returned when no hosts to the Connect method.
+	ErrNoHosts = errors.New("no hosts provided")
+	// ErrNoConnectionsStarted is returned when the driver couldn't to any of
+	// the provided hosts.
 	ErrNoConnectionsStarted = errors.New("no connections were made when creating the session")
-	ErrHostQueryFailed      = errors.New("unable to populate hosts")
-	ErrInvalidNode          = errors.New("invalid node")
-	ErrClusterClosed        = errors.New("cluster closed")
-
-	ErrNoConnections    = errors.New("gorethink: no connections were available")
+	// ErrInvalidNode is returned when attempting to connect to a node which
+	// returns an invalid response.
+	ErrInvalidNode = errors.New("invalid node")
+	// ErrClusterClosed is returned when a query is executed after the connection
+	// to the cluster has been closed.
+	ErrClusterClosed = errors.New("cluster closed")
+	// ErrNoConnections is returned when there are no active connections in the
+	// clusters connection pool.
+	ErrNoConnections = errors.New("gorethink: no connections were available")
+	// ErrConnectionClosed is returned when trying to send a query with a closed
+	// connection.
 	ErrConnectionClosed = errors.New("gorethink: the connection is closed")
-
-	ErrBusyBuffer = errors.New("Busy buffer")
 )
 
 func printCarrots(t Term, frames []*p.Frame) string {
@@ -65,6 +72,8 @@ var ErrEmptyResult = errors.New("The result does not contain any more rows")
 
 // Connection/Response errors
 
+// rqlResponseError is the base type for all errors, it formats both
+// for the response and query if set.
 type rqlResponseError struct {
 	response *Response
 	term     *Term
@@ -88,18 +97,25 @@ func (e rqlResponseError) String() string {
 	return e.Error()
 }
 
+// RQLCompileError represents an error that occurs when compiling a query on
+// the database server.
 type RQLCompileError struct {
 	rqlResponseError
 }
 
+// RQLRuntimeError represents an error when executing an error on the database
+// server, this is also returned by the database when using the `Error` term.
 type RQLRuntimeError struct {
 	rqlResponseError
 }
 
+// RQLClientError represents a client error returned from the database.
 type RQLClientError struct {
 	rqlResponseError
 }
 
+// RQLDriverError represents an unexpected error with the driver, if this error
+// persists please create an issue.
 type RQLDriverError struct {
 	message string
 }
@@ -112,6 +128,8 @@ func (e RQLDriverError) String() string {
 	return e.Error()
 }
 
+// RQLConnectionError represents an error when communicating with the database
+// server.
 type RQLConnectionError struct {
 	message string
 }

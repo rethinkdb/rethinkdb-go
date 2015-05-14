@@ -24,7 +24,7 @@ func (s *RethinkSuite) TestDbList(c *test.C) {
 
 	// Try and find it in the list
 	success := false
-	res, err := DbList().Run(sess)
+	res, err := DBList().Run(sess)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)

@@ -7,7 +7,7 @@ import (
 )
 
 type object struct {
-	Id    int64  `gorethink:"id,omitempty"`
+	ID    int64  `gorethink:"id,omitempty"`
 	Name  string `gorethink:"name"`
 	Attrs []attr
 }
@@ -135,7 +135,7 @@ func (s *RethinkSuite) TestCursorStruct(c *test.C) {
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.DeepEquals, object{
-		Id:   2,
+		ID:   2,
 		Name: "Object 1",
 		Attrs: []attr{attr{
 			Name:  "attr 1",
@@ -258,7 +258,7 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	c.Assert(response, test.HasLen, 2)
 	c.Assert(response, test.DeepEquals, []object{
 		object{
-			Id:   2,
+			ID:   2,
 			Name: "Object 1",
 			Attrs: []attr{attr{
 				Name:  "attr 1",
@@ -266,7 +266,7 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 			}},
 		},
 		object{
-			Id:   3,
+			ID:   3,
 			Name: "Object 2",
 			Attrs: []attr{attr{
 				Name:  "attr 1",
@@ -318,7 +318,7 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	c.Assert(response, test.HasLen, 2)
 	c.Assert(response, test.DeepEquals, []object{
 		object{
-			Id:   2,
+			ID:   2,
 			Name: "Object 1",
 			Attrs: []attr{attr{
 				Name:  "attr 1",
@@ -326,7 +326,7 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 			}},
 		},
 		object{
-			Id:   3,
+			ID:   3,
 			Name: "Object 2",
 			Attrs: []attr{attr{
 				Name:  "attr 1",

@@ -78,7 +78,7 @@ func makeObject(args termsObj) Term {
 	}
 }
 
-var nextVarId int64
+var nextVarID int64
 
 func makeFunc(f interface{}) Term {
 	value := reflect.ValueOf(f)
@@ -88,9 +88,9 @@ func makeFunc(f interface{}) Term {
 	var args = make([]reflect.Value, valueType.NumIn())
 	for i := 0; i < valueType.NumIn(); i++ {
 		// Get a slice of the VARs to use as the function arguments
-		args[i] = reflect.ValueOf(constructRootTerm("var", p.Term_VAR, []interface{}{nextVarId}, map[string]interface{}{}))
-		argNums[i] = nextVarId
-		atomic.AddInt64(&nextVarId, 1)
+		args[i] = reflect.ValueOf(constructRootTerm("var", p.Term_VAR, []interface{}{nextVarID}, map[string]interface{}{}))
+		argNums[i] = nextVarID
+		atomic.AddInt64(&nextVarID, 1)
 
 		// make sure all input arguments are of type Term
 		if valueType.In(i).String() != "gorethink.Term" {
