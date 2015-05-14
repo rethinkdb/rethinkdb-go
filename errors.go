@@ -88,38 +88,38 @@ func (e rqlResponseError) String() string {
 	return e.Error()
 }
 
-type ErrRQLCompile struct {
+type RQLCompileError struct {
 	rqlResponseError
 }
 
-type ErrRQLRuntime struct {
+type RQLRuntimeError struct {
 	rqlResponseError
 }
 
-type ErrRQLClient struct {
+type RQLClientError struct {
 	rqlResponseError
 }
 
-type ErrRQLDriver struct {
+type RQLDriverError struct {
 	message string
 }
 
-func (e ErrRQLDriver) Error() string {
+func (e RQLDriverError) Error() string {
 	return fmt.Sprintf("gorethink: %s", e.message)
 }
 
-func (e ErrRQLDriver) String() string {
+func (e RQLDriverError) String() string {
 	return e.Error()
 }
 
-type ErrRQLConnection struct {
+type RQLConnectionError struct {
 	message string
 }
 
-func (e ErrRQLConnection) Error() string {
+func (e RQLConnectionError) Error() string {
 	return fmt.Sprintf("gorethink: %s", e.message)
 }
 
-func (e ErrRQLConnection) String() string {
+func (e RQLConnectionError) String() string {
 	return e.Error()
 }

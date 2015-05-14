@@ -143,7 +143,7 @@ func (c *Connection) sendQuery(q Query) error {
 	// Build query
 	b, err := json.Marshal(q.build())
 	if err != nil {
-		return ErrRQLDriver{"Error building query"}
+		return RQLDriverError{"Error building query"}
 	}
 
 	// Set timeout
@@ -156,7 +156,7 @@ func (c *Connection) sendQuery(q Query) error {
 	// Send the JSON encoding of the query itself.
 	if err = c.writeQuery(q.Token, b); err != nil {
 		c.bad = true
-		return ErrRQLConnection{err.Error()}
+		return RQLConnectionError{err.Error()}
 	}
 
 	return nil
@@ -190,14 +190,14 @@ func (c *Connection) readResponse() (*Response, error) {
 	b := c.buf.takeBuffer(int(messageLength))
 	if _, err := io.ReadFull(c.conn, b[:]); err != nil {
 		c.bad = true
-		return nil, ErrRQLConnection{err.Error()}
+		return nil, RQLConnectionError{err.Error()}
 	}
 
 	// Decode the response
 	var response = newCachedResponse()
 	if err := json.Unmarshal(b, response); err != nil {
 		c.bad = true
-		return nil, ErrRQLDriver{err.Error()}
+		return nil, RQLDriverError{err.Error()}
 	}
 	response.Token = responseToken
 
@@ -207,11 +207,11 @@ func (c *Connection) readResponse() (*Response, error) {
 func (c *Connection) processResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
-		return c.processErrorResponse(q, response, ErrRQLClient{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLClientError{rqlResponseError{response, q.Term}})
 	case p.Response_COMPILE_ERROR:
-		return c.processErrorResponse(q, response, ErrRQLCompile{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLCompileError{rqlResponseError{response, q.Term}})
 	case p.Response_RUNTIME_ERROR:
-		return c.processErrorResponse(q, response, ErrRQLRuntime{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLRuntimeError{rqlResponseError{response, q.Term}})
 	case p.Response_SUCCESS_ATOM:
 		return c.processAtomResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
@@ -222,7 +222,7 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 		return c.processWaitResponse(q, response)
 	default:
 		putResponse(response)
-		return nil, nil, ErrRQLDriver{"Unexpected response type"}
+		return nil, nil, RQLDriverError{"Unexpected response type"}
 	}
 }
 
