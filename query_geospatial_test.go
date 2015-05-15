@@ -270,9 +270,9 @@ func (s *RethinkSuite) TestGeospatialFill(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestGeospatialGeojson(c *test.C) {
+func (s *RethinkSuite) TestGeospatialGeoJSON(c *test.C) {
 	var response types.Geometry
-	res, err := Geojson(map[string]interface{}{
+	res, err := GeoJSON(map[string]interface{}{
 		"type":        "Point",
 		"coordinates": []interface{}{-122.423246, 37.779388},
 	}).Run(sess)
@@ -283,9 +283,9 @@ func (s *RethinkSuite) TestGeospatialGeojson(c *test.C) {
 	c.Assert(response, geometryEquals, "Point", []float64{-122.423246, 37.779388})
 }
 
-func (s *RethinkSuite) TestGeospatialToGeojson(c *test.C) {
+func (s *RethinkSuite) TestGeospatialToGeoJSON(c *test.C) {
 	var response map[string]interface{}
-	res, err := Point(-122.423246, 37.779388).ToGeojson().Run(sess)
+	res, err := Point(-122.423246, 37.779388).ToGeoJSON().Run(sess)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
