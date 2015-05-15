@@ -21,6 +21,8 @@ In an attempt to make this library more "idiomatic" some functions have been ren
  - Renamed `Js` to `JS`
  - Renamed `Json` to `JSON`
  - Renamed `Http` to `HTTP`
+ - Renamed `GeoJson` to `GeoJSON`
+ - Renamed `ToGeoJson` to `ToGeoJSON`
 
 ## v0.7.2 - 2015-05-05
 ### Added
