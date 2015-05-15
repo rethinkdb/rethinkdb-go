@@ -4,7 +4,11 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-// Row returns the currently visited document.
+// Row returns the currently visited document. Note that Row does not work within
+// subqueries to access nested documents; you should use anonymous functions to
+// access those documents instead. Also note that unlike in other drivers to
+// access a rows fields you should call Field. For example:
+//   r.row("fieldname") should instead be r.Row.Field("fieldname")
 var Row = constructRootTerm("Doc", p.Term_IMPLICIT_VAR, []interface{}{}, map[string]interface{}{})
 
 // Literal replaces an object in a field instead of merging it with an existing

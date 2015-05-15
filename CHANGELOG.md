@@ -8,21 +8,28 @@ In an attempt to make this library more "idiomatic" some functions have been ren
 
 ## Added
  - Added more documentation.
+ - Added `Shards`, `Replicas` and `PrimaryReplicaTag` optional arguments in `TableCreateOpts`.
+ - Added `MultiGroup` and `MultiGroupByIndex` which are equivalent to the running `group` with the `multi` optional argument set to true.
 
 ### Changed 
- - Renamed `Db` to `DB`
- - Renamed `DbCreate` to `DBCreate`
- - Renamed `DbDrop` to `DBDrop`
- - Renamed `RqlConnectionError` to `RQLConnectionError`
- - Renamed `RqlDriverError` to `RQLDriverError`
- - Renamed `RqlClientError` to `RQLClientError`
- - Renamed `RqlRuntimeError` to `RQLRuntimeError`
- - Renamed `RqlCompileError` to `RQLCompileError`
- - Renamed `Js` to `JS`
- - Renamed `Json` to `JSON`
- - Renamed `Http` to `HTTP`
- - Renamed `GeoJson` to `GeoJSON`
- - Renamed `ToGeoJson` to `ToGeoJSON`
+ - Renamed `Db` to `DB`.
+ - Renamed `DbCreate` to `DBCreate`.
+ - Renamed `DbDrop` to `DBDrop`.
+ - Renamed `RqlConnectionError` to `RQLConnectionError`.
+ - Renamed `RqlDriverError` to `RQLDriverError`.
+ - Renamed `RqlClientError` to `RQLClientError`.
+ - Renamed `RqlRuntimeError` to `RQLRuntimeError`.
+ - Renamed `RqlCompileError` to `RQLCompileError`.
+ - Renamed `Js` to `JS`.
+ - Renamed `Json` to `JSON`.
+ - Renamed `Http` to `HTTP`.
+ - Renamed `GeoJson` to `GeoJSON`.
+ - Renamed `ToGeoJson` to `ToGeoJSON`.
+
+### Removed
+
+ - Removed `CacheSize` and `DataCenter` optional arguments in `TableCreateOpts`.
+ - Removed `CacheSize` optional argument from `InsertOpts`
 
 ## v0.7.2 - 2015-05-05
 ### Added

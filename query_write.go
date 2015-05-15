@@ -8,7 +8,6 @@ import (
 type InsertOpts struct {
 	Durability    interface{} `gorethink:"durability,omitempty"`
 	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
-	CacheSize     interface{} `gorethink:"cache_size,omitempty"`
 	Conflict      interface{} `gorethink:"conflict,omitempty"`
 }
 

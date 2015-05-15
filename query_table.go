@@ -5,12 +5,12 @@ import (
 )
 
 // TableCreateOpts contains the optional arguments for the TableCreate term
-// TODO(dancannon) arguments have changed and should be updated
 type TableCreateOpts struct {
-	PrimaryKey interface{} `gorethink:"primary_key,omitempty"`
-	Durability interface{} `gorethink:"durability,omitempty"`
-	CacheSize  interface{} `gorethink:"cache_size,omitempty"`
-	DataCenter interface{} `gorethink:"datacenter,omitempty"`
+	PrimaryKey        interface{} `gorethink:"primary_key,omitempty"`
+	Durability        interface{} `gorethink:"durability,omitempty"`
+	Shards            interface{} `gorethink:"shards,omitempty"`
+	DataCenter        interface{} `gorethink:"replicas,omitempty"`
+	PrimaryReplicaTag interface{} `gorethink:"primary_replica_tag,omitempty"`
 }
 
 func (o *TableCreateOpts) toMap() map[string]interface{} {
@@ -19,14 +19,6 @@ func (o *TableCreateOpts) toMap() map[string]interface{} {
 
 // TableCreate creates a table. A RethinkDB table is a collection of JSON
 // documents.
-//
-// If successful, the command returns an object with two fields:
-//   tables_created: always 1.
-//   config_changes: a list containing one two-field object, old_val and new_val:
-//   old_val: always null.
-//   new_val: the table’s new config value.
-// If a table with the same name already exists, the command throws
-// RqlRuntimeError.
 //
 // Note: Only alphanumeric characters and underscores are valid for the table name.
 func (t Term) TableCreate(name interface{}, optArgs ...TableCreateOpts) Term {

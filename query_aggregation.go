@@ -45,6 +45,20 @@ func (t Term) Group(fieldOrFunctions ...interface{}) Term {
 	return constructMethodTerm(t, "Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{})
 }
 
+// MultiGroup takes a stream and partitions it into multiple groups based on the
+// fields or functions provided. Commands chained after group will be
+// called on each of these grouped sub-streams, producing grouped data.
+//
+// Unlike Group single documents can be assigned to multiple groups, similar
+// to the behavior of multi-indexes. When the grouping value is an array, documents
+// will be placed in each group that corresponds to the elements of the array. If
+// the array is empty the row will be ignored.
+func (t Term) MultiGroup(fieldOrFunctions ...interface{}) Term {
+	return constructMethodTerm(t, "Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{
+		"multi": true,
+	})
+}
+
 // GroupByIndex takes a stream and partitions it into multiple groups based on the
 // fields or functions provided. Commands chained after group will be
 // called on each of these grouped sub-streams, producing grouped data.
@@ -54,8 +68,23 @@ func (t Term) GroupByIndex(index interface{}, fieldOrFunctions ...interface{}) T
 	})
 }
 
+// MultiGroupByIndex takes a stream and partitions it into multiple groups based on the
+// fields or functions provided. Commands chained after group will be
+// called on each of these grouped sub-streams, producing grouped data.
+//
+// Unlike Group single documents can be assigned to multiple groups, similar
+// to the behavior of multi-indexes. When the grouping value is an array, documents
+// will be placed in each group that corresponds to the elements of the array. If
+// the array is empty the row will be ignored.
+func (t Term) MultiGroupByIndex(index interface{}, fieldOrFunctions ...interface{}) Term {
+	return constructMethodTerm(t, "Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{
+		"index": index,
+		"mutli": true,
+	})
+}
+
 // Ungroup takes a grouped stream or grouped data and turns it into an array of
-// objects representing the groups. Any commands chained after ungroup will
+// objects representing the groups. Any commands chained after Ungroup will
 // operate on this array, rather than operating on each group individually.
 // This is useful if you want to e.g. order the groups by the value of their
 // reduction.

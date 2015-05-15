@@ -39,8 +39,10 @@ func (t Term) WithFields(args ...interface{}) Term {
 	return constructMethodTerm(t, "WithFields", p.Term_WITH_FIELDS, args, map[string]interface{}{})
 }
 
-// ConcatMap flattens a sequence of arrays returned by the mapping function into a single
-// sequence.
+// ConcatMap concatenates one or more elements into a single sequence using a
+// mapping function. ConcatMap works in a similar fashion to Map, applying the
+// given function to each element in a sequence, but it will always return a
+// single sequence.
 func (t Term) ConcatMap(args ...interface{}) Term {
 	return constructMethodTerm(t, "ConcatMap", p.Term_CONCAT_MAP, funcWrapArgs(args), map[string]interface{}{})
 }
@@ -55,11 +57,11 @@ func (o *OrderByOpts) toMap() map[string]interface{} {
 }
 
 // OrderBy sorts the sequence by document values of the given key(s). To specify
-// the ordering, wrap the attribute with either r.asc or r.desc (defaults to
+// the ordering, wrap the attribute with either r.Asc or r.Desc (defaults to
 // ascending).
 //
 // Sorting without an index requires the server to hold the sequence in memory,
-// and is limited to 100,000 documents (or the setting of the arrayLimit option
+// and is limited to 100,000 documents (or the setting of the ArrayLimit option
 // for run). Sorting with an index can be done on arbitrarily large tables, or
 // after a between command using the same index.
 func (t Term) OrderBy(args ...interface{}) Term {
