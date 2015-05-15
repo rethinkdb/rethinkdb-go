@@ -37,7 +37,6 @@ type Pool struct {
 	opts *ConnectOpts
 
 	mu           sync.Mutex // protects following fields
-	err          error      // the last error that occurred
 	freeConn     []*poolConn
 	connRequests []chan connRequest
 	numOpen      int
