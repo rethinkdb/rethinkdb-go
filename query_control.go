@@ -8,8 +8,6 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-var byteSliceType = reflect.TypeOf([]byte(nil))
-
 // Expr converts any value to an expression and is also used by many other terms
 // such as Insert and Update. This function can convert the following basic Go
 // types (bool, int, uint, string, float) and even pointers, maps and structs.

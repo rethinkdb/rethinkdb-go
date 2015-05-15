@@ -5,12 +5,10 @@ import (
 	"strconv"
 	"strings"
 	"sync/atomic"
-	"time"
 
 	"github.com/dancannon/gorethink/encoding"
 
 	p "github.com/dancannon/gorethink/ql2"
-	"github.com/golang/protobuf/proto"
 )
 
 // Helper functions for constructing terms
@@ -181,21 +179,6 @@ func convertTermObj(o map[string]interface{}) termsObj {
 	return terms
 }
 
-func mergeArgs(args ...interface{}) []interface{} {
-	newArgs := []interface{}{}
-
-	for _, arg := range args {
-		switch v := arg.(type) {
-		case []interface{}:
-			newArgs = append(newArgs, v...)
-		default:
-			newArgs = append(newArgs, v)
-		}
-	}
-
-	return newArgs
-}
-
 // Helper functions for debugging
 
 func allArgsToStringSlice(args termsList, optArgs termsObj) []string {
@@ -236,13 +219,6 @@ func optArgsToStringSlice(optArgs termsObj) []string {
 	return allArgs
 }
 
-func prefixLines(s string, prefix string) (result string) {
-	for _, line := range strings.Split(s, "\n") {
-		result += prefix + line + "\n"
-	}
-	return
-}
-
 func splitAddress(address string) (hostname string, port int) {
 	hostname = "localhost"
 	port = 28015
@@ -258,13 +234,6 @@ func splitAddress(address string) (hostname string, port int) {
 
 	return
 }
-
-func protobufToString(p proto.Message, indentLevel int) string {
-	return prefixLines(proto.MarshalTextString(p), strings.Repeat("    ", indentLevel))
-}
-
-var timeType = reflect.TypeOf(time.Time{})
-var termType = reflect.TypeOf(Term{})
 
 func encode(data interface{}) (interface{}, error) {
 	if _, ok := data.(Term); ok {
