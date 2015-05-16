@@ -25,6 +25,7 @@ In an attempt to make this library more "idiomatic" some functions have been ren
  - Renamed `Http` to `HTTP`.
  - Renamed `GeoJson` to `GeoJSON`.
  - Renamed `ToGeoJson` to `ToGeoJSON`.
+ - Renamed `WriteChanges` to `ChangeResponse`, this is now a general type and can be used when dealing with changefeeds.
 
 ### Removed
 

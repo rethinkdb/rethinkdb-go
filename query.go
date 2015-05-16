@@ -143,32 +143,32 @@ type OptArgs interface {
 	toMap() map[string]interface{}
 }
 
-// WriteResponse is a helper typed used when dealing with the response of a
+// WriteResponse is a helper type used when dealing with the response of a
 // write query. It is also returned by the RunWrite function.
 type WriteResponse struct {
-	Errors        int           `gorethink:"errors"`
-	Inserted      int           `gorethink:"inserted"`
-	Updated       int           `gorethink:"updated"`
-	Unchanged     int           `gorethink:"unchanged"`
-	Replaced      int           `gorethink:"replaced"`
-	Renamed       int           `gorethink:"renamed"`
-	Skipped       int           `gorethink:"skipped"`
-	Deleted       int           `gorethink:"deleted"`
-	Created       int           `gorethink:"created"`
-	DBsCreated    int           `gorethink:"dbs_created"`
-	TablesCreated int           `gorethink:"tables_created"`
-	Dropped       int           `gorethink:"dropped"`
-	DBsDropped    int           `gorethink:"dbs_dropped"`
-	TablesDropped int           `gorethink:"tables_dropped"`
-	GeneratedKeys []string      `gorethink:"generated_keys"`
-	FirstError    string        `gorethink:"first_error"` // populated if Errors > 0
-	ConfigChanges []ChangeValue `gorethink:"config_changes"`
-	Changes       []ChangeValue
+	Errors        int              `gorethink:"errors"`
+	Inserted      int              `gorethink:"inserted"`
+	Updated       int              `gorethink:"updated"`
+	Unchanged     int              `gorethink:"unchanged"`
+	Replaced      int              `gorethink:"replaced"`
+	Renamed       int              `gorethink:"renamed"`
+	Skipped       int              `gorethink:"skipped"`
+	Deleted       int              `gorethink:"deleted"`
+	Created       int              `gorethink:"created"`
+	DBsCreated    int              `gorethink:"dbs_created"`
+	TablesCreated int              `gorethink:"tables_created"`
+	Dropped       int              `gorethink:"dropped"`
+	DBsDropped    int              `gorethink:"dbs_dropped"`
+	TablesDropped int              `gorethink:"tables_dropped"`
+	GeneratedKeys []string         `gorethink:"generated_keys"`
+	FirstError    string           `gorethink:"first_error"` // populated if Errors > 0
+	ConfigChanges []ChangeResponse `gorethink:"config_changes"`
+	Changes       []ChangeResponse
 }
 
-// ChangeValue is a helper type used when dealing with changefeeds. The type
+// ChangeResponse is a helper type used when dealing with changefeeds. The type
 // contains both the value before the query and the new value.
-type ChangeValue struct {
+type ChangeResponse struct {
 	NewValue interface{} `gorethink:"new_val"`
 	OldValue interface{} `gorethink:"old_val"`
 }
