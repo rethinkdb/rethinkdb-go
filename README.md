@@ -89,7 +89,7 @@ When `DiscoverHosts` is true any nodes are added to the cluster after the initia
 
 This library is based on the official drivers so the code on the [API](http://www.rethinkdb.com/api/) page should require very few changes to work.
 
-To view full documentation for the query functions check the [GoDoc](http://godoc.org/github.com/dancannon/gorethink#Term)
+To view full documentation for the query functions check the [API reference](https://github.com/dancannon/gorethink/wiki/Go-ReQL-command-reference) or [GoDoc](http://godoc.org/github.com/dancannon/gorethink#Term)
 
 Slice Expr Example
 ```go
@@ -129,7 +129,7 @@ As shown above in the Between example optional arguments are passed to the funct
 
 Different result types are returned depending on what function is used to execute the query.
 
-- `Run` returns a cursor which can be used to view all rows returned.
+- `Run` returns a cugrsor which can be used to view all rows returned.
 - `RunWrite` returns a WriteResponse and should be used for queries such as Insert, Update, etc...
 - `Exec` sends a query to the server and closes the connection immediately after reading the response from the database. If you do not wish to wait for the response then you can set the `NoReply` flag.
 
@@ -239,7 +239,7 @@ BenchmarkSequentialSoftWritesParallel10      10000                           263
 
 ## Examples
 
-View other examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).
+Many functions have examples and are viewable in the godoc, alternatively view some more full features examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).
 
 ## License
 
