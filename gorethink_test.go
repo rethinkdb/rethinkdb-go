@@ -85,16 +85,28 @@ func testBenchmarkTeardown() {
 }
 
 // stubs
-func testSetup()    {}
-func testTeardown() {}
+func testSetup(m *testing.M) {
+	var err error
+	sess, err = Connect(ConnectOpts{
+		Address: url,
+		AuthKey: authKey,
+	})
+	if err != nil {
+		panic(err)
+	}
+}
+func testTeardown(m *testing.M) {
+	sess.Close()
+}
 
 func TestMain(m *testing.M) {
+	log.Debug("Setup")
 	// seed randomness for use with tests
 	rand.Seed(time.Now().UTC().UnixNano())
-	testSetup()
+	testSetup(m)
 	testBenchmarkSetup()
 	res := m.Run()
-	testTeardown()
+	testTeardown(m)
 	testBenchmarkTeardown()
 	os.Exit(res)
 }
@@ -109,19 +121,6 @@ func Test(t *testing.T) { test.TestingT(t) }
 type RethinkSuite struct{}
 
 var _ = test.Suite(&RethinkSuite{})
-
-func (s *RethinkSuite) SetUpSuite(c *test.C) {
-	var err error
-	sess, err = Connect(ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	c.Assert(err, test.IsNil)
-}
-
-func (s *RethinkSuite) TearDownSuite(c *test.C) {
-	sess.Close()
-}
 
 // Expressions used in tests
 var now = time.Now()

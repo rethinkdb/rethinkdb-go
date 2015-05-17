@@ -4,20 +4,12 @@ import (
 	"fmt"
 )
 
-func Example_Get() {
+func ExampleTerm_Get() {
 	type Person struct {
 		ID        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
 		LastName  string `gorethink:"last_name"`
 		Gender    string `gorethink:"gender"`
-	}
-
-	sess, err := Connect(ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
 	}
 
 	// Setup table
@@ -47,20 +39,12 @@ func Example_Get() {
 	// John Smith (M)
 }
 
-func Example_GetAll_Compound() {
+func ExampleTerm_GetAll_compound() {
 	type Person struct {
 		ID        string `gorethink:"id, omitempty"`
 		FirstName string `gorethink:"first_name"`
 		LastName  string `gorethink:"last_name"`
 		Gender    string `gorethink:"gender"`
-	}
-
-	sess, err := Connect(ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
 	}
 
 	// Setup table

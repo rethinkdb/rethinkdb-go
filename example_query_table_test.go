@@ -4,15 +4,7 @@ import (
 	"fmt"
 )
 
-func Example_TableCreate() {
-	sess, err := Connect(ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
-	}
-
+func ExampleTerm_TableCreate() {
 	// Setup database
 	DB("test").TableDrop("table").Run(sess)
 
@@ -27,15 +19,7 @@ func Example_TableCreate() {
 	// 1 table created
 }
 
-func Example_IndexCreate() {
-	sess, err := Connect(ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
-	}
-
+func ExampleTerm_IndexCreate() {
 	// Setup database
 	DB("test").TableDrop("table").Run(sess)
 	DB("test").TableCreate("table").Run(sess)
@@ -51,15 +35,7 @@ func Example_IndexCreate() {
 	// 1 index created
 }
 
-func Example_IndexCreate_compound() {
-	sess, err := Connect(ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
-	}
-
+func ExampleTerm_IndexCreate_compound() {
 	// Setup database
 	DB("test").TableDrop("table").Run(sess)
 	DB("test").TableCreate("table").Run(sess)

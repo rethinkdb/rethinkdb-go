@@ -5,15 +5,7 @@ import (
 )
 
 func Example() {
-	session, err := Connect(ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
-	}
-
-	res, err := Expr("Hello World").Run(session)
+	res, err := Expr("Hello World").Run(sess)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
