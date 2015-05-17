@@ -71,16 +71,16 @@ func testBenchmarkSetup() {
 		log.Fatalln(err.Error())
 	}
 
-	DbDrop(bDbName).Exec(bSess)
-	DbCreate(bDbName).Exec(bSess)
+	DBDrop(bDbName).Exec(bSess)
+	DBCreate(bDbName).Exec(bSess)
 
-	Db(bDbName).TableDrop(bTableName).Run(bSess)
-	Db(bDbName).TableCreate(bTableName).Run(bSess)
+	DB(bDbName).TableDrop(bTableName).Run(bSess)
+	DB(bDbName).TableCreate(bTableName).Run(bSess)
 
 }
 
 func testBenchmarkTeardown() {
-	Db(bDbName).TableDrop(bTableName).Run(bSess)
+	DB(bDbName).TableDrop(bTableName).Run(bSess)
 	bSess.Close()
 }
 
@@ -278,9 +278,9 @@ func (s *RethinkSuite) BenchmarkNoReplyExpr(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").RunWrite(sess)
-	Db("test").TableCreate("TestMany").RunWrite(sess)
-	Db("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(sess)
+	DB("test").TableCreate("TestMany").RunWrite(sess)
+	DB("test").Table("TestMany").Delete().RunWrite(sess)
 
 	// Insert rows
 	data := []interface{}{}
@@ -289,14 +289,14 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 			"id": i,
 		})
 	}
-	Db("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(sess)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
 
 		// Test query
 		var response interface{}
-		query := Db("test").Table("TestMany").Get(n)
+		query := DB("test").Table("TestMany").Get(n)
 		res, err := query.Run(sess)
 		c.Assert(err, test.IsNil)
 
@@ -309,9 +309,9 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").RunWrite(sess)
-	Db("test").TableCreate("TestMany").RunWrite(sess)
-	Db("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(sess)
+	DB("test").TableCreate("TestMany").RunWrite(sess)
+	DB("test").Table("TestMany").Delete().RunWrite(sess)
 
 	// Insert rows
 	data := []interface{}{}
@@ -325,14 +325,14 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 			}},
 		})
 	}
-	Db("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(sess)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
 
 		// Test query
 		var resObj object
-		query := Db("test").Table("TestMany").Get(n)
+		query := DB("test").Table("TestMany").Get(n)
 		res, err := query.Run(sess)
 		c.Assert(err, test.IsNil)
 
@@ -344,9 +344,9 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").RunWrite(sess)
-	Db("test").TableCreate("TestMany").RunWrite(sess)
-	Db("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(sess)
+	DB("test").TableCreate("TestMany").RunWrite(sess)
+	DB("test").Table("TestMany").Delete().RunWrite(sess)
 
 	// Insert rows
 	data := []interface{}{}
@@ -355,11 +355,11 @@ func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 			"id": i,
 		})
 	}
-	Db("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(sess)
 
 	for i := 0; i < c.N; i++ {
 		// Test query
-		res, err := Db("test").Table("TestMany").Run(sess)
+		res, err := DB("test").Table("TestMany").Run(sess)
 		c.Assert(err, test.IsNil)
 
 		var response []map[string]interface{}
@@ -372,9 +372,9 @@ func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").RunWrite(sess)
-	Db("test").TableCreate("TestMany").RunWrite(sess)
-	Db("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(sess)
+	DB("test").TableCreate("TestMany").RunWrite(sess)
+	DB("test").Table("TestMany").Delete().RunWrite(sess)
 
 	// Insert rows
 	data := []interface{}{}
@@ -388,11 +388,11 @@ func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 			}},
 		})
 	}
-	Db("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(sess)
 
 	for i := 0; i < c.N; i++ {
 		// Test query
-		res, err := Db("test").Table("TestMany").Run(sess)
+		res, err := DB("test").Table("TestMany").Run(sess)
 		c.Assert(err, test.IsNil)
 
 		var response []object

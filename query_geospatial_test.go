@@ -270,9 +270,9 @@ func (s *RethinkSuite) TestGeospatialFill(c *test.C) {
 	})
 }
 
-func (s *RethinkSuite) TestGeospatialGeojson(c *test.C) {
+func (s *RethinkSuite) TestGeospatialGeoJSON(c *test.C) {
 	var response types.Geometry
-	res, err := Geojson(map[string]interface{}{
+	res, err := GeoJSON(map[string]interface{}{
 		"type":        "Point",
 		"coordinates": []interface{}{-122.423246, 37.779388},
 	}).Run(sess)
@@ -283,9 +283,9 @@ func (s *RethinkSuite) TestGeospatialGeojson(c *test.C) {
 	c.Assert(response, geometryEquals, "Point", []float64{-122.423246, 37.779388})
 }
 
-func (s *RethinkSuite) TestGeospatialToGeojson(c *test.C) {
+func (s *RethinkSuite) TestGeospatialToGeoJSON(c *test.C) {
 	var response map[string]interface{}
-	res, err := Point(-122.423246, 37.779388).ToGeojson().Run(sess)
+	res, err := Point(-122.423246, 37.779388).ToGeoJSON().Run(sess)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -298,19 +298,19 @@ func (s *RethinkSuite) TestGeospatialToGeojson(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialGetIntersecting(c *test.C) {
 	// Setup table
-	Db("test").TableDrop("geospatial").Run(sess)
-	Db("test").TableCreate("geospatial").Run(sess)
-	Db("test").Table("geospatial").IndexCreate("area", IndexCreateOpts{
+	DB("test").TableDrop("geospatial").Run(sess)
+	DB("test").TableCreate("geospatial").Run(sess)
+	DB("test").Table("geospatial").IndexCreate("area", IndexCreateOpts{
 		Geo: true,
 	}).Run(sess)
-	Db("test").Table("geospatial").Insert([]interface{}{
+	DB("test").Table("geospatial").Insert([]interface{}{
 		map[string]interface{}{"area": Circle(Point(-117.220406, 32.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-100.220406, 20.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-117.200406, 32.723464), 100000)},
 	}).Run(sess)
 
 	var response []interface{}
-	res, err := Db("test").Table("geospatial").GetIntersecting(
+	res, err := DB("test").Table("geospatial").GetIntersecting(
 		Circle(Point(-117.220406, 32.719464), 100000),
 		GetIntersectingOpts{
 			Index: "area",
@@ -325,19 +325,19 @@ func (s *RethinkSuite) TestGeospatialGetIntersecting(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialGetNearest(c *test.C) {
 	// Setup table
-	Db("test").TableDrop("geospatial").Run(sess)
-	Db("test").TableCreate("geospatial").Run(sess)
-	Db("test").Table("geospatial").IndexCreate("area", IndexCreateOpts{
+	DB("test").TableDrop("geospatial").Run(sess)
+	DB("test").TableCreate("geospatial").Run(sess)
+	DB("test").Table("geospatial").IndexCreate("area", IndexCreateOpts{
 		Geo: true,
 	}).Run(sess)
-	Db("test").Table("geospatial").Insert([]interface{}{
+	DB("test").Table("geospatial").Insert([]interface{}{
 		map[string]interface{}{"area": Circle(Point(-117.220406, 32.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-100.220406, 20.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-115.210306, 32.733364), 100000)},
 	}).Run(sess)
 
 	var response []interface{}
-	res, err := Db("test").Table("geospatial").GetNearest(
+	res, err := DB("test").Table("geospatial").GetNearest(
 		Point(-117.220406, 32.719464),
 		GetNearestOpts{
 			Index:   "area",

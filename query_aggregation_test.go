@@ -85,15 +85,15 @@ func (s *RethinkSuite) TestAggregationGroupMapReduceUngroup(c *test.C) {
 
 func (s *RethinkSuite) TestAggregationGroupMapReduceTable(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(sess)
-	Db("test").TableCreate("TestAggregationGroupedMapReduceTable").Exec(sess)
+	DBCreate("test").Exec(sess)
+	DB("test").TableCreate("TestAggregationGroupedMapReduceTable").Exec(sess)
 
 	// Insert rows
-	err := Db("test").Table("TestAggregationGroupedMapReduceTable").Insert(objList).Exec(sess)
+	err := DB("test").Table("TestAggregationGroupedMapReduceTable").Insert(objList).Exec(sess)
 	c.Assert(err, test.IsNil)
 
 	var response []interface{}
-	query := Db("test").Table("TestAggregationGroupedMapReduceTable").Group(func(row Term) Term {
+	query := DB("test").Table("TestAggregationGroupedMapReduceTable").Group(func(row Term) Term {
 		return row.Field("id").Mod(2).Eq(0)
 	}).Map(func(row Term) Term {
 		return row.Field("num")
@@ -212,16 +212,16 @@ func (s *RethinkSuite) TestAggregationGroupMax(c *test.C) {
 
 func (s *RethinkSuite) TestAggregationMin(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(sess)
-	Db("test").TableCreate("Table2").Exec(sess)
-	Db("test").Table("Table2").IndexCreate("num").Exec(sess)
+	DBCreate("test").Exec(sess)
+	DB("test").TableCreate("Table2").Exec(sess)
+	DB("test").Table("Table2").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table2").Insert(objList).Exec(sess)
+	DB("test").Table("Table2").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
-	query := Db("test").Table("Table2").MinIndex("num")
+	query := DB("test").Table("Table2").MinIndex("num")
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -233,16 +233,16 @@ func (s *RethinkSuite) TestAggregationMin(c *test.C) {
 
 func (s *RethinkSuite) TestAggregationMaxIndex(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(sess)
-	Db("test").TableCreate("Table2").Exec(sess)
-	Db("test").Table("Table2").IndexCreate("num").Exec(sess)
+	DBCreate("test").Exec(sess)
+	DB("test").TableCreate("Table2").Exec(sess)
+	DB("test").Table("Table2").IndexCreate("num").Exec(sess)
 
 	// Insert rows
-	Db("test").Table("Table2").Insert(objList).Exec(sess)
+	DB("test").Table("Table2").Insert(objList).Exec(sess)
 
 	// Test query
 	var response interface{}
-	query := Db("test").Table("Table2").MaxIndex("num")
+	query := DB("test").Table("Table2").MaxIndex("num")
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 

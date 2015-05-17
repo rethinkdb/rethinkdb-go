@@ -4,7 +4,7 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-// Returns the inner product of two sequences (e.g. a table, a filter result)
+// InnerJoin returns the inner product of two sequences (e.g. a table, a filter result)
 // filtered by the predicate. The query compares each row of the left sequence
 // with each row of the right sequence to find all pairs of rows which satisfy
 // the predicate. When the predicate is satisfied, each matched pair of rows
@@ -13,12 +13,13 @@ func (t Term) InnerJoin(args ...interface{}) Term {
 	return constructMethodTerm(t, "InnerJoin", p.Term_INNER_JOIN, args, map[string]interface{}{})
 }
 
-// Computes a left outer join by retaining each row in the left table even if no
-// match was found in the right table.
+// OuterJoin computes a left outer join by retaining each row in the left table even
+// if no match was found in the right table.
 func (t Term) OuterJoin(args ...interface{}) Term {
 	return constructMethodTerm(t, "OuterJoin", p.Term_OUTER_JOIN, args, map[string]interface{}{})
 }
 
+// EqJoinOpts contains the optional arguments for the EqJoin term.
 type EqJoinOpts struct {
 	Index interface{} `gorethink:"index,omitempty"`
 }
@@ -27,7 +28,7 @@ func (o *EqJoinOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
-// An efficient join that looks up elements in the right table by primary key.
+// EqJoin is an efficient join that looks up elements in the right table by primary key.
 //
 // Optional arguments: "index" (string - name of the index to use in right table instead of the primary key)
 func (t Term) EqJoin(left, right interface{}, optArgs ...EqJoinOpts) Term {
@@ -38,7 +39,7 @@ func (t Term) EqJoin(left, right interface{}, optArgs ...EqJoinOpts) Term {
 	return constructMethodTerm(t, "EqJoin", p.Term_EQ_JOIN, []interface{}{funcWrap(left), right}, opts)
 }
 
-// Used to 'zip' up the result of a join by merging the 'right' fields into 'left'
+// Zip is used to 'zip' up the result of a join by merging the 'right' fields into 'left'
 // fields of each member of the sequence.
 func (t Term) Zip(args ...interface{}) Term {
 	return constructMethodTerm(t, "Zip", p.Term_ZIP, args, map[string]interface{}{})

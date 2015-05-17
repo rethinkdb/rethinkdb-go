@@ -4,7 +4,7 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-// CircleOpts describes the optional arguments for a Circle operation
+// CircleOpts contains the optional arguments for the Circle term.
 type CircleOpts struct {
 	NumVertices interface{} `gorethink:"num_vertices,omitempty"`
 	GeoSystem   interface{} `gorethink:"geo_system,omitempty"`
@@ -28,7 +28,7 @@ func Circle(point, radius interface{}, optArgs ...CircleOpts) Term {
 	return constructRootTerm("Circle", p.Term_CIRCLE, []interface{}{point, radius}, opts)
 }
 
-// DistanceOpts describes the optional arguments for a Distance operation
+// DistanceOpts contains the optional arguments for the Distance term.
 type DistanceOpts struct {
 	GeoSystem interface{} `gorethink:"geo_system,omitempty"`
 	Unit      interface{} `gorethink:"unit,omitempty"`
@@ -67,17 +67,17 @@ func (t Term) Fill() Term {
 	return constructMethodTerm(t, "Fill", p.Term_FILL, []interface{}{}, map[string]interface{}{})
 }
 
-// Geojson converts a GeoJSON object to a ReQL geometry object.
-func Geojson(args ...interface{}) Term {
-	return constructRootTerm("Geojson", p.Term_GEOJSON, args, map[string]interface{}{})
+// GeoJSON converts a GeoJSON object to a ReQL geometry object.
+func GeoJSON(args ...interface{}) Term {
+	return constructRootTerm("GeoJSON", p.Term_GEOJSON, args, map[string]interface{}{})
 }
 
-// ToGeojson converts a ReQL geometry object to a GeoJSON object.
-func (t Term) ToGeojson(args ...interface{}) Term {
-	return constructMethodTerm(t, "ToGeojson", p.Term_TO_GEOJSON, args, map[string]interface{}{})
+// ToGeoJSON converts a ReQL geometry object to a GeoJSON object.
+func (t Term) ToGeoJSON(args ...interface{}) Term {
+	return constructMethodTerm(t, "ToGeoJSON", p.Term_TO_GEOJSON, args, map[string]interface{}{})
 }
 
-// GetIntersectingOpts describes the optional arguments for a GetIntersecting operation
+// GetIntersectingOpts contains the optional arguments for the GetIntersecting term.
 type GetIntersectingOpts struct {
 	Index interface{} `gorethink:"index,omitempty"`
 }
@@ -97,7 +97,7 @@ func (t Term) GetIntersecting(args interface{}, optArgs ...GetIntersectingOpts) 
 	return constructMethodTerm(t, "GetIntersecting", p.Term_GET_INTERSECTING, []interface{}{args}, opts)
 }
 
-// GetIntersectingOpts describes the optional arguments for a GetIntersecting operation
+// GetNearestOpts contains the optional arguments for the GetNearest term.
 type GetNearestOpts struct {
 	Index      interface{} `gorethink:"index,omitempty"`
 	MaxResults interface{} `gorethink:"max_results,omitempty"`

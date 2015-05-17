@@ -45,13 +45,11 @@ func newCursor(conn *Connection, cursorType string, token int64, term *Term, opt
 //     err = cursor.Err() // get any error encountered during iteration
 //     ...
 type Cursor struct {
-	pc          *poolConn
 	releaseConn func(error)
 
 	conn       *Connection
 	token      int64
 	cursorType string
-	query      Query
 	term       *Term
 	opts       map[string]interface{}
 

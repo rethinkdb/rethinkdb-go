@@ -145,7 +145,7 @@ func (n *Node) Exec(q Query) (err error) {
 // as being healthy.
 func (n *Node) Refresh() {
 	cursor, err := n.pool.Query(newQuery(
-		Db("rethinkdb").Table("server_status").Get(n.ID),
+		DB("rethinkdb").Table("server_status").Get(n.ID),
 		map[string]interface{}{},
 		n.cluster.opts,
 	))
