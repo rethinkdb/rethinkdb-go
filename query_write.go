@@ -89,9 +89,9 @@ func (t Term) Delete(optArgs ...DeleteOpts) Term {
 }
 
 // Sync ensures that writes on a given table are written to permanent storage.
-// Queries that specify soft durability ({durability: 'soft'}) do not give such
-// guarantees, so Sync can be used to ensure the state of these queries. A call
-// to Sync does not return until all previous writes to the table are persisted.
+// Queries that specify soft durability do not give such guarantees, so Sync
+// can be used to ensure the state of these queries. A call to Sync does not
+// return until all previous writes to the table are persisted.
 func (t Term) Sync(args ...interface{}) Term {
 	return constructMethodTerm(t, "Sync", p.Term_SYNC, args, map[string]interface{}{})
 }
