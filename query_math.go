@@ -151,6 +151,7 @@ func Not(args ...interface{}) Term {
 	return constructRootTerm("Not", p.Term_NOT, args, map[string]interface{}{})
 }
 
+// RandomOpts contains the optional arguments for the Random term.
 type RandomOpts struct {
 	Float interface{} `gorethink:"float,omitempty"`
 }
@@ -159,8 +160,8 @@ func (o *RandomOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
-// Generate a random number between the given bounds. If no arguments are
-// given, the result will be a floating-point number in the range [0,1).
+// Random generates a random number between the given bounds. If no arguments
+// are given, the result will be a floating-point number in the range [0,1).
 //
 // When passing a single argument, r.random(x), the result will be in the
 // range [0,x), and when passing two arguments, r.random(x,y), the range is

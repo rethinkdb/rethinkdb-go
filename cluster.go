@@ -135,7 +135,7 @@ func (c *Cluster) listenForNodeChanges() error {
 	}
 
 	cursor, err := node.Query(newQuery(
-		Db("rethinkdb").Table("server_status").Changes(),
+		DB("rethinkdb").Table("server_status").Changes(),
 		map[string]interface{}{},
 		c.opts,
 	))
@@ -197,7 +197,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 		defer conn.Close()
 
 		_, cursor, err := conn.Query(newQuery(
-			Db("rethinkdb").Table("server_status"),
+			DB("rethinkdb").Table("server_status"),
 			map[string]interface{}{},
 			c.opts,
 		))

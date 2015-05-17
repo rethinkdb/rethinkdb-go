@@ -143,7 +143,7 @@ func (s *RethinkSuite) TestControlExprTypes(c *test.C) {
 
 func (s *RethinkSuite) TestControlJs(c *test.C) {
 	var response int
-	query := Js("1;")
+	query := JS("1;")
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -159,7 +159,7 @@ func (s *RethinkSuite) TestControlHttp(c *test.C) {
 	}
 
 	var response map[string]interface{}
-	query := Http("httpbin.org/get?data=1")
+	query := HTTP("httpbin.org/get?data=1")
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -173,7 +173,7 @@ func (s *RethinkSuite) TestControlHttp(c *test.C) {
 
 func (s *RethinkSuite) TestControlJson(c *test.C) {
 	var response []int
-	query := Json("[1,2,3]")
+	query := JSON("[1,2,3]")
 	res, err := query.Run(sess)
 	c.Assert(err, test.IsNil)
 
@@ -189,7 +189,7 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 	c.Assert(err, test.NotNil)
 
 	c.Assert(err, test.NotNil)
-	c.Assert(err, test.FitsTypeOf, RqlRuntimeError{})
+	c.Assert(err, test.FitsTypeOf, RQLRuntimeError{})
 
 	c.Assert(err.Error(), test.Equals, "gorethink: An error occurred in: \nr.Error(\"An error occurred\")")
 }

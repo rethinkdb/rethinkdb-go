@@ -4,15 +4,24 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-// Match against a regular expression. Returns a match object containing the
-// matched string, that string's start/end position, and the capture groups.
+// Match matches against a regular expression. If no match is found, returns
+// null. If there is a match then an object with the following fields is
+// returned:
+//   str: The matched string
+//   start: The matched string’s start
+//   end: The matched string’s end
+//   groups: The capture groups defined with parentheses
 //
-//	Expr("id:0,name:mlucy,foo:bar").Match("name:(\\w+)").Field("groups").Nth(0).Field("str")
+// Accepts RE2 syntax (https://code.google.com/p/re2/wiki/Syntax). You can
+// enable case-insensitive matching by prefixing the regular expression with
+// (?i). See the linked RE2 documentation for more flags.
+//
+// The match command does not support backreferences.
 func (t Term) Match(args ...interface{}) Term {
 	return constructMethodTerm(t, "Match", p.Term_MATCH, args, map[string]interface{}{})
 }
 
-// Splits a string into substrings. Splits on whitespace when called with no arguments.
+// Split splits a string into substrings. Splits on whitespace when called with no arguments.
 // When called with a separator, splits on that separator. When called with a separator
 // and a maximum number of splits, splits on that separator at most max_splits times.
 // (Can be called with null as the separator if you want to split on whitespace while still
@@ -24,12 +33,12 @@ func (t Term) Split(args ...interface{}) Term {
 	return constructMethodTerm(t, "Split", p.Term_SPLIT, funcWrapArgs(args), map[string]interface{}{})
 }
 
-// Upcases a string.
+// Upcase upper-cases a string.
 func (t Term) Upcase(args ...interface{}) Term {
 	return constructMethodTerm(t, "Upcase", p.Term_UPCASE, args, map[string]interface{}{})
 }
 
-// Downcases a string.
+// Downcase lower-cases a string.
 func (t Term) Downcase(args ...interface{}) Term {
 	return constructMethodTerm(t, "Downcase", p.Term_DOWNCASE, args, map[string]interface{}{})
 }

@@ -187,32 +187,33 @@ func reqlGeometryToNativeGeometry(obj map[string]interface{}) (interface{}, erro
 	} else if coords, ok := obj["coordinates"]; !ok {
 		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v does not have the expected field \"coordinates\"", obj)
 	} else if typ == "Point" {
-		if point, err := types.UnmarshalPoint(coords); err != nil {
+		point, err := types.UnmarshalPoint(coords)
+		if err != nil {
 			return nil, err
-		} else {
-			return types.Geometry{
-				Type:  "Point",
-				Point: point,
-			}, nil
 		}
+
+		return types.Geometry{
+			Type:  "Point",
+			Point: point,
+		}, nil
 	} else if typ == "LineString" {
-		if line, err := types.UnmarshalLineString(coords); err != nil {
+		line, err := types.UnmarshalLineString(coords)
+		if err != nil {
 			return nil, err
-		} else {
-			return types.Geometry{
-				Type: "LineString",
-				Line: line,
-			}, nil
 		}
+		return types.Geometry{
+			Type: "LineString",
+			Line: line,
+		}, nil
 	} else if typ == "Polygon" {
-		if lines, err := types.UnmarshalPolygon(coords); err != nil {
+		lines, err := types.UnmarshalPolygon(coords)
+		if err != nil {
 			return nil, err
-		} else {
-			return types.Geometry{
-				Type:  "Polygon",
-				Lines: lines,
-			}, nil
 		}
+		return types.Geometry{
+			Type:  "Polygon",
+			Lines: lines,
+		}, nil
 	} else {
 		return nil, fmt.Errorf("pseudo-type GEOMETRY object %v field has unknown type %s", obj, typ)
 	}

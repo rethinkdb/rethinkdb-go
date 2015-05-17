@@ -155,14 +155,14 @@ func (s *RethinkSuite) TestTransformationOrderByAsc(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
-	Db("test").TableCreate("OrderByIndex").Exec(sess)
-	Db("test").Table("test").IndexDrop("OrderByIndex").Exec(sess)
+	DB("test").TableCreate("OrderByIndex").Exec(sess)
+	DB("test").Table("test").IndexDrop("OrderByIndex").Exec(sess)
 
 	// Test database creation
-	Db("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(sess)
-	Db("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(sess)
+	DB("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(sess)
+	DB("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(sess)
 
-	query := Db("test").Table("OrderByIndex").OrderBy(OrderByOpts{
+	query := DB("test").Table("OrderByIndex").OrderBy(OrderByOpts{
 		Index: "test",
 	})
 
@@ -185,14 +185,14 @@ func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTransformationOrderByIndexAsc(c *test.C) {
-	Db("test").TableCreate("OrderByIndex").Exec(sess)
-	Db("test").Table("test").IndexDrop("OrderByIndex").Exec(sess)
+	DB("test").TableCreate("OrderByIndex").Exec(sess)
+	DB("test").Table("test").IndexDrop("OrderByIndex").Exec(sess)
 
 	// Test database creation
-	Db("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(sess)
-	Db("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(sess)
+	DB("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(sess)
+	DB("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(sess)
 
-	query := Db("test").Table("OrderByIndex").OrderBy(OrderByOpts{
+	query := DB("test").Table("OrderByIndex").OrderBy(OrderByOpts{
 		Index: Asc("test"),
 	})
 
