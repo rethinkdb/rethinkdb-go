@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// Create a table named "table" with the default settings.
 func ExampleTerm_TableCreate() {
 	// Setup database
 	DB("test").TableDrop("table").Run(session)
@@ -19,6 +20,7 @@ func ExampleTerm_TableCreate() {
 	// 1 table created
 }
 
+// Create a simple index based on the field name.
 func ExampleTerm_IndexCreate() {
 	// Setup database
 	DB("test").TableDrop("table").Run(session)
@@ -35,6 +37,7 @@ func ExampleTerm_IndexCreate() {
 	// 1 index created
 }
 
+// Create a compound index based on the fields first_name and last_name.
 func ExampleTerm_IndexCreate_compound() {
 	// Setup database
 	DB("test").TableDrop("table").Run(session)

@@ -4,79 +4,126 @@ import (
 	"fmt"
 )
 
+// Find a document by ID.
 func ExampleTerm_Get() {
-	type Person struct {
-		ID        string `gorethink:"id, omitempty"`
-		FirstName string `gorethink:"first_name"`
-		LastName  string `gorethink:"last_name"`
-		Gender    string `gorethink:"gender"`
-	}
-
-	// Setup table
-	DB("test").TableDrop("table").Run(session)
-	DB("test").TableCreate("table").Run(session)
-	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(session)
-
 	// Fetch the row from the database
-	res, err := DB("test").Table("table").Get("1").Run(session)
+	res, err := DB("test").Table("heroes").Get(2).Run(session)
 	if err != nil {
-		log.Fatalf("Error finding person: %s", err)
+		fmt.Print(err)
+		return
 	}
+	defer res.Close()
 
 	if res.IsNil() {
-		log.Fatalf("Person not found")
+		fmt.Print("Row not found")
+		return
 	}
 
-	// Scan query result into the person variable
-	var person Person
-	err = res.One(&person)
+	var hero map[string]interface{}
+	err = res.One(&hero)
 	if err != nil {
-		log.Fatalf("Error scanning database result: %s", err)
+		fmt.Print("Error scanning database result: %s", err)
+		return
 	}
-	fmt.Printf("%s %s (%s)", person.FirstName, person.LastName, person.Gender)
+	fmt.Print(hero["name"])
 
-	// Output:
-	// John Smith (M)
+	// Output: Superman
 }
 
-func ExampleTerm_GetAll_compound() {
-	type Person struct {
-		ID        string `gorethink:"id, omitempty"`
-		FirstName string `gorethink:"first_name"`
-		LastName  string `gorethink:"last_name"`
-		Gender    string `gorethink:"gender"`
-	}
-
-	// Setup table
-	DB("test").TableDrop("table").Run(session)
-	DB("test").TableCreate("table").Run(session)
-	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(session)
-	DB("test").Table("table").IndexCreateFunc("full_name", func(row Term) interface{} {
-		return []interface{}{row.Field("first_name"), row.Field("last_name")}
-	}).Run(session)
-	DB("test").Table("table").IndexWait().Run(session)
-
+// Find a document and merge another document with it.
+func ExampleTerm_Get_Merge() {
 	// Fetch the row from the database
-	res, err := DB("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).Run(session)
+	res, err := DB("test").Table("heroes").Get(4).Merge(map[string]interface{}{
+		"powers": []string{"speed"},
+	}).Run(session)
 	if err != nil {
-		log.Fatalf("Error finding person: %s", err)
+		fmt.Print(err)
+		return
 	}
+	defer res.Close()
 
 	if res.IsNil() {
-		log.Fatalf("Person not found")
+		fmt.Print("Row not found")
+		return
 	}
+
+	var hero map[string]interface{}
+	err = res.One(&hero)
+	if err != nil {
+		fmt.Print("Error scanning database result: %s", err)
+		return
+	}
+	fmt.Printf("%s: %v", hero["name"], hero["powers"])
+
+	// Output: The Flash: [speed]
+}
+
+// Get all users who are 30 years old.
+func ExampleTerm_Filter() {
+	// Fetch the row from the database
+	res, err := DB("test").Table("users").Filter(map[string]interface{}{
+		"age": 30,
+	}).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer res.Close()
 
 	// Scan query result into the person variable
-	var person Person
-	err = res.One(&person)
-	if err == ErrEmptyResult {
-		log.Fatalf("Person not found")
-	} else if err != nil {
-		log.Fatalf("Error scanning database result: %s", err)
+	var users []interface{}
+	err = res.All(&users)
+	if err != nil {
+		fmt.Print("Error scanning database result: %s", err)
+		return
 	}
+	fmt.Printf("%d users", len(users))
 
-	fmt.Printf("%s %s (%s)", person.FirstName, person.LastName, person.Gender)
+	// Output: 2 users
+}
 
-	// Output:
-	// John Smith (M)
+// Get all users who are more than 25 years old.
+func ExampleTerm_Filter_Row() {
+	// Fetch the row from the database
+	res, err := DB("test").Table("users").Filter(Row.Field("age").Gt(25)).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer res.Close()
+
+	// Scan query result into the person variable
+	var users []interface{}
+	err = res.All(&users)
+	if err != nil {
+		fmt.Print("Error scanning database result: %s", err)
+		return
+	}
+	fmt.Printf("%d users", len(users))
+
+	// Output: 3 users
+}
+
+// Retrieve all users who have a gmail account (whose field email ends with @gmail.com).
+func ExampleTerm_Filter_Function() {
+	// Fetch the row from the database
+	res, err := DB("test").Table("users").Filter(func(user Term) Term {
+		return user.Field("email").Match("@gmail.com$")
+	}).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer res.Close()
+
+	// Scan query result into the person variable
+	var users []interface{}
+	err = res.All(&users)
+	if err != nil {
+		fmt.Print("Error scanning database result: %s", err)
+		return
+	}
+	fmt.Printf("%d users", len(users))
+
+	// Output: 1 users
 }

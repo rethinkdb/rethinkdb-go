@@ -79,7 +79,6 @@ func testBenchmarkSetup() {
 
 func testBenchmarkTeardown() {
 	DBDrop("benchmarks").Run(session)
-	session.Close()
 }
 
 func TestMain(m *testing.M) {
@@ -89,8 +88,8 @@ func TestMain(m *testing.M) {
 	testSetup(m)
 	testBenchmarkSetup()
 	res := m.Run()
-	testTeardown(m)
 	testBenchmarkTeardown()
+	testTeardown(m)
 
 	os.Exit(res)
 }
