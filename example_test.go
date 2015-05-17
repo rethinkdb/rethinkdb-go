@@ -5,7 +5,7 @@ import (
 )
 
 func Example() {
-	res, err := Expr("Hello World").Run(sess)
+	res, err := Expr("Hello World").Run(session)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}

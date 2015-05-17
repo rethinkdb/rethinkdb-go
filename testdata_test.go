@@ -1,0 +1,5 @@
+package gorethink
+
+func setupTestData() {
+
+}

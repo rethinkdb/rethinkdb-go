@@ -25,7 +25,7 @@ func (s *RethinkSuite) TestGeospatialDecodeGeometryPseudoType(c *test.C) {
 		"$reql_type$": "GEOMETRY",
 		"type":        "Polygon",
 		"coordinates": coords,
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -71,7 +71,7 @@ func (s *RethinkSuite) TestGeospatialEncodeGeometryPseudoType(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialCircle(c *test.C) {
 	var response types.Geometry
-	res, err := Circle([]float64{-122.423246, 37.779388}, 10).Run(sess)
+	res, err := Circle([]float64{-122.423246, 37.779388}, 10).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -117,7 +117,7 @@ func (s *RethinkSuite) TestGeospatialCircle(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialCirclePoint(c *test.C) {
 	var response types.Geometry
-	res, err := Circle(Point(-122.423246, 37.779388), 10).Run(sess)
+	res, err := Circle(Point(-122.423246, 37.779388), 10).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -163,7 +163,7 @@ func (s *RethinkSuite) TestGeospatialCirclePoint(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialCirclePointFill(c *test.C) {
 	var response types.Geometry
-	res, err := Circle(Point(-122.423246, 37.779388), 10, CircleOpts{Fill: true}).Run(sess)
+	res, err := Circle(Point(-122.423246, 37.779388), 10, CircleOpts{Fill: true}).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -211,7 +211,7 @@ func (s *RethinkSuite) TestGeospatialCirclePointFill(c *test.C) {
 func (s *RethinkSuite) TestGeospatialPointDistanceMethod(c *test.C) {
 	var response float64
 	f := 734125.249602186
-	res, err := Point(-122.423246, 37.779388).Distance(Point(-117.220406, 32.719464)).Run(sess)
+	res, err := Point(-122.423246, 37.779388).Distance(Point(-117.220406, 32.719464)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -224,7 +224,7 @@ func (s *RethinkSuite) TestGeospatialPointDistanceMethod(c *test.C) {
 func (s *RethinkSuite) TestGeospatialPointDistanceRoot(c *test.C) {
 	var response float64
 	f := 734125.249602186
-	res, err := Distance(Point(-122.423246, 37.779388), Point(-117.220406, 32.719464)).Run(sess)
+	res, err := Distance(Point(-122.423246, 37.779388), Point(-117.220406, 32.719464)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -237,7 +237,7 @@ func (s *RethinkSuite) TestGeospatialPointDistanceRoot(c *test.C) {
 func (s *RethinkSuite) TestGeospatialPointDistanceRootKm(c *test.C) {
 	var response float64
 	f := 734.125249602186
-	res, err := Distance(Point(-122.423246, 37.779388), Point(-117.220406, 32.719464), DistanceOpts{Unit: "km"}).Run(sess)
+	res, err := Distance(Point(-122.423246, 37.779388), Point(-117.220406, 32.719464), DistanceOpts{Unit: "km"}).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -254,7 +254,7 @@ func (s *RethinkSuite) TestGeospatialFill(c *test.C) {
 		[]float64{-122.423246, 37.329898},
 		[]float64{-121.886420, 37.329898},
 		[]float64{-121.886420, 37.779388},
-	).Fill().Run(sess)
+	).Fill().Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -275,7 +275,7 @@ func (s *RethinkSuite) TestGeospatialGeoJSON(c *test.C) {
 	res, err := GeoJSON(map[string]interface{}{
 		"type":        "Point",
 		"coordinates": []interface{}{-122.423246, 37.779388},
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -285,7 +285,7 @@ func (s *RethinkSuite) TestGeospatialGeoJSON(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialToGeoJSON(c *test.C) {
 	var response map[string]interface{}
-	res, err := Point(-122.423246, 37.779388).ToGeoJSON().Run(sess)
+	res, err := Point(-122.423246, 37.779388).ToGeoJSON().Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -298,16 +298,16 @@ func (s *RethinkSuite) TestGeospatialToGeoJSON(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialGetIntersecting(c *test.C) {
 	// Setup table
-	DB("test").TableDrop("geospatial").Run(sess)
-	DB("test").TableCreate("geospatial").Run(sess)
+	DB("test").TableDrop("geospatial").Run(session)
+	DB("test").TableCreate("geospatial").Run(session)
 	DB("test").Table("geospatial").IndexCreate("area", IndexCreateOpts{
 		Geo: true,
-	}).Run(sess)
+	}).Run(session)
 	DB("test").Table("geospatial").Insert([]interface{}{
 		map[string]interface{}{"area": Circle(Point(-117.220406, 32.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-100.220406, 20.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-117.200406, 32.723464), 100000)},
-	}).Run(sess)
+	}).Run(session)
 
 	var response []interface{}
 	res, err := DB("test").Table("geospatial").GetIntersecting(
@@ -315,7 +315,7 @@ func (s *RethinkSuite) TestGeospatialGetIntersecting(c *test.C) {
 		GetIntersectingOpts{
 			Index: "area",
 		},
-	).Run(sess)
+	).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -325,16 +325,16 @@ func (s *RethinkSuite) TestGeospatialGetIntersecting(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialGetNearest(c *test.C) {
 	// Setup table
-	DB("test").TableDrop("geospatial").Run(sess)
-	DB("test").TableCreate("geospatial").Run(sess)
+	DB("test").TableDrop("geospatial").Run(session)
+	DB("test").TableCreate("geospatial").Run(session)
 	DB("test").Table("geospatial").IndexCreate("area", IndexCreateOpts{
 		Geo: true,
-	}).Run(sess)
+	}).Run(session)
 	DB("test").Table("geospatial").Insert([]interface{}{
 		map[string]interface{}{"area": Circle(Point(-117.220406, 32.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-100.220406, 20.719464), 100000)},
 		map[string]interface{}{"area": Circle(Point(-115.210306, 32.733364), 100000)},
-	}).Run(sess)
+	}).Run(session)
 
 	var response []interface{}
 	res, err := DB("test").Table("geospatial").GetNearest(
@@ -343,7 +343,7 @@ func (s *RethinkSuite) TestGeospatialGetNearest(c *test.C) {
 			Index:   "area",
 			MaxDist: 1,
 		},
-	).Run(sess)
+	).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -359,7 +359,7 @@ func (s *RethinkSuite) TestGeospatialIncludesTrue(c *test.C) {
 		Point(-122.4, 37.3),
 		Point(-121.8, 37.3),
 		Point(-121.8, 37.7),
-	).Includes(Point(-122.3, 37.4)).Run(sess)
+	).Includes(Point(-122.3, 37.4)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -374,7 +374,7 @@ func (s *RethinkSuite) TestGeospatialIncludesFalse(c *test.C) {
 		Point(-122.4, 37.3),
 		Point(-121.8, 37.3),
 		Point(-121.8, 37.7),
-	).Includes(Point(100.3, 37.4)).Run(sess)
+	).Includes(Point(100.3, 37.4)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -394,7 +394,7 @@ func (s *RethinkSuite) TestGeospatialIntersectsTrue(c *test.C) {
 		Point(-122.4, 37.3),
 		Point(-121.8, 37.3),
 		Point(-121.8, 37.4),
-	)).Run(sess)
+	)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -414,7 +414,7 @@ func (s *RethinkSuite) TestGeospatialIntersectsFalse(c *test.C) {
 		Point(-102.4, 37.3),
 		Point(-101.8, 37.3),
 		Point(-101.8, 37.7),
-	)).Run(sess)
+	)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -424,7 +424,7 @@ func (s *RethinkSuite) TestGeospatialIntersectsFalse(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialLineLatLon(c *test.C) {
 	var response types.Geometry
-	res, err := Line([]float64{-122.423246, 37.779388}, []float64{-121.886420, 37.329898}).Run(sess)
+	res, err := Line([]float64{-122.423246, 37.779388}, []float64{-121.886420, 37.329898}).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -437,7 +437,7 @@ func (s *RethinkSuite) TestGeospatialLineLatLon(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialLinePoint(c *test.C) {
 	var response types.Geometry
-	res, err := Line(Point(-122.423246, 37.779388), Point(-121.886420, 37.329898)).Run(sess)
+	res, err := Line(Point(-122.423246, 37.779388), Point(-121.886420, 37.329898)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -450,7 +450,7 @@ func (s *RethinkSuite) TestGeospatialLinePoint(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialPoint(c *test.C) {
 	var response types.Geometry
-	res, err := Point(-122.423246, 37.779388).Run(sess)
+	res, err := Point(-122.423246, 37.779388).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -464,7 +464,7 @@ func (s *RethinkSuite) TestGeospatialPoint(c *test.C) {
 
 func (s *RethinkSuite) TestGeospatialPolygon(c *test.C) {
 	var response types.Geometry
-	res, err := Polygon(Point(-122.423246, 37.779388), Point(-122.423246, 37.329898), Point(-121.886420, 37.329898)).Run(sess)
+	res, err := Polygon(Point(-122.423246, 37.779388), Point(-122.423246, 37.329898), Point(-121.886420, 37.329898)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -491,7 +491,7 @@ func (s *RethinkSuite) TestGeospatialPolygonSub(c *test.C) {
 		Point(-122.3, 37.6),
 		Point(-122.0, 37.6),
 		Point(-122.0, 37.4),
-	)).Run(sess)
+	)).Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)

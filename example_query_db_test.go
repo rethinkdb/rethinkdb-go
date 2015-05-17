@@ -2,5 +2,5 @@ package gorethink
 
 func ExampleDBCreate() {
 	// Setup database
-	DBCreate("test").Run(sess)
+	DBCreate("test").Run(session)
 }

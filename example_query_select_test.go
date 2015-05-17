@@ -13,12 +13,12 @@ func ExampleTerm_Get() {
 	}
 
 	// Setup table
-	DB("test").TableDrop("table").Run(sess)
-	DB("test").TableCreate("table").Run(sess)
-	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
+	DB("test").TableDrop("table").Run(session)
+	DB("test").TableCreate("table").Run(session)
+	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(session)
 
 	// Fetch the row from the database
-	res, err := DB("test").Table("table").Get("1").Run(sess)
+	res, err := DB("test").Table("table").Get("1").Run(session)
 	if err != nil {
 		log.Fatalf("Error finding person: %s", err)
 	}
@@ -48,16 +48,16 @@ func ExampleTerm_GetAll_compound() {
 	}
 
 	// Setup table
-	DB("test").TableDrop("table").Run(sess)
-	DB("test").TableCreate("table").Run(sess)
-	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(sess)
+	DB("test").TableDrop("table").Run(session)
+	DB("test").TableCreate("table").Run(session)
+	DB("test").Table("table").Insert(Person{"1", "John", "Smith", "M"}).Run(session)
 	DB("test").Table("table").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
-	}).Run(sess)
-	DB("test").Table("table").IndexWait().Run(sess)
+	}).Run(session)
+	DB("test").Table("table").IndexWait().Run(session)
 
 	// Fetch the row from the database
-	res, err := DB("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).Run(sess)
+	res, err := DB("test").Table("table").GetAllByIndex("full_name", []interface{}{"John", "Smith"}).Run(session)
 	if err != nil {
 		log.Fatalf("Error finding person: %s", err)
 	}

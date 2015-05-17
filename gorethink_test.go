@@ -12,7 +12,7 @@ import (
 	test "gopkg.in/check.v1"
 )
 
-var sess *Session
+var session *Session
 var debug = flag.Bool("gorethink.debug", false, "print query trees")
 var url, url1, url2, url3, db, authKey string
 
@@ -53,61 +53,45 @@ func init() {
 //
 // Begin TestMain(), Setup, Teardown
 //
-func testBenchmarkSetup() {
-
-	var err error
-
-	bDbName = "benchmark"
-	bTableName = "benchmarks"
-
-	bSess, err = Connect(ConnectOpts{
-		Address:  url,
-		Database: bDbName,
-		MaxIdle:  50,
-		MaxOpen:  50,
-	})
-
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-
-	DBDrop(bDbName).Exec(bSess)
-	DBCreate(bDbName).Exec(bSess)
-
-	DB(bDbName).TableDrop(bTableName).Run(bSess)
-	DB(bDbName).TableCreate(bTableName).Run(bSess)
-
-}
-
-func testBenchmarkTeardown() {
-	DB(bDbName).TableDrop(bTableName).Run(bSess)
-	bSess.Close()
-}
-
-// stubs
 func testSetup(m *testing.M) {
 	var err error
-	sess, err = Connect(ConnectOpts{
+	session, err = Connect(ConnectOpts{
 		Address: url,
 		AuthKey: authKey,
 	})
 	if err != nil {
-		panic(err)
+		log.Fatalln(err.Error())
 	}
+
+	setupTestData()
 }
 func testTeardown(m *testing.M) {
-	sess.Close()
+	session.Close()
+}
+
+func testBenchmarkSetup() {
+	DBDrop("benchmarks").Exec(session)
+	DBCreate("benchmarks").Exec(session)
+
+	DB("benchmarks").TableDrop("benchmarks").Run(session)
+	DB("benchmarks").TableCreate("benchmarks").Run(session)
+}
+
+func testBenchmarkTeardown() {
+	DBDrop("benchmarks").Run(session)
+	session.Close()
 }
 
 func TestMain(m *testing.M) {
-	log.Debug("Setup")
 	// seed randomness for use with tests
 	rand.Seed(time.Now().UTC().UnixNano())
+
 	testSetup(m)
 	testBenchmarkSetup()
 	res := m.Run()
 	testTeardown(m)
 	testBenchmarkTeardown()
+
 	os.Exit(res)
 }
 
@@ -261,7 +245,7 @@ func (s *RethinkSuite) BenchmarkExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query
 		query := Expr(true)
-		err := query.Exec(sess)
+		err := query.Exec(session)
 		c.Assert(err, test.IsNil)
 	}
 }
@@ -270,16 +254,16 @@ func (s *RethinkSuite) BenchmarkNoReplyExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query
 		query := Expr(true)
-		err := query.Exec(sess, ExecOpts{NoReply: true})
+		err := query.Exec(session, ExecOpts{NoReply: true})
 		c.Assert(err, test.IsNil)
 	}
 }
 
 func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(sess)
-	DB("test").TableCreate("TestMany").RunWrite(sess)
-	DB("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(session)
+	DB("test").TableCreate("TestMany").RunWrite(session)
+	DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -288,7 +272,7 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 			"id": i,
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
@@ -296,7 +280,7 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 		// Test query
 		var response interface{}
 		query := DB("test").Table("TestMany").Get(n)
-		res, err := query.Run(sess)
+		res, err := query.Run(session)
 		c.Assert(err, test.IsNil)
 
 		err = res.One(&response)
@@ -308,9 +292,9 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(sess)
-	DB("test").TableCreate("TestMany").RunWrite(sess)
-	DB("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(session)
+	DB("test").TableCreate("TestMany").RunWrite(session)
+	DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -324,7 +308,7 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 			}},
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
@@ -332,7 +316,7 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 		// Test query
 		var resObj object
 		query := DB("test").Table("TestMany").Get(n)
-		res, err := query.Run(sess)
+		res, err := query.Run(session)
 		c.Assert(err, test.IsNil)
 
 		err = res.One(&resObj)
@@ -343,9 +327,9 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(sess)
-	DB("test").TableCreate("TestMany").RunWrite(sess)
-	DB("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(session)
+	DB("test").TableCreate("TestMany").RunWrite(session)
+	DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -354,11 +338,11 @@ func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 			"id": i,
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		// Test query
-		res, err := DB("test").Table("TestMany").Run(sess)
+		res, err := DB("test").Table("TestMany").Run(session)
 		c.Assert(err, test.IsNil)
 
 		var response []map[string]interface{}
@@ -371,9 +355,9 @@ func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(sess)
-	DB("test").TableCreate("TestMany").RunWrite(sess)
-	DB("test").Table("TestMany").Delete().RunWrite(sess)
+	DBCreate("test").RunWrite(session)
+	DB("test").TableCreate("TestMany").RunWrite(session)
+	DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -387,11 +371,11 @@ func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 			}},
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(sess)
+	DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		// Test query
-		res, err := DB("test").Table("TestMany").Run(sess)
+		res, err := DB("test").Table("TestMany").Run(session)
 		c.Assert(err, test.IsNil)
 
 		var response []object

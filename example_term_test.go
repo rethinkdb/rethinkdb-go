@@ -4,7 +4,7 @@ func ExampleTerm_Insert() {
 	Table("user").Insert(map[string]interface{}{
 		"name": "Micheal",
 		"age":  26,
-	}).RunWrite(sess)
+	}).RunWrite(session)
 }
 
 func ExampleTerm_Insert_multiple() {
@@ -17,5 +17,5 @@ func ExampleTerm_Insert_multiple() {
 			"name": "Slava",
 			"age":  30,
 		},
-	}).RunWrite(sess)
+	}).RunWrite(session)
 }
