@@ -1,7 +1,9 @@
 package gorethink
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
 	"math/rand"
 	"os"
 	"runtime"
@@ -416,4 +418,17 @@ func doConcurrentTest(c *test.C, ct func()) {
 	}
 
 	wg.Wait()
+}
+
+// Test utils
+
+// Print variable as JSON
+func jsonPrint(v interface{}) {
+	b, err := json.MarshalIndent(v, "", "    ")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(string(b))
 }

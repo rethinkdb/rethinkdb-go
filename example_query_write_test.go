@@ -12,7 +12,7 @@ func ExampleTerm_Insert_Struct() {
 		Content string `gorethink:"content"`
 	}
 
-	resp, err := DB("test").Table("posts").Insert(Post{
+	resp, err := DB("examples").Table("posts").Insert(Post{
 		ID:      1,
 		Title:   "Lorem ipsum",
 		Content: "Dolor sit amet",
@@ -36,7 +36,7 @@ func ExampleTerm_Insert_GeneratedKey() {
 		Content string `gorethink:"content"`
 	}
 
-	resp, err := DB("test").Table("posts").Insert(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Insert(map[string]interface{}{
 		"title":   "Lorem ipsum",
 		"content": "Dolor sit amet",
 	}).RunWrite(session)
@@ -53,7 +53,7 @@ func ExampleTerm_Insert_GeneratedKey() {
 
 // Insert a document into the table posts using a map.
 func ExampleTerm_Insert_Map() {
-	resp, err := DB("test").Table("posts").Insert(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Insert(map[string]interface{}{
 		"id":      2,
 		"title":   "Lorem ipsum",
 		"content": "Dolor sit amet",
@@ -71,7 +71,7 @@ func ExampleTerm_Insert_Map() {
 
 // Insert multiple documents into the table posts.
 func ExampleTerm_Insert_Multiple() {
-	resp, err := DB("test").Table("posts").Insert([]interface{}{
+	resp, err := DB("examples").Table("posts").Insert([]interface{}{
 		map[string]interface{}{
 			"title":   "Lorem ipsum",
 			"content": "Dolor sit amet",
@@ -95,7 +95,7 @@ func ExampleTerm_Insert_Multiple() {
 // Insert a document into the table posts, replacing the document if it already
 // exists.
 func ExampleTerm_Insert_Upsert() {
-	resp, err := DB("test").Table("posts").Insert(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Insert(map[string]interface{}{
 		"id":    1,
 		"title": "Lorem ipsum 2",
 	}, InsertOpts{
@@ -114,7 +114,7 @@ func ExampleTerm_Insert_Upsert() {
 
 // Update the status of the post with id of 1 to published.
 func ExampleTerm_Update() {
-	resp, err := DB("test").Table("posts").Get(2).Update(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Get(2).Update(map[string]interface{}{
 		"status": "published",
 	}).RunWrite(session)
 	if err != nil {
@@ -130,7 +130,7 @@ func ExampleTerm_Update() {
 
 // Update bob's cell phone number.
 func ExampleTerm_Update_Nested() {
-	resp, err := DB("test").Table("users").Get("bob").Update(map[string]interface{}{
+	resp, err := DB("examples").Table("users").Get("bob").Update(map[string]interface{}{
 		"contact": map[string]interface{}{
 			"phone": "408-555-4242",
 		},
@@ -148,7 +148,7 @@ func ExampleTerm_Update_Nested() {
 
 // Update the status of all posts to published.
 func ExampleTerm_Update_All() {
-	resp, err := DB("test").Table("posts").Update(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Update(map[string]interface{}{
 		"status": "published",
 	}).RunWrite(session)
 	if err != nil {
@@ -165,7 +165,7 @@ func ExampleTerm_Update_All() {
 // Increment the field view of the post with id of 1. If the field views does not
 // exist, it will be set to 0.
 func ExampleTerm_Update_Increment() {
-	resp, err := DB("test").Table("posts").Get(1).Update(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Get(1).Update(map[string]interface{}{
 		"views": Row.Field("views").Add(1).Default(0),
 	}).RunWrite(session)
 	if err != nil {
@@ -181,7 +181,7 @@ func ExampleTerm_Update_Increment() {
 
 // Update the status of the post with id of 1 using soft durability.
 func ExampleTerm_Update_SoftDurability() {
-	resp, err := DB("test").Table("posts").Get(2).Update(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Get(2).Update(map[string]interface{}{
 		"status": "draft",
 	}, UpdateOpts{
 		Durability: "soft",
@@ -199,7 +199,7 @@ func ExampleTerm_Update_SoftDurability() {
 
 // Delete a single document from the table posts.
 func ExampleTerm_Delete() {
-	resp, err := DB("test").Table("posts").Get(2).Delete().RunWrite(session)
+	resp, err := DB("examples").Table("posts").Get(2).Delete().RunWrite(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -213,7 +213,7 @@ func ExampleTerm_Delete() {
 
 // Delete all comments where the field status is published
 func ExampleTerm_Delete_Many() {
-	resp, err := DB("test").Table("posts").Filter(map[string]interface{}{
+	resp, err := DB("examples").Table("posts").Filter(map[string]interface{}{
 		"status": "published",
 	}).Delete().RunWrite(session)
 	if err != nil {
@@ -221,8 +221,8 @@ func ExampleTerm_Delete_Many() {
 		return
 	}
 
-	fmt.Printf("%d row deleted", resp.Deleted)
+	fmt.Printf("%d rows deleted", resp.Deleted)
 
 	// Output:
-	// 5 row deleted
+	// 4 rows deleted
 }

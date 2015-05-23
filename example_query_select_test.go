@@ -7,7 +7,7 @@ import (
 // Find a document by ID.
 func ExampleTerm_Get() {
 	// Fetch the row from the database
-	res, err := DB("test").Table("heroes").Get(2).Run(session)
+	res, err := DB("examples").Table("heroes").Get(2).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -33,7 +33,7 @@ func ExampleTerm_Get() {
 // Find a document and merge another document with it.
 func ExampleTerm_Get_Merge() {
 	// Fetch the row from the database
-	res, err := DB("test").Table("heroes").Get(4).Merge(map[string]interface{}{
+	res, err := DB("examples").Table("heroes").Get(4).Merge(map[string]interface{}{
 		"powers": []string{"speed"},
 	}).Run(session)
 	if err != nil {
@@ -61,7 +61,7 @@ func ExampleTerm_Get_Merge() {
 // Get all users who are 30 years old.
 func ExampleTerm_Filter() {
 	// Fetch the row from the database
-	res, err := DB("test").Table("users").Filter(map[string]interface{}{
+	res, err := DB("examples").Table("users").Filter(map[string]interface{}{
 		"age": 30,
 	}).Run(session)
 	if err != nil {
@@ -85,7 +85,7 @@ func ExampleTerm_Filter() {
 // Get all users who are more than 25 years old.
 func ExampleTerm_Filter_Row() {
 	// Fetch the row from the database
-	res, err := DB("test").Table("users").Filter(Row.Field("age").Gt(25)).Run(session)
+	res, err := DB("examples").Table("users").Filter(Row.Field("age").Gt(25)).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -107,7 +107,7 @@ func ExampleTerm_Filter_Row() {
 // Retrieve all users who have a gmail account (whose field email ends with @gmail.com).
 func ExampleTerm_Filter_Function() {
 	// Fetch the row from the database
-	res, err := DB("test").Table("users").Filter(func(user Term) Term {
+	res, err := DB("examples").Table("users").Filter(func(user Term) Term {
 		return user.Field("email").Match("@gmail.com$")
 	}).Run(session)
 	if err != nil {

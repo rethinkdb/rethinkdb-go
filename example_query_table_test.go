@@ -7,9 +7,9 @@ import (
 // Create a table named "table" with the default settings.
 func ExampleTerm_TableCreate() {
 	// Setup database
-	DB("test").TableDrop("table").Run(session)
+	DB("examples").TableDrop("table").Run(session)
 
-	response, err := DB("test").TableCreate("table").RunWrite(session)
+	response, err := DB("examples").TableCreate("table").RunWrite(session)
 	if err != nil {
 		log.Fatalf("Error creating table: %s", err)
 	}
@@ -23,10 +23,10 @@ func ExampleTerm_TableCreate() {
 // Create a simple index based on the field name.
 func ExampleTerm_IndexCreate() {
 	// Setup database
-	DB("test").TableDrop("table").Run(session)
-	DB("test").TableCreate("table").Run(session)
+	DB("examples").TableDrop("table").Run(session)
+	DB("examples").TableCreate("table").Run(session)
 
-	response, err := DB("test").Table("table").IndexCreate("name").RunWrite(session)
+	response, err := DB("examples").Table("table").IndexCreate("name").RunWrite(session)
 	if err != nil {
 		log.Fatalf("Error creating index: %s", err)
 	}
@@ -40,10 +40,10 @@ func ExampleTerm_IndexCreate() {
 // Create a compound index based on the fields first_name and last_name.
 func ExampleTerm_IndexCreate_compound() {
 	// Setup database
-	DB("test").TableDrop("table").Run(session)
-	DB("test").TableCreate("table").Run(session)
+	DB("examples").TableDrop("table").Run(session)
+	DB("examples").TableCreate("table").Run(session)
 
-	response, err := DB("test").Table("table").IndexCreateFunc("full_name", func(row Term) interface{} {
+	response, err := DB("examples").Table("table").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(session)
 	if err != nil {
