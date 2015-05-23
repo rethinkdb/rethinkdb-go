@@ -35,14 +35,6 @@ import (
 //   // Note the leading comma.
 //   Field int `gorethink:",omitempty"`
 func Expr(val interface{}) Term {
-	return expr(val, 20)
-}
-
-func expr(val interface{}, depth int) Term {
-	if depth <= 0 {
-		panic("Maximum nesting depth limit exceeded")
-	}
-
 	if val == nil {
 		return Term{
 			termType: p.Term_DATUM,
@@ -56,14 +48,14 @@ func expr(val interface{}, depth int) Term {
 	case []interface{}:
 		vals := make([]Term, len(val))
 		for i, v := range val {
-			vals[i] = expr(v, depth)
+			vals[i] = Expr(v)
 		}
 
 		return makeArray(vals)
 	case map[string]interface{}:
 		vals := make(map[string]Term, len(val))
 		for k, v := range val {
-			vals[k] = expr(v, depth)
+			vals[k] = Expr(v)
 		}
 
 		return makeObject(vals)
@@ -85,7 +77,7 @@ func expr(val interface{}, depth int) Term {
 				}
 			}
 
-			return expr(data, depth-1)
+			return Expr(data)
 
 		case reflect.Slice, reflect.Array:
 			// Check if slice is a byte slice
@@ -99,19 +91,19 @@ func expr(val interface{}, depth int) Term {
 					}
 				}
 
-				return expr(data, depth-1)
+				return Expr(data)
 			}
 
 			vals := make([]Term, valValue.Len())
 			for i := 0; i < valValue.Len(); i++ {
-				vals[i] = expr(valValue.Index(i).Interface(), depth)
+				vals[i] = Expr(valValue.Index(i).Interface())
 			}
 
 			return makeArray(vals)
 		case reflect.Map:
 			vals := make(map[string]Term, len(valValue.MapKeys()))
 			for _, k := range valValue.MapKeys() {
-				vals[k.String()] = expr(valValue.MapIndex(k).Interface(), depth)
+				vals[k.String()] = Expr(valValue.MapIndex(k).Interface())
 			}
 
 			return makeObject(vals)
