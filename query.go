@@ -217,7 +217,9 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 
 // RunWrite runs a query using the given connection but unlike Run automatically
 // scans the result into a variable of type WriteResponss. This function should be used
-// if you are running a write query (such as Insert,  Update, TableCreate, etc...)
+// if you are running a write query (such as Insert,  Update, TableCreate, etc...).
+//
+// If an error occurs when running the write query the first error is returned.
 //
 //	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
 func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
@@ -234,6 +236,10 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 
 	if err = res.Close(); err != nil {
 		return response, err
+	}
+
+	if response.Errors > 0 {
+		return response, fmt.Errorf(response.FirstError)
 	}
 
 	return response, nil
