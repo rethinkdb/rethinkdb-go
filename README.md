@@ -46,7 +46,7 @@ See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect)
 
 The driver uses a connection pool at all times, by default it creates and frees connections automatically. It's safe for concurrent use by multiple goroutines.
 
-To configure the connection pool `MaxIdle`, `MaxOpen` and `IdleTimeout` can be specified during connection. If you wish to change the value of `MaxIdle` or `MaxOpen` during runtime then the functions `SetMaxIdleConns` and `SetMaxOpenConns` can be used.
+To configure the connection pool `MaxIdle`, `MaxOpen` and `Timeout` can be specified during connection. If you wish to change the value of `MaxIdle` or `MaxOpen` during runtime then the functions `SetMaxIdleConns` and `SetMaxOpenConns` can be used.
 
 ```go
 var session *r.Session
