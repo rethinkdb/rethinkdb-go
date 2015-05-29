@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
-	"io"
 	"net"
 	"sync/atomic"
 	"time"
@@ -187,8 +186,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	}
 
 	// Read response header (token+length)
-	_, err := io.ReadFull(c.conn, c.headerBuf[:respHeaderLen])
-	if err != nil {
+	if _, err := c.read(c.headerBuf[:], respHeaderLen); err != nil {
 		return nil, err
 	}
 
@@ -197,7 +195,8 @@ func (c *Connection) readResponse() (*Response, error) {
 
 	// Read the JSON encoding of the Response itself.
 	b := c.buf.takeBuffer(int(messageLength))
-	if _, err := io.ReadFull(c.conn, b[:]); err != nil {
+
+	if _, err := c.read(b, int(messageLength)); err != nil {
 		c.bad = true
 		return nil, RQLConnectionError{err.Error()}
 	}

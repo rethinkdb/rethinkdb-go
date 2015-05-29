@@ -11,9 +11,10 @@ import (
 
 func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 	session, err := Connect(ConnectOpts{
+		Addresses:           []string{url, url2},
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
-	}, url, url2)
+	})
 	c.Assert(err, test.IsNil)
 
 	t := time.NewTimer(time.Second * 30)
@@ -31,13 +32,43 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 	}
 }
 
+func (s *RethinkSuite) TestClusterRecoverAfterNoNodes(c *test.C) {
+	session, err := Connect(ConnectOpts{
+		Addresses:           []string{url, url2},
+		DiscoverHosts:       true,
+		NodeRefreshInterval: time.Second,
+	})
+	c.Assert(err, test.IsNil)
+
+	t := time.NewTimer(time.Second * 30)
+	hasHadZeroNodes := false
+	for {
+		select {
+		// Fail if deadline has passed
+		case <-t.C:
+			c.Fatal("No node was added to the cluster")
+		default:
+			// Check if there are no nodes
+			if len(session.cluster.GetNodes()) == 0 {
+				hasHadZeroNodes = true
+			}
+
+			// Pass if another node was added
+			if len(session.cluster.GetNodes()) >= 1 && hasHadZeroNodes {
+				return
+			}
+		}
+	}
+}
+
 func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
 	session, err := Connect(ConnectOpts{
+		Addresses:           []string{url, url2, url3},
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
 		MaxIdle:             50,
 		MaxOpen:             200,
-	}, url, url2, url3)
+	})
 	c.Assert(err, test.IsNil)
 
 	attempts := 0

@@ -69,6 +69,21 @@ func (c *Connection) readHandshakeSuccess() error {
 	return nil
 }
 
+func (c *Connection) read(buf []byte, length int) (total int, err error) {
+	var n int
+	for total < length {
+		if n, err = c.conn.Read(buf[total:length]); err != nil {
+			break
+		}
+		total += n
+	}
+	if err != nil {
+		return total, err
+	}
+
+	return total, nil
+}
+
 func (c *Connection) writeQuery(token int64, q []byte) error {
 	pos := 0
 	dataLen := 8 + 4 + len(q)
