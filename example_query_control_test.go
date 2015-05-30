@@ -34,14 +34,8 @@ func ExampleBranch() {
 
 // Return an error
 func ExampleError() {
-	_, err := Error("this is a runtime error").Run(session)
-	if err != nil {
-		fmt.Print(err)
-	}
-
-	// Output:
-	// gorethink: this is a runtime error in:
-	// r.Error("this is a runtime error")
+	err := Error("this is a runtime error").Exec(session)
+	fmt.Println(err)
 }
 
 // Suppose we want to retrieve the titles and authors of the table posts. In the
