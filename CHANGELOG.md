@@ -6,10 +6,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes see below.
 
-## Added
+### Added
  - Added more documentation.
  - Added `Shards`, `Replicas` and `PrimaryReplicaTag` optional arguments in `TableCreateOpts`.
  - Added `MultiGroup` and `MultiGroupByIndex` which are equivalent to the running `group` with the `multi` optional argument set to true.
+
+### Fixed 
+ - Fixed issue causing inconsistent results when unmarshaling query response into structs (#192)
 
 ### Changed 
  - Renamed `Db` to `DB`.
