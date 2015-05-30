@@ -163,7 +163,7 @@ Internal Changes
 
 - Updated the driver to support RethinkDB v1.14 (#116)
 - Added the Binary data type
-- Added the Binary command which takes a `[]byte`, `io.Reader` or `bytes.Buffer{}` as an argument.
+- Added the Binary command which takes a `[]byte` or `bytes.Buffer{}` as an argument.
 - Added the `BinaryFormat` optional argument to `RunOpts` 
 - Added the `GroupFormat` optional argument to `RunOpts` 
 - Added the `ArrayLimit` optional argument to `RunOpts` 
