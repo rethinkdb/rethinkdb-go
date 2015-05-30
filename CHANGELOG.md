@@ -11,6 +11,9 @@ In an attempt to make this library more "idiomatic" some functions have been ren
  - Added `Shards`, `Replicas` and `PrimaryReplicaTag` optional arguments in `TableCreateOpts`.
  - Added `MultiGroup` and `MultiGroupByIndex` which are equivalent to the running `group` with the `multi` optional argument set to true.
 
+### Fixed
+ - Fixed issue causing errors when closing a changefeed cursor (#191)
+
 ### Changed 
  - Renamed `Db` to `DB`.
  - Renamed `DbCreate` to `DBCreate`.
