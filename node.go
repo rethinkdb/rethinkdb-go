@@ -8,6 +8,10 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
+const (
+	maxNodeHealth = 100
+)
+
 // Node represents a database server in the cluster
 type Node struct {
 	ID      string
@@ -30,7 +34,7 @@ func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
 		aliases:         aliases,
 		cluster:         cluster,
 		pool:            pool,
-		health:          100,
+		health:          maxNodeHealth,
 		refreshDoneChan: make(chan struct{}),
 	}
 	// Start node refresh loop
@@ -170,14 +174,14 @@ func (n *Node) Refresh() {
 	n.ResetHealth()
 }
 
-// DecrementHealth decreases the nodes health by 1 (the nodes health starts at 100)
+// DecrementHealth decreases the nodes health by 1 (the nodes health starts at maxNodeHealth)
 func (n *Node) DecrementHealth() {
 	atomic.AddInt64(&n.health, -1)
 }
 
-// ResetHealth sets the nodes health back to 100 (fully healthy)
+// ResetHealth sets the nodes health back to maxNodeHealth (fully healthy)
 func (n *Node) ResetHealth() {
-	atomic.StoreInt64(&n.health, 100)
+	atomic.StoreInt64(&n.health, maxNodeHealth)
 }
 
 // IsHealthy checks the nodes health by ensuring that the health counter is above 0.
