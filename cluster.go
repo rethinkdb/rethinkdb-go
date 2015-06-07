@@ -206,27 +206,14 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			continue
 		}
 
-		if c.opts.DiscoverHosts {
-			var results []nodeStatus
-			err = cursor.All(&results)
-			if err != nil {
-				continue
-			}
+		var results []nodeStatus
+		err = cursor.All(&results)
+		if err != nil {
+			continue
+		}
 
-			for _, result := range results {
-				node, err := c.connectNodeWithStatus(result)
-				if err == nil {
-					if _, ok := nodeSet[node.ID]; !ok {
-						log.WithFields(logrus.Fields{
-							"id":   node.ID,
-							"host": node.Host.String(),
-						}).Debug("Connected to node")
-						nodeSet[node.ID] = node
-					}
-				}
-			}
-		} else {
-			node, err := c.connectNode(host.String(), []Host{host})
+		for _, result := range results {
+			node, err := c.connectNodeWithStatus(result)
 			if err == nil {
 				if _, ok := nodeSet[node.ID]; !ok {
 					log.WithFields(logrus.Fields{
