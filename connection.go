@@ -4,7 +4,6 @@ import (
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
-	"io"
 	"net"
 	"sync/atomic"
 	"time"
@@ -16,6 +15,8 @@ const (
 	respHeaderLen = 12
 )
 
+// Response represents the raw response from a query, most of the time you
+// should instead use a Cursor when reading from the database.
 type Response struct {
 	Token     int64
 	Type      p.Response_ResponseType   `json:"t"`
@@ -95,6 +96,10 @@ func (c *Connection) Close() error {
 	return nil
 }
 
+// Query sends a Query to the database, returning both the raw Response and a
+// Cursor which should be used to view the query's response.
+//
+// This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	if c == nil {
 		return nil, nil, nil
@@ -108,7 +113,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		q.Token = c.nextToken()
 		if c.opts.Database != "" {
-			q.Opts["db"] = Db(c.opts.Database).build()
+			q.Opts["db"] = DB(c.opts.Database).build()
 		}
 	}
 
@@ -139,11 +144,12 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	}
 }
 
+// sendQuery marshals the Query and sends the JSON to the server.
 func (c *Connection) sendQuery(q Query) error {
 	// Build query
 	b, err := json.Marshal(q.build())
 	if err != nil {
-		return RqlDriverError{"Error building query"}
+		return RQLDriverError{"Error building query"}
 	}
 
 	// Set timeout
@@ -156,7 +162,7 @@ func (c *Connection) sendQuery(q Query) error {
 	// Send the JSON encoding of the query itself.
 	if err = c.writeQuery(q.Token, b); err != nil {
 		c.bad = true
-		return RqlConnectionError{err.Error()}
+		return RQLConnectionError{err.Error()}
 	}
 
 	return nil
@@ -169,6 +175,8 @@ func (c *Connection) nextToken() int64 {
 	return atomic.AddInt64(&c.token, 1)
 }
 
+// readResponse attempts to read a Response from the server, if no response
+// could be read then an error is returned.
 func (c *Connection) readResponse() (*Response, error) {
 	// Set timeout
 	if c.opts.Timeout == 0 {
@@ -178,8 +186,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	}
 
 	// Read response header (token+length)
-	_, err := io.ReadFull(c.conn, c.headerBuf[:respHeaderLen])
-	if err != nil {
+	if _, err := c.read(c.headerBuf[:], respHeaderLen); err != nil {
 		return nil, err
 	}
 
@@ -188,16 +195,17 @@ func (c *Connection) readResponse() (*Response, error) {
 
 	// Read the JSON encoding of the Response itself.
 	b := c.buf.takeBuffer(int(messageLength))
-	if _, err := io.ReadFull(c.conn, b[:]); err != nil {
+
+	if _, err := c.read(b, int(messageLength)); err != nil {
 		c.bad = true
-		return nil, RqlConnectionError{err.Error()}
+		return nil, RQLConnectionError{err.Error()}
 	}
 
 	// Decode the response
 	var response = newCachedResponse()
 	if err := json.Unmarshal(b, response); err != nil {
 		c.bad = true
-		return nil, RqlDriverError{err.Error()}
+		return nil, RQLDriverError{err.Error()}
 	}
 	response.Token = responseToken
 
@@ -207,11 +215,11 @@ func (c *Connection) readResponse() (*Response, error) {
 func (c *Connection) processResponse(q Query, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
-		return c.processErrorResponse(q, response, RqlClientError{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLClientError{rqlResponseError{response, q.Term}})
 	case p.Response_COMPILE_ERROR:
-		return c.processErrorResponse(q, response, RqlCompileError{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLCompileError{rqlResponseError{response, q.Term}})
 	case p.Response_RUNTIME_ERROR:
-		return c.processErrorResponse(q, response, RqlRuntimeError{rqlResponseError{response, q.Term}})
+		return c.processErrorResponse(q, response, RQLRuntimeError{rqlResponseError{response, q.Term}})
 	case p.Response_SUCCESS_ATOM:
 		return c.processAtomResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
@@ -222,7 +230,7 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 		return c.processWaitResponse(q, response)
 	default:
 		putResponse(response)
-		return nil, nil, RqlDriverError{"Unexpected response type"}
+		return nil, nil, RQLDriverError{"Unexpected response type"}
 	}
 }
 

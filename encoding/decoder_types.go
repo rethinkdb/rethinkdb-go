@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"reflect"
+	"sort"
 	"strconv"
 )
 
@@ -442,7 +443,10 @@ func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) {
 	keyType := dv.Type().Key()
 	elemType := dv.Type().Elem()
 
-	for _, sElemKey := range sv.MapKeys() {
+	keys := sv.MapKeys()
+	sort.Sort(valueByString(keys))
+
+	for _, sElemKey := range keys {
 		var dElemKey reflect.Value
 		var dElemVal reflect.Value
 
@@ -478,7 +482,10 @@ type mapAsStructDecoder struct {
 }
 
 func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
-	for _, kv := range sv.MapKeys() {
+	keys := sv.MapKeys()
+	sort.Sort(valueByString(keys))
+
+	for _, kv := range keys {
 		var f *field
 		var fieldDec decoderFunc
 		key := []byte(kv.String())

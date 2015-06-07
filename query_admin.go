@@ -16,6 +16,7 @@ func (t Term) Rebalance() Term {
 	return constructMethodTerm(t, "Rebalance", p.Term_REBALANCE, []interface{}{}, map[string]interface{}{})
 }
 
+// ReconfigureOpts contains the optional arguments for the Reconfigure term.
 type ReconfigureOpts struct {
 	Shards     interface{} `gorethink:"shards,omitempty"`
 	Replicas   interface{} `gorethink:"replicas,omitempty"`
@@ -37,6 +38,7 @@ func (t Term) Status() Term {
 	return constructMethodTerm(t, "Status", p.Term_STATUS, []interface{}{}, map[string]interface{}{})
 }
 
+// WaitOpts contains the optional arguments for the Wait term.
 type WaitOpts struct {
 	WaitFor interface{} `gorethink:"wait_for,omitempty"`
 	Timeout interface{} `gorethink:"timeout,omitempty"`

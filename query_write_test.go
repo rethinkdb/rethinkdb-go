@@ -5,17 +5,17 @@ import (
 )
 
 func (s *RethinkSuite) TestWriteInsert(c *test.C) {
-	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
-	_, err := query.Run(sess)
+	query := DB("test").Table("test").Insert(map[string]interface{}{"num": 1})
+	_, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestWriteInsertChanges(c *test.C) {
-	query := Db("test").Table("test").Insert([]interface{}{
+	query := DB("test").Table("test").Insert([]interface{}{
 		map[string]interface{}{"num": 1},
 		map[string]interface{}{"num": 2},
 	}, InsertOpts{ReturnChanges: true})
-	res, err := query.RunWrite(sess)
+	res, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Inserted, test.Equals, 2)
 	c.Assert(len(res.Changes), test.Equals, 2)
@@ -33,8 +33,8 @@ func (s *RethinkSuite) TestWriteInsertStruct(c *test.C) {
 		},
 	}
 
-	query := Db("test").Table("test").Insert(o)
-	res, err := query.Run(sess)
+	query := DB("test").Table("test").Insert(o)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -55,8 +55,8 @@ func (s *RethinkSuite) TestWriteInsertStructPointer(c *test.C) {
 		},
 	}
 
-	query := Db("test").Table("test").Insert(&o)
-	res, err := query.Run(sess)
+	query := DB("test").Table("test").Insert(&o)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -66,34 +66,34 @@ func (s *RethinkSuite) TestWriteInsertStructPointer(c *test.C) {
 }
 
 func (s *RethinkSuite) TestWriteUpdate(c *test.C) {
-	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
-	_, err := query.Run(sess)
+	query := DB("test").Table("test").Insert(map[string]interface{}{"num": 1})
+	_, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	// Update the first row in the table
-	query = Db("test").Table("test").Sample(1).Update(map[string]interface{}{"num": 2})
-	_, err = query.Run(sess)
+	query = DB("test").Table("test").Sample(1).Update(map[string]interface{}{"num": 2})
+	_, err = query.Run(session)
 	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestWriteReplace(c *test.C) {
-	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
-	_, err := query.Run(sess)
+	query := DB("test").Table("test").Insert(map[string]interface{}{"num": 1})
+	_, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	// Replace the first row in the table
-	query = Db("test").Table("test").Sample(1).Update(map[string]interface{}{"num": 2})
-	_, err = query.Run(sess)
+	query = DB("test").Table("test").Sample(1).Update(map[string]interface{}{"num": 2})
+	_, err = query.Run(session)
 	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestWriteDelete(c *test.C) {
-	query := Db("test").Table("test").Insert(map[string]interface{}{"num": 1})
-	_, err := query.Run(sess)
+	query := DB("test").Table("test").Insert(map[string]interface{}{"num": 1})
+	_, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	// Delete the first row in the table
-	query = Db("test").Table("test").Sample(1).Delete()
-	_, err = query.Run(sess)
+	query = DB("test").Table("test").Sample(1).Delete()
+	_, err = query.Run(session)
 	c.Assert(err, test.IsNil)
 }

@@ -8,10 +8,6 @@ import (
 	"time"
 )
 
-var bSess *Session
-var bDbName string
-var bTableName string
-
 func BenchmarkBatch200RandomWrites(b *testing.B) {
 
 	var term Term
@@ -28,10 +24,10 @@ func BenchmarkBatch200RandomWrites(b *testing.B) {
 		}
 
 		// Insert the new item into the database
-		term = Table(bTableName).Insert(data)
+		term = DB("benchmarks").Table("benchmarks").Insert(data)
 
 		// Insert the new item into the database
-		_, err := term.RunWrite(bSess, RunOpts{
+		_, err := term.RunWrite(session, RunOpts{
 			MinBatchRows: 200,
 			MaxBatchRows: 200,
 		})
@@ -61,10 +57,10 @@ func BenchmarkBatch200RandomWritesParallel10(b *testing.B) {
 			}
 
 			// Insert the new item into the database
-			term = Table(bTableName).Insert(data)
+			term = DB("benchmarks").Table("benchmarks").Insert(data)
 
 			// Insert the new item into the database
-			_, err := term.RunWrite(bSess, RunOpts{
+			_, err := term.RunWrite(session, RunOpts{
 				MinBatchRows: 200,
 				MaxBatchRows: 200,
 			})
@@ -98,10 +94,10 @@ func BenchmarkBatch200SoftRandomWritesParallel10(b *testing.B) {
 			}
 
 			// Insert the new item into the database
-			term = Table(bTableName).Insert(data, opts)
+			term = DB("benchmarks").Table("benchmarks").Insert(data, opts)
 
 			// Insert the new item into the database
-			_, err := term.RunWrite(bSess, RunOpts{
+			_, err := term.RunWrite(session, RunOpts{
 				MinBatchRows: 200,
 				MaxBatchRows: 200,
 			})
@@ -121,7 +117,7 @@ func BenchmarkRandomWrites(b *testing.B) {
 			"customer_id": strconv.FormatInt(r.Int63(), 10),
 		}
 		// Insert the new item into the database
-		_, err := Table(bTableName).Insert(data).RunWrite(bSess)
+		_, err := DB("benchmarks").Table("benchmarks").Insert(data).RunWrite(session)
 		if err != nil {
 			b.Errorf("insert failed [%s] ", err)
 		}
@@ -141,7 +137,7 @@ func BenchmarkRandomWritesParallel10(b *testing.B) {
 				"customer_id": strconv.FormatInt(r.Int63(), 10),
 			}
 			// Insert the new item into the database
-			_, err := Table(bTableName).Insert(data).RunWrite(bSess)
+			_, err := DB("benchmarks").Table("benchmarks").Insert(data).RunWrite(session)
 			if err != nil {
 				b.Errorf("insert failed [%s] ", err)
 			}
@@ -158,7 +154,7 @@ func BenchmarkRandomSoftWrites(b *testing.B) {
 		}
 		// Insert the new item into the database
 		opts := InsertOpts{Durability: "soft"}
-		_, err := Table(bTableName).Insert(data, opts).RunWrite(bSess)
+		_, err := DB("benchmarks").Table("benchmarks").Insert(data, opts).RunWrite(session)
 		if err != nil {
 			b.Errorf("insert failed [%s] ", err)
 		}
@@ -180,7 +176,7 @@ func BenchmarkRandomSoftWritesParallel10(b *testing.B) {
 
 			// Insert the new item into the database
 			opts := InsertOpts{Durability: "soft"}
-			_, err := Table(bTableName).Insert(data, opts).RunWrite(bSess)
+			_, err := DB("benchmarks").Table("benchmarks").Insert(data, opts).RunWrite(session)
 			if err != nil {
 				b.Errorf("insert failed [%s] ", err)
 			}
@@ -199,7 +195,7 @@ func BenchmarkSequentialWrites(b *testing.B) {
 		}
 
 		// Insert the new item into the database
-		_, err := Table(bTableName).Insert(data).RunWrite(bSess)
+		_, err := DB("benchmarks").Table("benchmarks").Insert(data).RunWrite(session)
 		if err != nil {
 			b.Errorf("insert failed [%s] ", err)
 			return
@@ -226,7 +222,7 @@ func BenchmarkSequentialWritesParallel10(b *testing.B) {
 			}
 
 			// Insert the new item into the database
-			_, err := Table(bTableName).Insert(data).RunWrite(bSess)
+			_, err := DB("benchmarks").Table("benchmarks").Insert(data).RunWrite(session)
 			if err != nil {
 				b.Errorf("insert failed [%s] ", err)
 				return
@@ -248,7 +244,7 @@ func BenchmarkSequentialSoftWrites(b *testing.B) {
 		}
 
 		// Insert the new item into the database
-		_, err := Table(bTableName).Insert(data, opts).RunWrite(bSess)
+		_, err := Table("benchmarks").Insert(data, opts).RunWrite(session)
 		if err != nil {
 			b.Errorf("insert failed [%s] ", err)
 			return
@@ -277,7 +273,7 @@ func BenchmarkSequentialSoftWritesParallel10(b *testing.B) {
 			opts := InsertOpts{Durability: "soft"}
 
 			// Insert the new item into the database
-			_, err := Table(bTableName).Insert(data, opts).RunWrite(bSess)
+			_, err := Table("benchmarks").Insert(data, opts).RunWrite(session)
 			if err != nil {
 				b.Errorf("insert failed [%s] ", err)
 				return

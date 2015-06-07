@@ -8,24 +8,33 @@ import (
 	p "github.com/dancannon/gorethink/ql2"
 )
 
-var byteSliceType = reflect.TypeOf([]byte(nil))
-
-// Expr converts any value to an expression.  Internally it uses the `json`
-// module to convert any literals, so any type annotations or methods understood
-// by that module can be used. If the value cannot be converted, an error is
-// returned at query .Run(session) time.
+// Expr converts any value to an expression and is also used by many other terms
+// such as Insert and Update. This function can convert the following basic Go
+// types (bool, int, uint, string, float) and even pointers, maps and structs.
 //
-// If you want to call expression methods on an object that is not yet an
-// expression, this is the function you want.
+// When evaluating structs they are encoded into a map before being sent to the
+// server. Each exported field is added to the map unless
+//
+//  - the field's tag is "-", or
+//  - the field is empty and its tag specifies the "omitempty" option.
+//
+// Each fields default name in the map is the field name but can be specified
+// in the struct field's tag value. The "gorethink" key in the struct field's
+// tag value is the key name, followed by an optional comma and options. Examples:
+//
+//   // Field is ignored by this package.
+//   Field int `gorethink:"-"`
+//   // Field appears as key "myName".
+//   Field int `gorethink:"myName"`
+//   // Field appears as key "myName" and
+//   // the field is omitted from the object if its value is empty,
+//   // as defined above.
+//   Field int `gorethink:"myName,omitempty"`
+//   // Field appears as key "Field" (the default), but
+//   // the field is skipped if empty.
+//   // Note the leading comma.
+//   Field int `gorethink:",omitempty"`
 func Expr(val interface{}) Term {
-	return expr(val, 20)
-}
-
-func expr(val interface{}, depth int) Term {
-	if depth <= 0 {
-		panic("Maximum nesting depth limit exceeded")
-	}
-
 	if val == nil {
 		return Term{
 			termType: p.Term_DATUM,
@@ -39,14 +48,14 @@ func expr(val interface{}, depth int) Term {
 	case []interface{}:
 		vals := make([]Term, len(val))
 		for i, v := range val {
-			vals[i] = expr(v, depth)
+			vals[i] = Expr(v)
 		}
 
 		return makeArray(vals)
 	case map[string]interface{}:
 		vals := make(map[string]Term, len(val))
 		for k, v := range val {
-			vals[k] = expr(v, depth)
+			vals[k] = Expr(v)
 		}
 
 		return makeObject(vals)
@@ -68,7 +77,7 @@ func expr(val interface{}, depth int) Term {
 				}
 			}
 
-			return expr(data, depth-1)
+			return Expr(data)
 
 		case reflect.Slice, reflect.Array:
 			// Check if slice is a byte slice
@@ -82,19 +91,19 @@ func expr(val interface{}, depth int) Term {
 					}
 				}
 
-				return expr(data, depth-1)
-			} else {
-				vals := make([]Term, valValue.Len())
-				for i := 0; i < valValue.Len(); i++ {
-					vals[i] = expr(valValue.Index(i).Interface(), depth)
-				}
-
-				return makeArray(vals)
+				return Expr(data)
 			}
+
+			vals := make([]Term, valValue.Len())
+			for i := 0; i < valValue.Len(); i++ {
+				vals[i] = Expr(valValue.Index(i).Interface())
+			}
+
+			return makeArray(vals)
 		case reflect.Map:
 			vals := make(map[string]Term, len(valValue.MapKeys()))
 			for _, k := range valValue.MapKeys() {
-				vals[k.String()] = expr(valValue.MapIndex(k).Interface(), depth)
+				vals[k.String()] = Expr(valValue.MapIndex(k).Interface())
 			}
 
 			return makeObject(vals)
@@ -107,12 +116,14 @@ func expr(val interface{}, depth int) Term {
 	}
 }
 
-// Create a JavaScript expression.
-func Js(jssrc interface{}) Term {
+// JS creates a JavaScript expression which is evaluated by the database when
+// running the query.
+func JS(jssrc interface{}) Term {
 	return constructRootTerm("Js", p.Term_JAVASCRIPT, []interface{}{jssrc}, map[string]interface{}{})
 }
 
-type HttpOpts struct {
+// HTTPOpts contains the optional arguments for the HTTP term
+type HTTPOpts struct {
 	// General Options
 	Timeout      interface{} `gorethink:"timeout,omitempty"`
 	Reattempts   interface{} `gorethink:"reattempts,omitempty"`
@@ -132,12 +143,14 @@ type HttpOpts struct {
 	PageLimit interface{} `gorethink:"page_limit,omitempty"`
 }
 
-func (o *HttpOpts) toMap() map[string]interface{} {
+func (o *HTTPOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
-// Parse a JSON string on the server.
-func Http(url interface{}, optArgs ...HttpOpts) Term {
+// HTTP retrieves data from the specified URL over HTTP. The return type depends
+// on the resultFormat option, which checks the Content-Type of the response by
+// default.
+func HTTP(url interface{}, optArgs ...HTTPOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -145,12 +158,12 @@ func Http(url interface{}, optArgs ...HttpOpts) Term {
 	return constructRootTerm("Http", p.Term_HTTP, []interface{}{url}, opts)
 }
 
-// Parse a JSON string on the server.
-func Json(args ...interface{}) Term {
+// JSON parses a JSON string on the server.
+func JSON(args ...interface{}) Term {
 	return constructRootTerm("Json", p.Term_JSON, args, map[string]interface{}{})
 }
 
-// Throw a runtime error. If called with no arguments inside the second argument
+// Error throws a runtime error. If called with no arguments inside the second argument
 // to `default`, re-throw the current error.
 func Error(args ...interface{}) Term {
 	return constructRootTerm("Error", p.Term_ERROR, args, map[string]interface{}{})
@@ -164,6 +177,16 @@ func Args(args ...interface{}) Term {
 }
 
 // Binary encapsulates binary data within a query.
+//
+// The type of data binary accepts depends on the client language. In Go, it
+// expects either a byte array/slice or a bytes.Buffer.
+//
+// Only a limited subset of ReQL commands may be chained after binary:
+//  - coerceTo can coerce binary objects to string types
+//  - count will return the number of bytes in the object
+//  - slice will treat bytes like array indexes (i.e., slice(10,20) will return bytes 10–19)
+//  - typeOf returns PTYPE<BINARY>
+//  - info will return information on a binary object.
 func Binary(data interface{}) Term {
 	var b []byte
 
@@ -191,7 +214,7 @@ func binaryTerm(data string) Term {
 	return t
 }
 
-// Evaluate the expr in the context of one or more value bindings. The type of
+// Do evaluates the expr in the context of one or more value bindings. The type of
 // the result is the type of the value returned from expr.
 func (t Term) Do(args ...interface{}) Term {
 	newArgs := []interface{}{}
@@ -202,7 +225,7 @@ func (t Term) Do(args ...interface{}) Term {
 	return constructRootTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
-// Evaluate the expr in the context of one or more value bindings. The type of
+// Do evaluates the expr in the context of one or more value bindings. The type of
 // the result is the type of the value returned from expr.
 func Do(args ...interface{}) Term {
 	newArgs := []interface{}{}
@@ -212,7 +235,7 @@ func Do(args ...interface{}) Term {
 	return constructRootTerm("Do", p.Term_FUNCALL, newArgs, map[string]interface{}{})
 }
 
-// Evaluate one of two control paths based on the value of an expression.
+// Branch evaluates one of two control paths based on the value of an expression.
 // branch is effectively an if renamed due to language constraints.
 //
 // The type of the result is determined by the type of the branch that gets executed.
@@ -238,7 +261,7 @@ func Range(args ...interface{}) Term {
 	return constructRootTerm("Range", p.Term_RANGE, args, map[string]interface{}{})
 }
 
-// Handle non-existence errors. Tries to evaluate and return its first argument.
+// Default handles non-existence errors. Tries to evaluate and return its first argument.
 // If an error related to the absence of a value is thrown in the process, or if
 // its first argument returns null, returns its second argument. (Alternatively,
 // the second argument may be a function which will be called with either the
@@ -247,7 +270,7 @@ func (t Term) Default(args ...interface{}) Term {
 	return constructMethodTerm(t, "Default", p.Term_DEFAULT, args, map[string]interface{}{})
 }
 
-// Converts a value of one type into another.
+// CoerceTo converts a value of one type into another.
 //
 // You can convert: a selection, sequence, or object into an ARRAY, an array of
 // pairs into an OBJECT, and any DATUM into a STRING.
@@ -255,17 +278,17 @@ func (t Term) CoerceTo(args ...interface{}) Term {
 	return constructMethodTerm(t, "CoerceTo", p.Term_COERCE_TO, args, map[string]interface{}{})
 }
 
-// Gets the type of a value.
+// TypeOf gets the type of a value.
 func (t Term) TypeOf(args ...interface{}) Term {
 	return constructMethodTerm(t, "TypeOf", p.Term_TYPE_OF, args, map[string]interface{}{})
 }
 
-// Gets the type of a value.
+// ToJSON converts a ReQL value or object to a JSON string.
 func (t Term) ToJSON() Term {
 	return constructMethodTerm(t, "ToJSON", p.Term_TO_JSON_STRING, []interface{}{}, map[string]interface{}{})
 }
 
-// Get information about a RQL value.
+// Info gets information about a RQL value.
 func (t Term) Info(args ...interface{}) Term {
 	return constructMethodTerm(t, "Info", p.Term_INFO, args, map[string]interface{}{})
 }

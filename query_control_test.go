@@ -11,7 +11,7 @@ import (
 func (s *RethinkSuite) TestControlExprNil(c *test.C) {
 	var response interface{}
 	query := Expr(nil)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -23,7 +23,7 @@ func (s *RethinkSuite) TestControlExprNil(c *test.C) {
 func (s *RethinkSuite) TestControlExprSimple(c *test.C) {
 	var response int
 	query := Expr(1)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -35,7 +35,7 @@ func (s *RethinkSuite) TestControlExprSimple(c *test.C) {
 func (s *RethinkSuite) TestControlExprList(c *test.C) {
 	var response []interface{}
 	query := Expr(narr)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -51,7 +51,7 @@ func (s *RethinkSuite) TestControlExprList(c *test.C) {
 func (s *RethinkSuite) TestControlExprObj(c *test.C) {
 	var response map[string]interface{}
 	query := Expr(nobj)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -70,7 +70,7 @@ func (s *RethinkSuite) TestControlExprObj(c *test.C) {
 func (s *RethinkSuite) TestControlStruct(c *test.C) {
 	var response map[string]interface{}
 	query := Expr(str)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -108,7 +108,7 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 func (s *RethinkSuite) TestControlMapTypeAlias(c *test.C) {
 	var response TMap
 	query := Expr(TMap{"A": 1, "B": 2})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -120,7 +120,7 @@ func (s *RethinkSuite) TestControlMapTypeAlias(c *test.C) {
 func (s *RethinkSuite) TestControlStringTypeAlias(c *test.C) {
 	var response TStr
 	query := Expr(TStr("Hello"))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -132,7 +132,7 @@ func (s *RethinkSuite) TestControlStringTypeAlias(c *test.C) {
 func (s *RethinkSuite) TestControlExprTypes(c *test.C) {
 	var response []interface{}
 	query := Expr([]interface{}{int64(1), uint64(1), float64(1.0), int32(1), uint32(1), float32(1), "1", true, false})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -143,8 +143,8 @@ func (s *RethinkSuite) TestControlExprTypes(c *test.C) {
 
 func (s *RethinkSuite) TestControlJs(c *test.C) {
 	var response int
-	query := Js("1;")
-	res, err := query.Run(sess)
+	query := JS("1;")
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -159,8 +159,8 @@ func (s *RethinkSuite) TestControlHttp(c *test.C) {
 	}
 
 	var response map[string]interface{}
-	query := Http("httpbin.org/get?data=1")
-	res, err := query.Run(sess)
+	query := HTTP("httpbin.org/get?data=1")
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -173,8 +173,8 @@ func (s *RethinkSuite) TestControlHttp(c *test.C) {
 
 func (s *RethinkSuite) TestControlJson(c *test.C) {
 	var response []int
-	query := Json("[1,2,3]")
-	res, err := query.Run(sess)
+	query := JSON("[1,2,3]")
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -185,11 +185,11 @@ func (s *RethinkSuite) TestControlJson(c *test.C) {
 
 func (s *RethinkSuite) TestControlError(c *test.C) {
 	query := Error("An error occurred")
-	err := query.Exec(sess)
+	err := query.Exec(session)
 	c.Assert(err, test.NotNil)
 
 	c.Assert(err, test.NotNil)
-	c.Assert(err, test.FitsTypeOf, RqlRuntimeError{})
+	c.Assert(err, test.FitsTypeOf, RQLRuntimeError{})
 
 	c.Assert(err.Error(), test.Equals, "gorethink: An error occurred in: \nr.Error(\"An error occurred\")")
 }
@@ -197,7 +197,7 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 func (s *RethinkSuite) TestControlDoNothing(c *test.C) {
 	var response []interface{}
 	query := Do([]interface{}{map[string]interface{}{"a": 1}, map[string]interface{}{"a": 2}, map[string]interface{}{"a": 3}})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -209,7 +209,7 @@ func (s *RethinkSuite) TestControlDoNothing(c *test.C) {
 func (s *RethinkSuite) TestControlArgs(c *test.C) {
 	var response time.Time
 	query := Time(Args(Expr([]interface{}{2014, 7, 12, "Z"})))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -221,7 +221,7 @@ func (s *RethinkSuite) TestControlBinaryByteArray(c *test.C) {
 	var response []byte
 
 	query := Binary([]byte("Hello World"))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -235,7 +235,7 @@ func (s *RethinkSuite) TestControlBinaryByteArrayAlias(c *test.C) {
 	var response []byte
 
 	query := Binary(byteArray("Hello World"))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -247,7 +247,7 @@ func (s *RethinkSuite) TestControlBinaryExpr(c *test.C) {
 	var response []byte
 
 	query := Expr([]byte("Hello World"))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -259,7 +259,7 @@ func (s *RethinkSuite) TestControlBinaryExprAlias(c *test.C) {
 	var response []byte
 
 	query := Expr(byteArray("Hello World"))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -271,7 +271,7 @@ func (s *RethinkSuite) TestControlBinaryTerm(c *test.C) {
 	var response []byte
 
 	query := Binary(Expr([]byte("Hello World")))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -285,7 +285,7 @@ func (s *RethinkSuite) TestControlBinaryElemTerm(c *test.C) {
 	query := Expr(map[string]interface{}{
 		"bytes": []byte("Hello World"),
 	})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -302,7 +302,7 @@ func (s *RethinkSuite) TestControlDo(c *test.C) {
 	}, func(row Term) Term {
 		return row.Field("a")
 	})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -320,7 +320,7 @@ func (s *RethinkSuite) TestControlDoWithExpr(c *test.C) {
 	}).Do(func(row Term) Term {
 		return row.Field("a")
 	})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -336,7 +336,7 @@ func (s *RethinkSuite) TestControlBranchSimple(c *test.C) {
 		1,
 		2,
 	)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -352,7 +352,7 @@ func (s *RethinkSuite) TestControlBranchWithMapExpr(c *test.C) {
 		Row.Sub(1),
 		Row.Add(1),
 	))
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -366,7 +366,7 @@ func (s *RethinkSuite) TestControlDefault(c *test.C) {
 	query := Expr(defaultObjList).Map(func(row Term) Term {
 		return row.Field("a").Default(1)
 	})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -378,7 +378,7 @@ func (s *RethinkSuite) TestControlDefault(c *test.C) {
 func (s *RethinkSuite) TestControlCoerceTo(c *test.C) {
 	var response string
 	query := Expr(1).CoerceTo("STRING")
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -390,7 +390,7 @@ func (s *RethinkSuite) TestControlCoerceTo(c *test.C) {
 func (s *RethinkSuite) TestControlTypeOf(c *test.C) {
 	var response string
 	query := Expr(1).TypeOf()
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -402,7 +402,7 @@ func (s *RethinkSuite) TestControlTypeOf(c *test.C) {
 func (s *RethinkSuite) TestControlRangeNoArgs(c *test.C) {
 	var response []int
 	query := Range().Limit(100)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -414,7 +414,7 @@ func (s *RethinkSuite) TestControlRangeNoArgs(c *test.C) {
 func (s *RethinkSuite) TestControlRangeSingleArgs(c *test.C) {
 	var response []int
 	query := Range(4)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -426,7 +426,7 @@ func (s *RethinkSuite) TestControlRangeSingleArgs(c *test.C) {
 func (s *RethinkSuite) TestControlRangeTwoArgs(c *test.C) {
 	var response []int
 	query := Range(4, 6)
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -438,7 +438,7 @@ func (s *RethinkSuite) TestControlRangeTwoArgs(c *test.C) {
 func (s *RethinkSuite) TestControlToJSON(c *test.C) {
 	var response string
 	query := Expr([]int{4, 5}).ToJSON()
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+	"sync/atomic"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
@@ -45,19 +46,17 @@ func newCursor(conn *Connection, cursorType string, token int64, term *Term, opt
 //     err = cursor.Err() // get any error encountered during iteration
 //     ...
 type Cursor struct {
-	pc          *poolConn
 	releaseConn func(error)
 
 	conn       *Connection
 	token      int64
 	cursorType string
-	query      Query
 	term       *Term
 	opts       map[string]interface{}
 
 	lastErr   error
 	fetching  bool
-	closed    bool
+	closed    int32
 	finished  bool
 	isAtom    bool
 	buffer    queue
@@ -86,7 +85,7 @@ func (c *Cursor) Err() error {
 func (c *Cursor) Close() error {
 	var err error
 
-	if c.closed {
+	if c.closed != 0 || !atomic.CompareAndSwapInt32(&c.closed, 0, 1) {
 		return nil
 	}
 
@@ -99,7 +98,7 @@ func (c *Cursor) Close() error {
 	}
 
 	// Stop any unfinished queries
-	if !c.closed && !c.finished {
+	if c.closed == 0 && !c.finished {
 		q := Query{
 			Type:  p.Query_STOP,
 			Token: c.token,
@@ -112,7 +111,6 @@ func (c *Cursor) Close() error {
 		c.releaseConn(err)
 	}
 
-	c.closed = true
 	c.conn = nil
 	c.buffer.elems = nil
 	c.responses.elems = nil
@@ -133,7 +131,7 @@ func (c *Cursor) Close() error {
 // Also note that you are able to reuse the same variable multiple times as
 // `Next` zeroes the value before scanning in the result.
 func (c *Cursor) Next(dest interface{}) bool {
-	if c.closed {
+	if c.closed != 0 {
 		return false
 	}
 
@@ -153,7 +151,7 @@ func (c *Cursor) Next(dest interface{}) bool {
 func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 	for c.lastErr == nil {
 		// Check if response is closed/finished
-		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed {
+		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed != 0 {
 			return false, errCursorClosed
 		}
 
@@ -361,7 +359,7 @@ func (c *Cursor) fetchMore() error {
 	if !c.fetching {
 		c.fetching = true
 
-		if c.closed {
+		if c.closed != 0 {
 			return errCursorClosed
 		}
 

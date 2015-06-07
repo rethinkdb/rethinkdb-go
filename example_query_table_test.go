@@ -1,25 +1,15 @@
-package gorethink_test
+package gorethink
 
 import (
 	"fmt"
-	"log"
-
-	r "github.com/dancannon/gorethink"
 )
 
-func Example_TableCreate() {
-	sess, err := r.Connect(r.ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
-	}
-
+// Create a table named "table" with the default settings.
+func ExampleTerm_TableCreate() {
 	// Setup database
-	r.Db("test").TableDrop("table").Run(sess)
+	DB("examples").TableDrop("table").Run(session)
 
-	response, err := r.Db("test").TableCreate("table").RunWrite(sess)
+	response, err := DB("examples").TableCreate("table").RunWrite(session)
 	if err != nil {
 		log.Fatalf("Error creating table: %s", err)
 	}
@@ -30,20 +20,13 @@ func Example_TableCreate() {
 	// 1 table created
 }
 
-func Example_IndexCreate() {
-	sess, err := r.Connect(r.ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
-	}
-
+// Create a simple index based on the field name.
+func ExampleTerm_IndexCreate() {
 	// Setup database
-	r.Db("test").TableDrop("table").Run(sess)
-	r.Db("test").TableCreate("table").Run(sess)
+	DB("examples").TableDrop("table").Run(session)
+	DB("examples").TableCreate("table").Run(session)
 
-	response, err := r.Db("test").Table("table").IndexCreate("name").RunWrite(sess)
+	response, err := DB("examples").Table("table").IndexCreate("name").RunWrite(session)
 	if err != nil {
 		log.Fatalf("Error creating index: %s", err)
 	}
@@ -54,22 +37,15 @@ func Example_IndexCreate() {
 	// 1 index created
 }
 
-func Example_IndexCreate_compound() {
-	sess, err := r.Connect(r.ConnectOpts{
-		Address: url,
-		AuthKey: authKey,
-	})
-	if err != nil {
-		log.Fatalf("Error connecting to DB: %s", err)
-	}
-
+// Create a compound index based on the fields first_name and last_name.
+func ExampleTerm_IndexCreate_compound() {
 	// Setup database
-	r.Db("test").TableDrop("table").Run(sess)
-	r.Db("test").TableCreate("table").Run(sess)
+	DB("examples").TableDrop("table").Run(session)
+	DB("examples").TableCreate("table").Run(session)
 
-	response, err := r.Db("test").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
+	response, err := DB("examples").Table("table").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
-	}).RunWrite(sess)
+	}).RunWrite(session)
 	if err != nil {
 		log.Fatalf("Error creating index: %s", err)
 	}

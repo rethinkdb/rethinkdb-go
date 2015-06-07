@@ -58,3 +58,15 @@ func typeByIndex(t reflect.Type, index []int) reflect.Type {
 	}
 	return t
 }
+
+// valueByString sorts reflect.Value by the string value, this is useful for
+// sorting the result of MapKeys
+type valueByString []reflect.Value
+
+func (x valueByString) Len() int { return len(x) }
+
+func (x valueByString) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
+
+func (x valueByString) Less(i, j int) bool {
+	return x[i].String() < x[j].String()
+}

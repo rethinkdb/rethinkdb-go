@@ -8,7 +8,7 @@ func (s *RethinkSuite) TestMathAdd(c *test.C) {
 	query := Expr(1).Add(2)
 
 	var response int
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -21,7 +21,7 @@ func (s *RethinkSuite) TestMathSub(c *test.C) {
 	query := Expr(2).Sub(1)
 
 	var response int
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -34,7 +34,7 @@ func (s *RethinkSuite) TestMathSubNegative(c *test.C) {
 	query := Expr(1).Sub(2)
 
 	var response int
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -47,7 +47,7 @@ func (s *RethinkSuite) TestMathMul(c *test.C) {
 	query := Expr(5).Mul(4)
 
 	var response int
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -60,7 +60,7 @@ func (s *RethinkSuite) TestMathDiv(c *test.C) {
 	query := Expr(8).Div(4)
 
 	var response int
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -73,7 +73,7 @@ func (s *RethinkSuite) TestMathMod(c *test.C) {
 	query := Expr(7).Mod(2)
 
 	var response int
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -86,7 +86,7 @@ func (s *RethinkSuite) TestMathEqTrue(c *test.C) {
 	query := Expr(1).Eq(1)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -99,7 +99,7 @@ func (s *RethinkSuite) TestMathEqFalse(c *test.C) {
 	query := Expr(1).Eq(2)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -112,7 +112,7 @@ func (s *RethinkSuite) TestMathEqStringTrue(c *test.C) {
 	query := Expr("test").Eq("test")
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -125,7 +125,7 @@ func (s *RethinkSuite) TestCompareLt(c *test.C) {
 	query := Expr(2).Lt(1)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -138,7 +138,7 @@ func (s *RethinkSuite) TestCompareLe(c *test.C) {
 	query := Expr(2).Le(1)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -151,7 +151,7 @@ func (s *RethinkSuite) TestCompareLeEqual(c *test.C) {
 	query := Expr(2).Le(2)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -164,7 +164,7 @@ func (s *RethinkSuite) TestCompareGt(c *test.C) {
 	query := Expr(2).Gt(1)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -177,7 +177,7 @@ func (s *RethinkSuite) TestCompareGe(c *test.C) {
 	query := Expr(2).Ge(1)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -190,7 +190,7 @@ func (s *RethinkSuite) TestCompareGeEqual(c *test.C) {
 	query := Expr(2).Le(2)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -203,7 +203,7 @@ func (s *RethinkSuite) TestBoolNotTrue(c *test.C) {
 	query := Expr(true).Not()
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -216,7 +216,7 @@ func (s *RethinkSuite) TestBoolAnd(c *test.C) {
 	query := Expr(true).And(true)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -229,7 +229,7 @@ func (s *RethinkSuite) TestBoolOr(c *test.C) {
 	query := Expr(true).Or(false)
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)
@@ -242,7 +242,7 @@ func (s *RethinkSuite) TestBoolDeMorgan(c *test.C) {
 	query := Expr(true).And(false).Eq(Expr(true).Not().Or(Expr(false).Not()).Not())
 
 	var response bool
-	r, err := query.Run(sess)
+	r, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = r.One(&response)

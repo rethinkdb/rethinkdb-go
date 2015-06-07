@@ -7,7 +7,7 @@ import (
 )
 
 type object struct {
-	Id    int64  `gorethink:"id,omitempty"`
+	ID    int64  `gorethink:"id,omitempty"`
 	Name  string `gorethink:"name"`
 	Attrs []attr
 }
@@ -18,7 +18,7 @@ type attr struct {
 }
 
 func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
-	res, err := Expr(5).Run(sess)
+	res, err := Expr(5).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -29,7 +29,7 @@ func (s *RethinkSuite) TestCursorLiteral(c *test.C) {
 }
 
 func (s *RethinkSuite) TestCursorSlice(c *test.C) {
-	res, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(sess)
+	res, err := Expr([]interface{}{1, 2, 3, 4, 5}).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -45,7 +45,7 @@ func (s *RethinkSuite) TestCursorPartiallyNilSlice(c *test.C) {
 			map[string]interface{}{"num": 1},
 			nil,
 		},
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -64,7 +64,7 @@ func (s *RethinkSuite) TestCursorMap(c *test.C) {
 	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -81,7 +81,7 @@ func (s *RethinkSuite) TestCursorMapIntoInterface(c *test.C) {
 	res, err := Expr(map[string]interface{}{
 		"id":   2,
 		"name": "Object 1",
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -102,7 +102,7 @@ func (s *RethinkSuite) TestCursorMapNested(c *test.C) {
 			"name":  "attr 1",
 			"value": "value 1",
 		}},
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -127,7 +127,7 @@ func (s *RethinkSuite) TestCursorStruct(c *test.C) {
 			"Name":  "attr 1",
 			"Value": "value 1",
 		}},
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -135,7 +135,7 @@ func (s *RethinkSuite) TestCursorStruct(c *test.C) {
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.DeepEquals, object{
-		Id:   2,
+		ID:   2,
 		Name: "Object 1",
 		Attrs: []attr{attr{
 			Name:  "attr 1",
@@ -152,7 +152,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 		"T": time.Unix(t.Unix(), 0).In(time.UTC),
 		"Z": zeroTime,
 		"B": []byte("hello"),
-	}).Run(sess)
+	}).Run(session)
 	c.Assert(err, test.IsNil)
 
 	var response PseudoTypes
@@ -166,7 +166,7 @@ func (s *RethinkSuite) TestCursorStructPseudoTypes(c *test.C) {
 }
 
 func (s *RethinkSuite) TestCursorAtomString(c *test.C) {
-	res, err := Expr("a").Run(sess)
+	res, err := Expr("a").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -177,7 +177,7 @@ func (s *RethinkSuite) TestCursorAtomString(c *test.C) {
 }
 
 func (s *RethinkSuite) TestCursorAtomArray(c *test.C) {
-	res, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(sess)
+	res, err := Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
@@ -188,47 +188,47 @@ func (s *RethinkSuite) TestCursorAtomArray(c *test.C) {
 }
 
 func (s *RethinkSuite) TestEmptyResults(c *test.C) {
-	DbCreate("test").Exec(sess)
-	Db("test").TableCreate("test").Exec(sess)
-	res, err := Db("test").Table("test").Get("missing value").Run(sess)
+	DBCreate("test").Exec(session)
+	DB("test").TableCreate("test").Exec(session)
+	res, err := DB("test").Table("test").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 
-	res, err = Db("test").Table("test").Get("missing value").Run(sess)
+	res, err = DB("test").Table("test").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	var response interface{}
 	err = res.One(&response)
 	c.Assert(err, test.Equals, ErrEmptyResult)
 	c.Assert(res.IsNil(), test.Equals, true)
 
-	res, err = Expr(nil).Run(sess)
+	res, err = Expr(nil).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 
-	res, err = Db("test").Table("test").Get("missing value").Run(sess)
+	res, err = DB("test").Table("test").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 
-	res, err = Db("test").Table("test").GetAll("missing value", "another missing value").Run(sess)
+	res, err = DB("test").Table("test").GetAll("missing value", "another missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Next(&response), test.Equals, false)
 
 	var obj object
 	obj.Name = "missing value"
-	res, err = Db("test").Table("test").Filter(obj).Run(sess)
+	res, err = DB("test").Table("test").Filter(obj).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 }
 
 func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(sess)
-	Db("test").TableDrop("Table3").Exec(sess)
-	Db("test").TableCreate("Table3").Exec(sess)
-	Db("test").Table("Table3").IndexCreate("num").Exec(sess)
+	DBCreate("test").Exec(session)
+	DB("test").TableDrop("Table3").Exec(session)
+	DB("test").TableCreate("Table3").Exec(session)
+	DB("test").Table("Table3").IndexCreate("num").Exec(session)
 
 	// Insert rows
-	Db("test").Table("Table3").Insert([]interface{}{
+	DB("test").Table("Table3").Insert([]interface{}{
 		map[string]interface{}{
 			"id":   2,
 			"name": "Object 1",
@@ -245,11 +245,11 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 				"Value": "value 1",
 			}},
 		},
-	}).Exec(sess)
+	}).Exec(session)
 
 	// Test query
-	query := Db("test").Table("Table3").OrderBy("id")
-	res, err := query.Run(sess)
+	query := DB("test").Table("Table3").OrderBy("id")
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	var response []object
@@ -258,7 +258,7 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	c.Assert(response, test.HasLen, 2)
 	c.Assert(response, test.DeepEquals, []object{
 		object{
-			Id:   2,
+			ID:   2,
 			Name: "Object 1",
 			Attrs: []attr{attr{
 				Name:  "attr 1",
@@ -266,7 +266,7 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 			}},
 		},
 		object{
-			Id:   3,
+			ID:   3,
 			Name: "Object 2",
 			Attrs: []attr{attr{
 				Name:  "attr 1",
@@ -278,13 +278,13 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 
 func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	// Ensure table + database exist
-	DbCreate("test").Exec(sess)
-	Db("test").TableDrop("Table3").Exec(sess)
-	Db("test").TableCreate("Table3").Exec(sess)
-	Db("test").Table("Table3").IndexCreate("num").Exec(sess)
+	DBCreate("test").Exec(session)
+	DB("test").TableDrop("Table3").Exec(session)
+	DB("test").TableCreate("Table3").Exec(session)
+	DB("test").Table("Table3").IndexCreate("num").Exec(session)
 
 	// Insert rows
-	Db("test").Table("Table3").Insert([]interface{}{
+	DB("test").Table("Table3").Insert([]interface{}{
 		map[string]interface{}{
 			"id":   2,
 			"name": "Object 1",
@@ -301,11 +301,11 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 				"Value": "value 1",
 			}},
 		},
-	}).Exec(sess)
+	}).Exec(session)
 
 	// Test query
-	query := Db("test").Table("Table3").OrderBy("id")
-	res, err := query.Run(sess)
+	query := DB("test").Table("Table3").OrderBy("id")
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	ch := make(chan object)
@@ -318,7 +318,7 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	c.Assert(response, test.HasLen, 2)
 	c.Assert(response, test.DeepEquals, []object{
 		object{
-			Id:   2,
+			ID:   2,
 			Name: "Object 1",
 			Attrs: []attr{attr{
 				Name:  "attr 1",
@@ -326,7 +326,7 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 			}},
 		},
 		object{
-			Id:   3,
+			ID:   3,
 			Name: "Object 2",
 			Attrs: []attr{attr{
 				Name:  "attr 1",
@@ -356,7 +356,7 @@ func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
 			"B": 1,
 		},
 	})
-	res, err := query.Run(sess)
+	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
 	var i int

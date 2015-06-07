@@ -16,10 +16,9 @@ const maxBadConnRetries = 10
 var (
 	connectionRequestQueueSize = 1000000
 
-	errPoolClosed   = errors.New("gorethink: pool is closed")
-	errConnClosed   = errors.New("gorethink: conn is closed")
-	errConnBusy     = errors.New("gorethink: conn is busy")
-	errConnInactive = errors.New("gorethink: conn was never active")
+	errPoolClosed = errors.New("gorethink: pool is closed")
+	errConnClosed = errors.New("gorethink: conn is closed")
+	errConnBusy   = errors.New("gorethink: conn is busy")
 )
 
 // depSet is a finalCloser's outstanding dependencies
@@ -38,7 +37,6 @@ type Pool struct {
 	opts *ConnectOpts
 
 	mu           sync.Mutex // protects following fields
-	err          error      // the last error that occurred
 	freeConn     []*poolConn
 	connRequests []chan connRequest
 	numOpen      int
