@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v1.0.0-RC.1 - 2015-06-07
 In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes see below.
 
 ### Added
