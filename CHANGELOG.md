@@ -13,6 +13,7 @@ In an attempt to make this library more "idiomatic" some functions have been ren
 
 ### Fixed 
  - Fixed issue causing inconsistent results when unmarshaling query response into structs (#192)
+ - Fixed issue causing errors when closing a changefeed cursor (#191)
 
 ### Changed 
  - Renamed `Db` to `DB`.
