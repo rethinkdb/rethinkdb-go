@@ -6,12 +6,12 @@ import (
 
 func (s *RethinkSuite) TestDbCreate(c *test.C) {
 	// Delete the test2 database if it already exists
-	DBDrop("test").Exec(sess)
+	DBDrop("test").Exec(session)
 
 	// Test database creation
 	query := DBCreate("test")
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.DBsCreated, jsonEquals, 1)
 }
@@ -20,11 +20,11 @@ func (s *RethinkSuite) TestDbList(c *test.C) {
 	var response []interface{}
 
 	// create database
-	DBCreate("test").Exec(sess)
+	DBCreate("test").Exec(session)
 
 	// Try and find it in the list
 	success := false
-	res, err := DBList().Run(sess)
+	res, err := DBList().Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -43,15 +43,15 @@ func (s *RethinkSuite) TestDbList(c *test.C) {
 
 func (s *RethinkSuite) TestDbDelete(c *test.C) {
 	// Delete the test2 database if it already exists
-	DBCreate("test").Exec(sess)
+	DBCreate("test").Exec(session)
 
 	// Test database creation
 	query := DBDrop("test")
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.DBsDropped, jsonEquals, 1)
 
 	// Ensure that there is still a test DB after the test has finished
-	DBCreate("test").Exec(sess)
+	DBCreate("test").Exec(session)
 }

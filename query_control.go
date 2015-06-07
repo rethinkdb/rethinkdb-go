@@ -177,6 +177,16 @@ func Args(args ...interface{}) Term {
 }
 
 // Binary encapsulates binary data within a query.
+//
+// The type of data binary accepts depends on the client language. In Go, it
+// expects either a byte array/slice or a bytes.Buffer.
+//
+// Only a limited subset of ReQL commands may be chained after binary:
+//  - coerceTo can coerce binary objects to string types
+//  - count will return the number of bytes in the object
+//  - slice will treat bytes like array indexes (i.e., slice(10,20) will return bytes 10–19)
+//  - typeOf returns PTYPE<BINARY>
+//  - info will return information on a binary object.
 func Binary(data interface{}) Term {
 	var b []byte
 

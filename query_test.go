@@ -5,7 +5,7 @@ import test "gopkg.in/check.v1"
 func (s *RethinkSuite) TestQueryRun(c *test.C) {
 	var response string
 
-	res, err := Expr("Test").Run(sess)
+	res, err := Expr("Test").Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
@@ -15,14 +15,14 @@ func (s *RethinkSuite) TestQueryRun(c *test.C) {
 }
 
 func (s *RethinkSuite) TestQueryExec(c *test.C) {
-	err := Expr("Test").Exec(sess)
+	err := Expr("Test").Exec(session)
 	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestQueryProfile(c *test.C) {
 	var response string
 
-	res, err := Expr("Test").Run(sess, RunOpts{
+	res, err := Expr("Test").Run(session, RunOpts{
 		Profile: true,
 	})
 	c.Assert(err, test.IsNil)
@@ -37,7 +37,7 @@ func (s *RethinkSuite) TestQueryProfile(c *test.C) {
 func (s *RethinkSuite) TestQueryRunRawTime(c *test.C) {
 	var response map[string]interface{}
 
-	res, err := Now().Run(sess, RunOpts{
+	res, err := Now().Run(session, RunOpts{
 		TimeFormat: "raw",
 	})
 	c.Assert(err, test.IsNil)

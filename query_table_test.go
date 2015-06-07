@@ -7,44 +7,44 @@ import (
 )
 
 func (s *RethinkSuite) TestTableCreate(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
+	DB("test").TableDrop("test").Exec(session)
 
 	// Test database creation
 	query := DB("test").TableCreate("test")
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.TablesCreated, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
-	DB("test").TableDrop("testOpts").Exec(sess)
+	DB("test").TableDrop("testOpts").Exec(session)
 
 	// Test database creation
 	query := DB("test").TableCreate("testOpts", TableCreateOpts{
 		PrimaryKey: "it",
 	})
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.TablesCreated, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreateSoftDurability(c *test.C) {
-	DB("test").TableDrop("testOpts").Exec(sess)
+	DB("test").TableDrop("testOpts").Exec(session)
 
 	// Test database creation
 	query := DB("test").TableCreate("testOpts", TableCreateOpts{
 		Durability: "soft",
 	})
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.TablesCreated, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
-	DB("test").TableDrop("testOpts").Exec(sess)
+	DB("test").TableDrop("testOpts").Exec(session)
 
 	// Test database creation
 	query := DB("test").TableCreate("testOpts", TableCreateOpts{
@@ -52,21 +52,21 @@ func (s *RethinkSuite) TestTableCreateSoftMultipleOpts(c *test.C) {
 		Durability: "soft",
 	})
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.TablesCreated, jsonEquals, 1)
 
-	DB("test").TableDrop("test").Exec(sess)
+	DB("test").TableDrop("test").Exec(session)
 }
 
 func (s *RethinkSuite) TestTableList(c *test.C) {
 	var response []interface{}
 
-	DB("test").TableCreate("test").Exec(sess)
+	DB("test").TableCreate("test").Exec(session)
 
 	// Try and find it in the list
 	success := false
-	res, err := DB("test").TableList().Run(sess)
+	res, err := DB("test").TableList().Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -84,37 +84,37 @@ func (s *RethinkSuite) TestTableList(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableDelete(c *test.C) {
-	DB("test").TableCreate("test").Exec(sess)
+	DB("test").TableCreate("test").Exec(session)
 
 	// Test database creation
 	query := DB("test").TableDrop("test")
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.TablesDropped, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableIndexCreate(c *test.C) {
-	DB("test").TableCreate("test").Exec(sess)
-	DB("test").Table("test").IndexDrop("test").Exec(sess)
+	DB("test").TableCreate("test").Exec(session)
+	DB("test").Table("test").IndexDrop("test").Exec(session)
 
 	// Test database creation
 	query := DB("test").Table("test").IndexCreate("test", IndexCreateOpts{
 		Multi: true,
 	})
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.Created, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableCompoundIndexCreate(c *test.C) {
-	DBCreate("test").Exec(sess)
-	DB("test").TableDrop("TableCompound").Exec(sess)
-	DB("test").TableCreate("TableCompound").Exec(sess)
+	DBCreate("test").Exec(session)
+	DB("test").TableDrop("TableCompound").Exec(session)
+	DB("test").TableCreate("TableCompound").Exec(session)
 	response, err := DB("test").Table("TableCompound").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
-	}).RunWrite(sess)
+	}).RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.Created, test.Equals, 1)
 }
@@ -122,12 +122,12 @@ func (s *RethinkSuite) TestTableCompoundIndexCreate(c *test.C) {
 func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 	var response []interface{}
 
-	DB("test").TableCreate("test").Exec(sess)
-	DB("test").Table("test").IndexCreate("test").Exec(sess)
+	DB("test").TableCreate("test").Exec(session)
+	DB("test").Table("test").IndexCreate("test").Exec(session)
 
 	// Try and find it in the list
 	success := false
-	res, err := DB("test").Table("test").IndexList().Run(sess)
+	res, err := DB("test").Table("test").IndexList().Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.All(&response)
@@ -145,37 +145,37 @@ func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
-	DB("test").TableCreate("test").Exec(sess)
-	DB("test").Table("test").IndexCreate("test").Exec(sess)
+	DB("test").TableCreate("test").Exec(session)
+	DB("test").Table("test").IndexCreate("test").Exec(session)
 
 	// Test database creation
 	query := DB("test").Table("test").IndexDrop("test")
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.Dropped, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
-	DB("test").TableDrop("test").Exec(sess)
-	DB("test").TableCreate("test").Exec(sess)
-	DB("test").Table("test").IndexCreate("test").Exec(sess)
+	DB("test").TableDrop("test").Exec(session)
+	DB("test").TableCreate("test").Exec(session)
+	DB("test").Table("test").IndexCreate("test").Exec(session)
 
 	// Test index rename
 	query := DB("test").Table("test").IndexRename("test", "test2")
 
-	response, err := query.RunWrite(sess)
+	response, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(response.Renamed, jsonEquals, 1)
 }
 
 func (s *RethinkSuite) TestTableChanges(c *test.C) {
-	DB("test").TableDrop("changes").Exec(sess)
-	DB("test").TableCreate("changes").Exec(sess)
+	DB("test").TableDrop("changes").Exec(session)
+	DB("test").TableCreate("changes").Exec(session)
 
 	var n int
 
-	res, err := DB("test").Table("changes").Changes().Run(sess)
+	res, err := DB("test").Table("changes").Changes().Run(session)
 	if err != nil {
 		c.Fatal(err.Error())
 	}
@@ -198,16 +198,16 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 		wg.Done()
 	}()
 
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 6}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 7}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 8}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 9}).Exec(sess)
-	DB("test").Table("changes").Insert(map[string]interface{}{"n": 10}).Exec(sess)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 6}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 7}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 8}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 9}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 10}).Exec(session)
 
 	wg.Wait()
 
