@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+	"sync/atomic"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"

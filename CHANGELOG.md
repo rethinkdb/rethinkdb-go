@@ -2,18 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
-
+## v1.0.0-RC.1 - 2015-06-07
 In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes see below.
 
 ### Added
  - Added more documentation.
  - Added `Shards`, `Replicas` and `PrimaryReplicaTag` optional arguments in `TableCreateOpts`.
  - Added `MultiGroup` and `MultiGroupByIndex` which are equivalent to the running `group` with the `multi` optional argument set to true.
-
-### Fixed 
- - Fixed issue causing inconsistent results when unmarshaling query response into structs (#192)
- - Fixed issue causing errors when closing a changefeed cursor (#191)
 
 ### Changed 
  - Renamed `Db` to `DB`.
@@ -32,11 +27,12 @@ In an attempt to make this library more "idiomatic" some functions have been ren
  - Renamed `WriteChanges` to `ChangeResponse`, this is now a general type and can be used when dealing with changefeeds.
  - Removed depth limit when encoding values using `Expr`
 
-## Fixed
+### Fixed
+ - Fixed issue causing inconsistent results when unmarshaling query response into structs (#192)
+ - Fixed issue causing errors when closing a changefeed cursor (#191)
  - Fixed issue causing nodes to remain unhealthy when host discovery is disabled (#195)
 
 ### Removed
-
  - Removed `CacheSize` and `DataCenter` optional arguments in `TableCreateOpts`.
  - Removed `CacheSize` optional argument from `InsertOpts`
 

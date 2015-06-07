@@ -5,7 +5,7 @@ import (
 )
 
 // Get john's age
-func ExampleField() {
+func ExampleTerm_Field() {
 	cur, err := DB("examples").Table("users").Get("john").Field("age").Run(session)
 	if err != nil {
 		fmt.Print(err)

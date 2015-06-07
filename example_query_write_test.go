@@ -5,7 +5,7 @@ import (
 )
 
 // Insert a document into the table posts using a struct.
-func ExampleTerm_Insert_Struct() {
+func ExampleTerm_Insert_struct() {
 	type Post struct {
 		ID      int    `gorethink:"id"`
 		Title   string `gorethink:"title"`
@@ -30,7 +30,7 @@ func ExampleTerm_Insert_Struct() {
 
 // Insert a document without a defined primary key into the table posts where
 // the primary key is id.
-func ExampleTerm_Insert_GeneratedKey() {
+func ExampleTerm_Insert_generatedKey() {
 	type Post struct {
 		Title   string `gorethink:"title"`
 		Content string `gorethink:"content"`
@@ -52,7 +52,7 @@ func ExampleTerm_Insert_GeneratedKey() {
 }
 
 // Insert a document into the table posts using a map.
-func ExampleTerm_Insert_Map() {
+func ExampleTerm_Insert_map() {
 	resp, err := DB("examples").Table("posts").Insert(map[string]interface{}{
 		"id":      2,
 		"title":   "Lorem ipsum",
@@ -70,7 +70,7 @@ func ExampleTerm_Insert_Map() {
 }
 
 // Insert multiple documents into the table posts.
-func ExampleTerm_Insert_Multiple() {
+func ExampleTerm_Insert_multiple() {
 	resp, err := DB("examples").Table("posts").Insert([]interface{}{
 		map[string]interface{}{
 			"title":   "Lorem ipsum",
@@ -94,7 +94,7 @@ func ExampleTerm_Insert_Multiple() {
 
 // Insert a document into the table posts, replacing the document if it already
 // exists.
-func ExampleTerm_Insert_Upsert() {
+func ExampleTerm_Insert_upsert() {
 	resp, err := DB("examples").Table("posts").Insert(map[string]interface{}{
 		"id":    1,
 		"title": "Lorem ipsum 2",
@@ -129,7 +129,7 @@ func ExampleTerm_Update() {
 }
 
 // Update bob's cell phone number.
-func ExampleTerm_Update_Nested() {
+func ExampleTerm_Update_nested() {
 	resp, err := DB("examples").Table("users").Get("bob").Update(map[string]interface{}{
 		"contact": map[string]interface{}{
 			"phone": "408-555-4242",
@@ -147,7 +147,7 @@ func ExampleTerm_Update_Nested() {
 }
 
 // Update the status of all posts to published.
-func ExampleTerm_Update_All() {
+func ExampleTerm_Update_all() {
 	resp, err := DB("examples").Table("posts").Update(map[string]interface{}{
 		"status": "published",
 	}).RunWrite(session)
@@ -164,7 +164,7 @@ func ExampleTerm_Update_All() {
 
 // Increment the field view of the post with id of 1. If the field views does not
 // exist, it will be set to 0.
-func ExampleTerm_Update_Increment() {
+func ExampleTerm_Update_increment() {
 	resp, err := DB("examples").Table("posts").Get(1).Update(map[string]interface{}{
 		"views": Row.Field("views").Add(1).Default(0),
 	}).RunWrite(session)
@@ -180,7 +180,7 @@ func ExampleTerm_Update_Increment() {
 }
 
 // Update the status of the post with id of 1 using soft durability.
-func ExampleTerm_Update_SoftDurability() {
+func ExampleTerm_Update_softDurability() {
 	resp, err := DB("examples").Table("posts").Get(2).Update(map[string]interface{}{
 		"status": "draft",
 	}, UpdateOpts{
@@ -212,7 +212,7 @@ func ExampleTerm_Delete() {
 }
 
 // Delete all comments where the field status is published
-func ExampleTerm_Delete_Many() {
+func ExampleTerm_Delete_many() {
 	resp, err := DB("examples").Table("posts").Filter(map[string]interface{}{
 		"status": "published",
 	}).Delete().RunWrite(session)
