@@ -62,7 +62,7 @@ func ExampleTerm_Default() {
 }
 
 // Convert a Go integer to a ReQL object
-func ExampleExpr_Int() {
+func ExampleExpr_int() {
 	cur, err := Expr(1).Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -82,7 +82,7 @@ func ExampleExpr_Int() {
 }
 
 // Convert a Go slice to a ReQL object
-func ExampleExpr_Slice() {
+func ExampleExpr_slice() {
 	cur, err := Expr([]int{1, 2, 3}).Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -107,7 +107,7 @@ func ExampleExpr_Slice() {
 }
 
 // Convert a Go slice to a ReQL object
-func ExampleExpr_Map() {
+func ExampleExpr_map() {
 	cur, err := Expr(map[string]interface{}{
 		"a": 1,
 		"b": "b",
@@ -134,7 +134,7 @@ func ExampleExpr_Map() {
 }
 
 // Convert a Go slice to a ReQL object
-func ExampleExpr_Struct() {
+func ExampleExpr_struct() {
 	type ExampleTypeNested struct {
 		N int
 	}
@@ -188,7 +188,7 @@ func ExampleExpr_Struct() {
 
 // Convert a Go struct (with gorethink tags) to a ReQL object. The tags allow
 // the field names to be changed.
-func ExampleExpr_StructTags() {
+func ExampleExpr_structTags() {
 	type ExampleType struct {
 		A int    `gorethink:"field_a"`
 		B string `gorethink:"field_b"`

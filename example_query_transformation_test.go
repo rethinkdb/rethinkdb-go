@@ -28,7 +28,7 @@ func ExampleTerm_Map() {
 }
 
 // Sum the elements of three sequences.
-func ExampleMap_MultipleSequences() {
+func ExampleMap_multipleSequences() {
 	var sequence1 = []int{100, 200, 300, 400}
 	var sequence2 = []int{10, 20, 30, 40}
 	var sequence3 = []int{1, 2, 3, 4}
@@ -55,7 +55,7 @@ func ExampleMap_MultipleSequences() {
 }
 
 // Order all the posts using the index date.
-func ExampleTerm_OrderBy_Index() {
+func ExampleTerm_OrderBy_index() {
 	cur, err := DB("examples").Table("posts").OrderBy(OrderByOpts{
 		Index: "date",
 	}).Run(session)
@@ -75,7 +75,7 @@ func ExampleTerm_OrderBy_Index() {
 }
 
 // Order all the posts using the index date in descending order.
-func ExampleTerm_OrderBy_IndexDesc() {
+func ExampleTerm_OrderBy_indexDesc() {
 	cur, err := DB("examples").Table("posts").OrderBy(OrderByOpts{
 		Index: Desc("date"),
 	}).Run(session)
@@ -96,7 +96,7 @@ func ExampleTerm_OrderBy_IndexDesc() {
 
 // You can efficiently order using multiple fields by using a compound index.
 // For example order by date and title.
-func ExampleTerm_OrderBy_Compound() {
+func ExampleTerm_OrderBy_compound() {
 	cur, err := DB("examples").Table("posts").OrderBy(OrderByOpts{
 		Index: Desc("dateAndTitle"),
 	}).Run(session)
@@ -117,7 +117,7 @@ func ExampleTerm_OrderBy_Compound() {
 
 // If you have a sequence with fewer documents than the arrayLimit, you can order
 // it by multiple fields without an index.
-func ExampleTerm_OrderBy_Multiple() {
+func ExampleTerm_OrderBy_multiple() {
 	cur, err := DB("examples").Table("posts").OrderBy(
 		"title",
 		OrderByOpts{Index: Desc("date")},
@@ -140,7 +140,7 @@ func ExampleTerm_OrderBy_Multiple() {
 // Notice that an index ordering always has highest precedence. The following
 // query orders posts by date, and if multiple posts were published on the same
 // date, they will be ordered by title.
-func ExampleTerm_OrderBy_MultipleWithIndex() {
+func ExampleTerm_OrderBy_multipleWithIndex() {
 	cur, err := DB("examples").Table("posts").OrderBy(
 		"title",
 		OrderByOpts{Index: Desc("date")},
