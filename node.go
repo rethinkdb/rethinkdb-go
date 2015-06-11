@@ -44,19 +44,17 @@ func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
 		refreshInterval = time.Second * 30
 	}
 
-	if cluster.opts.DiscoverHosts {
-		go func() {
-			refreshTicker := time.NewTicker(refreshInterval)
-			for {
-				select {
-				case <-refreshTicker.C:
-					node.Refresh()
-				case <-node.refreshDoneChan:
-					return
-				}
+	go func() {
+		refreshTicker := time.NewTicker(refreshInterval)
+		for {
+			select {
+			case <-refreshTicker.C:
+				node.Refresh()
+			case <-node.refreshDoneChan:
+				return
 			}
-		}()
-	}
+		}
+	}()
 
 	return node
 }
@@ -149,26 +147,52 @@ func (n *Node) Exec(q Query) (err error) {
 // the nodes health is decrease, if there were no issues then the node is marked
 // as being healthy.
 func (n *Node) Refresh() {
-	cursor, err := n.pool.Query(newQuery(
-		DB("rethinkdb").Table("server_status").Get(n.ID),
-		map[string]interface{}{},
-		n.cluster.opts,
-	))
-	if err != nil {
-		n.DecrementHealth()
-		return
-	}
-	defer cursor.Close()
+	if n.cluster.opts.DiscoverHosts {
+		// If host discovery is enabled then check the servers status
+		cursor, err := n.pool.Query(newQuery(
+			DB("rethinkdb").Table("server_status").Get(n.ID),
+			map[string]interface{}{},
+			n.cluster.opts,
+		))
+		if err != nil {
+			n.DecrementHealth()
+			return
+		}
+		defer cursor.Close()
 
-	var status nodeStatus
-	err = cursor.One(&status)
-	if err != nil {
-		return
-	}
+		var status nodeStatus
+		err = cursor.One(&status)
+		if err != nil {
+			return
+		}
 
-	if status.Status != "connected" {
-		n.DecrementHealth()
-		return
+		if status.Status != "connected" {
+			n.DecrementHealth()
+			return
+		}
+	} else {
+		// If host discovery is disabled just execute a simple ping query
+		cursor, err := n.pool.Query(newQuery(
+			Expr("OK"),
+			map[string]interface{}{},
+			n.cluster.opts,
+		))
+		if err != nil {
+			n.DecrementHealth()
+			return
+		}
+		defer cursor.Close()
+
+		var status string
+		err = cursor.One(&status)
+		if err != nil {
+			return
+		}
+
+		if status != "OK" {
+			n.DecrementHealth()
+			return
+		}
 	}
 
 	// If status check was successful reset health
@@ -177,9 +201,7 @@ func (n *Node) Refresh() {
 
 // DecrementHealth decreases the nodes health by 1 (the nodes health starts at maxNodeHealth)
 func (n *Node) DecrementHealth() {
-	if n.cluster.opts.DiscoverHosts {
-		atomic.AddInt64(&n.health, -1)
-	}
+	atomic.AddInt64(&n.health, -1)
 }
 
 // ResetHealth sets the nodes health back to maxNodeHealth (fully healthy)
