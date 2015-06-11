@@ -2,7 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## v1.0.0-RC.1 - 2015-06-07
+## v1.0.0 RC2 - 2015-06-11
+
+### Fixed
+ - Fixed issue causing driver to fail when connecting to DB which did not have its canonical address set correctly (#200).
+
+## v1.0.0 RC1 - 2015-06-07
 In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes see below.
 
 ### Added
