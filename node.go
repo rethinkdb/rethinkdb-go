@@ -44,18 +44,19 @@ func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
 		refreshInterval = time.Second * 30
 	}
 
-	go func() {
-
-		refreshTicker := time.NewTicker(refreshInterval)
-		for {
-			select {
-			case <-refreshTicker.C:
-				node.Refresh()
-			case <-node.refreshDoneChan:
-				return
+	if cluster.opts.DiscoverHosts {
+		go func() {
+			refreshTicker := time.NewTicker(refreshInterval)
+			for {
+				select {
+				case <-refreshTicker.C:
+					node.Refresh()
+				case <-node.refreshDoneChan:
+					return
+				}
 			}
-		}
-	}()
+		}()
+	}
 
 	return node
 }
@@ -124,7 +125,7 @@ func (n *Node) Query(q Query) (cursor *Cursor, err error) {
 		n.DecrementHealth()
 	}
 
-	return
+	return cursor, err
 }
 
 // Exec executes a ReQL query using this nodes connection pool.
@@ -138,7 +139,7 @@ func (n *Node) Exec(q Query) (err error) {
 		n.DecrementHealth()
 	}
 
-	return
+	return err
 }
 
 // Refresh attempts to connect to the node and check that it is still connected
@@ -176,7 +177,9 @@ func (n *Node) Refresh() {
 
 // DecrementHealth decreases the nodes health by 1 (the nodes health starts at maxNodeHealth)
 func (n *Node) DecrementHealth() {
-	atomic.AddInt64(&n.health, -1)
+	if n.cluster.opts.DiscoverHosts {
+		atomic.AddInt64(&n.health, -1)
+	}
 }
 
 // ResetHealth sets the nodes health back to maxNodeHealth (fully healthy)
