@@ -82,7 +82,7 @@ if err != nil {
 }
 ```
 
-When `DiscoverHosts` is true any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by GoRethink.
+When `DiscoverHosts` is true any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by GoRethink. Unfortunately the canonical address of each server in the cluster **MUST** be set as otherwise clients will try to connect to the database nodes locally. For more information about how to set a RethinkDB servers canonical address set this page http://www.rethinkdb.com/docs/config-file/.
 
 
 ## Query Functions
