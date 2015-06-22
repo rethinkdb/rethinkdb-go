@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v1.0.0 RC3 - 2015-06-22
+
+### Changed
+ - Reverted change that added sorting to maps when decoding due to performance concerts, instead documented that struct tags should be used. Especially when using a field named `Id`.
+
 ## v1.0.0 RC2 - 2015-06-11
 
 ### Fixed

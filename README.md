@@ -7,7 +7,7 @@
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
 
 
-Current version: v1.0.0 RC2 (RethinkDB v2.0) 
+Current version: v1.0.0 RC3 (RethinkDB v2.0) 
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -204,6 +204,8 @@ Field int `gorethink:"myName,omitempty"`
 // Note the leading comma.
 Field int `gorethink:",omitempty"`
 ```
+
+**NOTE:** It is strongly recommended that struct tags are used to explicitly define the mapping between your Go type and how the data is stored by RethinkDB. This is especially important when using an `Id` field as by default RethinkDB will create a field named `id` as the primary key (note that the RethinkDB field is lowercase but the Go version starts with a capital letter).
 
 ## Benchmarks
 
