@@ -98,7 +98,7 @@ func (c *Cursor) Close() error {
 	}
 
 	// Stop any unfinished queries
-	if c.closed == 0 && !c.finished {
+	if !c.finished {
 		q := Query{
 			Type:  p.Query_STOP,
 			Token: c.token,
