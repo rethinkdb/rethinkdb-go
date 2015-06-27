@@ -20,6 +20,11 @@ Please note that this version of the driver only supports versions of RethinkDB 
 go get -u github.com/dancannon/gorethink
 ```
 
+Or (pinned to the v1.x.x tag)
+```
+go get gopkg.in/dancannon/gorethink.v1
+```
+
 ## Connection
 
 ### Basic Connection
