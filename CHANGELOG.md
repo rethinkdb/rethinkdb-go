@@ -2,23 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v1.0.0 - 2015-06-27
 
-### Fixed
-- Fixed ongoing queries not being properly stopped when closing the cursor.
+1.0.0 is finally here, This is the first stable production ready release of GoRethink!
 
-## v1.0.0 RC3 - 2015-06-22
+![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker.png "Golang Gopher and RethinkDB Thinker")
 
-### Changed
- - Reverted change that added sorting to maps when decoding due to performance concerts, instead documented that struct tags should be used. Especially when using a field named `Id`.
-
-## v1.0.0 RC2 - 2015-06-11
-
-### Fixed
- - Fixed issue causing driver to fail when connecting to DB which did not have its canonical address set correctly (#200).
-
-## v1.0.0 RC1 - 2015-06-07
-In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes see below.
+In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes and bug fixes see below.
 
 ### Added
  - Added more documentation.
@@ -43,9 +33,10 @@ In an attempt to make this library more "idiomatic" some functions have been ren
  - Removed depth limit when encoding values using `Expr`
 
 ### Fixed
- - Fixed issue causing inconsistent results when unmarshaling query response into structs (#192)
  - Fixed issue causing errors when closing a changefeed cursor (#191)
  - Fixed issue causing nodes to remain unhealthy when host discovery is disabled (#195)
+ - Fixed issue causing driver to fail when connecting to DB which did not have its canonical address set correctly (#200).
+- Fixed ongoing queries not being properly stopped when closing the cursor.
 
 ### Removed
  - Removed `CacheSize` and `DataCenter` optional arguments in `TableCreateOpts`.
