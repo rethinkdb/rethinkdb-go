@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"sync"
+	"time"
 
 	test "gopkg.in/check.v1"
 )
@@ -212,4 +213,43 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	wg.Wait()
 
 	c.Assert(n, test.Equals, 10)
+}
+
+func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
+	DB("test").TableDrop("changes").Exec(session)
+	DB("test").TableCreate("changes").Exec(session)
+
+	var n int
+
+	res, err := DB("test").Table("changes").Changes().Run(session)
+	if err != nil {
+		c.Fatal(err.Error())
+	}
+	c.Assert(res.Type(), test.Equals, "Feed")
+
+	change := make(chan ChangeResponse)
+
+	// Close cursor after one second
+	go func() {
+		<-time.After(time.Second)
+		res.Close()
+	}()
+
+	// Insert 5 docs
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(session)
+
+	// Listen for changes
+	res.Listen(change)
+	for _ = range change {
+		n++
+	}
+	if res.Err() != nil {
+		c.Fatal(res.Err())
+	}
+
+	c.Assert(n, test.Equals, 5)
 }
