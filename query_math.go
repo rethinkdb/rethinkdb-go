@@ -7,7 +7,7 @@ import (
 var (
 	// MinVal represents the smallest possible value RethinkDB can store
 	MinVal = constructRootTerm("MinVal", p.Term_MINVAL, []interface{}{}, map[string]interface{}{})
-	// MaxVal represents the smallest possible value RethinkDB can store
+	// MaxVal represents the largest possible value RethinkDB can store
 	MaxVal = constructRootTerm("MaxVal", p.Term_MAXVAL, []interface{}{}, map[string]interface{}{})
 )
 
