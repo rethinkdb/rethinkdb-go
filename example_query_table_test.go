@@ -11,7 +11,7 @@ func ExampleTerm_TableCreate() {
 
 	response, err := DB("examples").TableCreate("table").RunWrite(session)
 	if err != nil {
-		log.Fatalf("Error creating table: %s", err)
+		Log.Fatalf("Error creating table: %s", err)
 	}
 
 	fmt.Printf("%d table created", response.TablesCreated)
@@ -28,7 +28,7 @@ func ExampleTerm_IndexCreate() {
 
 	response, err := DB("examples").Table("table").IndexCreate("name").RunWrite(session)
 	if err != nil {
-		log.Fatalf("Error creating index: %s", err)
+		Log.Fatalf("Error creating index: %s", err)
 	}
 
 	fmt.Printf("%d index created", response.Created)
@@ -47,7 +47,7 @@ func ExampleTerm_IndexCreate_compound() {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(session)
 	if err != nil {
-		log.Fatalf("Error creating index: %s", err)
+		Log.Fatalf("Error creating index: %s", err)
 	}
 
 	fmt.Printf("%d index created", response.Created)
