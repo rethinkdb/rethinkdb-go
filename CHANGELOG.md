@@ -5,6 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Added
  - Added race detector to CI
+
+### Changed
+ - Made `Cursor` safe for concurrent use (`Session` is already safe).
+
 ### Fixed
  - Fixed race condition in node pool
 
