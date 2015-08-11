@@ -41,21 +41,33 @@ func constructMethodTerm(prevVal Term, name string, termType p.Term_TermType, ar
 
 // Helper functions for creating internal RQL types
 
-func newQuery(t Term, qopts map[string]interface{}, copts *ConnectOpts) Query {
+func newQuery(t Term, qopts map[string]interface{}, copts *ConnectOpts) (q Query, err error) {
 	queryOpts := map[string]interface{}{}
 	for k, v := range qopts {
-		queryOpts[k] = Expr(v).build()
+		queryOpts[k], err = Expr(v).build()
+		if err != nil {
+			return
+		}
 	}
 	if copts.Database != "" {
-		queryOpts["db"] = DB(copts.Database).build()
+		queryOpts["db"], err = DB(copts.Database).build()
+		if err != nil {
+			return
+		}
+	}
+
+	builtTerm, err := t.build()
+	if err != nil {
+		return q, err
 	}
 
 	// Construct query
 	return Query{
-		Type: p.Query_START,
-		Term: &t,
-		Opts: queryOpts,
-	}
+		Type:      p.Query_START,
+		Term:      &t,
+		Opts:      queryOpts,
+		builtTerm: builtTerm,
+	}, nil
 }
 
 // makeArray takes a slice of terms and produces a single MAKE_ARRAY term

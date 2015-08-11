@@ -446,3 +446,9 @@ func (s *RethinkSuite) TestControlToJSON(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, "[4,5]")
 }
+
+func (s *RethinkSuite) TestControlInvalidType(c *test.C) {
+	query := Expr(map[struct{ string }]string{})
+	_, err := query.Run(session)
+	c.Assert(err, test.NotNil)
+}

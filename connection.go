@@ -113,7 +113,11 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		q.Token = c.nextToken()
 		if c.opts.Database != "" {
-			q.Opts["db"] = DB(c.opts.Database).build()
+			var err error
+			q.Opts["db"], err = DB(c.opts.Database).build()
+			if err != nil {
+				return nil, nil, err
+			}
 		}
 	}
 

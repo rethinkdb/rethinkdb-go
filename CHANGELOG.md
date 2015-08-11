@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed
+ - Fixed encoding errors not being returned when running queries
+
 ## v1.0.0 - 2015-06-27
 
 1.0.0 is finally here, This is the first stable production ready release of GoRethink!
