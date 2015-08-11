@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 
 	p "github.com/dancannon/gorethink/ql2"
 )

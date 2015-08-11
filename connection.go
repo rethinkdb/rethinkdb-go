@@ -156,7 +156,7 @@ func (c *Connection) sendQuery(q Query) error {
 	if c.opts.Timeout == 0 {
 		c.conn.SetWriteDeadline(time.Time{})
 	} else {
-		c.conn.SetWriteDeadline(time.Now().Add(c.opts.Timeout))
+		c.conn.SetWriteDeadline(time.Now().Add(c.opts.WriteTimeout))
 	}
 
 	// Send the JSON encoding of the query itself.
@@ -182,7 +182,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	if c.opts.Timeout == 0 {
 		c.conn.SetReadDeadline(time.Time{})
 	} else {
-		c.conn.SetReadDeadline(time.Now().Add(c.opts.Timeout))
+		c.conn.SetReadDeadline(time.Now().Add(c.opts.ReadTimeout))
 	}
 
 	// Read response header (token+length)

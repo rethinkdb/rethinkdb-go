@@ -10,6 +10,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added `Union` as a root term
  - Added `Branch` as a root term
 
+### Changed
+ - Changed `Timeout` connect argument to only configure the connection timeout.
+
 ## Deprecated
  - Deprecated `UseOutdated` optional argument
 
