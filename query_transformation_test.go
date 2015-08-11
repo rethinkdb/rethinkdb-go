@@ -160,6 +160,7 @@ func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
 
 	// Test database creation
 	DB("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(session)
+	DB("test").Table("OrderByIndex").IndexWait().Exec(session)
 	DB("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(session)
 
 	query := DB("test").Table("OrderByIndex").OrderBy(OrderByOpts{
@@ -190,6 +191,7 @@ func (s *RethinkSuite) TestTransformationOrderByIndexAsc(c *test.C) {
 
 	// Test database creation
 	DB("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(session)
+	DB("test").Table("OrderByIndex").IndexWait().Exec(session)
 	DB("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(session)
 
 	query := DB("test").Table("OrderByIndex").OrderBy(OrderByOpts{

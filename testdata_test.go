@@ -17,12 +17,14 @@ func setupTestData() {
 	DB("examples").TableCreate("marvel").Exec(session)
 
 	DB("examples").Table("posts").IndexCreate("date").Exec(session)
+	DB("examples").Table("posts").IndexWait().Exec(session)
 	DB("examples").Table("posts").IndexCreateFunc(
 		"dateAndTitle",
 		[]interface{}{Row.Field("date"), Row.Field("title")},
 	).Exec(session)
 
 	DB("examples").Table("games").IndexCreate("type").Exec(session)
+	DB("examples").Table("games").IndexWait().Exec(session)
 
 	// Create heroes table
 	DB("examples").Table("heroes").Insert([]interface{}{

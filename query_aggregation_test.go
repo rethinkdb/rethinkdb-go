@@ -215,6 +215,7 @@ func (s *RethinkSuite) TestAggregationMin(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table2").Exec(session)
 	DB("test").Table("Table2").IndexCreate("num").Exec(session)
+	DB("test").Table("Table2").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table2").Insert(objList).Exec(session)
@@ -236,6 +237,7 @@ func (s *RethinkSuite) TestAggregationMaxIndex(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table2").Exec(session)
 	DB("test").Table("Table2").IndexCreate("num").Exec(session)
+	DB("test").Table("Table2").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table2").Insert(objList).Exec(session)

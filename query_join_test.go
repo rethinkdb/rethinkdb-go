@@ -122,6 +122,7 @@ func (s *RethinkSuite) TestJoinEqJoinDiffIdsZip(c *test.C) {
 	}).Exec(session)
 	c.Assert(err, test.IsNil)
 	DB("test").Table("Join3").IndexCreate("it").Exec(session)
+	DB("test").Table("Join3").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Join1").Delete().Exec(session)

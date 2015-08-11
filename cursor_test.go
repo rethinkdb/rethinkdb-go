@@ -226,6 +226,7 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	DB("test").TableDrop("Table3").Exec(session)
 	DB("test").TableCreate("Table3").Exec(session)
 	DB("test").Table("Table3").IndexCreate("num").Exec(session)
+	DB("test").Table("Table3").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table3").Insert([]interface{}{
@@ -282,6 +283,7 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	DB("test").TableDrop("Table3").Exec(session)
 	DB("test").TableCreate("Table3").Exec(session)
 	DB("test").Table("Table3").IndexCreate("num").Exec(session)
+	DB("test").Table("Table3").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table3").Insert([]interface{}{
