@@ -107,7 +107,7 @@ r.Expr(map[string]interface{}{"a": 1, "b": 2, "c": 3}).Run(session)
 ```
 Get Example
 ```go
-r.Db("database").Table("table").Get("GUID").Run(session)
+r.DB("database").Table("table").Get("GUID").Run(session)
 ```
 Map Example (Func)
 ```go
@@ -121,7 +121,7 @@ r.Expr([]interface{}{1, 2, 3, 4, 5}).Map(r.Row.Add(1)).Run(session)
 ```
 Between (Optional Args) Example
 ```go
-r.Db("database").Table("table").Between(1, 10, r.BetweenOpts{
+r.DB("database").Table("table").Between(1, 10, r.BetweenOpts{
     Index: "num",
     RightBound: "closed",
 }).Run(session)
@@ -142,7 +142,7 @@ Different result types are returned depending on what function is used to execut
 Example:
 
 ```go
-res, err := r.Db("database").Table("tablename").Get(key).Run(session)
+res, err := r.DB("database").Table("tablename").Get(key).Run(session)
 if err != nil {
     // error
 }

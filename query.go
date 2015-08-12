@@ -176,7 +176,8 @@ type ChangeResponse struct {
 
 // RunOpts contains the optional arguments for the Run function.
 type RunOpts struct {
-	Db             interface{} `gorethink:"db,omitempty"`
+	DB             interface{} `gorethink:"db,omitempty"`
+	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
 	Profile        interface{} `gorethink:"profile,omitempty"`
 	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
@@ -223,7 +224,7 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 //
 // If an error occurs when running the write query the first error is returned.
 //
-//	res, err := r.Db("database").Table("table").Insert(doc).RunWrite(sess)
+//	res, err := r.DB("database").Table("table").Insert(doc).RunWrite(sess)
 func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	var response WriteResponse
 
@@ -254,7 +255,8 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 // When NoReply is true it causes the driver not to wait to receive the result
 // and return immediately.
 type ExecOpts struct {
-	Db             interface{} `gorethink:"db,omitempty"`
+	DB             interface{} `gorethink:"db,omitempty"`
+	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
 	Profile        interface{} `gorethink:"profile,omitempty"`
 	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
@@ -280,7 +282,7 @@ func (o *ExecOpts) toMap() map[string]interface{} {
 // Exec runs the query but does not return the result. Exec will still wait for
 // the response to be received unless the NoReply field is true.
 //
-//	err := r.Db("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
+//	err := r.DB("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
 //		NoReply: true,
 //	})
 func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
