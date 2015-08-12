@@ -5,8 +5,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Added
  - Added race detector to CI
+
 ### Fixed
  - Fixed race condition in node pool
+ - Fixed node refresh issue with RethinkDB 2.1 due to an API change
 
 ## v1.0.0 - 2015-06-27
 

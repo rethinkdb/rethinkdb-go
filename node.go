@@ -160,13 +160,20 @@ func (n *Node) Refresh() {
 		}
 		defer cursor.Close()
 
+		// Cant find node status so assuming node has been disconnected
+		if cursor.IsNil() {
+			n.DecrementHealth()
+			return
+		}
+
+		// Below check is for RethinkDB 2.0
 		var status nodeStatus
 		err = cursor.One(&status)
 		if err != nil {
 			return
 		}
 
-		if status.Status != "connected" {
+		if status.Status != "" && status.Status != "connected" {
 			n.DecrementHealth()
 			return
 		}
