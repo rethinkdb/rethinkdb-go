@@ -173,13 +173,13 @@ func (c *Cursor) Next(dest interface{}) bool {
 func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 	c.mu.Lock()
 	for {
-		if c.lastErr == nil {
+		if c.lastErr != nil {
 			c.mu.Unlock()
 			return false, c.lastErr
 		}
 
 		// Check if response is closed/finished
-		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed != 0 {
+		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed {
 			c.mu.Unlock()
 			return false, errCursorClosed
 		}
@@ -422,13 +422,10 @@ func (c *Cursor) handleError(err error) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	c.handleErrorLocked(err)
+	return c.handleErrorLocked(err)
 }
 
 func (c *Cursor) handleErrorLocked(err error) error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
 	if c.lastErr == nil {
 		c.lastErr = err
 	}

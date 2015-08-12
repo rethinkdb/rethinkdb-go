@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"net"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -32,6 +33,8 @@ type Connection struct {
 	address string
 	opts    *ConnectOpts
 	conn    net.Conn
+
+	mu      sync.Mutex
 	_       [4]byte
 	token   int64
 	cursors map[int64]*Cursor
@@ -86,6 +89,9 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 
 // Close closes the underlying net.Conn
 func (c *Connection) Close() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if c.conn != nil {
 		c.conn.Close()
 		c.conn = nil
@@ -101,6 +107,9 @@ func (c *Connection) Close() error {
 //
 // This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if c == nil {
 		return nil, nil, nil
 	}
