@@ -5,6 +5,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Added
  - Added race detector to CI
+ - Replaced `UseOutdated` with `ReadMode`
+
+## Deprecated
+ - Deprecated `UseOutdated` optional argument
+
 ### Fixed
  - Fixed race condition in node pool
 

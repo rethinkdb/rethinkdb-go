@@ -177,7 +177,8 @@ type ChangeResponse struct {
 type RunOpts struct {
 	Db             interface{} `gorethink:"db,omitempty"`
 	Profile        interface{} `gorethink:"profile,omitempty"`
-	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"`
+	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
+	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
 	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
@@ -254,7 +255,8 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 type ExecOpts struct {
 	Db             interface{} `gorethink:"db,omitempty"`
 	Profile        interface{} `gorethink:"profile,omitempty"`
-	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"`
+	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
+	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
 	GroupFormat    interface{} `gorethink:"group_format,omitempty"`

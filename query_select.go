@@ -11,7 +11,8 @@ func DB(args ...interface{}) Term {
 
 // TableOpts contains the optional arguments for the Table term
 type TableOpts struct {
-	UseOutdated      interface{} `gorethink:"use_outdated,omitempty"`
+	ReadMode         interface{} `gorethink:"read_mode,omitempty"`
+	UseOutdated      interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
 	IdentifierFormat interface{} `gorethink:"identifier_format,omitempty"`
 }
 
