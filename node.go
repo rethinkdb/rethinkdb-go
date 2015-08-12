@@ -211,7 +211,8 @@ func (n *Node) ResetHealth() {
 
 // IsHealthy checks the nodes health by ensuring that the health counter is above 0.
 func (n *Node) IsHealthy() bool {
-	return n.health > 0
+	health := atomic.LoadInt64(&n.health)
+	return health > 0
 }
 
 type nodeStatus struct {

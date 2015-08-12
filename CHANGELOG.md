@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Added
+ - Added race detector to CI
+### Fixed
+ - Fixed race condition in node pool
+
 ## v1.0.0 - 2015-06-27
 
 1.0.0 is finally here, This is the first stable production ready release of GoRethink!

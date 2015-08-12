@@ -1,6 +1,6 @@
 language: go
 
-gobuild_args: -tags='cluster'
+gobuild_args: -tags='cluster' -race
 
 go:
   - 1.4
