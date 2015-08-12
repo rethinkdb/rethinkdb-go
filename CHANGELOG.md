@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Added race detector to CI
  - Replaced `UseOutdated` with `ReadMode`
+ - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
 
 ## Deprecated
  - Deprecated `UseOutdated` optional argument
