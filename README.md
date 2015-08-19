@@ -249,6 +249,12 @@ BenchmarkSequentialSoftWritesParallel10      10000                           263
 
 Many functions have examples and are viewable in the godoc, alternatively view some more full features examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).
 
+## Further reading
+
+- [GoRethink Goes 1.0](https://www.compose.io/articles/gorethink-goes-1-0/)
+- [Go, RethinkDB & Changefeeds](https://www.compose.io/articles/go-rethinkdb-and-changefeeds-part-1/)
+- [Build an IRC bot in Go with RethinkDB changefeeds](http://rethinkdb.com/blog/go-irc-bot/)
+
 ## License
 
 Copyright 2013 Daniel Cannon
