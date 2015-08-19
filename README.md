@@ -1,5 +1,7 @@
 # GoRethink - RethinkDB Driver for Go 
 
+**Driver does not currently support RethinkDB 2.1, update coming soon!**
+
 [![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)](https://github.com/dancannon/gorethink/releases/tag/v1.0.0-rc.3)
 [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
 [![build status](https://img.shields.io/travis/dancannon/gorethink/master.svg "build status")](https://travis-ci.org/dancannon/gorethink) 
