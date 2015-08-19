@@ -150,18 +150,18 @@ func (c *Cursor) Close() error {
 // `Next` zeroes the value before scanning in the result.
 func (c *Cursor) Next(dest interface{}) bool {
 	c.mu.Lock()
-	closed := c.closed
-	c.mu.Unlock()
-
-	if closed {
+	if c.closed {
+		c.mu.Unlock()
 		return false
 	}
 
-	hasMore, err := c.loadNext(dest)
+	hasMore, err := c.loadNextLocked(dest)
 	if c.handleError(err) != nil {
+		c.mu.Unlock()
 		c.Close()
 		return false
 	}
+	c.mu.Unlock()
 
 	if !hasMore {
 		c.Close()
@@ -170,17 +170,14 @@ func (c *Cursor) Next(dest interface{}) bool {
 	return hasMore
 }
 
-func (c *Cursor) loadNext(dest interface{}) (bool, error) {
-	c.mu.Lock()
+func (c *Cursor) loadNextLocked(dest interface{}) (bool, error) {
 	for {
 		if c.lastErr != nil {
-			c.mu.Unlock()
 			return false, c.lastErr
 		}
 
 		// Check if response is closed/finished
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed {
-			c.mu.Unlock()
 			return false, errCursorClosed
 		}
 
@@ -194,7 +191,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
-			c.mu.Unlock()
 			return false, nil
 		}
 
@@ -226,7 +222,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 
 		if c.buffer.Len() > 0 {
 			data := c.buffer.Pop()
-			c.mu.Unlock()
 
 			err := encoding.Decode(dest, data)
 			if err != nil {
