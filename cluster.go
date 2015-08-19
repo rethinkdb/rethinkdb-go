@@ -120,7 +120,7 @@ func (c *Cluster) discover() {
 
 			return c.listenForNodeChanges()
 		}, b, func(err error, wait time.Duration) {
-			log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
+			Log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
 		})
 	}
 }
@@ -165,7 +165,7 @@ func (c *Cluster) listenForNodeChanges() error {
 					if !c.nodeExists(node) {
 						c.addNode(node)
 
-						log.WithFields(logrus.Fields{
+						Log.WithFields(logrus.Fields{
 							"id":   node.ID,
 							"host": node.Host.String(),
 						}).Debug("Connected to node")
@@ -191,7 +191,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 	for _, host := range hosts {
 		conn, err := NewConnection(host.String(), c.opts)
 		if err != nil {
-			log.Warnf("Error creating connection %s", err.Error())
+			Log.Warnf("Error creating connection %s", err.Error())
 			continue
 		}
 		defer conn.Close()
@@ -202,7 +202,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			c.opts,
 		))
 		if err != nil {
-			log.Warnf("Error fetching cluster status %s", err)
+			Log.Warnf("Error fetching cluster status %s", err)
 			continue
 		}
 
@@ -217,7 +217,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 				node, err := c.connectNodeWithStatus(result)
 				if err == nil {
 					if _, ok := nodeSet[node.ID]; !ok {
-						log.WithFields(logrus.Fields{
+						Log.WithFields(logrus.Fields{
 							"id":   node.ID,
 							"host": node.Host.String(),
 						}).Debug("Connected to node")
@@ -229,7 +229,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			node, err := c.connectNode(host.String(), []Host{host})
 			if err == nil {
 				if _, ok := nodeSet[node.ID]; !ok {
-					log.WithFields(logrus.Fields{
+					Log.WithFields(logrus.Fields{
 						"id":   node.ID,
 						"host": node.Host.String(),
 					}).Debug("Connected to node")
