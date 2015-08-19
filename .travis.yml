@@ -4,6 +4,7 @@ gobuild_args: -tags='cluster' -race
 
 go:
   - 1.4
+  - 1.5
   - tip
 
 cache: apt
