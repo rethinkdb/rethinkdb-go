@@ -17,7 +17,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Changed `Timeout` connect argument to only configure the connection timeout.
  - Replaced `Db` with `DB` in `RunOpts` and `ExecOpts` (`Db` still works for now)
- - Made `Cursor` safe for concurrent use (`Session` was already safe).
+ - Made `Cursor` and `Session` safe for concurrent use
+ - Replaced `ErrClusterClosed` with `ErrConnectionClosed`
 
 ## Deprecated
  - Deprecated `UseOutdated` optional argument

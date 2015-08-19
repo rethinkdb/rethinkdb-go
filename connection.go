@@ -106,12 +106,12 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	c.mu.Lock()
 	if c == nil {
 		c.mu.Unlock()
-		return nil, nil, nil
+		return nil, nil, ErrConnectionClosed
 	}
 	if c.conn == nil {
 		c.bad = true
 		c.mu.Unlock()
-		return nil, nil, nil
+		return nil, nil, ErrConnectionClosed
 	}
 
 	// Add token if query is a START/NOREPLY_WAIT

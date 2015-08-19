@@ -326,7 +326,7 @@ func (c *Cluster) getSeeds() []Host {
 // TODO(dancannon) replace with hostpool
 func (c *Cluster) GetRandomNode() (*Node, error) {
 	if !c.IsConnected() {
-		return nil, ErrClusterClosed
+		return nil, ErrNoConnections
 	}
 	// Must copy array reference for copy on write semantics to work.
 	nodeArray := c.GetNodes()
