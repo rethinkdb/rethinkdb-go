@@ -2,7 +2,7 @@
 
 **Driver does not currently support RethinkDB 2.1, update coming soon!**
 
-[![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)](https://github.com/dancannon/gorethink/releases/tag/v1.0.0-rc.3)
+[![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)](https://github.com/dancannon/gorethink/releases)
 [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
 [![build status](https://img.shields.io/travis/dancannon/gorethink/master.svg "build status")](https://travis-ci.org/dancannon/gorethink) 
 
@@ -10,7 +10,7 @@
 
 ![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v1.0.0 (RethinkDB v2.0)
+Current version: v1.1.0 (RethinkDB v2.1)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 

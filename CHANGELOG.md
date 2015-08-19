@@ -2,9 +2,8 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v1.1.0
 ### Added
- - Added race detector to CI
  - Replaced `UseOutdated` with `ReadMode`
  - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
  - Added `Union` as a root term
@@ -12,7 +11,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added `ReadTimeout` and `WriteTimeout` to `RunOpts` and `ExecOpts`
  - Exported `github.com/Sirupsen/logrus.Logger` as `Log`
  - Added support for encoding maps with non-string keys
-- Added 'Round', 'Ceil' and 'Floor' terms
+ - Added 'Round', 'Ceil' and 'Floor' terms
+ - Added race detector to CI
 
 ### Changed
  - Changed `Timeout` connect argument to only configure the connection timeout.
