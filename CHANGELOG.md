@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Added
  - Added race detector to CI
+<<<<<<< HEAD
  - Replaced `UseOutdated` with `ReadMode`
  - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
  - Added `Union` as a root term
@@ -17,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Changed `Timeout` connect argument to only configure the connection timeout.
  - Replaced `Db` with `DB` in `RunOpts` and `ExecOpts` (`Db` still works for now)
+ - Made `Cursor` safe for concurrent use (`Session` was already safe).
 
 ## Deprecated
  - Deprecated `UseOutdated` optional argument

@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"net"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -32,13 +33,12 @@ type Connection struct {
 	address string
 	opts    *ConnectOpts
 	conn    net.Conn
+
 	_       [4]byte
+	mu      sync.Mutex
 	token   int64
 	cursors map[int64]*Cursor
 	bad     bool
-
-	headerBuf [respHeaderLen]byte
-	buf       buffer
 }
 
 // NewConnection creates a new connection to the database server
@@ -68,7 +68,6 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 			return nil, err
 		}
 	}
-	c.buf = newBuffer(c.conn)
 	// Send handshake request
 	if err = c.writeHandshakeReq(); err != nil {
 		c.Close()
@@ -86,6 +85,9 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 
 // Close closes the underlying net.Conn
 func (c *Connection) Close() error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if c.conn != nil {
 		c.conn.Close()
 		c.conn = nil
@@ -101,11 +103,14 @@ func (c *Connection) Close() error {
 //
 // This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
+	c.mu.Lock()
 	if c == nil {
+		c.mu.Unlock()
 		return nil, nil, nil
 	}
 	if c.conn == nil {
 		c.bad = true
+		c.mu.Unlock()
 		return nil, nil, nil
 	}
 
@@ -116,6 +121,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 			q.Opts["db"] = DB(c.opts.Database).build()
 		}
 	}
+	c.mu.Unlock()
 
 	err := c.sendQuery(q)
 	if err != nil {
@@ -186,15 +192,16 @@ func (c *Connection) readResponse() (*Response, error) {
 	}
 
 	// Read response header (token+length)
-	if _, err := c.read(c.headerBuf[:], respHeaderLen); err != nil {
+	headerBuf := [respHeaderLen]byte{}
+	if _, err := c.read(headerBuf[:], respHeaderLen); err != nil {
 		return nil, err
 	}
 
-	responseToken := int64(binary.LittleEndian.Uint64(c.headerBuf[:8]))
-	messageLength := binary.LittleEndian.Uint32(c.headerBuf[8:])
+	responseToken := int64(binary.LittleEndian.Uint64(headerBuf[:8]))
+	messageLength := binary.LittleEndian.Uint32(headerBuf[8:])
 
 	// Read the JSON encoding of the Response itself.
-	b := c.buf.takeBuffer(int(messageLength))
+	b := make([]byte, int(messageLength))
 
 	if _, err := c.read(b, int(messageLength)); err != nil {
 		c.bad = true
@@ -235,9 +242,11 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 }
 
 func (c *Connection) processErrorResponse(q Query, response *Response, err error) (*Response, *Cursor, error) {
+	c.mu.Lock()
 	cursor := c.cursors[response.Token]
 
 	delete(c.cursors, response.Token)
+	c.mu.Unlock()
 
 	return response, cursor, err
 }
@@ -269,6 +278,7 @@ func (c *Connection) processPartialResponse(q Query, response *Response) (*Respo
 		}
 	}
 
+	c.mu.Lock()
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
@@ -277,6 +287,7 @@ func (c *Connection) processPartialResponse(q Query, response *Response) (*Respo
 
 		c.cursors[response.Token] = cursor
 	}
+	c.mu.Unlock()
 
 	cursor.extend(response)
 
@@ -284,6 +295,7 @@ func (c *Connection) processPartialResponse(q Query, response *Response) (*Respo
 }
 
 func (c *Connection) processSequenceResponse(q Query, response *Response) (*Response, *Cursor, error) {
+	c.mu.Lock()
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
@@ -292,6 +304,7 @@ func (c *Connection) processSequenceResponse(q Query, response *Response) (*Resp
 	}
 
 	delete(c.cursors, response.Token)
+	c.mu.Unlock()
 
 	cursor.extend(response)
 
@@ -299,7 +312,28 @@ func (c *Connection) processSequenceResponse(q Query, response *Response) (*Resp
 }
 
 func (c *Connection) processWaitResponse(q Query, response *Response) (*Response, *Cursor, error) {
+	c.mu.Lock()
 	delete(c.cursors, response.Token)
+	c.mu.Unlock()
 
 	return response, nil, nil
+}
+
+var responseCache = make(chan *Response, 16)
+
+func newCachedResponse() *Response {
+	select {
+	case r := <-responseCache:
+		return r
+	default:
+		return new(Response)
+	}
+}
+
+func putResponse(r *Response) {
+	*r = Response{} // zero it
+	select {
+	case responseCache <- r:
+	default:
+	}
 }

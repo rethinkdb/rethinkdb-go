@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
-	"sync/atomic"
+	"sync"
 
 	"github.com/dancannon/gorethink/encoding"
 	p "github.com/dancannon/gorethink/ql2"
@@ -54,9 +54,10 @@ type Cursor struct {
 	term       *Term
 	opts       map[string]interface{}
 
+	mu        sync.RWMutex
 	lastErr   error
 	fetching  bool
-	closed    int32
+	closed    bool
 	finished  bool
 	isAtom    bool
 	buffer    queue
@@ -66,17 +67,26 @@ type Cursor struct {
 
 // Profile returns the information returned from the query profiler.
 func (c *Cursor) Profile() interface{} {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	return c.profile
 }
 
 // Type returns the cursor type (by default "Cursor")
 func (c *Cursor) Type() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	return c.cursorType
 }
 
 // Err returns nil if no errors happened during iteration, or the actual
 // error otherwise.
 func (c *Cursor) Err() error {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	return c.lastErr
 }
 
@@ -85,10 +95,17 @@ func (c *Cursor) Err() error {
 func (c *Cursor) Close() error {
 	var err error
 
-	if c.closed != 0 || !atomic.CompareAndSwapInt32(&c.closed, 0, 1) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// If cursor is already closed return immediately
+	closed := c.closed
+	if closed {
 		return nil
 	}
 
+	// Get connection and check its valid, don't need to lock as this is only
+	// set when the cursor is created
 	conn := c.conn
 	if conn == nil {
 		return nil
@@ -111,6 +128,7 @@ func (c *Cursor) Close() error {
 		c.releaseConn(err)
 	}
 
+	c.closed = true
 	c.conn = nil
 	c.buffer.elems = nil
 	c.responses.elems = nil
@@ -131,15 +149,19 @@ func (c *Cursor) Close() error {
 // Also note that you are able to reuse the same variable multiple times as
 // `Next` zeroes the value before scanning in the result.
 func (c *Cursor) Next(dest interface{}) bool {
-	if c.closed != 0 {
+	c.mu.Lock()
+	if c.closed {
+		c.mu.Unlock()
 		return false
 	}
 
-	hasMore, err := c.loadNext(dest)
+	hasMore, err := c.loadNextLocked(dest)
 	if c.handleError(err) != nil {
+		c.mu.Unlock()
 		c.Close()
 		return false
 	}
+	c.mu.Unlock()
 
 	if !hasMore {
 		c.Close()
@@ -148,18 +170,24 @@ func (c *Cursor) Next(dest interface{}) bool {
 	return hasMore
 }
 
-func (c *Cursor) loadNext(dest interface{}) (bool, error) {
-	for c.lastErr == nil {
+func (c *Cursor) loadNextLocked(dest interface{}) (bool, error) {
+	for {
+		if c.lastErr != nil {
+			return false, c.lastErr
+		}
+
 		// Check if response is closed/finished
-		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed != 0 {
+		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.closed {
 			return false, errCursorClosed
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && !c.finished {
+			c.mu.Unlock()
 			err := c.fetchMore()
 			if err != nil {
 				return false, err
 			}
+			c.mu.Lock()
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
@@ -203,8 +231,6 @@ func (c *Cursor) loadNext(dest interface{}) (bool, error) {
 			return true, nil
 		}
 	}
-
-	return false, c.lastErr
 }
 
 // All retrieves all documents from the result set into the provided slice
@@ -323,6 +349,9 @@ func (c *Cursor) Listen(channel interface{}) {
 
 // IsNil tests if the current row is nil.
 func (c *Cursor) IsNil() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	if c.buffer.Len() > 0 {
 		bufferedItem := c.buffer.Peek()
 		if bufferedItem == nil {
@@ -356,10 +385,16 @@ func (c *Cursor) IsNil() bool {
 // will return after sending the continue query.
 func (c *Cursor) fetchMore() error {
 	var err error
-	if !c.fetching {
-		c.fetching = true
 
-		if c.closed != 0 {
+	c.mu.Lock()
+	fetching := c.fetching
+	closed := c.closed
+
+	if !fetching {
+		c.fetching = true
+		c.mu.Unlock()
+
+		if closed {
 			return errCursorClosed
 		}
 
@@ -370,6 +405,8 @@ func (c *Cursor) fetchMore() error {
 
 		_, _, err = c.conn.Query(q)
 		c.handleError(err)
+	} else {
+		c.mu.Unlock()
 	}
 
 	return err
@@ -377,10 +414,12 @@ func (c *Cursor) fetchMore() error {
 
 // handleError sets the value of lastErr to err if lastErr is not yet set.
 func (c *Cursor) handleError(err error) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	return c.handleErrorLocked(err)
 }
 
-// handleError sets the value of lastErr to err if lastErr is not yet set.
 func (c *Cursor) handleErrorLocked(err error) error {
 	if c.lastErr == nil {
 		c.lastErr = err
@@ -391,6 +430,13 @@ func (c *Cursor) handleErrorLocked(err error) error {
 
 // extend adds the result of a continue query to the cursor.
 func (c *Cursor) extend(response *Response) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	c.extendLocked(response)
+}
+
+func (c *Cursor) extendLocked(response *Response) {
 	for _, response := range response.Responses {
 		c.responses.Push(response)
 	}
