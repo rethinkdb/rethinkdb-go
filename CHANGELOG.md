@@ -5,7 +5,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Added
  - Added race detector to CI
-<<<<<<< HEAD
  - Replaced `UseOutdated` with `ReadMode`
  - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
  - Added `Union` as a root term
