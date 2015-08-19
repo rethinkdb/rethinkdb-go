@@ -9,6 +9,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
  - Added `Union` as a root term
  - Added `Branch` as a root term
+ - Added `ReadTimeout` and `WriteTimeout` to `RunOpts` and `ExecOpts`
+
+### Changed
+ - Changed `Timeout` connect argument to only configure the connection timeout.
 
 ## Deprecated
  - Deprecated `UseOutdated` optional argument

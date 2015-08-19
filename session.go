@@ -18,12 +18,14 @@ type Session struct {
 
 // ConnectOpts is used to specify optional arguments when connecting to a cluster.
 type ConnectOpts struct {
-	Address   string        `gorethink:"address,omitempty"`
-	Addresses []string      `gorethink:"addresses,omitempty"`
-	Database  string        `gorethink:"database,omitempty"`
-	AuthKey   string        `gorethink:"authkey,omitempty"`
-	Timeout   time.Duration `gorethink:"timeout,omitempty"`
-	TLSConfig *tls.Config   `gorethink:"tlsconfig,omitempty"`
+	Address      string        `gorethink:"address,omitempty"`
+	Addresses    []string      `gorethink:"addresses,omitempty"`
+	Database     string        `gorethink:"database,omitempty"`
+	AuthKey      string        `gorethink:"authkey,omitempty"`
+	Timeout      time.Duration `gorethink:"timeout,omitempty"`
+	WriteTimeout time.Duration `gorethink:"write_timeout,omitempty"`
+	ReadTimeout  time.Duration `gorethink:"read_timeout,omitempty"`
+	TLSConfig    *tls.Config   `gorethink:"tlsconfig,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	MaxOpen int `gorethink:"max_open,omitempty"`
