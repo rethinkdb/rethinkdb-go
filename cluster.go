@@ -207,7 +207,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			c.opts,
 		)
 		if err != nil {
-			log.Warnf("Error building query %s", err)
+			Log.Warnf("Error building query %s", err)
 			continue
 		}
 
