@@ -11,6 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added `Branch` as a root term
  - Added `ReadTimeout` and `WriteTimeout` to `RunOpts` and `ExecOpts`
  - Exported `github.com/Sirupsen/logrus.Logger` as `Log`
+ - Added support for encoding maps with non-string keys
 
 ### Changed
  - Changed `Timeout` connect argument to only configure the connection timeout.

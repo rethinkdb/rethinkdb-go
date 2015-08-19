@@ -2,6 +2,7 @@ package encoding
 
 import (
 	"encoding/base64"
+	"fmt"
 	"math"
 	"reflect"
 	"time"
@@ -119,6 +120,10 @@ func interfaceEncoder(v reflect.Value) interface{} {
 	return encode(v.Elem())
 }
 
+func asStringEncoder(v reflect.Value) interface{} {
+	return fmt.Sprintf("%v", v.Interface())
+}
+
 func unsupportedTypeEncoder(v reflect.Value) interface{} {
 	panic(&UnsupportedTypeError{v.Type()})
 }
@@ -164,7 +169,7 @@ func newStructEncoder(t reflect.Type) encoderFunc {
 }
 
 type mapEncoder struct {
-	elemEnc encoderFunc
+	keyEnc, elemEnc encoderFunc
 }
 
 func (me *mapEncoder) encode(v reflect.Value) interface{} {
@@ -175,17 +180,32 @@ func (me *mapEncoder) encode(v reflect.Value) interface{} {
 	m := make(map[string]interface{})
 
 	for _, k := range v.MapKeys() {
-		m[k.String()] = me.elemEnc(v.MapIndex(k))
+		m[me.keyEnc(k).(string)] = me.elemEnc(v.MapIndex(k))
 	}
 
 	return m
 }
 
 func newMapEncoder(t reflect.Type) encoderFunc {
-	if t.Key().Kind() != reflect.String {
+	var keyEnc encoderFunc
+	switch t.Key().Kind() {
+	case reflect.Bool:
+		keyEnc = asStringEncoder
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		keyEnc = asStringEncoder
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		keyEnc = asStringEncoder
+	case reflect.Float32, reflect.Float64:
+		keyEnc = asStringEncoder
+	case reflect.String:
+		keyEnc = stringEncoder
+	case reflect.Interface:
+		keyEnc = asStringEncoder
+	default:
 		return unsupportedTypeEncoder
 	}
-	me := &mapEncoder{typeEncoder(t.Elem())}
+
+	me := &mapEncoder{keyEnc, typeEncoder(t.Elem())}
 	return me.encode
 }
 
