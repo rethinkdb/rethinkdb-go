@@ -426,3 +426,16 @@ func (s *RethinkSuite) TestTransformationUnion(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9})
 }
+
+func (s *RethinkSuite) TestTransformationUnionRoot(c *test.C) {
+	query := Union(arr, arr)
+
+	var response []interface{}
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+}

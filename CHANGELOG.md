@@ -5,6 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Added
  - Added race detector to CI
+ - Replaced `UseOutdated` with `ReadMode`
+ - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
+ - Added `Union` as a root term
+ - Added `Branch` as a root term
+
+## Deprecated
+ - Deprecated `UseOutdated` optional argument
 
 ### Fixed
  - Fixed race condition in node pool

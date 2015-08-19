@@ -152,6 +152,11 @@ func (t Term) IsEmpty(args ...interface{}) Term {
 }
 
 // Union concatenates two sequences.
+func Union(args ...interface{}) Term {
+	return constructRootTerm("Union", p.Term_UNION, args, map[string]interface{}{})
+}
+
+// Union concatenates two sequences.
 func (t Term) Union(args ...interface{}) Term {
 	return constructMethodTerm(t, "Union", p.Term_UNION, args, map[string]interface{}{})
 }
