@@ -14,16 +14,17 @@ import (
 // and also allows the driver to identify the response as they can come out of
 // order.
 type Query struct {
-	Type  p.Query_QueryType
-	Token int64
-	Term  *Term
-	Opts  map[string]interface{}
+	Type      p.Query_QueryType
+	Token     int64
+	Term      *Term
+	Opts      map[string]interface{}
+	builtTerm interface{}
 }
 
 func (q *Query) build() []interface{} {
 	res := []interface{}{int(q.Type)}
 	if q.Term != nil {
-		res = append(res, q.Term.build())
+		res = append(res, q.builtTerm)
 	}
 
 	if len(q.Opts) > 0 {
@@ -49,26 +50,36 @@ type Term struct {
 	data     interface{}
 	args     []Term
 	optArgs  map[string]Term
+	lastErr  error
 }
 
 // build takes the query tree and prepares it to be sent as a JSON
 // expression
-func (t Term) build() interface{} {
+func (t Term) build() (interface{}, error) {
+	var err error
+
+	if t.lastErr != nil {
+		return nil, t.lastErr
+	}
+
 	switch t.termType {
 	case p.Term_DATUM:
-		return t.data
+		return t.data, nil
 	case p.Term_MAKE_OBJ:
 		res := map[string]interface{}{}
 		for k, v := range t.optArgs {
-			res[k] = v.build()
+			res[k], err = v.build()
+			if err != nil {
+				return nil, err
+			}
 		}
-		return res
+		return res, nil
 	case p.Term_BINARY:
 		if len(t.args) == 0 {
 			return map[string]interface{}{
 				"$reql_type$": "BINARY",
 				"data":        t.data,
-			}
+			}, nil
 		}
 	}
 
@@ -76,11 +87,18 @@ func (t Term) build() interface{} {
 	optArgs := map[string]interface{}{}
 
 	for _, v := range t.args {
-		args = append(args, v.build())
+		arg, err := v.build()
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, arg)
 	}
 
 	for k, v := range t.optArgs {
-		optArgs[k] = v.build()
+		optArgs[k], err = v.build()
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	ret := []interface{}{int(t.termType)}
@@ -92,7 +110,7 @@ func (t Term) build() interface{} {
 		ret = append(ret, optArgs)
 	}
 
-	return ret
+	return ret, nil
 }
 
 // String returns a string representation of the query tree
@@ -214,7 +232,12 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 		opts = optArgs[0].toMap()
 	}
 
-	return s.Query(s.newQuery(t, opts))
+	q, err := s.newQuery(t, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.Query(q)
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
@@ -290,5 +313,10 @@ func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
 		opts = optArgs[0].toMap()
 	}
 
-	return s.Exec(s.newQuery(t, opts))
+	q, err := s.newQuery(t, opts)
+	if err != nil {
+		return err
+	}
+
+	return s.Exec(q)
 }

@@ -26,6 +26,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Fixed race condition in node pool
  - Fixed node refresh issue with RethinkDB 2.1 due to an API change
+ - Fixed encoding errors not being returned when running queries
 
 ## v1.0.0 - 2015-06-27
 

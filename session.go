@@ -187,6 +187,6 @@ func (s *Session) SetHosts(hosts []Host) {
 	s.hosts = hosts
 }
 
-func (s *Session) newQuery(t Term, opts map[string]interface{}) Query {
+func (s *Session) newQuery(t Term, opts map[string]interface{}) (Query, error) {
 	return newQuery(t, opts, s.opts)
 }

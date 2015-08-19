@@ -134,11 +134,16 @@ func (c *Cluster) listenForNodeChanges() error {
 		return err
 	}
 
-	cursor, err := node.Query(newQuery(
+	q, err := newQuery(
 		DB("rethinkdb").Table("server_status").Changes(),
 		map[string]interface{}{},
 		c.opts,
-	))
+	)
+	if err != nil {
+		return fmt.Errorf("Error building query %s", err)
+	}
+
+	cursor, err := node.Query(q)
 	if err != nil {
 		return err
 	}
@@ -196,11 +201,17 @@ func (c *Cluster) connectNodes(hosts []Host) {
 		}
 		defer conn.Close()
 
-		_, cursor, err := conn.Query(newQuery(
+		q, err := newQuery(
 			DB("rethinkdb").Table("server_status"),
 			map[string]interface{}{},
 			c.opts,
-		))
+		)
+		if err != nil {
+			log.Warnf("Error building query %s", err)
+			continue
+		}
+
+		_, cursor, err := conn.Query(q)
 		if err != nil {
 			Log.Warnf("Error fetching cluster status %s", err)
 			continue

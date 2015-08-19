@@ -149,11 +149,16 @@ func (n *Node) Exec(q Query) (err error) {
 func (n *Node) Refresh() {
 	if n.cluster.opts.DiscoverHosts {
 		// If host discovery is enabled then check the servers status
-		cursor, err := n.pool.Query(newQuery(
+		q, err := newQuery(
 			DB("rethinkdb").Table("server_status").Get(n.ID),
 			map[string]interface{}{},
 			n.cluster.opts,
-		))
+		)
+		if err != nil {
+			return
+		}
+
+		cursor, err := n.pool.Query(q)
 		if err != nil {
 			n.DecrementHealth()
 			return
@@ -179,11 +184,16 @@ func (n *Node) Refresh() {
 		}
 	} else {
 		// If host discovery is disabled just execute a simple ping query
-		cursor, err := n.pool.Query(newQuery(
+		q, err := newQuery(
 			Expr("OK"),
 			map[string]interface{}{},
 			n.cluster.opts,
-		))
+		)
+		if err != nil {
+			return
+		}
+
+		cursor, err := n.pool.Query(q)
 		if err != nil {
 			n.DecrementHealth()
 			return
