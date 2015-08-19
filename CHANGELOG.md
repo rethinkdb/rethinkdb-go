@@ -14,9 +14,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
  - Changed `Timeout` connect argument to only configure the connection timeout.
+ - Replaced `Db` with `DB` in `RunOpts` and `ExecOpts` (`Db` still works for now)
 
 ## Deprecated
  - Deprecated `UseOutdated` optional argument
+ - Deprecated `Db` in `RunOpt`
 
 ### Fixed
  - Fixed race condition in node pool
