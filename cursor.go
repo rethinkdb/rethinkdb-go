@@ -156,7 +156,7 @@ func (c *Cursor) Next(dest interface{}) bool {
 	}
 
 	hasMore, err := c.loadNextLocked(dest)
-	if c.handleError(err) != nil {
+	if c.handleErrorLocked(err) != nil {
 		c.mu.Unlock()
 		c.Close()
 		return false
@@ -404,7 +404,6 @@ func (c *Cursor) fetchMore() error {
 		}
 
 		_, _, err = c.conn.Query(q)
-		c.handleError(err)
 	} else {
 		c.mu.Unlock()
 	}
