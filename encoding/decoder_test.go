@@ -412,7 +412,27 @@ func TestDecodeUnmarshalerPointer(t *testing.T) {
 	}
 }
 
+func TestDecodeMapIntKeys(t *testing.T) {
+	input := map[string]int{"1": 1, "2": 2, "3": 3}
+	want := map[int]int{1: 1, 2: 2, 3: 3}
+
+	out := map[int]int{}
+	err := Decode(&out, input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
 func jsonEqual(a, b interface{}) bool {
+	// First check using reflect.DeepEqual
+	if reflect.DeepEqual(a, b) {
+		return true
+	}
+
+	// Then use jsonEqual
 	ba, err := json.Marshal(a)
 	if err != nil {
 		panic(err)

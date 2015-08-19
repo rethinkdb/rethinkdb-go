@@ -160,6 +160,7 @@ func (s *RethinkSuite) TestTransformationOrderByIndex(c *test.C) {
 
 	// Test database creation
 	DB("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(session)
+	DB("test").Table("OrderByIndex").IndexWait().Exec(session)
 	DB("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(session)
 
 	query := DB("test").Table("OrderByIndex").OrderBy(OrderByOpts{
@@ -190,6 +191,7 @@ func (s *RethinkSuite) TestTransformationOrderByIndexAsc(c *test.C) {
 
 	// Test database creation
 	DB("test").Table("OrderByIndex").IndexCreateFunc("test", Row.Field("num")).Exec(session)
+	DB("test").Table("OrderByIndex").IndexWait().Exec(session)
 	DB("test").Table("OrderByIndex").Insert(noDupNumObjList).Exec(session)
 
 	query := DB("test").Table("OrderByIndex").OrderBy(OrderByOpts{
@@ -414,6 +416,19 @@ func (s *RethinkSuite) TestTransformationIsEmpty(c *test.C) {
 
 func (s *RethinkSuite) TestTransformationUnion(c *test.C) {
 	query := Expr(arr).Union(arr)
+
+	var response []interface{}
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+}
+
+func (s *RethinkSuite) TestTransformationUnionRoot(c *test.C) {
+	query := Union(arr, arr)
 
 	var response []interface{}
 	res, err := query.Run(session)

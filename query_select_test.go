@@ -36,6 +36,7 @@ func (s *RethinkSuite) TestSelectGetAll(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table1").Exec(session)
 	DB("test").Table("Table1").IndexCreate("num").Exec(session)
+	DB("test").Table("Table1").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table1").Insert(objList).Exec(session)
@@ -61,6 +62,7 @@ func (s *RethinkSuite) TestSelectGetAllMultiple(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table1").Exec(session)
 	DB("test").Table("Table1").IndexCreate("num").Exec(session)
+	DB("test").Table("Table1").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table1").Insert(objList).Exec(session)
@@ -88,6 +90,7 @@ func (s *RethinkSuite) TestSelectGetAllByIndex(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table1").Exec(session)
 	DB("test").Table("Table1").IndexCreate("num").Exec(session)
+	DB("test").Table("Table1").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table1").Insert(objList).Exec(session)
@@ -111,6 +114,7 @@ func (s *RethinkSuite) TestSelectGetAllMultipleByIndex(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table2").Exec(session)
 	DB("test").Table("Table2").IndexCreate("num").Exec(session)
+	DB("test").Table("Table2").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table2").Insert(objList).Exec(session)
@@ -137,6 +141,7 @@ func (s *RethinkSuite) TestSelectGetAllCompoundIndex(c *test.C) {
 	write, err := DB("test").Table("TableCompound").IndexCreateFunc("full_name", func(row Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(session)
+	DB("test").Table("TableCompound").IndexWait().Exec(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(write.Created, test.Equals, 1)
 
@@ -187,6 +192,7 @@ func (s *RethinkSuite) TestSelectBetweenWithIndex(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table2").Exec(session)
 	DB("test").Table("Table2").IndexCreate("num").Exec(session)
+	DB("test").Table("Table2").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table2").Insert(objList).Exec(session)
@@ -216,6 +222,7 @@ func (s *RethinkSuite) TestSelectBetweenWithOptions(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table2").Exec(session)
 	DB("test").Table("Table2").IndexCreate("num").Exec(session)
+	DB("test").Table("Table2").IndexWait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table2").Insert(objList).Exec(session)

@@ -18,9 +18,6 @@ var (
 	// ErrInvalidNode is returned when attempting to connect to a node which
 	// returns an invalid response.
 	ErrInvalidNode = errors.New("invalid node")
-	// ErrClusterClosed is returned when a query is executed after the connection
-	// to the cluster has been closed.
-	ErrClusterClosed = errors.New("cluster closed")
 	// ErrNoConnections is returned when there are no active connections in the
 	// clusters connection pool.
 	ErrNoConnections = errors.New("gorethink: no connections were available")

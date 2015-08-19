@@ -23,11 +23,7 @@ func (c *Connection) writeData(data []byte) error {
 func (c *Connection) writeHandshakeReq() error {
 	pos := 0
 	dataLen := 4 + 4 + len(c.opts.AuthKey) + 4
-
-	data := c.buf.takeSmallBuffer(dataLen)
-	if data == nil {
-		return RQLDriverError{"Busy buffer"}
-	}
+	data := make([]byte, dataLen)
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
 	binary.LittleEndian.PutUint32(data[pos:], uint32(p.VersionDummy_V0_4))
@@ -87,11 +83,7 @@ func (c *Connection) read(buf []byte, length int) (total int, err error) {
 func (c *Connection) writeQuery(token int64, q []byte) error {
 	pos := 0
 	dataLen := 8 + 4 + len(q)
-
-	data := c.buf.takeBuffer(dataLen)
-	if data == nil {
-		return RQLDriverError{"Busy Buffer"}
-	}
+	data := make([]byte, dataLen)
 
 	// Send the protocol version to the server as a 4-byte little-endian-encoded integer
 	binary.LittleEndian.PutUint64(data[pos:], uint64(token))

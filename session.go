@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"crypto/tls"
+	"sync"
 	"time"
 
 	p "github.com/dancannon/gorethink/ql2"
@@ -10,20 +11,24 @@ import (
 // A Session represents a connection to a RethinkDB cluster and should be used
 // when executing queries.
 type Session struct {
-	hosts   []Host
-	opts    *ConnectOpts
+	hosts []Host
+	opts  *ConnectOpts
+
+	mu      sync.RWMutex
 	cluster *Cluster
 	closed  bool
 }
 
 // ConnectOpts is used to specify optional arguments when connecting to a cluster.
 type ConnectOpts struct {
-	Address   string        `gorethink:"address,omitempty"`
-	Addresses []string      `gorethink:"addresses,omitempty"`
-	Database  string        `gorethink:"database,omitempty"`
-	AuthKey   string        `gorethink:"authkey,omitempty"`
-	Timeout   time.Duration `gorethink:"timeout,omitempty"`
-	TLSConfig *tls.Config   `gorethink:"tlsconfig,omitempty"`
+	Address      string        `gorethink:"address,omitempty"`
+	Addresses    []string      `gorethink:"addresses,omitempty"`
+	Database     string        `gorethink:"database,omitempty"`
+	AuthKey      string        `gorethink:"authkey,omitempty"`
+	Timeout      time.Duration `gorethink:"timeout,omitempty"`
+	WriteTimeout time.Duration `gorethink:"write_timeout,omitempty"`
+	ReadTimeout  time.Duration `gorethink:"read_timeout,omitempty"`
+	TLSConfig    *tls.Config   `gorethink:"tlsconfig,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	MaxOpen int `gorethink:"max_open,omitempty"`
@@ -112,25 +117,32 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 		return err
 	}
 
+	s.mu.Lock()
 	s.cluster, err = NewCluster(s.hosts, s.opts)
 	if err != nil {
 		return err
 	}
 
 	s.closed = false
+	s.mu.Unlock()
 
 	return nil
 }
 
 // Close closes the session
 func (s *Session) Close(optArgs ...CloseOpts) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if s.closed {
 		return nil
 	}
 
 	if len(optArgs) >= 1 {
 		if optArgs[0].NoReplyWait {
+			s.mu.Unlock()
 			s.NoReplyWait()
+			s.mu.Lock()
 		}
 	}
 
@@ -146,12 +158,18 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 // SetMaxIdleConns sets the maximum number of connections in the idle
 // connection pool.
 func (s *Session) SetMaxIdleConns(n int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.opts.MaxIdle = n
 	s.cluster.SetMaxIdleConns(n)
 }
 
 // SetMaxOpenConns sets the maximum number of open connections to the database.
 func (s *Session) SetMaxOpenConns(n int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.opts.MaxOpen = n
 	s.cluster.SetMaxOpenConns(n)
 }
@@ -160,6 +178,13 @@ func (s *Session) SetMaxOpenConns(n int) {
 // processed by the server. Note that this guarantee only applies to queries
 // run on the given connection
 func (s *Session) NoReplyWait() error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.closed {
+		return ErrConnectionClosed
+	}
+
 	return s.cluster.Exec(Query{
 		Type: p.Query_NOREPLY_WAIT,
 	})
@@ -167,24 +192,44 @@ func (s *Session) NoReplyWait() error {
 
 // Use changes the default database used
 func (s *Session) Use(database string) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
 	s.opts.Database = database
 }
 
 // Query executes a ReQL query using the session to connect to the database
 func (s *Session) Query(q Query) (*Cursor, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.closed {
+		return nil, ErrConnectionClosed
+	}
+
 	return s.cluster.Query(q)
 }
 
 // Exec executes a ReQL query using the session to connect to the database
 func (s *Session) Exec(q Query) error {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	if s.closed {
+		return ErrConnectionClosed
+	}
+
 	return s.cluster.Exec(q)
 }
 
 // SetHosts resets the hosts used when connecting to the RethinkDB cluster
 func (s *Session) SetHosts(hosts []Host) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	s.hosts = hosts
 }
 
-func (s *Session) newQuery(t Term, opts map[string]interface{}) Query {
+func (s *Session) newQuery(t Term, opts map[string]interface{}) (Query, error) {
 	return newQuery(t, opts, s.opts)
 }

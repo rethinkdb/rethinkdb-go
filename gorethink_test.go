@@ -62,7 +62,7 @@ func testSetup(m *testing.M) {
 		AuthKey: authKey,
 	})
 	if err != nil {
-		log.Fatalln(err.Error())
+		Log.Fatalln(err.Error())
 	}
 
 	setupTestData()

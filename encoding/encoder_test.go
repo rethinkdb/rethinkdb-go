@@ -260,3 +260,16 @@ func TestDuplicatedFieldDisappears(t *testing.T) {
 		t.Fatalf("Encode: got %v want %v", got, want)
 	}
 }
+
+func TestEncodeMapIntKeys(t *testing.T) {
+	input := map[int]int{1: 1, 2: 2, 3: 3}
+	want := map[string]int{"1": 1, "2": 2, "3": 3}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}

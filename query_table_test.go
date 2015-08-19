@@ -125,6 +125,7 @@ func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 
 	DB("test").TableCreate("test").Exec(session)
 	DB("test").Table("test").IndexCreate("test").Exec(session)
+	DB("test").Table("test").IndexWait().Exec(session)
 
 	// Try and find it in the list
 	success := false
@@ -148,6 +149,7 @@ func (s *RethinkSuite) TestTableIndexList(c *test.C) {
 func (s *RethinkSuite) TestTableIndexDelete(c *test.C) {
 	DB("test").TableCreate("test").Exec(session)
 	DB("test").Table("test").IndexCreate("test").Exec(session)
+	DB("test").Table("test").IndexWait().Exec(session)
 
 	// Test database creation
 	query := DB("test").Table("test").IndexDrop("test")
@@ -161,6 +163,7 @@ func (s *RethinkSuite) TestTableIndexRename(c *test.C) {
 	DB("test").TableDrop("test").Exec(session)
 	DB("test").TableCreate("test").Exec(session)
 	DB("test").Table("test").IndexCreate("test").Exec(session)
+	DB("test").Table("test").IndexWait().Exec(session)
 
 	// Test index rename
 	query := DB("test").Table("test").IndexRename("test", "test2")

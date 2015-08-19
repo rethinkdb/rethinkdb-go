@@ -74,6 +74,7 @@ func Expr(val interface{}) Term {
 				return Term{
 					termType: p.Term_DATUM,
 					data:     nil,
+					lastErr:  err,
 				}
 			}
 
@@ -88,6 +89,7 @@ func Expr(val interface{}) Term {
 					return Term{
 						termType: p.Term_DATUM,
 						data:     nil,
+						lastErr:  err,
 					}
 				}
 
@@ -100,13 +102,6 @@ func Expr(val interface{}) Term {
 			}
 
 			return makeArray(vals)
-		case reflect.Map:
-			vals := make(map[string]Term, len(valValue.MapKeys()))
-			for _, k := range valValue.MapKeys() {
-				vals[k.String()] = Expr(valValue.MapIndex(k).Interface())
-			}
-
-			return makeObject(vals)
 		default:
 			return Term{
 				termType: p.Term_DATUM,
@@ -241,6 +236,14 @@ func Do(args ...interface{}) Term {
 // The type of the result is determined by the type of the branch that gets executed.
 func Branch(args ...interface{}) Term {
 	return constructRootTerm("Branch", p.Term_BRANCH, args, map[string]interface{}{})
+}
+
+// Branch evaluates one of two control paths based on the value of an expression.
+// branch is effectively an if renamed due to language constraints.
+//
+// The type of the result is determined by the type of the branch that gets executed.
+func (t Term) Branch(args ...interface{}) Term {
+	return constructMethodTerm(t, "Branch", p.Term_BRANCH, args, map[string]interface{}{})
 }
 
 // ForEach loops over a sequence, evaluating the given write query for each element.

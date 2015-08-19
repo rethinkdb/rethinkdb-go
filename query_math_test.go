@@ -250,3 +250,81 @@ func (s *RethinkSuite) TestBoolDeMorgan(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, true)
 }
+
+func (s *RethinkSuite) TestMathRootRound(c *test.C) {
+	query := Round(2.1)
+
+	var response int
+	r, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 2)
+}
+
+func (s *RethinkSuite) TestMathMethodRound(c *test.C) {
+	query := Expr(2.1).Round()
+
+	var response int
+	r, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 2)
+}
+
+func (s *RethinkSuite) TestMathRootCeil(c *test.C) {
+	query := Ceil(2.1)
+
+	var response int
+	r, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 3)
+}
+
+func (s *RethinkSuite) TestMathMethodCeil(c *test.C) {
+	query := Expr(2.1).Ceil()
+
+	var response int
+	r, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 3)
+}
+
+func (s *RethinkSuite) TestMathRootFloor(c *test.C) {
+	query := Floor(2.1)
+
+	var response int
+	r, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 2)
+}
+
+func (s *RethinkSuite) TestMathMethodFloor(c *test.C) {
+	query := Expr(2.1).Floor()
+
+	var response int
+	r, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = r.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 2)
+}

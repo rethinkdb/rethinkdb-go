@@ -120,7 +120,7 @@ func (c *Cluster) discover() {
 
 			return c.listenForNodeChanges()
 		}, b, func(err error, wait time.Duration) {
-			log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
+			Log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
 		})
 	}
 }
@@ -134,11 +134,16 @@ func (c *Cluster) listenForNodeChanges() error {
 		return err
 	}
 
-	cursor, err := node.Query(newQuery(
+	q, err := newQuery(
 		DB("rethinkdb").Table("server_status").Changes(),
 		map[string]interface{}{},
 		c.opts,
-	))
+	)
+	if err != nil {
+		return fmt.Errorf("Error building query %s", err)
+	}
+
+	cursor, err := node.Query(q)
 	if err != nil {
 		return err
 	}
@@ -165,7 +170,7 @@ func (c *Cluster) listenForNodeChanges() error {
 					if !c.nodeExists(node) {
 						c.addNode(node)
 
-						log.WithFields(logrus.Fields{
+						Log.WithFields(logrus.Fields{
 							"id":   node.ID,
 							"host": node.Host.String(),
 						}).Debug("Connected to node")
@@ -191,18 +196,24 @@ func (c *Cluster) connectNodes(hosts []Host) {
 	for _, host := range hosts {
 		conn, err := NewConnection(host.String(), c.opts)
 		if err != nil {
-			log.Warnf("Error creating connection %s", err.Error())
+			Log.Warnf("Error creating connection %s", err.Error())
 			continue
 		}
 		defer conn.Close()
 
-		_, cursor, err := conn.Query(newQuery(
+		q, err := newQuery(
 			DB("rethinkdb").Table("server_status"),
 			map[string]interface{}{},
 			c.opts,
-		))
+		)
 		if err != nil {
-			log.Warnf("Error fetching cluster status %s", err)
+			Log.Warnf("Error building query %s", err)
+			continue
+		}
+
+		_, cursor, err := conn.Query(q)
+		if err != nil {
+			Log.Warnf("Error fetching cluster status %s", err)
 			continue
 		}
 
@@ -217,7 +228,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 				node, err := c.connectNodeWithStatus(result)
 				if err == nil {
 					if _, ok := nodeSet[node.ID]; !ok {
-						log.WithFields(logrus.Fields{
+						Log.WithFields(logrus.Fields{
 							"id":   node.ID,
 							"host": node.Host.String(),
 						}).Debug("Connected to node")
@@ -229,7 +240,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			node, err := c.connectNode(host.String(), []Host{host})
 			if err == nil {
 				if _, ok := nodeSet[node.ID]; !ok {
-					log.WithFields(logrus.Fields{
+					Log.WithFields(logrus.Fields{
 						"id":   node.ID,
 						"host": node.Host.String(),
 					}).Debug("Connected to node")
@@ -315,7 +326,7 @@ func (c *Cluster) getSeeds() []Host {
 // TODO(dancannon) replace with hostpool
 func (c *Cluster) GetRandomNode() (*Node, error) {
 	if !c.IsConnected() {
-		return nil, ErrClusterClosed
+		return nil, ErrNoConnections
 	}
 	// Must copy array reference for copy on write semantics to work.
 	nodeArray := c.GetNodes()

@@ -2,6 +2,33 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v1.1.0
+### Added
+ - Replaced `UseOutdated` with `ReadMode`
+ - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
+ - Added `Union` as a root term
+ - Added `Branch` as a root term
+ - Added `ReadTimeout` and `WriteTimeout` to `RunOpts` and `ExecOpts`
+ - Exported `github.com/Sirupsen/logrus.Logger` as `Log`
+ - Added support for encoding maps with non-string keys
+ - Added 'Round', 'Ceil' and 'Floor' terms
+ - Added race detector to CI
+
+### Changed
+ - Changed `Timeout` connect argument to only configure the connection timeout.
+ - Replaced `Db` with `DB` in `RunOpts` and `ExecOpts` (`Db` still works for now)
+ - Made `Cursor` and `Session` safe for concurrent use
+ - Replaced `ErrClusterClosed` with `ErrConnectionClosed`
+
+## Deprecated
+ - Deprecated `UseOutdated` optional argument
+ - Deprecated `Db` in `RunOpt`
+
+### Fixed
+ - Fixed race condition in node pool
+ - Fixed node refresh issue with RethinkDB 2.1 due to an API change
+ - Fixed encoding errors not being returned when running queries
+
 ## v1.0.0 - 2015-06-27
 
 1.0.0 is finally here, This is the first stable production ready release of GoRethink!
