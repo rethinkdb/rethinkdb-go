@@ -1,7 +1,5 @@
 # GoRethink - RethinkDB Driver for Go 
 
-**Driver does not currently support RethinkDB 2.1, update coming soon!**
-
 [![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)](https://github.com/dancannon/gorethink/releases)
 [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
 [![build status](https://img.shields.io/travis/dancannon/gorethink/master.svg "build status")](https://travis-ci.org/dancannon/gorethink) 
@@ -188,7 +186,7 @@ if err != nil {
 }
 ```
 
-## Encoding/Decoding Structs
+## Encoding/Decoding
 When passing structs to Expr(And functions that use Expr such as Insert, Update) the structs are encoded into a map before being sent to the server. Each exported field is added to the map unless
 
   - the field's tag is "-", or
@@ -214,6 +212,8 @@ Field int `gorethink:",omitempty"`
 ```
 
 **NOTE:** It is strongly recommended that struct tags are used to explicitly define the mapping between your Go type and how the data is stored by RethinkDB. This is especially important when using an `Id` field as by default RethinkDB will create a field named `id` as the primary key (note that the RethinkDB field is lowercase but the Go version starts with a capital letter).
+
+When encoding maps with non-string keys the key values are automatically converted to strings where possible, however it is recommended that you use strings where possible (for example `map[string]T`).
 
 ## Benchmarks
 

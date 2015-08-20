@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Corrected protobuf import
+ - Fixed documentation
 
 ## v1.1.0
 ### Added
