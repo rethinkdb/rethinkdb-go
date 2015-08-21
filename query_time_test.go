@@ -18,12 +18,12 @@ func (s *RethinkSuite) TestTimeTime(c *test.C) {
 
 func (s *RethinkSuite) TestTimeTimeMillisecond(c *test.C) {
 	var response time.Time
-	res, err := Time(1986, 11, 3, 12, 30, 15.679, "Z").Run(session)
+	res, err := Time(1986, 11, 3, 12, 30, 15.6790123, "Z").Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = res.One(&response)
 	c.Assert(err, test.IsNil)
-	c.Assert(response.Equal(time.Date(1986, 11, 3, 12, 30, 15, 679.00002*1000*1000, time.UTC)), test.Equals, true)
+	c.Assert(response.Equal(time.Date(1986, 11, 3, 12, 30, 15, 679*1000*1000, time.UTC)), test.Equals, true)
 }
 
 func (s *RethinkSuite) TestTimeEpochTime(c *test.C) {
