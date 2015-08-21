@@ -125,8 +125,9 @@ func recursivelyConvertPseudotype(obj interface{}, opts map[string]interface{}) 
 
 func reqlTimeToNativeTime(timestamp float64, timezone string) (time.Time, error) {
 	sec, ms := math.Modf(timestamp)
-
-	t := time.Unix(int64(sec), int64(ms*1000*1000*1000))
+	
+	// Convert to native time rounding to milliseconds
+	t := time.Unix(int64(sec), int64(math.Floor(ms*1000+0.5))*1000*1000)
 
 	// Caclulate the timezone
 	if timezone != "" {
