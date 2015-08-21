@@ -19,7 +19,7 @@ It has these top-level messages:
 */
 package ql2
 
-import proto "github.com/hailocab/protobuf/proto"
+import proto "github.com/golang/protobuf/proto"
 import json "encoding/json"
 import math "math"
 
