@@ -1,6 +1,6 @@
 language: go
 
-gobuild_args: -tags='cluster' -race
+gobuild_args: -tags='cluster' -race -v -gocheck.vv
 
 go:
   - 1.4
