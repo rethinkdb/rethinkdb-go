@@ -67,7 +67,7 @@ func Expr(val interface{}) Term {
 		switch valType.Kind() {
 		case reflect.Func:
 			return makeFunc(val)
-		case reflect.Struct, reflect.Ptr:
+		case reflect.Struct, reflect.Map, reflect.Ptr:
 			data, err := encode(val)
 
 			if err != nil || data == nil {
