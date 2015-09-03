@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+### Fixed
+ - Fixed pointers not to be properly decoded
+
 ## v1.1.2
 ### Fixed
  - Fixed issue when encoding some maps
