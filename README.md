@@ -215,6 +215,16 @@ Field int `gorethink:",omitempty"`
 
 When encoding maps with non-string keys the key values are automatically converted to strings where possible, however it is recommended that you use strings where possible (for example `map[string]T`).
 
+## Logging
+
+By default the driver logs errors when it fails to connect to the database. If you would like more verbose error logging you can call `r.SetVerbose(true)`.
+
+Alternatively if you wish to modify the logging behaviour you can modify the logger provided by `github.com/Sirupsen/logrus`. For example the following code completely disable the logger:
+
+```go
+r.Log.Out = ioutil.Discard
+```
+
 ## Benchmarks
 
 Everyone wants their project's benchmarks to be speedy. And while we know that rethinkDb and the gorethink driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please. 
