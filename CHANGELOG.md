@@ -5,6 +5,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 ### Fixed
  - Fixed pointers not to be properly decoded
+ - Fixed queries always timing out when Timeout ConnectOpt is set.
 
 ## v1.1.2
 ### Fixed
