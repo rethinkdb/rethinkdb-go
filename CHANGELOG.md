@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Fixed pointers not to be properly decoded
 
+### Fixed 
+ - Fixed `Decode` no longer setting pointer to nil on document not found
+
 ## v1.1.3
 ### Fixed
  - Fixed pointers not to be properly decoded
