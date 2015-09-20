@@ -96,7 +96,7 @@ var optionalsExpected = map[string]interface{}{
 func TestOmitEmpty(t *testing.T) {
 	var o Optionals
 	o.Sw = "something"
-	o.Tr = time.Unix(0, 0)
+	o.Tr = time.Unix(0, 0).In(time.UTC)
 	o.Mr = map[string]interface{}{}
 	o.Mo = map[string]interface{}{}
 

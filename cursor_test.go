@@ -218,6 +218,13 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	res, err = DB("test").Table("test").Filter(obj).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
+
+	var objP *object
+
+	res, err = DB("test").Table("test").Get("missing value").Run(session)
+	res.Next(&objP)
+	c.Assert(err, test.IsNil)
+	c.Assert(objP, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorAll(c *test.C) {

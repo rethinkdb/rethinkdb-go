@@ -6,8 +6,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Timezones from `time.Time` are now stored in the database, before all times were stored as UTC. To convert a go `time.Time` back to UTC you can call  `t.In(time.UTC)`.
 
+### Fixed 
+ - Fixed `Decode` no longer setting pointer to nil on document not found
+
 ## v1.1.3
->>>>>>> v1.1.3
 ### Fixed
  - Fixed pointers not to be properly decoded
  - Fixed queries always timing out when Timeout ConnectOpt is set.
