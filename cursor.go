@@ -184,10 +184,10 @@ func (c *Cursor) loadNextLocked(dest interface{}) (bool, error) {
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && !c.finished {
 			c.mu.Unlock()
 			err := c.fetchMore()
+			c.mu.Lock()
 			if err != nil {
 				return false, err
 			}
-			c.mu.Lock()
 		}
 
 		if c.buffer.Len() == 0 && c.responses.Len() == 0 && c.finished {
