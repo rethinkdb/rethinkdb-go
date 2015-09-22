@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Timezones from `time.Time` are now stored in the database, before all times were stored as UTC. To convert a go `time.Time` back to UTC you can call  `t.In(time.UTC)`.
 
+### Removed
+ - Removed `ReadMode` option from `RunOpts` and `ExecOpts` (incorrectly added in v1.1.0)
+
 ### Fixed 
  - Fixed `Decode` no longer setting pointer to nil on document not found
 
