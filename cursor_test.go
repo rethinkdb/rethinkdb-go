@@ -345,6 +345,22 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestCursorChangesClose(c *test.C) {
+	// Ensure table + database exist
+	DBCreate("test").Exec(session)
+	DB("test").TableDrop("Table3").Exec(session)
+	DB("test").TableCreate("Table3").Exec(session)
+
+	// Test query
+	// res, err := DB("test").Table("Table3").Changes().Run(session)
+	res, err := DB("test").Table("Table3").Changes().Run(session)
+	c.Assert(err, test.IsNil)
+
+	// Ensure that the cursor can be closed
+	err = res.Close()
+	c.Assert(err, test.IsNil)
+}
+
 func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
 	// Test query
 	query := Expr([]interface{}{

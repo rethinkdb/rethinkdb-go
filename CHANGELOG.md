@@ -12,6 +12,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed 
  - Fixed `Decode` no longer setting pointer to nil on document not found
  - Fixed panic when `fetchMore` returns an error
+ - Fixed deadlock when closing changefeed
 
 ## v1.1.3
 ### Fixed
