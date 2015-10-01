@@ -18,6 +18,20 @@ func (s *RethinkSuite) TestTableCreate(c *test.C) {
 	c.Assert(response.TablesCreated, jsonEquals, 1)
 }
 
+func (s *RethinkSuite) TestTableCreateSessionDatabase(c *test.C) {
+	session, err := Connect(ConnectOpts{
+		Address: url,
+		AuthKey: authKey,
+	})
+	c.Assert(err, test.IsNil)
+	TableDrop("test").Exec(session)
+
+	// Test database creation
+	response, err := TableCreate("test").RunWrite(session)
+	c.Assert(err, test.IsNil)
+	c.Assert(response.TablesCreated, jsonEquals, 1)
+}
+
 func (s *RethinkSuite) TestTableCreatePrimaryKey(c *test.C) {
 	DB("test").TableDrop("testOpts").Exec(session)
 

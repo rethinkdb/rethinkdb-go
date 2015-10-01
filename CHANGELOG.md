@@ -6,6 +6,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Fixed pointers not to be properly decoded
 
+### Added
+ - Added root table terms (`r.TableCreate`, `r.TableList` and `r.TableDrop`)
+
 ### Removed
  - Removed `ReadMode` option from `RunOpts` and `ExecOpts` (incorrectly added in v1.1.0)
 
