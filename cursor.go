@@ -121,7 +121,9 @@ func (c *Cursor) Close() error {
 			Token: c.token,
 		}
 
+		c.mu.Unlock()
 		_, _, err = conn.Query(q)
+		c.mu.Lock()
 	}
 
 	if c.releaseConn != nil {
