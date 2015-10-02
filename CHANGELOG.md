@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Timezones from `time.Time` are now stored in the database, before all times were stored as UTC. To convert a go `time.Time` back to UTC you can call  `t.In(time.UTC)`.
 
+## v1.1.4
 ### Added
  - Added root table terms (`r.TableCreate`, `r.TableList` and `r.TableDrop`)
 
@@ -17,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed panic when `fetchMore` returns an error
  - Fixed deadlock when closing changefeed
  - Fixed stop query incorrectly waiting for response
+ - Fixed pointers not to be properly decoded
 
 ## v1.1.3
 ### Fixed
