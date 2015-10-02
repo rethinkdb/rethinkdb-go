@@ -264,9 +264,41 @@ func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 	for _ = range change {
 		n++
 	}
-	if res.Err() != nil {
-		c.Fatal(res.Err())
+	if res.Err() == nil {
+		c.Fatal("No error returned, expected connection closed")
 	}
 
 	c.Assert(n, test.Equals, 5)
+}
+
+func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
+	DB("test").TableDrop("changes").Exec(session)
+	DB("test").TableCreate("changes").Exec(session)
+
+	var n int
+
+	res, err := DB("test").Table("changes").Changes().Run(session)
+	if err != nil {
+		c.Fatal(err.Error())
+	}
+	c.Assert(res.Type(), test.Equals, "Feed")
+
+	change := make(chan ChangeResponse)
+
+	// Close cursor after one second
+	go func() {
+		<-time.After(time.Second)
+		res.Close()
+	}()
+
+	// Listen for changes
+	res.Listen(change)
+	for _ = range change {
+		n++
+	}
+	if res.Err() == nil {
+		c.Fatal("No error returned, expected connection closed")
+	}
+
+	c.Assert(n, test.Equals, 0)
 }
