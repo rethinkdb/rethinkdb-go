@@ -2,10 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
-### Fixed
- - Fixed pointers not to be properly decoded
-
+## v1.1.4
 ### Added
  - Added root table terms (`r.TableCreate`, `r.TableList` and `r.TableDrop`)
 
@@ -17,6 +14,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed panic when `fetchMore` returns an error
  - Fixed deadlock when closing changefeed
  - Fixed stop query incorrectly waiting for response
+ - Fixed pointers not to be properly decoded
 
 ## v1.1.3
 ### Fixed
