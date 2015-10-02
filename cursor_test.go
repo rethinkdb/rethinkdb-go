@@ -218,6 +218,13 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	res, err = DB("test").Table("test").Filter(obj).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
+
+	var objP *object
+
+	res, err = DB("test").Table("test").Get("missing value").Run(session)
+	res.Next(&objP)
+	c.Assert(err, test.IsNil)
+	c.Assert(objP, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorAll(c *test.C) {
@@ -336,6 +343,22 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 			}},
 		},
 	})
+}
+
+func (s *RethinkSuite) TestCursorChangesClose(c *test.C) {
+	// Ensure table + database exist
+	DBCreate("test").Exec(session)
+	DB("test").TableDrop("Table3").Exec(session)
+	DB("test").TableCreate("Table3").Exec(session)
+
+	// Test query
+	// res, err := DB("test").Table("Table3").Changes().Run(session)
+	res, err := DB("test").Table("Table3").Changes().Run(session)
+	c.Assert(err, test.IsNil)
+
+	// Ensure that the cursor can be closed
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
