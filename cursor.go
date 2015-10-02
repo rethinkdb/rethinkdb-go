@@ -119,11 +119,12 @@ func (c *Cursor) Close() error {
 		q := Query{
 			Type:  p.Query_STOP,
 			Token: c.token,
+			Opts: map[string]interface{}{
+				"noreply": true,
+			},
 		}
 
-		c.mu.Unlock()
 		_, _, err = conn.Query(q)
-		c.mu.Lock()
 	}
 
 	if c.releaseConn != nil {
