@@ -43,6 +43,10 @@ type ConnectOpts struct {
 	// NodeRefreshInterval is used to determine how often the driver should
 	// refresh the status of a node.
 	NodeRefreshInterval time.Duration `gorethink:"node_refresh_interval,omitempty"`
+
+	// Indicates whether the cursors running in this session should use json.Number instead of float64 while
+	// unmarshaling documents with interface{}. The default is `false`.
+	UseJSONNumber bool
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {
