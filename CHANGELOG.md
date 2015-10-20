@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
+### Added
+ - Added `UseJSONNumber` to `ConnectOpts` which changes the way the JSON unmarshal works when deserializing JSON with interface{}, it's preferred to use json.Number instead float64 as it preserves the original precision.
+
 ### Changed
  - Timezones from `time.Time` are now stored in the database, before all times were stored as UTC. To convert a go `time.Time` back to UTC you can call  `t.In(time.UTC)`.
 
