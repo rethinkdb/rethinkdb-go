@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"reflect"
@@ -200,7 +201,11 @@ func (c *Cursor) loadNextLocked(dest interface{}) (bool, error) {
 		if c.buffer.Len() == 0 && c.responses.Len() > 0 {
 			if response, ok := c.responses.Pop().(json.RawMessage); ok {
 				var value interface{}
-				err := json.Unmarshal(response, &value)
+				decoder := json.NewDecoder(bytes.NewBuffer(response))
+				if c.conn.opts.UseJSONNumber {
+					decoder.UseNumber()
+				}
+				err := decoder.Decode(&value)
 				if err != nil {
 					return false, err
 				}

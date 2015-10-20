@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"testing"
@@ -27,6 +28,35 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, jsonEquals, map[string]interface{}{"id": 6, "g1": 1, "g2": 1, "num": 15})
+
+	res.Close()
+}
+
+func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
+	session, err := Connect(ConnectOpts{
+		Address:       url,
+		AuthKey:       authKey,
+		UseJSONNumber: true,
+	})
+	c.Assert(err, test.IsNil)
+	defer session.Close()
+	// Ensure table + database exist
+	DBCreate("test").Exec(session)
+	DB("test").TableCreate("Table1").Exec(session)
+
+	// Insert rows
+	DB("test").Table("Table1").Insert(objList).Exec(session)
+
+	// Test query
+	var response interface{}
+	query := DB("test").Table("Table1").Get(6)
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, map[string]interface{}{"id": json.Number("6"), "g1": json.Number("1"), "g2": json.Number("1"), "num": json.Number("15")})
 
 	res.Close()
 }
