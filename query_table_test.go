@@ -302,3 +302,51 @@ func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 
 	c.Assert(n, test.Equals, 0)
 }
+
+func (s *RethinkSuite) TestTableChangesIncludeInitial(c *test.C) {
+	DB("test").TableDrop("changes").Exec(session)
+	DB("test").TableCreate("changes").Exec(session)
+
+	// Insert 5 documents to table initially
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(session)
+
+	var n int
+
+	res, err := DB("test").Table("changes").Changes(ChangesOpts{IncludeInitial: true}).Run(session)
+	if err != nil {
+		c.Fatal(err.Error())
+	}
+	c.Assert(res.Type(), test.Equals, "Feed")
+
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	// Use goroutine to wait for changes. Prints the first 10 results
+	go func() {
+		var response interface{}
+		for n < 10 && res.Next(&response) {
+			n++
+		}
+
+		println(response)
+		if res.Err() != nil {
+			c.Fatal(res.Err())
+		}
+
+		wg.Done()
+	}()
+
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 6}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 7}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 8}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 9}).Exec(session)
+	DB("test").Table("changes").Insert(map[string]interface{}{"n": 10}).Exec(session)
+
+	wg.Wait()
+
+	c.Assert(n, test.Equals, 10)
+}
