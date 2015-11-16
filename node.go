@@ -140,6 +140,23 @@ func (n *Node) Exec(q Query) (err error) {
 	return err
 }
 
+// Server returns the server name and server UUID being used by a connection.
+func (n *Node) Server() (ServerResponse, error) {
+	var response ServerResponse
+	var err error
+
+	if n.Closed() {
+		return response, ErrInvalidNode
+	}
+
+	response, err = n.pool.Server()
+	if err != nil {
+		n.DecrementHealth()
+	}
+
+	return response, err
+}
+
 // Refresh attempts to connect to the node and check that it is still connected
 // to the cluster.
 //

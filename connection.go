@@ -115,7 +115,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	}
 
 	// Add token if query is a START/NOREPLY_WAIT
-	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
+	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT || q.Type == p.Query_SERVER_INFO {
 		q.Token = c.nextToken()
 		if c.opts.Database != "" {
 			var err error
@@ -152,6 +152,33 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 			putResponse(response)
 		}
 	}
+}
+
+type ServerResponse struct {
+	ID   string `gorethink:"id"`
+	Name string `gorethink:"name"`
+}
+
+// Server returns the server name and server UUID being used by a connection.
+func (c *Connection) Server() (ServerResponse, error) {
+	var response ServerResponse
+
+	_, cur, err := c.Query(Query{
+		Type: p.Query_SERVER_INFO,
+	})
+	if err != nil {
+		return response, err
+	}
+
+	if err = cur.One(&response); err != nil {
+		return response, err
+	}
+
+	if err = cur.Close(); err != nil {
+		return response, err
+	}
+
+	return response, nil
 }
 
 // sendQuery marshals the Query and sends the JSON to the server.
@@ -231,7 +258,7 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 		return c.processErrorResponse(q, response, RQLCompileError{rqlResponseError{response, q.Term}})
 	case p.Response_RUNTIME_ERROR:
 		return c.processErrorResponse(q, response, RQLRuntimeError{rqlResponseError{response, q.Term}})
-	case p.Response_SUCCESS_ATOM:
+	case p.Response_SUCCESS_ATOM, p.Response_SERVER_INFO:
 		return c.processAtomResponse(q, response)
 	case p.Response_SUCCESS_PARTIAL:
 		return c.processPartialResponse(q, response)

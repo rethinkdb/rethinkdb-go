@@ -531,6 +531,38 @@ func (p *Pool) queryConn(pc *poolConn, releaseConn func(error), q Query) (*Curso
 	return cursor, nil
 }
 
+// Server returns the server name and server UUID being used by a connection.
+func (p *Pool) Server() (ServerResponse, error) {
+	var response ServerResponse
+	var err error
+
+	for i := 0; i < maxBadConnRetries; i++ {
+		response, err = p.server()
+		if err != ErrBadConn {
+			break
+		}
+	}
+	return response, err
+}
+func (p *Pool) server() (ServerResponse, error) {
+	var response ServerResponse
+	var err error
+
+	pc, err := p.conn()
+	if err != nil {
+		return response, err
+	}
+	defer func() {
+		p.putConn(pc, err)
+	}()
+
+	pc.Lock()
+	response, err = pc.ci.Server()
+	pc.Unlock()
+
+	return response, err
+}
+
 // Helper functions
 
 func stack() string {

@@ -70,6 +70,16 @@ func (c *Cluster) Exec(q Query) (err error) {
 	return node.Exec(q)
 }
 
+// Server returns the server name and server UUID being used by a connection.
+func (c *Cluster) Server() (ServerResponse, error) {
+	node, err := c.GetRandomNode()
+	if err != nil {
+		return ServerResponse{}, err
+	}
+
+	return node.Server()
+}
+
 // SetMaxIdleConns sets the maximum number of connections in the idle
 // connection pool.
 func (c *Cluster) SetMaxIdleConns(n int) {
