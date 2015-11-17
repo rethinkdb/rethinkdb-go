@@ -19,11 +19,13 @@ It has these top-level messages:
 */
 package ql2
 
-import proto "code.google.com/p/goprotobuf/proto"
+import proto "github.com/golang/protobuf/proto"
+import json "encoding/json"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
+var _ = &json.SyntaxError{}
 var _ = math.Inf
 
 // non-conforming protobuf libraries
@@ -59,6 +61,9 @@ func (x VersionDummy_Version) Enum() *VersionDummy_Version {
 func (x VersionDummy_Version) String() string {
 	return proto.EnumName(VersionDummy_Version_name, int32(x))
 }
+func (x VersionDummy_Version) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
+}
 func (x *VersionDummy_Version) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(VersionDummy_Version_value, data, "VersionDummy_Version")
 	if err != nil {
@@ -92,6 +97,9 @@ func (x VersionDummy_Protocol) Enum() *VersionDummy_Protocol {
 }
 func (x VersionDummy_Protocol) String() string {
 	return proto.EnumName(VersionDummy_Protocol_name, int32(x))
+}
+func (x VersionDummy_Protocol) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
 }
 func (x *VersionDummy_Protocol) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(VersionDummy_Protocol_value, data, "VersionDummy_Protocol")
@@ -136,6 +144,9 @@ func (x Query_QueryType) Enum() *Query_QueryType {
 func (x Query_QueryType) String() string {
 	return proto.EnumName(Query_QueryType_name, int32(x))
 }
+func (x Query_QueryType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
+}
 func (x *Query_QueryType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Query_QueryType_value, data, "Query_QueryType")
 	if err != nil {
@@ -168,6 +179,9 @@ func (x Frame_FrameType) Enum() *Frame_FrameType {
 }
 func (x Frame_FrameType) String() string {
 	return proto.EnumName(Frame_FrameType_name, int32(x))
+}
+func (x Frame_FrameType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
 }
 func (x *Frame_FrameType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Frame_FrameType_value, data, "Frame_FrameType")
@@ -230,6 +244,9 @@ func (x Response_ResponseType) Enum() *Response_ResponseType {
 func (x Response_ResponseType) String() string {
 	return proto.EnumName(Response_ResponseType_name, int32(x))
 }
+func (x Response_ResponseType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
+}
 func (x *Response_ResponseType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Response_ResponseType_value, data, "Response_ResponseType")
 	if err != nil {
@@ -279,6 +296,9 @@ func (x Response_ErrorType) Enum() *Response_ErrorType {
 }
 func (x Response_ErrorType) String() string {
 	return proto.EnumName(Response_ErrorType_name, int32(x))
+}
+func (x Response_ErrorType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
 }
 func (x *Response_ErrorType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Response_ErrorType_value, data, "Response_ErrorType")
@@ -337,6 +357,9 @@ func (x Response_ResponseNote) Enum() *Response_ResponseNote {
 func (x Response_ResponseNote) String() string {
 	return proto.EnumName(Response_ResponseNote_name, int32(x))
 }
+func (x Response_ResponseNote) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
+}
 func (x *Response_ResponseNote) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Response_ResponseNote_value, data, "Response_ResponseNote")
 	if err != nil {
@@ -387,6 +410,9 @@ func (x Datum_DatumType) Enum() *Datum_DatumType {
 }
 func (x Datum_DatumType) String() string {
 	return proto.EnumName(Datum_DatumType_name, int32(x))
+}
+func (x Datum_DatumType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
 }
 func (x *Datum_DatumType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Datum_DatumType_value, data, "Datum_DatumType")
@@ -1185,6 +1211,9 @@ func (x Term_TermType) Enum() *Term_TermType {
 }
 func (x Term_TermType) String() string {
 	return proto.EnumName(Term_TermType_name, int32(x))
+}
+func (x Term_TermType) MarshalJSON() ([]byte, error) {
+	return json.Marshal(x.String())
 }
 func (x *Term_TermType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Term_TermType_value, data, "Term_TermType")
