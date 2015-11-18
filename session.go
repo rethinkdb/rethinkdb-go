@@ -226,6 +226,11 @@ func (s *Session) Exec(q Query) error {
 	return s.cluster.Exec(q)
 }
 
+// Server returns the server name and server UUID being used by a connection.
+func (s *Session) Server() (ServerResponse, error) {
+	return s.cluster.Server()
+}
+
 // SetHosts resets the hosts used when connecting to the RethinkDB cluster
 func (s *Session) SetHosts(hosts []Host) {
 	s.mu.Lock()
