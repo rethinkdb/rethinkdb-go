@@ -296,7 +296,9 @@ func (t Term) Info(args ...interface{}) Term {
 	return constructMethodTerm(t, "Info", p.Term_INFO, args, map[string]interface{}{})
 }
 
-// UUID returns a UUID (universally unique identifier), a string that can be used as a unique ID.
+// Return a UUID (universally unique identifier), a string that can be used as a
+// unique ID. If a string is passed to uuid as an argument, the UUID will be
+// deterministic, derived from the string’s SHA-1 hash.
 func UUID(args ...interface{}) Term {
-	return constructRootTerm("UUID", p.Term_UUID, []interface{}{}, map[string]interface{}{})
+	return constructRootTerm("UUID", p.Term_UUID, args, map[string]interface{}{})
 }

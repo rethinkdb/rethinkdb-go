@@ -447,6 +447,30 @@ func (s *RethinkSuite) TestControlToJSON(c *test.C) {
 	c.Assert(response, test.Equals, "[4,5]")
 }
 
+func (s *RethinkSuite) TestControlUUID(c *test.C) {
+	var response string
+	query := UUID()
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(len(response) == 36, test.Equals, true)
+}
+
+func (s *RethinkSuite) TestControlUUIDString(c *test.C) {
+	var response string
+	query := UUID("rethinkdb")
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(len(response) == 36, test.Equals, true)
+}
+
 func (s *RethinkSuite) TestControlInvalidType(c *test.C) {
 	query := Expr(map[struct{ string }]string{})
 	_, err := query.Run(session)
