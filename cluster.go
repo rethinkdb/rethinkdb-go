@@ -34,8 +34,7 @@ type Cluster struct {
 // NewCluster creates a new cluster by connecting to the given hosts.
 func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
 	c := &Cluster{
-		// TODO: Make this configurable
-		hp:    hostpool.NewEpsilonGreedy([]string{}, 0, &hostpool.LinearEpsilonValueCalculator{}),
+		hp:    hostpool.NewEpsilonGreedy([]string{}, opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{}),
 		seeds: hosts,
 		opts:  opts,
 	}
@@ -358,7 +357,6 @@ func (c *Cluster) GetNextNode() (*Node, hostpool.HostPoolResponse, error) {
 	defer c.mu.RUnlock()
 
 	nodes := c.nodes
-
 	hpr := c.hp.Get()
 	if n, ok := nodes[hpr.Host()]; ok {
 		if !n.Closed() {

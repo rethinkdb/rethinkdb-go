@@ -6,12 +6,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Added `UUID` term
  - Added `Values` term
- - Added `IncludeInitial` to `ChangesOpts`
+ - Added `IncludeInitial` and `ChangefeedQueueSize` to `ChangesOpts`
  - Added `UseJSONNumber` to `ConnectOpts` which changes the way the JSON unmarshal works when deserializing JSON with interface{}, it's preferred to use json.Number instead float64 as it preserves the original precision.
+ - Added `HostDecayDuration` to `ConnectOpts` to configure how hosts are selected. For more information see the godoc.
 
 ### Changed
  - Timezones from `time.Time` are now stored in the database, before all times were stored as UTC. To convert a go `time.Time` back to UTC you can call  `t.In(time.UTC)`.
  - Improved host selection to use `hailocab/go-hostpool` to select nodes based on recent responses and timings.
+
+### Deprecated
+ - Deprecated the option `NodeRefreshInterval` in `ConnectOpts`
 
 ## v1.1.4
 ### Added
