@@ -20,12 +20,12 @@ It has these top-level messages:
 package ql2
 
 import proto "github.com/golang/protobuf/proto"
-import json "encoding/json"
+import fmt "fmt"
 import math "math"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
-var _ = &json.SyntaxError{}
+var _ = fmt.Errorf
 var _ = math.Inf
 
 // non-conforming protobuf libraries
@@ -61,9 +61,6 @@ func (x VersionDummy_Version) Enum() *VersionDummy_Version {
 func (x VersionDummy_Version) String() string {
 	return proto.EnumName(VersionDummy_Version_name, int32(x))
 }
-func (x VersionDummy_Version) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
-}
 func (x *VersionDummy_Version) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(VersionDummy_Version_value, data, "VersionDummy_Version")
 	if err != nil {
@@ -98,9 +95,6 @@ func (x VersionDummy_Protocol) Enum() *VersionDummy_Protocol {
 func (x VersionDummy_Protocol) String() string {
 	return proto.EnumName(VersionDummy_Protocol_name, int32(x))
 }
-func (x VersionDummy_Protocol) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
-}
 func (x *VersionDummy_Protocol) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(VersionDummy_Protocol_value, data, "VersionDummy_Protocol")
 	if err != nil {
@@ -118,6 +112,7 @@ const (
 	// (see [Response]).
 	Query_STOP         Query_QueryType = 3
 	Query_NOREPLY_WAIT Query_QueryType = 4
+	Query_SERVER_INFO  Query_QueryType = 5
 )
 
 var Query_QueryType_name = map[int32]string{
@@ -125,12 +120,14 @@ var Query_QueryType_name = map[int32]string{
 	2: "CONTINUE",
 	3: "STOP",
 	4: "NOREPLY_WAIT",
+	5: "SERVER_INFO",
 }
 var Query_QueryType_value = map[string]int32{
 	"START":        1,
 	"CONTINUE":     2,
 	"STOP":         3,
 	"NOREPLY_WAIT": 4,
+	"SERVER_INFO":  5,
 }
 
 func (x Query_QueryType) Enum() *Query_QueryType {
@@ -140,9 +137,6 @@ func (x Query_QueryType) Enum() *Query_QueryType {
 }
 func (x Query_QueryType) String() string {
 	return proto.EnumName(Query_QueryType_name, int32(x))
-}
-func (x Query_QueryType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
 }
 func (x *Query_QueryType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Query_QueryType_value, data, "Query_QueryType")
@@ -177,9 +171,6 @@ func (x Frame_FrameType) Enum() *Frame_FrameType {
 func (x Frame_FrameType) String() string {
 	return proto.EnumName(Frame_FrameType_name, int32(x))
 }
-func (x Frame_FrameType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
-}
 func (x *Frame_FrameType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Frame_FrameType_value, data, "Frame_FrameType")
 	if err != nil {
@@ -201,6 +192,7 @@ const (
 	// more of the sequence.  Keep sending [CONTINUE]
 	// queries until you get back [SUCCESS_SEQUENCE].
 	Response_WAIT_COMPLETE Response_ResponseType = 4
+	Response_SERVER_INFO   Response_ResponseType = 5
 	// These response types indicate failure.
 	Response_CLIENT_ERROR Response_ResponseType = 16
 	// client sends a malformed protobuf, or tries to
@@ -216,6 +208,7 @@ var Response_ResponseType_name = map[int32]string{
 	2:  "SUCCESS_SEQUENCE",
 	3:  "SUCCESS_PARTIAL",
 	4:  "WAIT_COMPLETE",
+	5:  "SERVER_INFO",
 	16: "CLIENT_ERROR",
 	17: "COMPILE_ERROR",
 	18: "RUNTIME_ERROR",
@@ -225,6 +218,7 @@ var Response_ResponseType_value = map[string]int32{
 	"SUCCESS_SEQUENCE": 2,
 	"SUCCESS_PARTIAL":  3,
 	"WAIT_COMPLETE":    4,
+	"SERVER_INFO":      5,
 	"CLIENT_ERROR":     16,
 	"COMPILE_ERROR":    17,
 	"RUNTIME_ERROR":    18,
@@ -237,9 +231,6 @@ func (x Response_ResponseType) Enum() *Response_ResponseType {
 }
 func (x Response_ResponseType) String() string {
 	return proto.EnumName(Response_ResponseType_name, int32(x))
-}
-func (x Response_ResponseType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
 }
 func (x *Response_ResponseType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Response_ResponseType_value, data, "Response_ResponseType")
@@ -290,9 +281,6 @@ func (x Response_ErrorType) Enum() *Response_ErrorType {
 }
 func (x Response_ErrorType) String() string {
 	return proto.EnumName(Response_ErrorType_name, int32(x))
-}
-func (x Response_ErrorType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
 }
 func (x *Response_ErrorType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Response_ErrorType_value, data, "Response_ErrorType")
@@ -351,9 +339,6 @@ func (x Response_ResponseNote) Enum() *Response_ResponseNote {
 func (x Response_ResponseNote) String() string {
 	return proto.EnumName(Response_ResponseNote_name, int32(x))
 }
-func (x Response_ResponseNote) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
-}
 func (x *Response_ResponseNote) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Response_ResponseNote_value, data, "Response_ResponseNote")
 	if err != nil {
@@ -404,9 +389,6 @@ func (x Datum_DatumType) Enum() *Datum_DatumType {
 }
 func (x Datum_DatumType) String() string {
 	return proto.EnumName(Datum_DatumType_name, int32(x))
-}
-func (x Datum_DatumType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
 }
 func (x *Datum_DatumType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Datum_DatumType_value, data, "Datum_DatumType")
@@ -502,6 +484,8 @@ const (
 	// | Sequence, STRING -> Sequence
 	// Return an array containing the keys of the object.
 	Term_KEYS Term_TermType = 94
+	// Return an array containing the values of the object.
+	Term_VALUES Term_TermType = 186
 	// Creates an object
 	Term_OBJECT Term_TermType = 143
 	// Check whether an object contains all the specified fields,
@@ -657,7 +641,7 @@ const (
 	Term_INDEX_LIST Term_TermType = 77
 	// Gets information about whether or not a set of indexes are ready to
 	// be accessed. Returns a list of objects that look like this:
-	// {index:STRING, ready:BOOL[, blocks_processed:NUMBER, blocks_total:NUMBER]}
+	// {index:STRING, ready:BOOL[, progress:NUMBER]}
 	Term_INDEX_STATUS Term_TermType = 139
 	// Blocks until a set of indexes are ready to be accessed. Returns the
 	// same values INDEX_STATUS.
@@ -882,6 +866,7 @@ var Term_TermType_name = map[int32]string{
 	93:  "CONTAINS",
 	31:  "GET_FIELD",
 	94:  "KEYS",
+	186: "VALUES",
 	143: "OBJECT",
 	32:  "HAS_FIELDS",
 	96:  "WITH_FIELDS",
@@ -1059,6 +1044,7 @@ var Term_TermType_value = map[string]int32{
 	"CONTAINS":           93,
 	"GET_FIELD":          31,
 	"KEYS":               94,
+	"VALUES":             186,
 	"OBJECT":             143,
 	"HAS_FIELDS":         32,
 	"WITH_FIELDS":        96,
@@ -1202,9 +1188,6 @@ func (x Term_TermType) Enum() *Term_TermType {
 func (x Term_TermType) String() string {
 	return proto.EnumName(Term_TermType_name, int32(x))
 }
-func (x Term_TermType) MarshalJSON() ([]byte, error) {
-	return json.Marshal(x.String())
-}
 func (x *Term_TermType) UnmarshalJSON(data []byte) error {
 	value, err := proto.UnmarshalJSONEnum(Term_TermType_value, data, "Term_TermType")
 	if err != nil {
@@ -1229,6 +1212,7 @@ func (*VersionDummy) ProtoMessage()    {}
 // * A [STOP] query with the same token as a [START] query that you want to stop.
 // * A [NOREPLY_WAIT] query with a unique per-connection token. The server answers
 //   with a [WAIT_COMPLETE] [Response].
+// * A [SERVER_INFO] query. The server answers with a [SERVER_INFO] [Response].
 type Query struct {
 	Type *Query_QueryType `protobuf:"varint,1,opt,name=type,enum=Query_QueryType" json:"type,omitempty"`
 	// A [Term] is how we represent the operations we want a query to perform.
@@ -1374,8 +1358,9 @@ type Response struct {
 	ErrorType *Response_ErrorType     `protobuf:"varint,7,opt,name=error_type,enum=Response_ErrorType" json:"error_type,omitempty"`
 	Notes     []Response_ResponseNote `protobuf:"varint,6,rep,name=notes,enum=Response_ResponseNote" json:"notes,omitempty"`
 	Token     *int64                  `protobuf:"varint,2,opt,name=token" json:"token,omitempty"`
-	// [response] contains 1 RQL datum if [type] is [SUCCESS_ATOM], or many RQL
-	// data if [type] is [SUCCESS_SEQUENCE] or [SUCCESS_PARTIAL].  It contains 1
+	// [response] contains 1 RQL datum if [type] is [SUCCESS_ATOM] or
+	// [SERVER_INFO].  [response] contains many RQL data if [type] is
+	// [SUCCESS_SEQUENCE] or [SUCCESS_PARTIAL].  [response] contains 1
 	// error message (of type [R_STR]) in all other cases.
 	Response []*Datum `protobuf:"bytes,3,rep,name=response" json:"response,omitempty"`
 	// If [type] is [CLIENT_ERROR], [TYPE_ERROR], or [RUNTIME_ERROR], then a
@@ -1456,33 +1441,18 @@ func (m *Response) GetProfile() *Datum {
 // the user in a Response.  Currently we only support JSON types, but we may
 // support other types in the future (e.g., a date type or an integer type).
 type Datum struct {
-	Type             *Datum_DatumType          `protobuf:"varint,1,opt,name=type,enum=Datum_DatumType" json:"type,omitempty"`
-	RBool            *bool                     `protobuf:"varint,2,opt,name=r_bool" json:"r_bool,omitempty"`
-	RNum             *float64                  `protobuf:"fixed64,3,opt,name=r_num" json:"r_num,omitempty"`
-	RStr             *string                   `protobuf:"bytes,4,opt,name=r_str" json:"r_str,omitempty"`
-	RArray           []*Datum                  `protobuf:"bytes,5,rep,name=r_array" json:"r_array,omitempty"`
-	RObject          []*Datum_AssocPair        `protobuf:"bytes,6,rep,name=r_object" json:"r_object,omitempty"`
-	XXX_extensions   map[int32]proto.Extension `json:"-"`
-	XXX_unrecognized []byte                    `json:"-"`
+	Type             *Datum_DatumType   `protobuf:"varint,1,opt,name=type,enum=Datum_DatumType" json:"type,omitempty"`
+	RBool            *bool              `protobuf:"varint,2,opt,name=r_bool" json:"r_bool,omitempty"`
+	RNum             *float64           `protobuf:"fixed64,3,opt,name=r_num" json:"r_num,omitempty"`
+	RStr             *string            `protobuf:"bytes,4,opt,name=r_str" json:"r_str,omitempty"`
+	RArray           []*Datum           `protobuf:"bytes,5,rep,name=r_array" json:"r_array,omitempty"`
+	RObject          []*Datum_AssocPair `protobuf:"bytes,6,rep,name=r_object" json:"r_object,omitempty"`
+	XXX_unrecognized []byte             `json:"-"`
 }
 
 func (m *Datum) Reset()         { *m = Datum{} }
 func (m *Datum) String() string { return proto.CompactTextString(m) }
 func (*Datum) ProtoMessage()    {}
-
-var extRange_Datum = []proto.ExtensionRange{
-	{10000, 20000},
-}
-
-func (*Datum) ExtensionRangeArray() []proto.ExtensionRange {
-	return extRange_Datum
-}
-func (m *Datum) ExtensionMap() map[int32]proto.Extension {
-	if m.XXX_extensions == nil {
-		m.XXX_extensions = make(map[int32]proto.Extension)
-	}
-	return m.XXX_extensions
-}
 
 func (m *Datum) GetType() Datum_DatumType {
 	if m != nil && m.Type != nil {
@@ -1596,30 +1566,15 @@ func (m *Datum_AssocPair) GetVal() *Datum {
 type Term struct {
 	Type *Term_TermType `protobuf:"varint,1,opt,name=type,enum=Term_TermType" json:"type,omitempty"`
 	// This is only used when type is DATUM.
-	Datum            *Datum                    `protobuf:"bytes,2,opt,name=datum" json:"datum,omitempty"`
-	Args             []*Term                   `protobuf:"bytes,3,rep,name=args" json:"args,omitempty"`
-	Optargs          []*Term_AssocPair         `protobuf:"bytes,4,rep,name=optargs" json:"optargs,omitempty"`
-	XXX_extensions   map[int32]proto.Extension `json:"-"`
-	XXX_unrecognized []byte                    `json:"-"`
+	Datum            *Datum            `protobuf:"bytes,2,opt,name=datum" json:"datum,omitempty"`
+	Args             []*Term           `protobuf:"bytes,3,rep,name=args" json:"args,omitempty"`
+	Optargs          []*Term_AssocPair `protobuf:"bytes,4,rep,name=optargs" json:"optargs,omitempty"`
+	XXX_unrecognized []byte            `json:"-"`
 }
 
 func (m *Term) Reset()         { *m = Term{} }
 func (m *Term) String() string { return proto.CompactTextString(m) }
 func (*Term) ProtoMessage()    {}
-
-var extRange_Term = []proto.ExtensionRange{
-	{10000, 20000},
-}
-
-func (*Term) ExtensionRangeArray() []proto.ExtensionRange {
-	return extRange_Term
-}
-func (m *Term) ExtensionMap() map[int32]proto.Extension {
-	if m.XXX_extensions == nil {
-		m.XXX_extensions = make(map[int32]proto.Extension)
-	}
-	return m.XXX_extensions
-}
 
 func (m *Term) GetType() Term_TermType {
 	if m != nil && m.Type != nil {
@@ -1674,6 +1629,16 @@ func (m *Term_AssocPair) GetVal() *Term {
 }
 
 func init() {
+	proto.RegisterType((*VersionDummy)(nil), "VersionDummy")
+	proto.RegisterType((*Query)(nil), "Query")
+	proto.RegisterType((*Query_AssocPair)(nil), "Query.AssocPair")
+	proto.RegisterType((*Frame)(nil), "Frame")
+	proto.RegisterType((*Backtrace)(nil), "Backtrace")
+	proto.RegisterType((*Response)(nil), "Response")
+	proto.RegisterType((*Datum)(nil), "Datum")
+	proto.RegisterType((*Datum_AssocPair)(nil), "Datum.AssocPair")
+	proto.RegisterType((*Term)(nil), "Term")
+	proto.RegisterType((*Term_AssocPair)(nil), "Term.AssocPair")
 	proto.RegisterEnum("VersionDummy_Version", VersionDummy_Version_name, VersionDummy_Version_value)
 	proto.RegisterEnum("VersionDummy_Protocol", VersionDummy_Protocol_name, VersionDummy_Protocol_value)
 	proto.RegisterEnum("Query_QueryType", Query_QueryType_name, Query_QueryType_value)
