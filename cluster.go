@@ -138,7 +138,7 @@ func (c *Cluster) discover() {
 
 			return c.listenForNodeChanges()
 		}, b, func(err error, wait time.Duration) {
-			Log.Debugf("Error discovering hosts %s, waiting %s", err, wait)
+			Log.Debugf("Error discovering hosts %s, waiting: %s", err, wait)
 		})
 	}
 }
@@ -158,7 +158,7 @@ func (c *Cluster) listenForNodeChanges() error {
 		c.opts,
 	)
 	if err != nil {
-		return fmt.Errorf("Error building query %s", err)
+		return fmt.Errorf("Error building query: %s", err)
 	}
 
 	cursor, err := node.Query(q)
@@ -217,7 +217,7 @@ func (c *Cluster) connectNodes(hosts []Host) {
 	for _, host := range hosts {
 		conn, err := NewConnection(host.String(), c.opts)
 		if err != nil {
-			Log.Warnf("Error creating connection %s", err.Error())
+			Log.Warnf("Error creating connection: %s", err.Error())
 			continue
 		}
 		defer conn.Close()
@@ -228,13 +228,13 @@ func (c *Cluster) connectNodes(hosts []Host) {
 			c.opts,
 		)
 		if err != nil {
-			Log.Warnf("Error building query %s", err)
+			Log.Warnf("Error building query: %s", err)
 			continue
 		}
 
 		_, cursor, err := conn.Query(q)
 		if err != nil {
-			Log.Warnf("Error fetching cluster status %s", err)
+			Log.Warnf("Error fetching cluster status: %s", err)
 			continue
 		}
 
@@ -260,6 +260,8 @@ func (c *Cluster) connectNodes(hosts []Host) {
 						}).Debug("Connected to node")
 						nodeSet[node.ID] = node
 					}
+				} else {
+					Log.Warnf("Error connecting to node: %s", err)
 				}
 			}
 		} else {
@@ -272,6 +274,8 @@ func (c *Cluster) connectNodes(hosts []Host) {
 					}).Debug("Connected to node")
 					nodeSet[node.ID] = node
 				}
+			} else {
+				Log.Warnf("Error connecting to node: %s", err)
 			}
 		}
 	}

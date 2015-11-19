@@ -13,9 +13,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Timezones from `time.Time` are now stored in the database, before all times were stored as UTC. To convert a go `time.Time` back to UTC you can call  `t.In(time.UTC)`.
  - Improved host selection to use `hailocab/go-hostpool` to select nodes based on recent responses and timings.
+ - Changed connection pool to use `fatih/pool` instead of a custom connection pool, this has caused some internal API changes and the behaviour of `MaxIdle` and `MaxOpen` has slightly changed. This change was made mostly to make driver maintenance easier.
+     + `MaxIdle` now configures the initial size of the pool, the name of this field will likely change in the future.
+     + Not setting `MaxOpen` no longer creates an unbounded connection pool per host but instead creates a pool with a maximum capacity of 2 per host.
 
 ### Deprecated
  - Deprecated the option `NodeRefreshInterval` in `ConnectOpts`
+ - Deprecated `SetMaxIdleConns` and `SetMaxOpenConns`, these options should now only be set when creating the session.
 
 ## v1.1.4
 ### Added

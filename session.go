@@ -31,6 +31,7 @@ type ConnectOpts struct {
 	TLSConfig    *tls.Config   `gorethink:"tlsconfig,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
+	// By default a maximum of 2 connections are opened per host.
 	MaxOpen int `gorethink:"max_open,omitempty"`
 
 	// Below options are for cluster discovery, please note there is a high

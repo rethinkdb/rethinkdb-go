@@ -47,7 +47,7 @@ func newCursor(conn *Connection, cursorType string, token int64, term *Term, opt
 //     err = cursor.Err() // get any error encountered during iteration
 //     ...
 type Cursor struct {
-	releaseConn func(error)
+	releaseConn func() error
 
 	conn       *Connection
 	token      int64
@@ -111,7 +111,7 @@ func (c *Cursor) Close() error {
 	if conn == nil {
 		return nil
 	}
-	if conn.conn == nil {
+	if conn.Conn == nil {
 		return nil
 	}
 
@@ -129,7 +129,9 @@ func (c *Cursor) Close() error {
 	}
 
 	if c.releaseConn != nil {
-		c.releaseConn(err)
+		if err := c.releaseConn(); err != nil {
+			return err
+		}
 	}
 
 	c.closed = true
