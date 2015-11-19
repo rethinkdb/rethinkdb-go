@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v1.2.0 - 2015-11-19
 ### Added
  - Added `UUID` term
  - Added `Values` term
@@ -24,7 +24,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Fixed some type aliases not being correctly encoded when using `Expr`.
 
-## v1.1.4
+## v1.1.4 - 2015-10-02
 ### Added
  - Added root table terms (`r.TableCreate`, `r.TableList` and `r.TableDrop`)
 
@@ -38,22 +38,22 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Fixed stop query incorrectly waiting for response
  - Fixed pointers not to be properly decoded
 
-## v1.1.3
+## v1.1.3 - 2015-09-06
 ### Fixed
  - Fixed pointers not to be properly decoded
  - Fixed queries always timing out when Timeout ConnectOpt is set.
 
-## v1.1.2
+## v1.1.2 - 2015-08-28
 ### Fixed
  - Fixed issue when encoding some maps
 
-## v1.1.1
+## v1.1.1 - 2015-08-21
 ### Fixed
  - Corrected protobuf import
  - Fixed documentation
  - Fixed issues with time pseudotype conversion that caused issues with milliseconds
 
-## v1.1.0
+## v1.1.0 - 2015-08-19
 ### Added
  - Replaced `UseOutdated` with `ReadMode`
  - Added `EmergencyRepair` and `NonVotingReplicaTags` to `ReconfigureOpts`
