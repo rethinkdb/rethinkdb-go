@@ -21,6 +21,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Deprecated the option `NodeRefreshInterval` in `ConnectOpts`
  - Deprecated `SetMaxIdleConns` and `SetMaxOpenConns`, these options should now only be set when creating the session.
 
+### Fixed
+ - Fixed some type aliases not being correctly encoded when using `Expr`.
+
 ## v1.1.4
 ### Added
  - Added root table terms (`r.TableCreate`, `r.TableList` and `r.TableDrop`)

@@ -59,6 +59,41 @@ func Expr(val interface{}) Term {
 		}
 
 		return makeObject(vals)
+	case
+		bool,
+		int,
+		int8,
+		int16,
+		int32,
+		int64,
+		uint,
+		uint8,
+		uint16,
+		uint32,
+		uint64,
+		float32,
+		float64,
+		uintptr,
+		string,
+		*bool,
+		*int,
+		*int8,
+		*int16,
+		*int32,
+		*int64,
+		*uint,
+		*uint8,
+		*uint16,
+		*uint32,
+		*uint64,
+		*float32,
+		*float64,
+		*uintptr,
+		*string:
+		return Term{
+			termType: p.Term_DATUM,
+			data:     val,
+		}
 	default:
 		// Use reflection to check for other types
 		valType := reflect.TypeOf(val)
@@ -103,9 +138,19 @@ func Expr(val interface{}) Term {
 
 			return makeArray(vals)
 		default:
+			data, err := encode(val)
+
+			if err != nil || data == nil {
+				return Term{
+					termType: p.Term_DATUM,
+					data:     nil,
+					lastErr:  err,
+				}
+			}
+
 			return Term{
 				termType: p.Term_DATUM,
-				data:     val,
+				data:     data,
 			}
 		}
 	}
