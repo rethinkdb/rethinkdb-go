@@ -29,9 +29,9 @@ func init() {
 		url = "localhost:28015"
 	}
 
-	url2 = os.Getenv("RETHINKDB_URL_1")
-	if url2 == "" {
-		url2 = "localhost:28016"
+	url1 = os.Getenv("RETHINKDB_URL_1")
+	if url1 == "" {
+		url1 = "localhost:28016"
 	}
 
 	url2 = os.Getenv("RETHINKDB_URL_2")

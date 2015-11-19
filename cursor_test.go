@@ -355,6 +355,7 @@ func (s *RethinkSuite) TestCursorChangesClose(c *test.C) {
 	// res, err := DB("test").Table("Table3").Changes().Run(session)
 	res, err := DB("test").Table("Table3").Changes().Run(session)
 	c.Assert(err, test.IsNil)
+	c.Assert(res, test.NotNil)
 
 	// Ensure that the cursor can be closed
 	err = res.Close()

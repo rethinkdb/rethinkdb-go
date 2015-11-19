@@ -75,6 +75,20 @@ func (s *RethinkSuite) TestSessionClose(c *test.C) {
 	c.Assert(err, test.NotNil)
 }
 
+func (s *RethinkSuite) TestSessionServer(c *test.C) {
+	session, err := Connect(ConnectOpts{
+		Address: url,
+		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
+	})
+	c.Assert(err, test.IsNil)
+
+	server, err := session.Server()
+	c.Assert(err, test.IsNil)
+
+	c.Assert(len(server.ID) > 0, test.Equals, true)
+	c.Assert(len(server.Name) > 0, test.Equals, true)
+}
+
 func (s *RethinkSuite) TestSessionConnectDatabase(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address:  url,
