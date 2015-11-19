@@ -264,9 +264,6 @@ func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 	for _ = range change {
 		n++
 	}
-	if res.Err() == nil {
-		c.Fatal("No error returned, expected connection closed")
-	}
 
 	c.Assert(n, test.Equals, 5)
 }
@@ -295,9 +292,6 @@ func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 	res.Listen(change)
 	for _ = range change {
 		n++
-	}
-	if res.Err() == nil {
-		c.Fatal("No error returned, expected connection closed")
 	}
 
 	c.Assert(n, test.Equals, 0)
