@@ -9,25 +9,12 @@ import (
 	"gopkg.in/fatih/pool.v2"
 )
 
-// maxBadConnRetries is the number of maximum retries if the driver returns
-// driver.ErrBadConn to signal a broken connection.
 const maxBadConnRetries = 10
 
 var (
 	errPoolClosed = errors.New("gorethink: pool is closed")
 	errConnClosed = errors.New("gorethink: conn is closed")
 	errConnBusy   = errors.New("gorethink: conn is busy")
-
-	// ErrBadConn should be returned by a connection operation to signal to the
-	// pool that a driver.Conn is in a bad state (such as the server
-	// having earlier closed the connection) and the pool should retry on a
-	// new connection.
-	//
-	// To prevent duplicate operations, ErrBadConn should NOT be returned
-	// if there's a possibility that the database server might have
-	// performed the operation. Even if the server sends back an error,
-	// you shouldn't return ErrBadConn.
-	ErrBadConn = errors.New("gorethink: bad connection")
 )
 
 // A Pool is used to store a pool of connections to a single RethinkDB server
