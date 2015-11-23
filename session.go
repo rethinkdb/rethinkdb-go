@@ -120,6 +120,17 @@ func (o *CloseOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
+// Convenience function that says whether client is still connected
+func (s *Session) IsConnected() bool {
+	if s.closed == true {
+		return false
+	}
+	if s.cluster == nil {
+		return false
+	}
+	return s.cluster.IsConnected()
+}
+
 // Reconnect closes and re-opens a session.
 func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 	var err error
