@@ -120,13 +120,10 @@ func (o *CloseOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
-// Convenience function that says whether client is still connected
+// IsConnected returns true if session has a valid connection.
 func (s *Session) IsConnected() bool {
-	if s.closed == true {
-		return false
-	}
-	if s.cluster == nil {
-		return false
+	if s.cluster == nil || s.closed {
+    return false
 	}
 	return s.cluster.IsConnected()
 }
