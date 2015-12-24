@@ -64,6 +64,40 @@ func printCarrots(t Term, frames []*p.Frame) string {
 	return b.String()
 }
 
+type ErrorType string
+
+const (
+	RQLQueryLogicError      ErrorType = "QUERY_LOGIC"
+	RQLNonExistenceError    ErrorType = "NON_EXISTENCE"
+	RQLResourceLimitError   ErrorType = "RESOURCE_LIMIT"
+	RQLUserError            ErrorType = "USER"
+	RQLInternalError        ErrorType = "INTERNAL"
+	RQLOpFailedError        ErrorType = "OP_FAILED"
+	RQLOpIndeterminateError ErrorType = "OP_INDETERMINATE"
+	RQLUnknownRuntimeError  ErrorType = "RUNTIME"
+)
+
+func getErrorType(code p.Response_ErrorType) ErrorType {
+	switch code {
+	case p.Response_QUERY_LOGIC:
+		return RQLQueryLogicError
+	case p.Response_NON_EXISTENCE:
+		return RQLNonExistenceError
+	case p.Response_RESOURCE_LIMIT:
+		return RQLResourceLimitError
+	case p.Response_USER:
+		return RQLUserError
+	case p.Response_INTERNAL:
+		return RQLInternalError
+	case p.Response_OP_FAILED:
+		return RQLOpFailedError
+	case p.Response_OP_INDETERMINATE:
+		return RQLOpIndeterminateError
+	default:
+		return RQLUnknownRuntimeError
+	}
+}
+
 // Error constants
 var ErrEmptyResult = errors.New("The result does not contain any more rows")
 
@@ -94,15 +128,25 @@ func (e rqlResponseError) String() string {
 	return e.Error()
 }
 
-// RQLCompileError represents an error that occurs when compiling a query on
-// the database server.
-type RQLCompileError struct {
-	rqlResponseError
-}
-
 // RQLRuntimeError represents an error when executing an error on the database
 // server, this is also returned by the database when using the `Error` term.
 type RQLRuntimeError struct {
+	rqlResponseError
+}
+
+// ErrorCode returns the raw error code returned by RethinkDB
+func (e RQLRuntimeError) ErrorCode() int32 {
+	return int32(e.response.ErrorType)
+}
+
+// ErrorType returns the enumerated error value returned by RethinkDB
+func (e RQLRuntimeError) ErrorType() ErrorType {
+	return getErrorType(e.response.ErrorType)
+}
+
+// RQLCompileError represents an error that occurs when compiling a query on
+// the database server.
+type RQLCompileError struct {
 	rqlResponseError
 }
 

@@ -186,6 +186,27 @@ if err != nil {
 }
 ```
 
+It is possible to determine why a query failed by checking the type of error returned, if the error returned is a:
+ - `RQLConnectionError` - Returned when communicating with the database server.
+ - `RQLDriverError` - Returned when an unexpected issue with the driver occurs, if you see this please create an issue.
+ - `RQLClientError` - Represents a client error returned by RethinkDB.
+ - `RQLCompileError` - Returned when RethinkDB failed to compile a query.
+ - `RQLRuntimeError` - Returned when a query failed to execute on the server. This type also includes the `ErrorCode` and `ErrorType` functions to further differentiate between errors.
+ - If any other error type is returned you can assume it because of an issue with the driver.
+
+To access the error code for a runtime you must first cast the error, for example:
+
+```go
+err := r.Error("Returns a runtime error").Exec(session)
+if err != nil {
+    if rerr, ok := err.(r.RQLRuntimeError); ok {
+        fmt.Printf("Runtime error of type %s returned: %s", rerr.ErrorType(), rerr)
+    } else {
+        fmt.Printf("%T returned: %s", err, err)
+    }
+}
+```
+
 ## Encoding/Decoding
 When passing structs to Expr(And functions that use Expr such as Insert, Update) the structs are encoded into a map before being sent to the server. Each exported field is added to the map unless
 
