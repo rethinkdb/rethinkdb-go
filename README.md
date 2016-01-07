@@ -34,6 +34,7 @@ Setting up a basic connection with RethinkDB is simple:
 ```go
 import (
     r "github.com/dancannon/gorethink"
+    "log"
 )
 
 var session *r.Session
