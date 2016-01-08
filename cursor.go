@@ -204,7 +204,7 @@ func (c *Cursor) loadNextLocked(dest interface{}) (bool, error) {
 
 		if len(c.buffer) == 0 && len(c.responses) > 0 {
 			var response json.RawMessage
-			response, c.responses = c.responses[len(c.responses)-1], c.responses[:len(c.responses)-1]
+			response, c.responses = c.responses[0], c.responses[1:]
 
 			var value interface{}
 			decoder := json.NewDecoder(bytes.NewBuffer(response))
@@ -235,7 +235,7 @@ func (c *Cursor) loadNextLocked(dest interface{}) (bool, error) {
 
 		if len(c.buffer) > 0 {
 			var data interface{}
-			data, c.buffer = c.buffer[len(c.buffer)-1], c.buffer[:len(c.buffer)-1]
+			data, c.buffer = c.buffer[0], c.buffer[1:]
 
 			err := encoding.Decode(dest, data)
 			if err != nil {
@@ -367,7 +367,7 @@ func (c *Cursor) IsNil() bool {
 	defer c.mu.RUnlock()
 
 	if len(c.buffer) > 0 {
-		bufferedItem := c.buffer[len(c.buffer)-1]
+		bufferedItem := c.buffer[0]
 		if bufferedItem == nil {
 			return true
 		}
@@ -376,7 +376,7 @@ func (c *Cursor) IsNil() bool {
 	}
 
 	if len(c.responses) > 0 {
-		response := c.responses[len(c.responses)-1]
+		response := c.responses[0]
 		if response == nil {
 			return true
 		}
