@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+ - Added more documentation and examples for `GetAll`.
+
 ### Fixed
 - Fixed `RunWrite` not defering its call to `Cursor.Close()`. This could cause issues if an error occurred when decoding the result.
 

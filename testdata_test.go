@@ -24,6 +24,9 @@ func setupTestData() {
 			[]interface{}{Row.Field("date"), Row.Field("title")},
 		).Exec(session)
 
+		DB("examples").Table("heroes").IndexCreate("code_name").Exec(session)
+		DB("examples").Table("heroes").IndexWait().Exec(session)
+
 		DB("examples").Table("games").IndexCreate("type").Exec(session)
 		DB("examples").Table("games").IndexWait().Exec(session)
 
