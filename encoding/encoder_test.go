@@ -273,3 +273,54 @@ func TestEncodeMapIntKeys(t *testing.T) {
 		t.Errorf("got %q, want %q", out, want)
 	}
 }
+
+type RefA struct {
+	ID string `gorethink:"id,omitempty"`
+	B  *RefB  `gorethink:"b_id,reference" gorethink_ref:"id"`
+}
+
+type RefB struct {
+	ID   string `gorethink:"id,omitempty"`
+	Name string `gorethink:"name"`
+}
+
+func TestReferenceField(t *testing.T) {
+	input := RefA{"1", &RefB{"2", "Name"}}
+	want := map[string]interface{}{"id": "1", "b_id": "2"}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+type RefC struct {
+	ID string `gorethink:"id,omitempty"`
+	B  *RefB  `gorethink:"b_id,reference" gorethink_ref:"b_id"`
+}
+
+func TestReferenceFieldMissing(t *testing.T) {
+	input := RefC{"1", &RefB{"2", "Name"}}
+
+	_, err := Encode(input)
+	if err == nil {
+		t.Errorf("expected non-nil error but got nil")
+	}
+}
+
+type RefD struct {
+	ID string `gorethink:"id,omitempty"`
+	B  string `gorethink:"b_id,reference" gorethink_ref:"b_id"`
+}
+
+func TestReferenceFieldInvalid(t *testing.T) {
+	input := RefD{"1", "B"}
+
+	_, err := Encode(input)
+	if err == nil {
+		t.Errorf("expected non-nil error but got nil")
+	}
+}

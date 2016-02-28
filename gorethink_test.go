@@ -243,6 +243,17 @@ var str = T{
 	},
 }
 
+type Author struct {
+	ID   string `gorethink:"id,omitempty"`
+	Name string `gorethink:"name"`
+}
+
+type Book struct {
+	ID     string `gorethink:"id,omitempty"`
+	Title  string `gorethink:"title"`
+	Author Author `gorethink:"author_id,reference" gorethink_ref:"id"`
+}
+
 func (s *RethinkSuite) BenchmarkExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query

@@ -97,3 +97,37 @@ func (s *RethinkSuite) TestWriteDelete(c *test.C) {
 	_, err = query.Run(session)
 	c.Assert(err, test.IsNil)
 }
+
+func (s *RethinkSuite) TestWriteReference(c *test.C) {
+	author := Author{
+		ID:   "1",
+		Name: "JRR Tolkien",
+	}
+
+	book := Book{
+		ID:     "1",
+		Title:  "The Lord of the Rings",
+		Author: author,
+	}
+
+	_, err := DB("test").Table("authors").Insert(author).RunWrite(session)
+	c.Assert(err, test.IsNil)
+
+	_, err = DB("test").Table("books").Insert(book).RunWrite(session)
+	c.Assert(err, test.IsNil)
+
+	// Read back book + author and check result
+	cursor, err := DB("test").Table("books").Get("1").Merge(func(p Term) interface{} {
+		return map[string]interface{}{
+			"author_id": DB("test").Table("authors").Get(p.Field("author_id")),
+		}
+	}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	var out Book
+	err = cursor.One(&out)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(out.Title, test.Equals, "The Lord of the Rings")
+	c.Assert(out.Author.Name, test.Equals, "JRR Tolkien")
+}

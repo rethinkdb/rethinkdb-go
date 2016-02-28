@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+## Added
+- Added the ability to reference subdocuments when inserting new documents, for more information see the documentation in the readme.
+
 ## v1.3.2 - 2015-02-01
 
 ### Fixed
