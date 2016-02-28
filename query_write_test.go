@@ -110,6 +110,11 @@ func (s *RethinkSuite) TestWriteReference(c *test.C) {
 		Author: author,
 	}
 
+	DB("test").TableDrop("authors").Exec(session)
+	DB("test").TableDrop("books").Exec(session)
+	DB("test").TableCreate("authors").Exec(session)
+	DB("test").TableCreate("books").Exec(session)
+
 	_, err := DB("test").Table("authors").Insert(author).RunWrite(session)
 	c.Assert(err, test.IsNil)
 
