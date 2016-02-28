@@ -136,3 +136,13 @@ func (s *RethinkSuite) TestWriteReference(c *test.C) {
 	c.Assert(out.Title, test.Equals, "The Lord of the Rings")
 	c.Assert(out.Author.Name, test.Equals, "JRR Tolkien")
 }
+
+func (s *RethinkSuite) TestWriteConflict(c *test.C) {
+	query := DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
+	_, err := query.RunWrite(session)
+	c.Assert(err, test.IsNil)
+
+	query = DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
+	_, err = query.RunWrite(session)
+	c.Assert(IsConflictErr(err), test.Equals, true)
+}
