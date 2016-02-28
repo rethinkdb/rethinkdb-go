@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Added
 - Added the ability to reference subdocuments when inserting new documents, for more information see the documentation in the readme.
+- Added the `SupportJSONTag` function which allows GoRethink to make use of the `json` struct tag.
 
 ## v1.3.2 - 2015-02-01
 

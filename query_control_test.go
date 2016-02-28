@@ -105,6 +105,24 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 	})
 }
 
+func (s *RethinkSuite) TestControlStructTags(c *test.C) {
+	SupportJSONTag(true)
+	defer SupportJSONTag(false)
+
+	var response map[string]interface{}
+	query := Expr(TagsTest{"1", "2", "3"})
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, map[string]interface{}{
+		"a": "1", "b": "2", "c1": "3",
+	})
+
+}
+
 func (s *RethinkSuite) TestControlMapTypeAlias(c *test.C) {
 	var response TMap
 	query := Expr(TMap{"A": 1, "B": 2})

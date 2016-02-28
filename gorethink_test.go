@@ -254,6 +254,12 @@ type Book struct {
 	Author Author `gorethink:"author_id,reference" gorethink_ref:"id"`
 }
 
+type TagsTest struct {
+	A string `gorethink:"a"`
+	B string `json:"b"`
+	C string `gorethink:"c1" json:"c2"`
+}
+
 func (s *RethinkSuite) BenchmarkExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query

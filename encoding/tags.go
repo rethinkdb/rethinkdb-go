@@ -8,9 +8,14 @@ import (
 	"unicode"
 )
 
+var (
+	SupportJSONTag = false
+)
+
 const (
-	TagName    = "gorethink"
-	RefTagName = "gorethink_ref"
+	TagName     = "gorethink"
+	JSONTagName = "json"
+	RefTagName  = "gorethink_ref"
 )
 
 // tagOptions is the string following a comma in a struct field's
@@ -18,7 +23,15 @@ const (
 type tagOptions string
 
 func getTag(sf reflect.StructField) string {
-	return sf.Tag.Get(TagName)
+	tag := sf.Tag.Get(TagName)
+
+	// If no gorethink tag could be found and the JSON tag has been enabled
+	// then check for that tag as well
+	if tag == "" && SupportJSONTag {
+		tag = sf.Tag.Get(JSONTagName)
+	}
+
+	return tag
 }
 
 func getRefTag(sf reflect.StructField) string {

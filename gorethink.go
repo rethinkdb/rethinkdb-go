@@ -29,3 +29,10 @@ func SetVerbose(verbose bool) {
 
 	Log.Level = logrus.InfoLevel
 }
+
+// SupportJSONTag allows you to enable the use of the JSON tag. When true is
+// passed to this function GoRethink will start checking for the JSON tag, the
+// GoRethink will still be used and the driver will check for this tag first.
+func SupportJSONTag(v bool) {
+	encoding.SupportJSONTag = v
+}
