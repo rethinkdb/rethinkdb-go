@@ -97,3 +97,13 @@ func (s *RethinkSuite) TestWriteDelete(c *test.C) {
 	_, err = query.Run(session)
 	c.Assert(err, test.IsNil)
 }
+
+func (s *RethinkSuite) TestWriteConflict(c *test.C) {
+	query := DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
+	_, err := query.RunWrite(session)
+	c.Assert(err, test.IsNil)
+
+	query = DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
+	_, err = query.RunWrite(session)
+	c.Assert(IsConflictErr(err), test.Equals, true)
+}

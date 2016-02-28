@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+## Added
+- Added helper functions for checking the error type of a write query, this is useful when calling `RunWrite`.
+    + Added `IsConflictErr` which returns true when RethinkDB returns a duplicate key error.
+    + Added `IsTypeErr` which returns true when RethinkDB returns an unexpected type error.
+
 ## v1.3.2 - 2015-02-01
 
 ### Fixed
