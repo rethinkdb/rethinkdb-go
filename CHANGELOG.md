@@ -11,6 +11,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
     + Added `IsConflictErr` which returns true when RethinkDB returns a duplicate key error.
     + Added `IsTypeErr` which returns true when RethinkDB returns an unexpected type error.
 
+## Fixed
+- Fixed an issue that could prevent bad connections from being removed from the connection pool.
+
 ## v1.3.2 - 2015-02-01
 
 ### Fixed

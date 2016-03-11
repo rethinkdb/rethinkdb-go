@@ -227,6 +227,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	// Read response header (token+length)
 	headerBuf := [respHeaderLen]byte{}
 	if _, err := c.read(headerBuf[:], respHeaderLen); err != nil {
+		c.bad = true
 		return nil, err
 	}
 
