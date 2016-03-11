@@ -52,7 +52,7 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		cursors: make(map[int64]*Cursor),
 	}
 	// Connect to Server
-	nd := net.Dialer{Timeout: c.opts.Timeout}
+	nd := net.Dialer{Timeout: c.opts.Timeout, KeepAlive: opts.KeepAlivePeriod}
 	if c.opts.TLSConfig == nil {
 		c.Conn, err = nd.Dial("tcp", address)
 	} else {
@@ -61,15 +61,7 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	if err != nil {
 		return nil, err
 	}
-	// Enable TCP Keepalives on TCP connections
-	if tc, ok := c.Conn.(*net.TCPConn); ok {
-		if err := tc.SetKeepAlive(true); err != nil {
-			// Don't send COM_QUIT before handshake.
-			c.Conn.Close()
-			c.Conn = nil
-			return nil, err
-		}
-	}
+
 	// Send handshake request
 	if err = c.writeHandshakeReq(); err != nil {
 		c.Close()
