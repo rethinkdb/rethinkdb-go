@@ -494,3 +494,28 @@ func (s *RethinkSuite) TestControlInvalidType(c *test.C) {
 	_, err := query.Run(session)
 	c.Assert(err, test.NotNil)
 }
+
+func (s *RethinkSuite) TestControlRawQuery(c *test.C) {
+	var response int
+	query := RawQuery([]byte(`1`))
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, 1)
+}
+
+func (s *RethinkSuite) TestControlRawQuery_advanced(c *test.C) {
+	var response []int
+	// r.expr([1,2,3]).map(function(v) { return v.add(1)})
+	query := RawQuery([]byte(`[38,[[2,[1,2,3]],[69,[[2,[25]],[24,[[10,[25]],1]]]]]]`))
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, []int{2, 3, 4})
+}
