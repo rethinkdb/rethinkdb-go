@@ -236,5 +236,5 @@ func ExampleRawQuery() {
 
 	jsonPrint(res)
 
-	// Output: hello world
+	// Output: "hello world"
 }

@@ -251,7 +251,7 @@ func (c *Cursor) nextLocked(dest interface{}) (bool, error) {
 	}
 }
 
-// Next retrieves the next response from the result set, blocking if necessary.
+// Next retrieves the next raw response from the result set, blocking if necessary.
 // Unlike Next the returned response is the raw JSON document returned from the
 // database.
 //
@@ -264,7 +264,7 @@ func (c *Cursor) NextResponse() ([]byte, bool) {
 		return nil, false
 	}
 
-	b, hasMore, err := c.nextResponseLocked(dest)
+	b, hasMore, err := c.nextResponseLocked()
 	if c.handleErrorLocked(err) != nil {
 		c.mu.Unlock()
 		c.Close()

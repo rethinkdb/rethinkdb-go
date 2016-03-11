@@ -3,8 +3,6 @@ package gorethink
 import (
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	test "gopkg.in/check.v1"
 )
 
@@ -430,8 +428,17 @@ func (s *RethinkSuite) TestCursorNextResponse(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Type(), test.Equals, "Cursor")
 
-	b, err := res.NextResponse()
+	b, ok := res.NextResponse()
+	c.Assert(ok, test.Equals, true)
+	c.Assert(b, jsonEquals, []byte(`5`))
+}
+
+func (s *RethinkSuite) TestCursorNextResponse_object(c *test.C) {
+	res, err := Expr(map[string]string{"foo": "bar"}).Run(session)
 	c.Assert(err, test.IsNil)
-	spew.Dump(b, string(b))
-	// c.Assert(response, jsonEquals, 5)
+	c.Assert(res.Type(), test.Equals, "Cursor")
+
+	b, ok := res.NextResponse()
+	c.Assert(ok, test.Equals, true)
+	c.Assert(b, jsonEquals, []byte(`{"foo":"bar"}`))
 }
