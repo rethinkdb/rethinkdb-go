@@ -12,7 +12,7 @@ Current version: v1.3.2 (RethinkDB v2.2)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/dancannon/gorethink?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
+If you need any help you can find me on the [RethinkDB slack](http://slack.rethinkdb.com/) in the #gorethink channel.
 
 ## Installation
 
