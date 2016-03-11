@@ -26,7 +26,6 @@ type Response struct {
 	Responses []json.RawMessage         `json:"r"`
 	Backtrace []interface{}             `json:"b"`
 	Profile   interface{}               `json:"p"`
-	ErrorType p.Response_ErrorType      `json:"e"`
 }
 
 // Connection is a connection to a rethinkdb database. Connection is not thread
