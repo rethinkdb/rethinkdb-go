@@ -10,6 +10,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Added helper functions for checking the error type of a write query, this is useful when calling `RunWrite`.
     + Added `IsConflictErr` which returns true when RethinkDB returns a duplicate key error.
     + Added `IsTypeErr` which returns true when RethinkDB returns an unexpected type error.
+- Added the `RawQuery` term which can be used to execute a raw JSON query, for more information about this query see the godoc.
+- Added the `NextResponse` function to `Cursor` which will return the next raw JSON response in the result set.
 
 ## Fixed
 - Fixed an issue that could prevent bad connections from being removed from the connection pool.

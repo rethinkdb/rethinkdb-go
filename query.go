@@ -45,6 +45,7 @@ type termsObj map[string]Term
 // see http://rethinkdb.com/docs/writing-drivers/.
 type Term struct {
 	name     string
+	rawQuery bool
 	rootTerm bool
 	termType p.Term_TermType
 	data     interface{}
@@ -60,6 +61,10 @@ func (t Term) build() (interface{}, error) {
 
 	if t.lastErr != nil {
 		return nil, t.lastErr
+	}
+
+	if t.rawQuery {
+		return t.data, nil
 	}
 
 	switch t.termType {

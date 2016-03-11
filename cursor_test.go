@@ -422,3 +422,23 @@ func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
 	}
 	c.Assert(res.Err(), test.IsNil)
 }
+
+func (s *RethinkSuite) TestCursorNextResponse(c *test.C) {
+	res, err := Expr(5).Run(session)
+	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
+
+	b, ok := res.NextResponse()
+	c.Assert(ok, test.Equals, true)
+	c.Assert(b, jsonEquals, []byte(`5`))
+}
+
+func (s *RethinkSuite) TestCursorNextResponse_object(c *test.C) {
+	res, err := Expr(map[string]string{"foo": "bar"}).Run(session)
+	c.Assert(err, test.IsNil)
+	c.Assert(res.Type(), test.Equals, "Cursor")
+
+	b, ok := res.NextResponse()
+	c.Assert(ok, test.Equals, true)
+	c.Assert(b, jsonEquals, []byte(`{"foo":"bar"}`))
+}
