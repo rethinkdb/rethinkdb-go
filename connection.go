@@ -97,11 +97,10 @@ func (c *Connection) Close() error {
 //
 // This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
-	c.mu.Lock()
 	if c == nil {
-		c.mu.Unlock()
 		return nil, nil, ErrConnectionClosed
 	}
+	c.mu.Lock()
 	if c.Conn == nil {
 		c.bad = true
 		c.mu.Unlock()
@@ -115,6 +114,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 			var err error
 			q.Opts["db"], err = DB(c.opts.Database).build()
 			if err != nil {
+				c.mu.Unlock()
 				return nil, nil, err
 			}
 		}
