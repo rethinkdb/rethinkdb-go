@@ -59,7 +59,7 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		c.Conn, err = tls.DialWithDialer(&nd, "tcp", address, c.opts.TLSConfig)
 	}
 	if err != nil {
-		return nil, err
+		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 	// Enable TCP Keepalives on TCP connections
 	if tc, ok := c.Conn.(*net.TCPConn); ok {
@@ -67,19 +67,19 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 			// Don't send COM_QUIT before handshake.
 			c.Conn.Close()
 			c.Conn = nil
-			return nil, err
+			return nil, RQLConnectionError{rqlError(err.Error())}
 		}
 	}
 	// Send handshake request
 	if err = c.writeHandshakeReq(); err != nil {
 		c.Close()
-		return nil, err
+		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 	// Read handshake response
 	err = c.readHandshakeSuccess()
 	if err != nil {
 		c.Close()
-		return nil, err
+		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
 	return c, nil
