@@ -149,19 +149,17 @@ func (p *Pool) Exec(q Query) error {
 
 		c, pc, err = p.conn()
 		if err != nil {
-			break
+			continue
 		}
+		defer pc.Close()
 
 		_, _, err = c.Query(q)
 
 		if c.isBad() {
 			pc.MarkUnusable()
-			c.Close()
 		} else {
-			pc.Close()
+			break
 		}
-
-		break
 	}
 
 	return err
@@ -178,7 +176,7 @@ func (p *Pool) Query(q Query) (*Cursor, error) {
 
 		c, pc, err = p.conn()
 		if err != nil {
-			break
+			continue
 		}
 
 		_, cursor, err = c.Query(q)
@@ -204,19 +202,17 @@ func (p *Pool) Server() (ServerResponse, error) {
 
 		c, pc, err = p.conn()
 		if err != nil {
-			break
+			continue
 		}
+		defer pc.Close()
 
 		response, err = c.Server()
 
 		if c.isBad() {
 			pc.MarkUnusable()
-			c.Close()
 		} else {
-			pc.Close()
+			break
 		}
-
-		break
 	}
 
 	return response, err
@@ -226,7 +222,6 @@ func releaseConn(c *Connection, pc *pool.PoolConn) func() error {
 	return func() error {
 		if c.isBad() {
 			pc.MarkUnusable()
-			return c.Close()
 		}
 
 		return pc.Close()

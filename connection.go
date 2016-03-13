@@ -123,7 +123,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 			var err error
 			q.Opts["db"], err = DB(c.opts.Database).build()
 			if err != nil {
-				return nil, nil, err
+				return nil, nil, RQLDriverError{rqlError(err.Error())}
 			}
 		}
 	}
@@ -228,7 +228,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	headerBuf := [respHeaderLen]byte{}
 	if _, err := c.read(headerBuf[:], respHeaderLen); err != nil {
 		c.bad = true
-		return nil, err
+		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
 	responseToken := int64(binary.LittleEndian.Uint64(headerBuf[:8]))
