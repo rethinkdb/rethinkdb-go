@@ -12,9 +12,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
     + Added `IsTypeErr` which returns true when RethinkDB returns an unexpected type error.
 - Added the `RawQuery` term which can be used to execute a raw JSON query, for more information about this query see the godoc.
 - Added the `NextResponse` function to `Cursor` which will return the next raw JSON response in the result set.
+- Added ability to set the keep alive period by setting the `KeepAlivePeriod` field in `ConnectOpts`.
 
 ## Fixed
 - Fixed an issue that could prevent bad connections from being removed from the connection pool.
+- Fixed certain connection errors not being returned as `RqlConnectionError` when calling `Run`, `Exec` or `RunWrite`. 
+- Fixed potential dead lock in connection code caused when building the query.
 
 ## v1.3.2 - 2015-02-01
 
