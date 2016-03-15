@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	Tags = false
+	Tags []string
 )
 
 const (
@@ -28,7 +28,7 @@ func getTag(sf reflect.StructField) string {
 	}
 
 	for _, tagName := range Tags {
-		if tag := sf.Tag.Get(TagName); tag != "" {
+		if tag := sf.Tag.Get(tagName); tag != "" {
 			return tag
 		}
 	}
