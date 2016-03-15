@@ -52,7 +52,7 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		cursors: make(map[int64]*Cursor),
 	}
 	// Connect to Server
-	nd := net.Dialer{Timeout: c.opts.Timeout}
+	nd := net.Dialer{Timeout: c.opts.Timeout, KeepAlive: opts.KeepAlivePeriod}
 	if c.opts.TLSConfig == nil {
 		c.Conn, err = nd.Dial("tcp", address)
 	} else {
@@ -61,15 +61,7 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	if err != nil {
 		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
-	// Enable TCP Keepalives on TCP connections
-	if tc, ok := c.Conn.(*net.TCPConn); ok {
-		if err := tc.SetKeepAlive(true); err != nil {
-			// Don't send COM_QUIT before handshake.
-			c.Conn.Close()
-			c.Conn = nil
-			return nil, RQLConnectionError{rqlError(err.Error())}
-		}
-	}
+
 	// Send handshake request
 	if err = c.writeHandshakeReq(); err != nil {
 		c.Close()
@@ -105,11 +97,10 @@ func (c *Connection) Close() error {
 //
 // This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
-	c.mu.Lock()
 	if c == nil {
-		c.mu.Unlock()
 		return nil, nil, ErrConnectionClosed
 	}
+	c.mu.Lock()
 	if c.Conn == nil {
 		c.bad = true
 		c.mu.Unlock()
@@ -123,6 +114,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 			var err error
 			q.Opts["db"], err = DB(c.opts.Database).build()
 			if err != nil {
+				c.mu.Unlock()
 				return nil, nil, RQLDriverError{rqlError(err.Error())}
 			}
 		}
