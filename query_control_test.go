@@ -106,8 +106,8 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 }
 
 func (s *RethinkSuite) TestControlStructTags(c *test.C) {
-	SupportJSONTag(true)
-	defer SupportJSONTag(false)
+	SetTags("gorethink", "json")
+	defer SetTags(nil)
 
 	var response map[string]interface{}
 	query := Expr(TagsTest{"1", "2", "3"})

@@ -216,7 +216,7 @@ Field int `gorethink:",omitempty"`
 
 When encoding maps with non-string keys the key values are automatically converted to strings where possible, however it is recommended that you use strings where possible (for example `map[string]T`).
 
-If you wish to use the `json` tags for GoRethink then you can call `SupportJSONTag(true)` when starting your program, this will cause GoRethink to check for `json` tags after checking for `gorethink` tags. By default this feature is disabled.
+If you wish to use the `json` tags for GoRethink then you can call `SetTags("gorethink", "json")` when starting your program, this will cause GoRethink to check for `json` tags after checking for `gorethink` tags. By default this feature is disabled. This function will also let you support any other tags, the driver will check for tags in the same order as the parameters.
 
 ### References
 

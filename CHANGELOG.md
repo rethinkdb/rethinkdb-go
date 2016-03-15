@@ -6,7 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Added
 - Added the ability to reference subdocuments when inserting new documents, for more information see the documentation in the readme.
-- Added the `SupportJSONTag` function which allows GoRethink to make use of the `json` struct tag.
+- Added the `SetTags` function which allows GoRethink to override which tags are used when working with structs. For example to support the `json` add the following call `SetTags("gorethink", "json")`.
 - Added helper functions for checking the error type of a write query, this is useful when calling `RunWrite`.
     + Added `IsConflictErr` which returns true when RethinkDB returns a duplicate key error.
     + Added `IsTypeErr` which returns true when RethinkDB returns an unexpected type error.

@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	SupportJSONTag = false
+	Tags = false
 )
 
 const (
@@ -23,15 +23,17 @@ const (
 type tagOptions string
 
 func getTag(sf reflect.StructField) string {
-	tag := sf.Tag.Get(TagName)
-
-	// If no gorethink tag could be found and the JSON tag has been enabled
-	// then check for that tag as well
-	if tag == "" && SupportJSONTag {
-		tag = sf.Tag.Get(JSONTagName)
+	if Tags == nil {
+		return sf.Tag.Get(TagName)
 	}
 
-	return tag
+	for _, tagName := range Tags {
+		if tag := sf.Tag.Get(TagName); tag != "" {
+			return tag
+		}
+	}
+
+	return ""
 }
 
 func getRefTag(sf reflect.StructField) string {
