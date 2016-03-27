@@ -190,9 +190,7 @@ func (c *Cursor) nextLocked(dest interface{}) (bool, error) {
 		}
 
 		if len(c.buffer) == 0 && len(c.responses) == 0 && !c.finished {
-			c.mu.Unlock()
 			err := c.fetchMore()
-			c.mu.Lock()
 			if err != nil {
 				return false, err
 			}
@@ -291,9 +289,7 @@ func (c *Cursor) nextResponseLocked() ([]byte, bool, error) {
 		}
 
 		if len(c.responses) == 0 && !c.finished {
-			c.mu.Unlock()
 			err := c.fetchMore()
-			c.mu.Lock()
 			if err != nil {
 				return nil, false, err
 			}
@@ -467,13 +463,11 @@ func (c *Cursor) IsNil() bool {
 func (c *Cursor) fetchMore() error {
 	var err error
 
-	c.mu.Lock()
 	fetching := c.fetching
 	closed := c.closed
 
 	if !fetching {
 		c.fetching = true
-		c.mu.Unlock()
 
 		if closed {
 			return errCursorClosed
@@ -484,9 +478,9 @@ func (c *Cursor) fetchMore() error {
 			Token: c.token,
 		}
 
-		_, _, err = c.conn.Query(q)
-	} else {
 		c.mu.Unlock()
+		_, _, err = c.conn.Query(q)
+		c.mu.Lock()
 	}
 
 	return err
