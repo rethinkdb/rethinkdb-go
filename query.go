@@ -270,7 +270,7 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	}
 
 	if response.Errors > 0 {
-		return response, fmt.Errorf(response.FirstError)
+		return response, fmt.Errorf("%s", response.FirstError)
 	}
 
 	return response, nil
