@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"sync"
 
-	"github.com/dancannon/gorethink/encoding"
-	p "github.com/dancannon/gorethink/ql2"
+	"gopkg.in/dancannon/gorethink.v1/encoding"
+	p "gopkg.in/dancannon/gorethink.v1/ql2"
 )
 
 var (

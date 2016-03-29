@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v1/ql2"
 )
 
 // A Query represents a query ready to be sent to the database, A Query differs

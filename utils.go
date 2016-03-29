@@ -6,9 +6,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/dancannon/gorethink/encoding"
+	"gopkg.in/dancannon/gorethink.v1/encoding"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v1/ql2"
 )
 
 // Helper functions for constructing terms

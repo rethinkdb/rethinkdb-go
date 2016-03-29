@@ -7,6 +7,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
  - Fixed panic when closing a connection at the same time as using a changefeed.
+ - Update imports to correctly use gopkg.in
 
 ## v1.4.0 - 2016-03-15
 
