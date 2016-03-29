@@ -156,6 +156,11 @@ func (t Term) String() string {
 	if t.rootTerm {
 		return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 	}
+
+	if t.args == nil {
+		return "r"
+	}
+
 	return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
 }
 
