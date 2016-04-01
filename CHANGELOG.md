@@ -8,6 +8,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
  - Fixed panic when closing a connection at the same time as using a changefeed.
  - Update imports to correctly use gopkg.in
+ - Fixed race condition when using anonymous functions
+ - Fixed IsConflictErr and IsTypeErr panicking when passed nil errors
 
 ## v1.4.0 - 2016-03-15
 
