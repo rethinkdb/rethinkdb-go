@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v1.4.1 - 2016-04-02
 
 ### Fixed
 
@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Update imports to correctly use gopkg.in
  - Fixed race condition when using anonymous functions
  - Fixed IsConflictErr and IsTypeErr panicking when passed nil errors
+ - RunWrite no longer misformats errors with formatting directives in them
 
 ## v1.4.0 - 2016-03-15
 
