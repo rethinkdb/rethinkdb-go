@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v1/ql2"
 )
 
 const (
@@ -41,6 +41,7 @@ type Connection struct {
 	token   int64
 	cursors map[int64]*Cursor
 	bad     bool
+	closed  bool
 }
 
 // NewConnection creates a new connection to the database server
@@ -82,14 +83,15 @@ func (c *Connection) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.Conn != nil {
-		c.Conn.Close()
-		c.Conn = nil
+	var err error
+
+	if !c.closed {
+		err = c.Conn.Close()
+		c.closed = true
+		c.cursors = make(map[int64]*Cursor)
 	}
 
-	c.cursors = nil
-
-	return nil
+	return err
 }
 
 // Query sends a Query to the database, returning both the raw Response and a

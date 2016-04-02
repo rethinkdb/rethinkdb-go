@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v1/ql2"
 )
 
 // A Session represents a connection to a RethinkDB cluster and should be used
