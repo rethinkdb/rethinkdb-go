@@ -135,7 +135,6 @@ type structEncoder struct {
 
 func (se *structEncoder) encode(v reflect.Value) interface{} {
 	m := make(map[string]interface{})
-
 	for i, f := range se.fields {
 		fv := fieldByIndex(v, f.index)
 		if !fv.IsValid() || f.omitEmpty && se.isEmptyValue(fv) {
@@ -146,33 +145,48 @@ func (se *structEncoder) encode(v reflect.Value) interface{} {
 
 		// If this field is a referenced field then attempt to extract the value.
 		if f.reference {
-			refName := f.name
-			if f.refName != "" {
-				refName = f.refName
-			}
-
-			// referenced fields can only handle maps so return an error if the
-			// encoded field is of a different type
-			m, ok := encField.(map[string]interface{})
-			if !ok {
-				err := fmt.Errorf("Error referencing field %s in %s, expected object but got %t", refName, f.name, encField)
-				panic(&MarshalerError{v.Type(), err})
-			}
-
-			refVal, ok := m[refName]
-			if !ok {
-				err := fmt.Errorf("Error referencing field %s in %s, could not find referenced field", refName, f.name)
-				panic(&MarshalerError{v.Type(), err})
-			}
-
 			// Override the encoded field with the referenced field
-			encField = refVal
+			encField = getReferenceField(f, v, encField)
 		}
 
 		m[f.name] = encField
 	}
 
 	return m
+}
+
+func getReferenceField(f field, v reflect.Value, encField interface{}) interface{} {
+	refName := f.name
+	if f.refName != "" {
+		refName = f.refName
+	}
+
+	encFields, isArray := encField.([]interface{})
+	if isArray {
+		refVals := make([]interface{}, len(encFields))
+		for i, e := range encFields {
+			refVals[i] = extractValue(e, v, f.name, refName)
+		}
+		return refVals
+	}
+	refVal := extractValue(encField, v, f.name, refName)
+	return refVal
+}
+
+func extractValue(encField interface{}, v reflect.Value, name string, refName string) interface{} {
+	// referenced fields can only handle maps so return an error if the
+	// encoded field is of a different type
+	m, ok := encField.(map[string]interface{})
+	if !ok {
+		err := fmt.Errorf("Error refing field %s in %s, expected object but got %t", refName, name, encField)
+		panic(&MarshalerError{v.Type(), err})
+	}
+	refVal, ok := m[refName]
+	if !ok {
+		err := fmt.Errorf("Error refing field %s in %s, could not find referenced field", refName, name)
+		panic(&MarshalerError{v.Type(), err})
+	}
+	return refVal
 }
 
 func (se *structEncoder) isEmptyValue(v reflect.Value) bool {
