@@ -154,6 +154,8 @@ func (c *Cursor) Close() error {
 // When Next returns false, the Err method should be called to verify if
 // there was an error during iteration.
 //
+// Next will automatically close the cursor if there are no more records to parse
+//
 // Also note that you are able to reuse the same variable multiple times as
 // `Next` zeroes the value before scanning in the result.
 func (c *Cursor) Next(dest interface{}) bool {
