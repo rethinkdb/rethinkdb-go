@@ -57,15 +57,16 @@ type Cursor struct {
 	term       *Term
 	opts       map[string]interface{}
 
-	mu        sync.RWMutex
-	lastErr   error
-	fetching  bool
-	closed    bool
-	finished  bool
-	isAtom    bool
-	buffer    []interface{}
-	responses []json.RawMessage
-	profile   interface{}
+	mu           sync.RWMutex
+	lastErr      error
+	fetching     bool
+	closed       bool
+	finished     bool
+	isAtom       bool
+	pendingSkips int
+	buffer       []interface{}
+	responses    []json.RawMessage
+	profile      interface{}
 }
 
 // Profile returns the information returned from the query profiler.
@@ -163,7 +164,7 @@ func (c *Cursor) Next(dest interface{}) bool {
 		return false
 	}
 
-	hasMore, err := c.nextLocked(dest)
+	hasMore, err := c.nextLocked(dest, true)
 	if c.handleErrorLocked(err) != nil {
 		c.mu.Unlock()
 		c.Close()
@@ -178,26 +179,10 @@ func (c *Cursor) Next(dest interface{}) bool {
 	return hasMore
 }
 
-func (c *Cursor) nextLocked(dest interface{}) (bool, error) {
+func (c *Cursor) nextLocked(dest interface{}, progressCursor bool) (bool, error) {
 	for {
-		if c.lastErr != nil {
-			return false, c.lastErr
-		}
-
-		// Check if response is closed/finished
-		if len(c.buffer) == 0 && len(c.responses) == 0 && c.closed {
-			return false, errCursorClosed
-		}
-
-		if len(c.buffer) == 0 && len(c.responses) == 0 && !c.finished {
-			err := c.fetchMore()
-			if err != nil {
-				return false, err
-			}
-			// Check if cursor was closed while fetching results
-			if c.closed {
-				return false, nil
-			}
+		if err := c.seekCursor(); err != nil {
+			return false, err
 		}
 
 		if len(c.buffer) == 0 && len(c.responses) == 0 && c.finished {
@@ -205,8 +190,8 @@ func (c *Cursor) nextLocked(dest interface{}) (bool, error) {
 		}
 
 		if len(c.buffer) == 0 && len(c.responses) > 0 {
-			var response json.RawMessage
-			response, c.responses = c.responses[0], c.responses[1:]
+			response := c.responses[0]
+			c.responses = c.responses[1:]
 
 			var value interface{}
 			decoder := json.NewDecoder(bytes.NewBuffer(response))
@@ -233,11 +218,14 @@ func (c *Cursor) nextLocked(dest interface{}) (bool, error) {
 			} else {
 				c.buffer = append(c.buffer, value)
 			}
+			c.applyPendingSkips(true)
 		}
 
 		if len(c.buffer) > 0 {
-			var data interface{}
-			data, c.buffer = c.buffer[0], c.buffer[1:]
+			var data interface{} = c.buffer[0]
+			if progressCursor {
+				c.buffer = c.buffer[1:]
+			}
 
 			err := encoding.Decode(dest, data)
 			if err != nil {
@@ -249,7 +237,56 @@ func (c *Cursor) nextLocked(dest interface{}) (bool, error) {
 	}
 }
 
-// Next retrieves the next raw response from the result set, blocking if necessary.
+// Peek behaves similarly to Next, retreiving the next document from the result set
+// and blocking if necessary. Peek, however, does not progress the position of the cursor.
+// This can be useful for expressions which can return different types to attempt to
+// decode them into different interfaces.
+//
+// Like Next, it will also automatically retrieve another batch of documents from
+// the server when the current one is exhausted, or before that in background
+// if possible.
+//
+// Unlike Next, Peek does not progress the position of the cursor. Peek
+// will return errors from decoding, but they will not be persisted in the cursor
+// and therefore will not be available on cursor.Err(). This can be useful for
+// expressions that can return different types to attempt to decode them into
+// different interfaces.
+//
+// Peek returns true if a document was successfully unmarshalled onto result,
+// and false at the end of the result set or if an error happened. Peek also
+// returns the error (if any) that occured
+func (c *Cursor) Peek(dest interface{}) (bool, error) {
+	c.mu.Lock()
+	if c.closed {
+		c.mu.Unlock()
+		return false, nil
+	}
+
+	hasMore, err := c.nextLocked(dest, false)
+	if _, isDecodeErr := err.(*encoding.DecodeTypeError); isDecodeErr {
+		c.mu.Unlock()
+		return false, err
+	}
+
+	if c.handleErrorLocked(err) != nil {
+		c.mu.Unlock()
+		c.Close()
+		return false, err
+	}
+	c.mu.Unlock()
+
+	return hasMore, nil
+}
+
+// Skip progresses the cursor by one record. It is useful after a successful
+// Peek to avoid duplicate decoding work.
+func (c *Cursor) Skip() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.pendingSkips++
+}
+
+// NextResponse retrieves the next raw response from the result set, blocking if necessary.
 // Unlike Next the returned response is the raw JSON document returned from the
 // database.
 //
@@ -279,24 +316,8 @@ func (c *Cursor) NextResponse() ([]byte, bool) {
 
 func (c *Cursor) nextResponseLocked() ([]byte, bool, error) {
 	for {
-		if c.lastErr != nil {
-			return nil, false, c.lastErr
-		}
-
-		// Check if response is closed/finished
-		if len(c.responses) == 0 && c.closed {
-			return nil, false, errCursorClosed
-		}
-
-		if len(c.responses) == 0 && !c.finished {
-			err := c.fetchMore()
-			if err != nil {
-				return nil, false, err
-			}
-			// Check if cursor was closed while fetching results
-			if c.closed {
-				return nil, false, nil
-			}
+		if err := c.seekCursor(); err != nil {
+			return nil, false, err
 		}
 
 		if len(c.responses) == 0 && c.finished {
@@ -520,4 +541,73 @@ func (c *Cursor) extendLocked(response *Response) {
 	c.isAtom = response.Type == p.Response_SUCCESS_ATOM
 
 	putResponse(response)
+}
+
+// seekCursor takes care of loading more data if needed and applying pending skips
+func (c *Cursor) seekCursor() error {
+	if c.lastErr != nil {
+		return c.lastErr
+	}
+
+	if len(c.responses) == 0 && c.closed {
+		return errCursorClosed
+	}
+
+	c.applyPendingSkips(false)
+
+	// Load more responses if they are available
+	if len(c.responses) == 0 && !c.finished {
+		for {
+			if len(c.responses) == 0 && !c.closed && !c.finished {
+				if err := c.fetchMore(); err != nil {
+					return err
+				}
+			}
+
+			// If we have more pending skips or we drained all of our responses, go around again
+			if morePending := c.applyPendingSkips(false); morePending || len(c.responses) == 0 {
+				if !c.closed && !c.finished {
+					continue
+				}
+			}
+
+			return nil
+		}
+	}
+	return nil
+}
+
+// applyPendingSkips applies all pending skips to the buffer and
+// returns whether there are more pending skips to be applied
+func (c *Cursor) applyPendingSkips(atomConverted bool) (stillPending bool) {
+	if c.pendingSkips == 0 {
+		return false
+	}
+
+	if atomConverted == false && c.isAtom {
+		return true
+	}
+
+	// Drain from the buffer first
+	if len(c.buffer) > c.pendingSkips {
+		c.buffer = c.buffer[c.pendingSkips:]
+		c.pendingSkips = 0
+		return false
+	} else if len(c.buffer) > 0 {
+		c.pendingSkips -= len(c.buffer)
+		c.buffer = c.buffer[:0]
+		if c.pendingSkips == 0 {
+			return false
+		}
+	}
+
+	if len(c.responses) > c.pendingSkips {
+		c.responses = c.responses[c.pendingSkips:]
+		c.pendingSkips = 0
+		return false
+	}
+
+	c.pendingSkips -= len(c.responses)
+	c.responses = c.responses[:0]
+	return c.pendingSkips > 0
 }
