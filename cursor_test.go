@@ -442,3 +442,66 @@ func (s *RethinkSuite) TestCursorNextResponse_object(c *test.C) {
 	c.Assert(ok, test.Equals, true)
 	c.Assert(b, jsonEquals, []byte(`{"foo":"bar"}`))
 }
+
+func (s *RethinkSuite) TestCursorPeek_idempotency(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	var result int
+
+	// Test idempotency
+	for i := 0; i < 2; i++ {
+		hasMore, err := res.Peek(&result)
+		c.Assert(err, test.IsNil)
+		c.Assert(result, test.Equals, 1)
+		c.Assert(hasMore, test.Equals, true)
+	}
+
+}
+
+func (s *RethinkSuite) TestCursorPeek_wrong_type(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	// Test that wrongType doesn't break the cursor
+	wrongType := struct {
+		Name string
+		Age  int
+	}{}
+
+	hasMore, err := res.Peek(&wrongType)
+	c.Assert(err, test.NotNil)
+	c.Assert(hasMore, test.Equals, false)
+	c.Assert(res.Err(), test.IsNil)
+}
+
+func (s *RethinkSuite) TestCursorPeek_usage(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	var result int
+
+	// Test that Skip progresses our cursor
+	res.Skip()
+	hasMore, err := res.Peek(&result)
+	c.Assert(err, test.IsNil)
+	c.Assert(result, test.Equals, 2)
+	c.Assert(hasMore, test.Equals, true)
+
+	// Test that we can use Next afterwards and we get the same result
+	hasMore = res.Next(&result)
+	c.Assert(result, test.Equals, 2)
+	c.Assert(hasMore, test.Equals, true)
+}
+
+func (s *RethinkSuite) TestCursorSkip(c *test.C) {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	c.Assert(err, test.IsNil)
+
+	res.Skip()
+
+	var result int
+	hasMore := res.Next(&result)
+	c.Assert(result, test.Equals, 2)
+	c.Assert(hasMore, test.Equals, true)
+}
