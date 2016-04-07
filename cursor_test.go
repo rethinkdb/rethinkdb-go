@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"fmt"
 	"time"
 
 	test "gopkg.in/check.v1"
@@ -504,4 +505,26 @@ func (s *RethinkSuite) TestCursorSkip(c *test.C) {
 	hasMore := res.Next(&result)
 	c.Assert(result, test.Equals, 2)
 	c.Assert(hasMore, test.Equals, true)
+}
+
+func ExampleCursor_Peek() {
+	res, err := Expr([]int{1, 2, 3}).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	var result, altResult int
+	wasRead, err := res.Peek(&result) // Result is now 1
+	if err != nil {
+		fmt.Print(err)
+		return
+	} else if !wasRead {
+		fmt.Print("No data to read!")
+	}
+
+	res.Next(&altResult) // altResult is also 1, peek didn't progress the cursor
+
+	res.Skip()        // progress the cursor, skipping 2
+	res.Peek(&result) // result is now 3
 }
