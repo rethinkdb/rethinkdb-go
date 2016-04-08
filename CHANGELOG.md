@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added the `Ordered` optional argument to `EqJoin`
  - Added the `Fold` term and examples
 
+### Deprecated
+ - Deprecated the root `Wait` term, `r.Table(...).Wait()` should now be used instead.
+
 ## v1.4.1 - 2016-04-02
 
 ### Fixed

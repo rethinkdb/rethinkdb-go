@@ -53,6 +53,8 @@ func (o *WaitOpts) toMap() map[string]interface{} {
 // Wait for a table or all the tables in a database to be ready. A table may be
 // temporarily unavailable after creation, rebalancing or reconfiguring. The
 // wait command blocks until the given table (or database) is fully up to date.
+//
+// Deprecated: This function is not supported by RethinkDB 2.3 and above.
 func Wait(optArgs ...WaitOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {

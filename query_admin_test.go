@@ -56,23 +56,6 @@ func (s *RethinkSuite) TestAdminTableStatus(c *test.C) {
 	c.Assert(response["status"], test.NotNil)
 }
 
-func (s *RethinkSuite) TestAdminWait(c *test.C) {
-	DB("test").TableDrop("test").Exec(session)
-	DB("test").TableCreate("test").Exec(session)
-
-	// Test index rename
-	query := Wait()
-
-	res, err := query.Run(session)
-	c.Assert(err, test.IsNil)
-
-	var response map[string]interface{}
-	err = res.One(&response)
-	c.Assert(err, test.IsNil)
-
-	c.Assert(response["ready"].(float64) > 0, test.Equals, true)
-}
-
 func (s *RethinkSuite) TestAdminWaitOpts(c *test.C) {
 	DB("test").TableDrop("test").Exec(session)
 	DB("test").TableCreate("test").Exec(session)
