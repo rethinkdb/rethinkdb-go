@@ -48,9 +48,6 @@ func init() {
 	if db == "" {
 		db = "test"
 	}
-
-	// Needed for running tests for RethinkDB with a non-empty authkey
-	authKey = os.Getenv("RETHINKDB_AUTHKEY")
 }
 
 //
@@ -60,7 +57,6 @@ func testSetup(m *testing.M) {
 	var err error
 	session, err = Connect(ConnectOpts{
 		Address: url,
-		AuthKey: authKey,
 	})
 	if err != nil {
 		Log.Fatalln(err.Error())

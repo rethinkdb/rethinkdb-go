@@ -63,16 +63,14 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
-	// Send handshake request
-	if err = c.writeHandshakeReq(); err != nil {
-		c.Close()
-		return nil, RQLConnectionError{rqlError(err.Error())}
-	}
-	// Read handshake response
-	err = c.readHandshakeSuccess()
+	// Send handshake
+	handshake, err := c.handshake(opts.HandshakeVersion)
 	if err != nil {
-		c.Close()
-		return nil, RQLConnectionError{rqlError(err.Error())}
+		return nil, err
+	}
+
+	if err = handshake.Send(); err != nil {
+		return nil, err
 	}
 
 	return c, nil

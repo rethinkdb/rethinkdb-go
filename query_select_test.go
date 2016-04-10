@@ -35,7 +35,6 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address:       url,
-		AuthKey:       authKey,
 		UseJSONNumber: true,
 	})
 	c.Assert(err, test.IsNil)
@@ -377,7 +376,6 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 	rand.Seed(time.Now().UnixNano())
 	sess, _ := Connect(ConnectOpts{
 		Address: url,
-		AuthKey: authKey,
 		MaxOpen: 200,
 		MaxIdle: 200,
 	})

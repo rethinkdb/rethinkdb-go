@@ -24,13 +24,16 @@ type ConnectOpts struct {
 	Address      string        `gorethink:"address,omitempty"`
 	Addresses    []string      `gorethink:"addresses,omitempty"`
 	Database     string        `gorethink:"database,omitempty"`
-	AuthKey      string        `gorethink:"authkey,omitempty"`
+	Username     string        `gorethink:"username,omitempty"`
+	Password     string        `gorethink:"password,omitempty"`
+	AuthKey      string        `gorethink:"authkey,omitempty"` // Deprecated
 	Timeout      time.Duration `gorethink:"timeout,omitempty"`
 	WriteTimeout time.Duration `gorethink:"write_timeout,omitempty"`
 	ReadTimeout  time.Duration `gorethink:"read_timeout,omitempty"`
 	// The duration in which a connection should send a keep-alive.
-	KeepAlivePeriod time.Duration `gorethink:"keep_alive_timeout,omitempty"`
-	TLSConfig       *tls.Config   `gorethink:"tlsconfig,omitempty"`
+	KeepAlivePeriod  time.Duration    `gorethink:"keep_alive_timeout,omitempty"`
+	TLSConfig        *tls.Config      `gorethink:"tlsconfig,omitempty"`
+	HandshakeVersion HandshakeVersion `gorethink:"handshake_version,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 	// By default a maximum of 2 connections are opened per host.
