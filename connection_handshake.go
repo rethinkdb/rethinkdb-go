@@ -33,9 +33,9 @@ type connectionHandshake interface {
 func (c *Connection) handshake(version HandshakeVersion) (connectionHandshake, error) {
 	switch version {
 	case HandshakeV0_4:
-		return &connectionHandshakeV0_4{c}, nil
+		return &connectionHandshakeV0_4{conn: c}, nil
 	case HandshakeV1_0:
-		return &connectionHandshakeV1_0{c, ""}, nil
+		return &connectionHandshakeV1_0{conn: c}, nil
 	default:
 		return nil, fmt.Errorf("Unrecognised handshake version")
 	}
@@ -111,19 +111,21 @@ const (
 )
 
 type connectionHandshakeV1_0 struct {
-	conn *Connection
+	conn   *Connection
+	reader *bufio.Reader
 
 	authMsg string
 }
 
 func (c *connectionHandshakeV1_0) Send() error {
+	c.reader = bufio.NewReader(c.conn.Conn)
+
 	// Generate client nonce
 	clientNonce, err := c.generateNonce()
 	if err != nil {
 		c.conn.Close()
 		return RQLDriverError{rqlError(fmt.Sprintf("Failed to generate client nonce: %s", err))}
 	}
-
 	// Send client first message
 	if err := c.writeFirstMessage(clientNonce); err != nil {
 		c.conn.Close()
@@ -175,8 +177,8 @@ func (c *connectionHandshakeV1_0) writeFirstMessage(clientNonce string) error {
 
 	c.authMsg = fmt.Sprintf("n=%s,r=%s", username, clientNonce)
 	msg := fmt.Sprintf(
-		`{"protocol_version": %d,"authentication_method": "%s","authentication": "n,,%s"}`,
-		handshakeV1_0_protocolVersionNumber, handshakeV1_0_authenticationMethod, c.authMsg,
+		`{"protocol_version": %d,"authentication": "n,,%s","authentication_method": "%s"}`,
+		handshakeV1_0_protocolVersionNumber, c.authMsg, handshakeV1_0_authenticationMethod,
 	)
 
 	pos := 0
@@ -361,6 +363,7 @@ func (c *connectionHandshakeV1_0) readFinalMessage(serverSignature string) error
 }
 
 func (c *connectionHandshakeV1_0) writeData(data []byte) error {
+
 	if err := c.conn.writeData(data); err != nil {
 		return RQLConnectionError{rqlError(err.Error())}
 	}
@@ -369,8 +372,7 @@ func (c *connectionHandshakeV1_0) writeData(data []byte) error {
 }
 
 func (c *connectionHandshakeV1_0) readResponse() ([]byte, error) {
-	reader := bufio.NewReader(c.conn.Conn)
-	line, err := reader.ReadBytes('\x00')
+	line, err := c.reader.ReadBytes('\x00')
 	if err != nil {
 		if err == io.EOF {
 			return nil, RQLConnectionError{rqlError(fmt.Sprintf("Unexpected EOF: %s", string(line)))}
