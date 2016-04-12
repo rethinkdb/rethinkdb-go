@@ -324,3 +324,26 @@ func TestReferenceFieldInvalid(t *testing.T) {
 		t.Errorf("expected non-nil error but got nil")
 	}
 }
+
+type RefE struct {
+	ID   string  `gorethink:"id,omitempty"`
+	FIDs *[]RefF `gorethink:"f_ids,reference" gorethink_ref:"id"`
+}
+
+type RefF struct {
+	ID   string `gorethink:"id,omitempty"`
+	Name string `gorethink:"name"`
+}
+
+func TestReferenceFieldArray(t *testing.T) {
+	input := RefE{"1", &[]RefF{RefF{"2", "Name2"}, RefF{"3", "Name3"}}}
+	want := map[string]interface{}{"id": "1", "f_ids": []string{"2", "3"}}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
