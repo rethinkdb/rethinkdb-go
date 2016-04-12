@@ -276,6 +276,30 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	return response, nil
 }
 
+// ReadOne is a shortcut method that runs the query on the given connection
+// and reads one response from the cursor before closing it.
+//
+// It returns any errors encountered from running the query or reading the response
+func (t Term) ReadOne(dest interface{}, s *Session, optArgs ...RunOpts) error {
+	res, err := t.Run(s, optArgs...)
+	if err != nil {
+		return err
+	}
+	return res.One(dest)
+}
+
+// ReadAll is a shortcut method that runs the query on the given connection
+// and reads all of the responses from the cursor before closing it.
+//
+// It returns any errors encountered from running the query or reading the responses
+func (t Term) ReadAll(dest interface{}, s *Session, optArgs ...RunOpts) error {
+	res, err := t.Run(s, optArgs...)
+	if err != nil {
+		return err
+	}
+	return res.All(dest)
+}
+
 // ExecOpts contains the optional arguments for the Exec function and  inherits
 // its options from RunOpts, the only difference is the addition of the NoReply
 // field.
