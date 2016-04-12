@@ -73,3 +73,9 @@ func (t Term) Wait(optArgs ...WaitOpts) Term {
 	}
 	return constructMethodTerm(t, "Wait", p.Term_WAIT, []interface{}{}, opts)
 }
+
+// Grant modifies access permissions for a user account, globally or on a
+// per-database or per-table basis.
+func (t Term) Grant(args ...interface{}) Term {
+	return constructMethodTerm(t, "Grant", p.Term_GRANT, args, map[string]interface{}{})
+}

@@ -91,3 +91,18 @@ func (s *RethinkSuite) TestAdminStatus(c *test.C) {
 
 	c.Assert(response["ready"], test.Equals, float64(1))
 }
+
+func (s *RethinkSuite) TestAdminGrantDatabase(c *test.C) {
+	DB("rethinkdb").Table("users").Insert(map[string]string{
+		"id":       "test_user",
+		"password": "password",
+	}).Exec(session)
+
+	DB("test").TableDrop("test_grant").Exec(session)
+	DB("test").TableCreate("test_grant").Exec(session)
+
+	err := DB("test").Table("test_grant").Grant("test_user", map[string]bool{
+		"read": true, "write": true, "config": true,
+	}).Exec(session)
+	c.Assert(err, test.IsNil)
+}

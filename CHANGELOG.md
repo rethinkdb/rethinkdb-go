@@ -17,6 +17,7 @@ r.Connect(
 
 ### Added
  - Added support for username/password authentication. To login pass your username and password when creating a session using the `Username` and `Password` fields in the `ConnectOpts`.
+ - Added the `Grant` term
  - Added the `Ordered` optional argument to `EqJoin`
  - Added the `Fold` term and examples
 
