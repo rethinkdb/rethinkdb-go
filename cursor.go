@@ -519,7 +519,7 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 		return c.lastErr
 	}
 
-	if len(c.responses) == 0 && c.closed {
+	if len(c.buffer) == 0 && len(c.responses) == 0 && c.closed {
 		return errCursorClosed
 	}
 
@@ -534,7 +534,7 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 				return err
 			}
 			continue // go around the loop again to re-apply pending skips
-		} else if len(c.responses) == 0 && !c.finished && !c.closed {
+		} else if len(c.buffer) == 0 && len(c.responses) == 0 && !c.finished && !c.closed {
 			//  We skipped all of our data, load some more
 			if err := c.fetchMore(); err != nil {
 				return err
