@@ -49,6 +49,12 @@ func newTypeEncoder(t reflect.Type, allowAddr bool) encoderFunc {
 		return newArrayEncoder(t)
 	case reflect.Ptr:
 		return newPtrEncoder(t)
+	case reflect.Func:
+		// functions are a special case as they can be used internally for
+		// optional arguments. Just return the raw function, if somebody tries
+		// to pass a function to the database the JSON marshaller will catch this
+		// anyway.
+		return funcEncoder
 	default:
 		return unsupportedTypeEncoder
 	}
@@ -118,6 +124,13 @@ func interfaceEncoder(v reflect.Value) interface{} {
 		return nil
 	}
 	return encode(v.Elem())
+}
+
+func funcEncoder(v reflect.Value) interface{} {
+	if v.IsNil() {
+		return nil
+	}
+	return v.Interface()
 }
 
 func asStringEncoder(v reflect.Value) interface{} {

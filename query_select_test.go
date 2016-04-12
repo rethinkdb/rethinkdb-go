@@ -35,7 +35,6 @@ func (s *RethinkSuite) TestSelectGet(c *test.C) {
 func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address:       url,
-		AuthKey:       authKey,
 		UseJSONNumber: true,
 	})
 	c.Assert(err, test.IsNil)
@@ -377,7 +376,6 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 	rand.Seed(time.Now().UnixNano())
 	sess, _ := Connect(ConnectOpts{
 		Address: url,
-		AuthKey: authKey,
 		MaxOpen: 200,
 		MaxIdle: 200,
 	})
@@ -495,28 +493,28 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 	waitChannel := make(chan error, attempts)
 
 	for i := 0; i < attempts; i++ {
-		go func(i int, c chan error) {
+		go func(i int, ch chan error) {
 			res, err := DB("test").Table("TestMany").Run(session)
 			if err != nil {
-				c <- err
+				ch <- err
 				return
 			}
 
 			var response []map[string]interface{}
 			err = res.All(&response)
 			if err != nil {
-				c <- err
+				ch <- err
 				return
 			}
 
 			if len(response) != 100 {
-				c <- fmt.Errorf("expected response length 100, received %d", len(response))
+				ch <- fmt.Errorf("expected response length 100, received %d", len(response))
 				return
 			}
 
 			res.Close()
 
-			c <- nil
+			ch <- nil
 		}(i, waitChannel)
 	}
 

@@ -53,6 +53,8 @@ func (o *WaitOpts) toMap() map[string]interface{} {
 // Wait for a table or all the tables in a database to be ready. A table may be
 // temporarily unavailable after creation, rebalancing or reconfiguring. The
 // wait command blocks until the given table (or database) is fully up to date.
+//
+// Deprecated: This function is not supported by RethinkDB 2.3 and above.
 func Wait(optArgs ...WaitOpts) Term {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
@@ -70,4 +72,10 @@ func (t Term) Wait(optArgs ...WaitOpts) Term {
 		opts = optArgs[0].toMap()
 	}
 	return constructMethodTerm(t, "Wait", p.Term_WAIT, []interface{}{}, opts)
+}
+
+// Grant modifies access permissions for a user account, globally or on a
+// per-database or per-table basis.
+func (t Term) Grant(args ...interface{}) Term {
+	return constructMethodTerm(t, "Grant", p.Term_GRANT, args, map[string]interface{}{})
 }

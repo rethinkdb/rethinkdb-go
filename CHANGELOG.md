@@ -2,6 +2,29 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Changed
+
+ - GoRethink now uses the v1.0 RethinkDB protocol which supports RethinkDB v2.3 and above. If you are using RethinkDB 2.2 or older please set `HandshakeVersion` when creating a session. For example:
+```go
+r.Connect(
+    ...
+    HandshakeVersion: r.HandshakeV0_4,
+    ...
+)
+```
+
+### Added
+ - Added support for username/password authentication. To login pass your username and password when creating a session using the `Username` and `Password` fields in the `ConnectOpts`.
+ - Added the `Grant` term
+ - Added the `Ordered` optional argument to `EqJoin`
+ - Added the `Fold` term and examples
+
+### Deprecated
+ - Deprecated the root `Wait` term, `r.Table(...).Wait()` should now be used instead.
+ - Deprecated session authentication using `AuthKey` 
+
 ## v1.4.1 - 2016-04-02
 
 ### Fixed
