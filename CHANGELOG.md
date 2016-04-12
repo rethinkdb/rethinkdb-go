@@ -20,10 +20,16 @@ r.Connect(
  - Added the `Grant` term
  - Added the `Ordered` optional argument to `EqJoin`
  - Added the `Fold` term and examples
+ - Added the `ReadOne` and `ReadAll` helper functions for quickly executing a query and scanning the result into a variable. For examples see the godocs.
+ - Added the `Peek` and `Skip` functions to the `Cursor`.
+ - Added support for referential arrays in structs
 
 ### Deprecated
  - Deprecated the root `Wait` term, `r.Table(...).Wait()` should now be used instead.
  - Deprecated session authentication using `AuthKey` 
+
+### Fixed
+ - Fixed issue with `ReconfigureOpts` field `PrimaryTag`
 
 ## v1.4.1 - 2016-04-02
 
