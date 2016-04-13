@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	p "github.com/dancannon/gorethink/ql2"
+	p "gopkg.in/dancannon/gorethink.v1/ql2"
 )
 
 // A Query represents a query ready to be sent to the database, A Query differs
@@ -156,6 +156,11 @@ func (t Term) String() string {
 	if t.rootTerm {
 		return fmt.Sprintf("r.%s(%s)", t.name, strings.Join(allArgsToStringSlice(t.args, t.optArgs), ", "))
 	}
+
+	if t.args == nil {
+		return "r"
+	}
+
 	return fmt.Sprintf("%s.%s(%s)", t.args[0].String(), t.name, strings.Join(allArgsToStringSlice(t.args[1:], t.optArgs), ", "))
 }
 
@@ -265,7 +270,7 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 	}
 
 	if response.Errors > 0 {
-		return response, fmt.Errorf(response.FirstError)
+		return response, fmt.Errorf("%s", response.FirstError)
 	}
 
 	return response, nil
