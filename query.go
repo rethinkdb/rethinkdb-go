@@ -206,6 +206,7 @@ type RunOpts struct {
 	DB             interface{} `gorethink:"db,omitempty"`
 	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
 	Profile        interface{} `gorethink:"profile,omitempty"`
+	Durability     interface{} `gorethink:"durability,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
@@ -310,6 +311,7 @@ type ExecOpts struct {
 	DB             interface{} `gorethink:"db,omitempty"`
 	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
 	Profile        interface{} `gorethink:"profile,omitempty"`
+	Durability     interface{} `gorethink:"durability,omitempty"`
 	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
 	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
 	TimeFormat     interface{} `gorethink:"time_format,omitempty"`

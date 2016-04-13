@@ -23,6 +23,7 @@ r.Connect(
  - Added the `ReadOne` and `ReadAll` helper functions for quickly executing a query and scanning the result into a variable. For examples see the godocs.
  - Added the `Peek` and `Skip` functions to the `Cursor`.
  - Added support for referential arrays in structs
+ - Added the `Durability` argument to `RunOpts`/`ExecOpts`
 
 ### Deprecated
  - Deprecated the root `Wait` term, `r.Table(...).Wait()` should now be used instead.
