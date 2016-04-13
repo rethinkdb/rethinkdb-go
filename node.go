@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/hailocab/go-hostpool"
-	p "gopkg.in/dancannon/gorethink.v2/internal/ql2"
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 // Node represents a database server in the cluster
