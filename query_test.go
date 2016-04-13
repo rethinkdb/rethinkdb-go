@@ -14,6 +14,23 @@ func (s *RethinkSuite) TestQueryRun(c *test.C) {
 	c.Assert(response, test.Equals, "Test")
 }
 
+func (s *RethinkSuite) TestQueryReadOne(c *test.C) {
+	var response string
+
+	err := Expr("Test").ReadOne(&response, session)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "Test")
+}
+
+func (s *RethinkSuite) TestQueryReadAll(c *test.C) {
+	var response []int
+
+	err := Expr([]int{1, 2, 3}).ReadAll(&response, session)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.HasLen, 3)
+	c.Assert(response, test.DeepEquals, []int{1, 2, 3})
+}
+
 func (s *RethinkSuite) TestQueryExec(c *test.C) {
 	err := Expr("Test").Exec(session)
 	c.Assert(err, test.IsNil)

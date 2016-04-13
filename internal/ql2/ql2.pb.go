@@ -38,6 +38,7 @@ const (
 	VersionDummy_V0_2 VersionDummy_Version = 1915781601
 	VersionDummy_V0_3 VersionDummy_Version = 1601562686
 	VersionDummy_V0_4 VersionDummy_Version = 1074539808
+	VersionDummy_V1_0 VersionDummy_Version = 885177795
 )
 
 var VersionDummy_Version_name = map[int32]string{
@@ -45,12 +46,14 @@ var VersionDummy_Version_name = map[int32]string{
 	1915781601: "V0_2",
 	1601562686: "V0_3",
 	1074539808: "V0_4",
+	885177795:  "V1_0",
 }
 var VersionDummy_Version_value = map[string]int32{
 	"V0_1": 1063369270,
 	"V0_2": 1915781601,
 	"V0_3": 1601562686,
 	"V0_4": 1074539808,
+	"V1_0": 885177795,
 }
 
 func (x VersionDummy_Version) Enum() *VersionDummy_Version {
@@ -268,6 +271,7 @@ const (
 	Response_OP_FAILED        Response_ErrorType = 4100000
 	Response_OP_INDETERMINATE Response_ErrorType = 4200000
 	Response_USER             Response_ErrorType = 5000000
+	Response_PERMISSION_ERROR Response_ErrorType = 6000000
 )
 
 var Response_ErrorType_name = map[int32]string{
@@ -278,6 +282,7 @@ var Response_ErrorType_name = map[int32]string{
 	4100000: "OP_FAILED",
 	4200000: "OP_INDETERMINATE",
 	5000000: "USER",
+	6000000: "PERMISSION_ERROR",
 }
 var Response_ErrorType_value = map[string]int32{
 	"INTERNAL":         1000000,
@@ -287,6 +292,7 @@ var Response_ErrorType_value = map[string]int32{
 	"OP_FAILED":        4100000,
 	"OP_INDETERMINATE": 4200000,
 	"USER":             5000000,
+	"PERMISSION_ERROR": 6000000,
 }
 
 func (x Response_ErrorType) Enum() *Response_ErrorType {
@@ -536,6 +542,7 @@ const (
 	Term_BETWEEN Term_TermType = 182
 	Term_REDUCE  Term_TermType = 37
 	Term_MAP     Term_TermType = 38
+	Term_FOLD    Term_TermType = 187
 	// Filter a sequence with either a function or a shortcut
 	// object (see API docs for details).  The body of FILTER is
 	// wrapped in an implicit `.default(false)`, and you can
@@ -656,6 +663,8 @@ const (
 	// Ensures that previously issued soft-durability writes are complete and
 	// written to disk.
 	Term_SYNC Term_TermType = 138
+	// Set global, database, or table-specific permissions
+	Term_GRANT Term_TermType = 188
 	// * Secondary indexes OPs
 	// Creates a new secondary index with a particular name and definition.
 	Term_INDEX_CREATE Term_TermType = 75
@@ -901,6 +910,7 @@ var Term_TermType_name = map[int32]string{
 	182: "BETWEEN",
 	37:  "REDUCE",
 	38:  "MAP",
+	187: "FOLD",
 	39:  "FILTER",
 	40:  "CONCAT_MAP",
 	41:  "ORDER_BY",
@@ -937,6 +947,7 @@ var Term_TermType_name = map[int32]string{
 	176: "RECONFIGURE",
 	179: "REBALANCE",
 	138: "SYNC",
+	188: "GRANT",
 	75:  "INDEX_CREATE",
 	76:  "INDEX_DROP",
 	77:  "INDEX_LIST",
@@ -1079,6 +1090,7 @@ var Term_TermType_value = map[string]int32{
 	"BETWEEN":            182,
 	"REDUCE":             37,
 	"MAP":                38,
+	"FOLD":               187,
 	"FILTER":             39,
 	"CONCAT_MAP":         40,
 	"ORDER_BY":           41,
@@ -1115,6 +1127,7 @@ var Term_TermType_value = map[string]int32{
 	"RECONFIGURE":        176,
 	"REBALANCE":          179,
 	"SYNC":               138,
+	"GRANT":              188,
 	"INDEX_CREATE":       75,
 	"INDEX_DROP":         76,
 	"INDEX_LIST":         77,
@@ -1392,7 +1405,7 @@ type Response struct {
 	Response []*Datum `protobuf:"bytes,3,rep,name=response" json:"response,omitempty"`
 	// If [type] is [CLIENT_ERROR], [TYPE_ERROR], or [RUNTIME_ERROR], then a
 	// backtrace will be provided.  The backtrace says where in the query the
-	// error occured.  Ideally this information will be presented to the user as
+	// error occurred.  Ideally this information will be presented to the user as
 	// a pretty-printed version of their query with the erroneous section
 	// underlined.  A backtrace is a series of 0 or more [Frame]s, each of which
 	// specifies either the index of a positional argument or the name of an

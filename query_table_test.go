@@ -21,7 +21,6 @@ func (s *RethinkSuite) TestTableCreate(c *test.C) {
 func (s *RethinkSuite) TestTableCreateSessionDatabase(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address: url,
-		AuthKey: authKey,
 	})
 	c.Assert(err, test.IsNil)
 	TableDrop("test").Exec(session)
