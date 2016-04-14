@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+ - Added `UnionWithOpts` term which allows `Union` to be called with optional arguments (such as `Interleave`)
+
 ### Fixed
  - Fixed error when connecting to database as non-admin user
 
