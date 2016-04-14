@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v2.0.1 - 2016-04-14
 
 ### Added
  - Added `UnionWithOpts` term which allows `Union` to be called with optional arguments (such as `Interleave`)
