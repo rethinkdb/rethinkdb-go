@@ -6,6 +6,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
  - Added `UnionWithOpts` term which allows `Union` to be called with optional arguments (such as `Interleave`)
+ - Added `IncludeOffsets` and `IncludeTypes` optional arguments to `ChangesOpts`
+ - Added `Conflict` optional argument to `InsertOpts`
 
 ### Fixed
  - Fixed error when connecting to database as non-admin user
