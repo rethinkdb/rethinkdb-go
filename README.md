@@ -91,6 +91,35 @@ if err != nil {
 
 When `DiscoverHosts` is true any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by GoRethink. Unfortunately the canonical address of each server in the cluster **MUST** be set as otherwise clients will try to connect to the database nodes locally. For more information about how to set a RethinkDB servers canonical address set this page http://www.rethinkdb.com/docs/config-file/.
 
+## User Authentication
+
+To login with a username and password you should first create a user, this can be done by writing to the `users` system table and then grant that user access to any tables or databases they need access to. This queries can also be executed in the RethinkDB admin console.
+
+```go
+err := r.DB("rethinkdb").Table("users").Insert(map[string]string{
+    "id": "john",
+    "password": "p455w0rd",
+}).Exec(session)
+...
+err = r.DB("blog").Table("posts").Grant("john", map[string]bool{
+    "read": true,
+    "write": true,
+}).Exec(session)
+...
+```
+
+Finally the username and password should be passed to `Connect` when creating your session, for example:
+
+```go
+session, err := r.Connect(r.ConnectOpts{
+    Address: "localhost:28015",
+    Database: "blog",
+    Username: "john",
+    Password: "p455w0rd",
+})
+```
+
+Please note that `DiscoverHosts` will not work with user authentication at this time due to the fact that RethinkDB restricts access to the required system tables.
 
 ## Query Functions
 
