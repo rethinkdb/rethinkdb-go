@@ -10,7 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added `Conflict` optional argument to `InsertOpts`
 
 ### Fixed
- - Fixed error when connecting to database as non-admin user
+ - Fixed error when connecting to database as non-admin user, please note that `DiscoverHosts` will not work with user authentication at this time due to the fact that RethinkDB restricts access to the required system tables.
 
 ## v2.0.0 - 2016-04-13
 
