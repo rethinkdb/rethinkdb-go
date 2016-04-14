@@ -10,7 +10,38 @@ import (
 func (s *RethinkSuite) TestSessionConnect(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address: url,
-		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
+	})
+	c.Assert(err, test.IsNil)
+
+	row, err := Expr("Hello World").Run(session)
+	c.Assert(err, test.IsNil)
+
+	var response string
+	err = row.One(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "Hello World")
+}
+
+func (s *RethinkSuite) TestSessionConnectHandshakeV1_0(c *test.C) {
+	session, err := Connect(ConnectOpts{
+		Address:          url,
+		HandshakeVersion: HandshakeV1_0,
+	})
+	c.Assert(err, test.IsNil)
+
+	row, err := Expr("Hello World").Run(session)
+	c.Assert(err, test.IsNil)
+
+	var response string
+	err = row.One(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, "Hello World")
+}
+
+func (s *RethinkSuite) TestSessionConnectHandshakeV0_4(c *test.C) {
+	session, err := Connect(ConnectOpts{
+		Address:          url,
+		HandshakeVersion: HandshakeV0_4,
 	})
 	c.Assert(err, test.IsNil)
 
@@ -26,7 +57,6 @@ func (s *RethinkSuite) TestSessionConnect(c *test.C) {
 func (s *RethinkSuite) TestSessionReconnect(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address: url,
-		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
 	})
 	c.Assert(err, test.IsNil)
 
@@ -61,7 +91,6 @@ func (s *RethinkSuite) TestSessionConnectError(c *test.C) {
 func (s *RethinkSuite) TestSessionClose(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address: url,
-		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
 	})
 	c.Assert(err, test.IsNil)
 
@@ -78,7 +107,6 @@ func (s *RethinkSuite) TestSessionClose(c *test.C) {
 func (s *RethinkSuite) TestSessionServer(c *test.C) {
 	session, err := Connect(ConnectOpts{
 		Address: url,
-		AuthKey: os.Getenv("RETHINKDB_AUTHKEY"),
 	})
 	c.Assert(err, test.IsNil)
 
