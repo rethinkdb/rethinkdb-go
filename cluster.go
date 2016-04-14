@@ -222,17 +222,6 @@ func (c *Cluster) connectNodes(hosts []Host) {
 		}
 		defer conn.Close()
 
-		svrRsp, err := conn.Server()
-		if err != nil {
-			Log.Warnf("Error fetching server ID: %s", err)
-			continue
-		}
-
-		// TODO: connect to seed hosts using `.Server()` to get server ID. Need
-		// some way of making this backwards compatible
-
-		// TODO: AFTER try to discover hosts
-
 		if c.opts.DiscoverHosts {
 			q, err := newQuery(
 				DB("rethinkdb").Table("server_status"),
@@ -271,6 +260,12 @@ func (c *Cluster) connectNodes(hosts []Host) {
 				}
 			}
 		} else {
+			svrRsp, err := conn.Server()
+			if err != nil {
+				Log.Warnf("Error fetching server ID: %s", err)
+				continue
+			}
+
 			node, err := c.connectNode(svrRsp.ID, []Host{host})
 			if err == nil {
 				if _, ok := nodeSet[node.ID]; !ok {
