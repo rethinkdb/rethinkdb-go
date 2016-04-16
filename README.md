@@ -16,13 +16,14 @@ If you need any help you can find me on the [RethinkDB slack](http://slack.rethi
 
 ## Installation
 
-```sh
-go get -u github.com/dancannon/gorethink
-```
-
-Or (pinned to the v1.x.x tag)
 ```
 go get gopkg.in/dancannon/gorethink.v2
+```
+
+(Or v1)
+
+```sh
+go get gopkg.in/dancannon/gorethink.v1
 ```
 
 ## Connection
