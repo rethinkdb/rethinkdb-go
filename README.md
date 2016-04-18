@@ -8,7 +8,7 @@
 
 ![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v2.0.0 (RethinkDB v2.3)
+Current version: v2.0.1 (RethinkDB v2.3)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -16,13 +16,14 @@ If you need any help you can find me on the [RethinkDB slack](http://slack.rethi
 
 ## Installation
 
-```sh
-go get -u github.com/dancannon/gorethink
-```
-
-Or (pinned to the v1.x.x tag)
 ```
 go get gopkg.in/dancannon/gorethink.v2
+```
+
+(Or v1)
+
+```sh
+go get gopkg.in/dancannon/gorethink.v1
 ```
 
 ## Connection
