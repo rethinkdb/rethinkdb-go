@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v2.0.2 - 2016-04-18
+
+### Fixed
+ - Fixed issue which prevented anonymous `time.Time` values from being encoded when used in a struct.
+ - Fixed panic when attempting to run a query with a nil session
+
 ## v2.0.1 - 2016-04-14
 
 ### Added
