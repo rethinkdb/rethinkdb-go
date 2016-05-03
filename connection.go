@@ -63,6 +63,16 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
+	// Enable TCP Keepalives on TCP connections
+	if tc, ok := c.Conn.(*net.TCPConn); ok {
+		if err := tc.SetKeepAlive(true); err != nil {
+			// Don't send COM_QUIT before handshake.
+			c.Conn.Close()
+			c.Conn = nil
+			return nil, err
+		}
+	}
+
 	// Send handshake
 	handshake, err := c.handshake(opts.HandshakeVersion)
 	if err != nil {
