@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+ - Added constants for system database and table names.
+
 ### Changed
  - Re-enabled keep alive by default.
 
