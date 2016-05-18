@@ -183,6 +183,9 @@ func (p *Pool) Query(q Query) (*Cursor, error) {
 
 		if err == nil {
 			cursor.releaseConn = releaseConn(c, pc)
+		} else if c.isBad() {
+			pc.MarkUnusable()
+			continue
 		}
 
 		break

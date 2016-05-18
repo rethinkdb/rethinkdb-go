@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Fixed
+ - Fixed queries not being retried when using `Query()`, queries are now retried if the request failed due to a bad connection.
+
 ## v2.0.3
 
 ### Added
