@@ -85,7 +85,9 @@ func (s *RethinkSuite) TestSessionConnectError(c *test.C) {
 		Address: "nonexistanturl",
 		Timeout: time.Second,
 	})
+
 	c.Assert(err, test.NotNil)
+	c.Assert(err, test.FitsTypeOf, RQLConnectionError{})
 }
 
 func (s *RethinkSuite) TestSessionClose(c *test.C) {

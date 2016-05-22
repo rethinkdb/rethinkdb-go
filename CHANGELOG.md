@@ -4,6 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+ - Changed `Connect` to return the reason for connections failing (instead of just "no connections were made when creating the session")
+
 ### Fixed
  - Fixed queries not being retried when using `Query()`, queries are now retried if the request failed due to a bad connection.
  - Fixed `Cursor` methods panicking if using a nil cursor, please note that you should still always check if your queries return an error.
