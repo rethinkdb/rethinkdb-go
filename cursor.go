@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	errNilCursor    = errors.New("cursor is nil")
 	errCursorClosed = errors.New("connection closed, cannot read cursor")
 )
 
@@ -71,6 +72,10 @@ type Cursor struct {
 
 // Profile returns the information returned from the query profiler.
 func (c *Cursor) Profile() interface{} {
+	if c == nil {
+		return nil
+	}
+
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -79,6 +84,10 @@ func (c *Cursor) Profile() interface{} {
 
 // Type returns the cursor type (by default "Cursor")
 func (c *Cursor) Type() string {
+	if c == nil {
+		return "Cursor"
+	}
+
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -88,6 +97,10 @@ func (c *Cursor) Type() string {
 // Err returns nil if no errors happened during iteration, or the actual
 // error otherwise.
 func (c *Cursor) Err() error {
+	if c == nil {
+		return errNilCursor
+	}
+
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -97,10 +110,14 @@ func (c *Cursor) Err() error {
 // Close closes the cursor, preventing further enumeration. If the end is
 // encountered, the cursor is closed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
-	var err error
+	if c == nil {
+		return errNilCursor
+	}
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
+
+	var err error
 
 	// If cursor is already closed return immediately
 	closed := c.closed
@@ -158,6 +175,10 @@ func (c *Cursor) Close() error {
 // Also note that you are able to reuse the same variable multiple times as
 // `Next` zeroes the value before scanning in the result.
 func (c *Cursor) Next(dest interface{}) bool {
+	if c == nil {
+		return false
+	}
+
 	c.mu.Lock()
 	if c.closed {
 		c.mu.Unlock()
@@ -224,6 +245,10 @@ func (c *Cursor) nextLocked(dest interface{}, progressCursor bool) (bool, error)
 // and false at the end of the result set or if an error happened. Peek also
 // returns the error (if any) that occured
 func (c *Cursor) Peek(dest interface{}) (bool, error) {
+	if c == nil {
+		return false, errNilCursor
+	}
+
 	c.mu.Lock()
 	if c.closed {
 		c.mu.Unlock()
@@ -249,6 +274,10 @@ func (c *Cursor) Peek(dest interface{}) (bool, error) {
 // Skip progresses the cursor by one record. It is useful after a successful
 // Peek to avoid duplicate decoding work.
 func (c *Cursor) Skip() {
+	if c == nil {
+		return
+	}
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.pendingSkips++
@@ -261,6 +290,10 @@ func (c *Cursor) Skip() {
 // NextResponse returns false (and a nil byte slice) at the end of the result
 // set or if an error happened.
 func (c *Cursor) NextResponse() ([]byte, bool) {
+	if c == nil {
+		return nil, false
+	}
+
 	c.mu.Lock()
 	if c.closed {
 		c.mu.Unlock()
@@ -312,6 +345,10 @@ func (c *Cursor) nextResponseLocked() ([]byte, bool, error) {
 // to reuse the existing slice without allocating any more space by either
 // resizing or returning a selection of the slice if necessary.
 func (c *Cursor) All(result interface{}) error {
+	if c == nil {
+		return errNilCursor
+	}
+
 	resultv := reflect.ValueOf(result)
 	if resultv.Kind() != reflect.Ptr || resultv.Elem().Kind() != reflect.Slice {
 		panic("result argument must be a slice address")
@@ -355,6 +392,10 @@ func (c *Cursor) All(result interface{}) error {
 // Also note that you are able to reuse the same variable multiple times as
 // `One` zeroes the value before scanning in the result.
 func (c *Cursor) One(result interface{}) error {
+	if c == nil {
+		return errNilCursor
+	}
+
 	if c.IsNil() {
 		c.Close()
 		return ErrEmptyResult
@@ -417,6 +458,10 @@ func (c *Cursor) Listen(channel interface{}) {
 
 // IsNil tests if the current row is nil.
 func (c *Cursor) IsNil() bool {
+	if c == nil {
+		return true
+	}
+
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 

@@ -6,6 +6,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Fixed queries not being retried when using `Query()`, queries are now retried if the request failed due to a bad connection.
+ - Fixed `Cursor` methods panicking if using a nil cursor, please note that you should still always check if your queries return an error.
 
 ## v2.0.3
 
