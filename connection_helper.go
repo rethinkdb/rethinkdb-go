@@ -5,11 +5,8 @@ import "encoding/binary"
 // Write 'data' to conn
 func (c *Connection) writeData(data []byte) error {
 	_, err := c.Conn.Write(data[:])
-	if err != nil {
-		return err
-	}
 
-	return nil
+	return err
 }
 
 func (c *Connection) read(buf []byte, length int) (total int, err error) {
@@ -20,11 +17,8 @@ func (c *Connection) read(buf []byte, length int) (total int, err error) {
 		}
 		total += n
 	}
-	if err != nil {
-		return total, err
-	}
 
-	return total, nil
+	return total, err
 }
 
 func (c *Connection) writeQuery(token int64, q []byte) error {

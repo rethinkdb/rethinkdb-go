@@ -466,12 +466,7 @@ func (c *Cursor) IsNil() bool {
 	defer c.mu.RUnlock()
 
 	if len(c.buffer) > 0 {
-		bufferedItem := c.buffer[0]
-		if bufferedItem == nil {
-			return true
-		}
-
-		return false
+		return c.buffer[0] == nil
 	}
 
 	if len(c.responses) > 0 {
@@ -545,10 +540,7 @@ func (c *Cursor) extend(response *Response) {
 }
 
 func (c *Cursor) extendLocked(response *Response) {
-	for _, response := range response.Responses {
-		c.responses = append(c.responses, response)
-	}
-
+	c.responses = append(c.responses, response.Responses...)
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL
 	c.fetching = false
 	c.isAtom = response.Type == p.Response_SUCCESS_ATOM
@@ -652,9 +644,7 @@ func (c *Cursor) bufferNextResponse() error {
 
 	// If response is an ATOM then try and convert to an array
 	if data, ok := value.([]interface{}); ok && c.isAtom {
-		for _, v := range data {
-			c.buffer = append(c.buffer, v)
-		}
+		c.buffer = append(c.buffer, data...)
 	} else if value == nil {
 		c.buffer = append(c.buffer, nil)
 	} else {

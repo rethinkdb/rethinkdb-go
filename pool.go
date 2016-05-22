@@ -13,8 +13,6 @@ const maxBadConnRetries = 3
 
 var (
 	errPoolClosed = errors.New("gorethink: pool is closed")
-	errConnClosed = errors.New("gorethink: conn is closed")
-	errConnBusy   = errors.New("gorethink: conn is busy")
 )
 
 // A Pool is used to store a pool of connections to a single RethinkDB server
