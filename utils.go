@@ -266,3 +266,17 @@ func encode(data interface{}) (interface{}, error) {
 
 	return v, nil
 }
+
+// shouldRetryQuery checks the result of a query and returns true if the query
+// should be retried
+func shouldRetryQuery(q Query, err error) bool {
+	if err == nil {
+		return false
+	}
+
+	if _, ok := err.(RQLConnectionError); ok {
+		return true
+	}
+
+	return err == ErrConnectionClosed
+}

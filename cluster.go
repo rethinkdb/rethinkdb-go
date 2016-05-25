@@ -58,37 +58,68 @@ func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
 
 // Query executes a ReQL query using the cluster to connect to the database
 func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
-	node, hpr, err := c.GetNextNode()
-	if err != nil {
-		return nil, err
+	for i := 0; i < c.numRetries(); i++ {
+		var node *Node
+		var hpr hostpool.HostPoolResponse
+
+		node, hpr, err = c.GetNextNode()
+		if err != nil {
+			return nil, err
+		}
+
+		cursor, err = node.Query(q)
+		hpr.Mark(err)
+
+		if !shouldRetryQuery(q, err) {
+			break
+		}
 	}
 
-	cursor, err = node.Query(q)
-	hpr.Mark(err)
 	return cursor, err
 }
 
 // Exec executes a ReQL query using the cluster to connect to the database
 func (c *Cluster) Exec(q Query) (err error) {
-	node, hpr, err := c.GetNextNode()
-	if err != nil {
-		return err
+	for i := 0; i < c.numRetries(); i++ {
+		var node *Node
+		var hpr hostpool.HostPoolResponse
+
+		node, hpr, err = c.GetNextNode()
+		if err != nil {
+			return err
+		}
+
+		err = node.Exec(q)
+		hpr.Mark(err)
+
+		if !shouldRetryQuery(q, err) {
+			break
+		}
 	}
 
-	err = node.Exec(q)
-	hpr.Mark(err)
 	return err
 }
 
 // Server returns the server name and server UUID being used by a connection.
 func (c *Cluster) Server() (response ServerResponse, err error) {
-	node, hpr, err := c.GetNextNode()
-	if err != nil {
-		return ServerResponse{}, err
+	for i := 0; i < c.numRetries(); i++ {
+		var node *Node
+		var hpr hostpool.HostPoolResponse
+
+		node, hpr, err = c.GetNextNode()
+		if err != nil {
+			return ServerResponse{}, err
+		}
+
+		response, err = node.Server()
+		hpr.Mark(err)
+
+		// This query should not fail so retry if any error is detected
+		if err == nil {
+			break
+		}
 	}
 
-	response, err = node.Server()
-	hpr.Mark(err)
 	return response, err
 }
 
@@ -472,4 +503,12 @@ func (c *Cluster) removeNode(nodeID string) {
 
 func (c *Cluster) nextNodeIndex() int64 {
 	return atomic.AddInt64(&c.nodeIndex, 1)
+}
+
+func (c *Cluster) numRetries() int {
+	if n := c.opts.NumRetries; n > 0 {
+		return n
+	}
+
+	return 3
 }

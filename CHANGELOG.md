@@ -16,6 +16,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
  - Changed `Connect` to return the reason for connections failing (instead of just "no connections were made when creating the session")
+ - Changed how queries are retried internally, previously when a query failed due to an issue with the connection a new connection was picked from the connection pool and the query was retried, now the driver will attempt to retry the query with a new host (and connection). This should make applications connecting to a multi-node cluster more reliable.
 
 ### Fixed
  - Fixed queries not being retried when using `Query()`, queries are now retried if the request failed due to a bad connection.
