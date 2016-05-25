@@ -43,19 +43,19 @@ func constructMethodTerm(prevVal Term, name string, termType p.Term_TermType, ar
 func newQuery(t Term, qopts map[string]interface{}, copts *ConnectOpts) (q Query, err error) {
 	queryOpts := map[string]interface{}{}
 	for k, v := range qopts {
-		queryOpts[k], err = Expr(v).build()
+		queryOpts[k], err = Expr(v).Build()
 		if err != nil {
 			return
 		}
 	}
 	if copts.Database != "" {
-		queryOpts["db"], err = DB(copts.Database).build()
+		queryOpts["db"], err = DB(copts.Database).Build()
 		if err != nil {
 			return
 		}
 	}
 
-	builtTerm, err := t.build()
+	builtTerm, err := t.Build()
 	if err != nil {
 		return q, err
 	}

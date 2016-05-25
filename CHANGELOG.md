@@ -12,6 +12,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
      + Queries can be mocked using `On` and `Return`, `Mock` also contains functions for asserting that the required mocked queries were executed.
      + For more information about how to mock queries see the readme and tests in `mock_test.go`.
 
+## Changed
+
+- Exported the `Build()` function on `Query` and `Term`.
+
 ## v2.0.4 - 2016-05-22
 
 ### Changed

@@ -21,7 +21,7 @@ type Query struct {
 	builtTerm interface{}
 }
 
-func (q *Query) build() []interface{} {
+func (q *Query) Build() []interface{} {
 	res := []interface{}{int(q.Type)}
 	if q.Term != nil {
 		res = append(res, q.builtTerm)
@@ -56,7 +56,7 @@ type Term struct {
 
 // build takes the query tree and prepares it to be sent as a JSON
 // expression
-func (t Term) build() (interface{}, error) {
+func (t Term) Build() (interface{}, error) {
 	var err error
 
 	if t.lastErr != nil {
@@ -73,7 +73,7 @@ func (t Term) build() (interface{}, error) {
 	case p.Term_MAKE_OBJ:
 		res := map[string]interface{}{}
 		for k, v := range t.optArgs {
-			res[k], err = v.build()
+			res[k], err = v.Build()
 			if err != nil {
 				return nil, err
 			}
@@ -92,7 +92,7 @@ func (t Term) build() (interface{}, error) {
 	optArgs := make(map[string]interface{}, len(t.optArgs))
 
 	for i, v := range t.args {
-		arg, err := v.build()
+		arg, err := v.Build()
 		if err != nil {
 			return nil, err
 		}
@@ -100,7 +100,7 @@ func (t Term) build() (interface{}, error) {
 	}
 
 	for k, v := range t.optArgs {
-		optArgs[k], err = v.build()
+		optArgs[k], err = v.Build()
 		if err != nil {
 			return nil, err
 		}
