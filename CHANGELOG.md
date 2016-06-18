@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Added
+
+ - Added ability to mock queries based on the library github.com/stretchr/testify
+     + Added the `QueryExecutor` interface and changed query runner methods (`Run`/`Exec`) to accept this type instead of `*Session`, `Session` will still be accepted as it implements the `QueryExecutor` interface.
+     + Added the `NewMock` function to create a mock query executor
+     + Queries can be mocked using `On` and `Return`, `Mock` also contains functions for asserting that the required mocked queries were executed.
+     + For more information about how to mock queries see the readme and tests in `mock_test.go`.
+
 ## v2.0.4 - 2016-05-22
 
 ### Changed

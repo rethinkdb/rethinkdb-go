@@ -297,6 +297,41 @@ Alternatively if you wish to modify the logging behaviour you can modify the log
 r.Log.Out = ioutil.Discard
 ```
 
+## Mocking
+
+The driver includes the ability to mock queries meaning that you can test your code without needing to talk to a real RethinkDB cluster, this is perfect for ensuring that your application has high unit test coverage.
+
+To write tests with mocking you should create an instance of `Mock` and then setup expectations using `On` and `Return`. Expectations allow you to define what results should be returned when a known query is executed, they are configured by passing the query term you want to mock to `On` and then the response and error to `Return`, if a non-nil error is passed to `Return` then any time that query is executed the error will be returned, if no error is passed then a cursor will be built using the value passed to `Return`. Once all your expectations have been created you should then execute you queries using the `Mock` instead of a `Session`.
+
+Here is an example that shows how to mock a query that returns multiple rows and the resulting cursor can be used as normal.
+
+```go
+func TestSomething(t *testing.T) {
+    mock := r.NewMock()
+    mock.on(r.Table("people")).Return([]interface{}{
+        map[string]interface{}{"id": 1, "name": "John Smith"},
+        map[string]interface{}{"id": 2, "name": "Jane Smith"},
+    }, nil)
+
+    cursor, err := r.Table("people").Run(mock)
+    if err != nil {
+        t.Errorf(err)
+    }
+
+    var rows []interface{}
+    err := res.All(&rows)
+    if err != nil {
+        t.Errorf(err)
+    }
+
+    // Test result of rows
+
+    mock.AssertExpectations(t)
+}
+```
+
+The mocking implementation is based on amazing https://github.com/stretchr/testify library, thanks to @stretchr for their awesome work!
+
 ## Benchmarks
 
 Everyone wants their project's benchmarks to be speedy. And while we know that rethinkDb and the gorethink driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please. 
