@@ -6,12 +6,19 @@ import (
 	"fmt"
 	"sync"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
 // Mocking is based on the amazing package github.com/stretchr/testify
 
+// testingT is an interface wrapper around *testing.T
+type testingT interface {
+	Logf(format string, args ...interface{})
+	Errorf(format string, args ...interface{})
+	FailNow()
+}
+
+// MockQuery represents a mocked query and is used for setting expectations,
+// as well as recording activity.
 type MockQuery struct {
 	parent *Mock
 
@@ -21,10 +28,10 @@ type MockQuery struct {
 	// Holds the JSON representation of query
 	BuiltQuery []byte
 
-	// Holds the response that should be returned when this method is called.
+	// Holds the response that should be returned when this method is executed.
 	Response interface{}
 
-	// Holds the error that should be returned when this method is called.
+	// Holds the error that should be returned when this method is executed.
 	Error error
 
 	// The number of times to return the return arguments when setting
@@ -35,8 +42,8 @@ type MockQuery struct {
 	// recieves a message or is closed. nil means it returns immediately.
 	WaitFor <-chan time.Time
 
-	// Amount of times this call has been called
-	count int
+	// Amount of times this query has been executed
+	executed int
 }
 
 func newMockQuery(parent *Mock, q Query) *MockQuery {
@@ -75,7 +82,7 @@ func (mq *MockQuery) unlock() {
 
 // Return specifies the return arguments for the expectation.
 //
-//    Mock.On("DoSomething").Return(nil, errors.New("failed"))
+//    mock.On(r.Table("test")).Return(nil, errors.New("failed"))
 func (mq *MockQuery) Return(response interface{}, err error) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -88,14 +95,14 @@ func (mq *MockQuery) Return(response interface{}, err error) *MockQuery {
 
 // Once indicates that that the mock should only return the value once.
 //
-//    Mock.On("MyMethod", arg1, arg2).Return(returnArg1, returnArg2).Once()
+//    mock.On(r.Table("test")).Return(result, nil).Once()
 func (mq *MockQuery) Once() *MockQuery {
 	return mq.Times(1)
 }
 
 // Twice indicates that that the mock should only return the value twice.
 //
-//    Mock.On("MyMethod", arg1, arg2).Return(returnArg1, returnArg2).Twice()
+//    mock.On(r.Table("test")).Return(result, nil).Twice()
 func (mq *MockQuery) Twice() *MockQuery {
 	return mq.Times(2)
 }
@@ -103,7 +110,7 @@ func (mq *MockQuery) Twice() *MockQuery {
 // Times indicates that that the mock should only return the indicated number
 // of times.
 //
-//    Mock.On("MyMethod", arg1, arg2).Return(returnArg1, returnArg2).Times(5)
+//    mock.On(r.Table("test")).Return(result, nil).Times(5)
 func (mq *MockQuery) Times(i int) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -114,7 +121,7 @@ func (mq *MockQuery) Times(i int) *MockQuery {
 // WaitUntil sets the channel that will block the mock's return until its closed
 // or a message is received.
 //
-//    Mock.On("MyMethod", arg1, arg2).WaitUntil(time.After(time.Second))
+//    mock.On(r.Table("test")).WaitUntil(time.After(time.Second))
 func (mq *MockQuery) WaitUntil(w <-chan time.Time) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -122,9 +129,9 @@ func (mq *MockQuery) WaitUntil(w <-chan time.Time) *MockQuery {
 	return mq
 }
 
-// After sets how long to block until the call returns
+// After sets how long to block until the query returns
 //
-//    Mock.On("MyMethod", arg1, arg2).After(time.Second)
+//    mock.On(r.Table("test")).After(time.Second)
 func (mq *MockQuery) After(d time.Duration) *MockQuery {
 	return mq.WaitUntil(time.After(d))
 }
@@ -133,12 +140,22 @@ func (mq *MockQuery) After(d time.Duration) *MockQuery {
 // allows syntax like.
 //
 //    Mock.
-//       On("MyMethod", 1).Return(nil).
-//       On("MyOtherMethod", 'a', 'b', 'c').Return(errors.New("Some Error"))
+//       On(r.Table("test")).Return(result, nil).
+//       On(r.Table("test2")).Return(nil, errors.New("Some Error"))
 func (mq *MockQuery) On(t Term) *MockQuery {
 	return mq.parent.On(t)
 }
 
+// Mock is used to mock query execution and verify that the expected queries are
+// being executed. Mocks are used by creating an instance using NewMock and then
+// passing this when running your queries instead of a session. For example:
+//
+//     mock := r.NewMock()
+//     mock.on(r.Table("test")).Return([]interface{}{data}, nil)
+//
+//     cursor, err := r.Table("test").Run(mock)
+//
+//     mock.AssertExpectations(t)
 type Mock struct {
 	mu   sync.Mutex
 	opts ConnectOpts
@@ -147,6 +164,9 @@ type Mock struct {
 	Queries         []MockQuery
 }
 
+// NewMock creates an instance of Mock, you can optionally pass ConnectOpts to
+// the function, if passed any mocked query will be generated using those
+// options.
 func NewMock(opts ...ConnectOpts) *Mock {
 	m := &Mock{
 		ExpectedQueries: make([]*MockQuery, 0),
@@ -160,6 +180,10 @@ func NewMock(opts ...ConnectOpts) *Mock {
 	return m
 }
 
+// On starts a description of an expectation of the specified query
+// being executed.
+//
+//     mock.On(r.Table("test"))
 func (m *Mock) On(t Term, opts ...map[string]interface{}) *MockQuery {
 	var qopts map[string]interface{}
 	if len(opts) > 0 {
@@ -173,6 +197,75 @@ func (m *Mock) On(t Term, opts ...map[string]interface{}) *MockQuery {
 	return mq
 }
 
+// AssertExpectations asserts that everything specified with On and Return was
+// in fact executed as expected. Queries may have been executed in any order.
+func (m *Mock) AssertExpectations(t testingT) bool {
+	var somethingMissing bool
+	var failedExpectations int
+
+	// iterate through each expectation
+	expectedQueries := m.expectedQueries()
+	for _, expectedQuery := range expectedQueries {
+		if !m.queryWasExecuted(expectedQuery) && expectedQuery.executed == 0 {
+			somethingMissing = true
+			failedExpectations++
+			t.Logf("❌\t%s", expectedQuery.Query.Term.String())
+		} else {
+			m.mu.Lock()
+			if expectedQuery.Repeatability > 0 {
+				somethingMissing = true
+				failedExpectations++
+			} else {
+				t.Logf("✅\t%s", expectedQuery.Query.Term.String())
+			}
+			m.mu.Unlock()
+		}
+	}
+
+	if somethingMissing {
+		t.Errorf("FAIL: %d out of %d expectation(s) were met.\n\tThe query you are testing needs to be executed %d more times(s).", len(expectedQueries)-failedExpectations, len(expectedQueries), failedExpectations)
+	}
+
+	return !somethingMissing
+}
+
+// AssertNumberOfExecutions asserts that the query was executed expectedExecutions times.
+func (m *Mock) AssertNumberOfExecutions(t testingT, expectedQuery *MockQuery, expectedExecutions int) bool {
+	var actualExecutions int
+	for _, query := range m.queries() {
+		if bytes.Equal(query.BuiltQuery, expectedQuery.BuiltQuery) {
+			actualExecutions++
+		}
+	}
+
+	if expectedExecutions != actualExecutions {
+		t.Errorf("Expected number of executions (%d) does not match the actual number of executions (%d).", expectedExecutions, actualExecutions)
+		return false
+	}
+
+	return true
+}
+
+// AssertExecuted asserts that the method was executed.
+// It can produce a false result when an argument is a pointer type and the underlying value changed after executing the mocked method.
+func (m *Mock) AssertExecuted(t testingT, expectedQuery *MockQuery) bool {
+	if !m.queryWasExecuted(expectedQuery) {
+		t.Errorf("The query \"%s\" should have been executed, but was not.", expectedQuery.Query.Term.String())
+		return false
+	}
+	return true
+}
+
+// AssertNotExecuted asserts that the method was not executed.
+// It can produce a false result when an argument is a pointer type and the underlying value changed after executing the mocked method.
+func (m *Mock) AssertNotExecuted(t testingT, expectedQuery *MockQuery) bool {
+	if m.queryWasExecuted(expectedQuery) {
+		t.Errorf("The query \"%s\" was executed, but should NOT have been.", expectedQuery.Query.Term.String())
+		return false
+	}
+	return true
+}
+
 func (m *Mock) IsConnected() bool {
 	return true
 }
@@ -181,20 +274,20 @@ func (m *Mock) Query(q Query) (*Cursor, error) {
 	found, query := m.findExpectedQuery(q)
 
 	if found < 0 {
-		panic(fmt.Sprintf("gorethink: mock: This query was unexpected:\n\t\t%s\n\tat: %s", q.Term.String(), assert.CallerInfo()))
+		panic(fmt.Sprintf("gorethink: mock: This query was unexpected:\n\t\t%s", q.Term.String()))
 	} else {
 		m.mu.Lock()
 		switch {
 		case query.Repeatability == 1:
 			query.Repeatability = -1
-			query.count++
+			query.executed++
 
 		case query.Repeatability > 1:
 			query.Repeatability--
-			query.count++
+			query.executed++
 
 		case query.Repeatability == 0:
-			query.count++
+			query.executed++
 		}
 		m.mu.Unlock()
 	}
@@ -251,4 +344,27 @@ func (m *Mock) findExpectedQuery(q Query) (int, *MockQuery) {
 	}
 
 	return -1, nil
+}
+
+func (m *Mock) queryWasExecuted(expectedQuery *MockQuery) bool {
+	for _, query := range m.queries() {
+		if bytes.Equal(query.BuiltQuery, expectedQuery.BuiltQuery) {
+			return true
+		}
+	}
+
+	// we didn't find the expected query
+	return false
+}
+
+func (m *Mock) expectedQueries() []*MockQuery {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return append([]*MockQuery{}, m.ExpectedQueries...)
+}
+
+func (m *Mock) queries() []MockQuery {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return append([]MockQuery{}, m.Queries...)
 }
