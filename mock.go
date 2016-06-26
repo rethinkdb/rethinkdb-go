@@ -48,7 +48,7 @@ type MockQuery struct {
 
 func newMockQuery(parent *Mock, q Query) *MockQuery {
 	// Build and marshal term
-	builtQuery, err := json.Marshal(q.build())
+	builtQuery, err := json.Marshal(q.Build())
 	if err != nil {
 		panic(fmt.Sprintf("Failed to build query: %s", err))
 	}
@@ -329,7 +329,7 @@ func (m *Mock) newQuery(t Term, opts map[string]interface{}) (Query, error) {
 
 func (m *Mock) findExpectedQuery(q Query) (int, *MockQuery) {
 	// Build and marshal query
-	builtQuery, err := json.Marshal(q.build())
+	builtQuery, err := json.Marshal(q.Build())
 	if err != nil {
 		panic(fmt.Sprintf("Failed to build query: %s", err))
 	}
