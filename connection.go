@@ -124,7 +124,7 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT {
 		if c.opts.Database != "" {
 			var err error
-			q.Opts["db"], err = DB(c.opts.Database).build()
+			q.Opts["db"], err = DB(c.opts.Database).Build()
 			if err != nil {
 				c.mu.Unlock()
 				return nil, nil, RQLDriverError{rqlError(err.Error())}
@@ -190,7 +190,7 @@ func (c *Connection) Server() (ServerResponse, error) {
 // sendQuery marshals the Query and sends the JSON to the server.
 func (c *Connection) sendQuery(q Query) error {
 	// Build query
-	b, err := json.Marshal(q.build())
+	b, err := json.Marshal(q.Build())
 	if err != nil {
 		return RQLDriverError{rqlError("Error building query")}
 	}

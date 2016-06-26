@@ -9,8 +9,6 @@ import (
 	"gopkg.in/fatih/pool.v2"
 )
 
-const maxBadConnRetries = 3
-
 var (
 	errPoolClosed = errors.New("gorethink: pool is closed")
 )
@@ -139,25 +137,16 @@ func (p *Pool) SetMaxOpenConns(n int) {
 
 // Exec executes a query without waiting for any response.
 func (p *Pool) Exec(q Query) error {
-	var err error
+	c, pc, err := p.conn()
+	if err != nil {
+		return err
+	}
+	defer pc.Close()
 
-	for i := 0; i < maxBadConnRetries; i++ {
-		var c *Connection
-		var pc *pool.PoolConn
+	_, _, err = c.Query(q)
 
-		c, pc, err = p.conn()
-		if err != nil {
-			continue
-		}
-		defer pc.Close()
-
-		_, _, err = c.Query(q)
-
-		if c.isBad() {
-			pc.MarkUnusable()
-		} else {
-			break
-		}
+	if c.isBad() {
+		pc.MarkUnusable()
 	}
 
 	return err
@@ -165,28 +154,17 @@ func (p *Pool) Exec(q Query) error {
 
 // Query executes a query and waits for the response
 func (p *Pool) Query(q Query) (*Cursor, error) {
-	var cursor *Cursor
-	var err error
+	c, pc, err := p.conn()
+	if err != nil {
+		return nil, err
+	}
 
-	for i := 0; i < maxBadConnRetries; i++ {
-		var c *Connection
-		var pc *pool.PoolConn
+	_, cursor, err := c.Query(q)
 
-		c, pc, err = p.conn()
-		if err != nil {
-			continue
-		}
-
-		_, cursor, err = c.Query(q)
-
-		if err == nil {
-			cursor.releaseConn = releaseConn(c, pc)
-		} else if c.isBad() {
-			pc.MarkUnusable()
-			continue
-		}
-
-		break
+	if err == nil {
+		cursor.releaseConn = releaseConn(c, pc)
+	} else if c.isBad() {
+		pc.MarkUnusable()
 	}
 
 	return cursor, err
@@ -195,25 +173,17 @@ func (p *Pool) Query(q Query) (*Cursor, error) {
 // Server returns the server name and server UUID being used by a connection.
 func (p *Pool) Server() (ServerResponse, error) {
 	var response ServerResponse
-	var err error
 
-	for i := 0; i < maxBadConnRetries; i++ {
-		var c *Connection
-		var pc *pool.PoolConn
+	c, pc, err := p.conn()
+	if err != nil {
+		return response, err
+	}
+	defer pc.Close()
 
-		c, pc, err = p.conn()
-		if err != nil {
-			continue
-		}
-		defer pc.Close()
+	response, err = c.Server()
 
-		response, err = c.Server()
-
-		if c.isBad() {
-			pc.MarkUnusable()
-		} else {
-			break
-		}
+	if c.isBad() {
+		pc.MarkUnusable()
 	}
 
 	return response, err

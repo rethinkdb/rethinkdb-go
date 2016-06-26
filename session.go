@@ -59,6 +59,11 @@ type ConnectOpts struct {
 	// Indicates whether the cursors running in this session should use json.Number instead of float64 while
 	// unmarshaling documents with interface{}. The default is `false`.
 	UseJSONNumber bool
+
+	// NumRetries is the number of times a query is retried if a connection
+	// error is detected, queries are not retried if RethinkDB returns a
+	// runtime error.
+	NumRetries int
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {

@@ -2,10 +2,26 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v2.1.0 - 2016-06-26
+
+### Added
+
+ - Added ability to mock queries based on the library github.com/stretchr/testify
+     + Added the `QueryExecutor` interface and changed query runner methods (`Run`/`Exec`) to accept this type instead of `*Session`, `Session` will still be accepted as it implements the `QueryExecutor` interface.
+     + Added the `NewMock` function to create a mock query executor
+     + Queries can be mocked using `On` and `Return`, `Mock` also contains functions for asserting that the required mocked queries were executed.
+     + For more information about how to mock queries see the readme and tests in `mock_test.go`.
+
+## Changed
+
+- Exported the `Build()` function on `Query` and `Term`.
+- Updated import of `github.com/cenkalti/backoff` to `github.com/cenk/backoff`
+
 ## v2.0.4 - 2016-05-22
 
 ### Changed
  - Changed `Connect` to return the reason for connections failing (instead of just "no connections were made when creating the session")
+ - Changed how queries are retried internally, previously when a query failed due to an issue with the connection a new connection was picked from the connection pool and the query was retried, now the driver will attempt to retry the query with a new host (and connection). This should make applications connecting to a multi-node cluster more reliable.
 
 ### Fixed
  - Fixed queries not being retried when using `Query()`, queries are now retried if the request failed due to a bad connection.

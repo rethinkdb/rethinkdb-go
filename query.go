@@ -21,7 +21,7 @@ type Query struct {
 	builtTerm interface{}
 }
 
-func (q *Query) build() []interface{} {
+func (q *Query) Build() []interface{} {
 	res := []interface{}{int(q.Type)}
 	if q.Term != nil {
 		res = append(res, q.builtTerm)
@@ -56,7 +56,7 @@ type Term struct {
 
 // build takes the query tree and prepares it to be sent as a JSON
 // expression
-func (t Term) build() (interface{}, error) {
+func (t Term) Build() (interface{}, error) {
 	var err error
 
 	if t.lastErr != nil {
@@ -73,7 +73,7 @@ func (t Term) build() (interface{}, error) {
 	case p.Term_MAKE_OBJ:
 		res := map[string]interface{}{}
 		for k, v := range t.optArgs {
-			res[k], err = v.build()
+			res[k], err = v.Build()
 			if err != nil {
 				return nil, err
 			}
@@ -92,7 +92,7 @@ func (t Term) build() (interface{}, error) {
 	optArgs := make(map[string]interface{}, len(t.optArgs))
 
 	for i, v := range t.args {
-		arg, err := v.build()
+		arg, err := v.Build()
 		if err != nil {
 			return nil, err
 		}
@@ -100,7 +100,7 @@ func (t Term) build() (interface{}, error) {
 	}
 
 	for k, v := range t.optArgs {
-		optArgs[k], err = v.build()
+		optArgs[k], err = v.Build()
 		if err != nil {
 			return nil, err
 		}
@@ -171,6 +171,14 @@ type OptArgs interface {
 	toMap() map[string]interface{}
 }
 
+type QueryExecutor interface {
+	IsConnected() bool
+	Query(Query) (*Cursor, error)
+	Exec(Query) error
+
+	newQuery(t Term, opts map[string]interface{}) (Query, error)
+}
+
 // WriteResponse is a helper type used when dealing with the response of a
 // write query. It is also returned by the RunWrite function.
 type WriteResponse struct {
@@ -236,7 +244,7 @@ func (o *RunOpts) toMap() map[string]interface{} {
 //	for rows.Next(&doc) {
 //      // Do something with document
 //	}
-func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
+func (t Term) Run(s QueryExecutor, optArgs ...RunOpts) (*Cursor, error) {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
@@ -261,7 +269,7 @@ func (t Term) Run(s *Session, optArgs ...RunOpts) (*Cursor, error) {
 // If an error occurs when running the write query the first error is returned.
 //
 //	res, err := r.DB("database").Table("table").Insert(doc).RunWrite(sess)
-func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
+func (t Term) RunWrite(s QueryExecutor, optArgs ...RunOpts) (WriteResponse, error) {
 	var response WriteResponse
 
 	res, err := t.Run(s, optArgs...)
@@ -285,7 +293,7 @@ func (t Term) RunWrite(s *Session, optArgs ...RunOpts) (WriteResponse, error) {
 // and reads one response from the cursor before closing it.
 //
 // It returns any errors encountered from running the query or reading the response
-func (t Term) ReadOne(dest interface{}, s *Session, optArgs ...RunOpts) error {
+func (t Term) ReadOne(dest interface{}, s QueryExecutor, optArgs ...RunOpts) error {
 	res, err := t.Run(s, optArgs...)
 	if err != nil {
 		return err
@@ -297,7 +305,7 @@ func (t Term) ReadOne(dest interface{}, s *Session, optArgs ...RunOpts) error {
 // and reads all of the responses from the cursor before closing it.
 //
 // It returns any errors encountered from running the query or reading the responses
-func (t Term) ReadAll(dest interface{}, s *Session, optArgs ...RunOpts) error {
+func (t Term) ReadAll(dest interface{}, s QueryExecutor, optArgs ...RunOpts) error {
 	res, err := t.Run(s, optArgs...)
 	if err != nil {
 		return err
@@ -342,10 +350,14 @@ func (o *ExecOpts) toMap() map[string]interface{} {
 //	err := r.DB("database").Table("table").Insert(doc).Exec(sess, r.ExecOpts{
 //		NoReply: true,
 //	})
-func (t Term) Exec(s *Session, optArgs ...ExecOpts) error {
+func (t Term) Exec(s QueryExecutor, optArgs ...ExecOpts) error {
 	opts := map[string]interface{}{}
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
+	}
+
+	if s == nil || !s.IsConnected() {
+		return ErrConnectionClosed
 	}
 
 	q, err := s.newQuery(t, opts)
