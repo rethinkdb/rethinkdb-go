@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v2.1.0 - 2016-06-26
 
 ### Added
 
@@ -15,6 +15,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ## Changed
 
 - Exported the `Build()` function on `Query` and `Term`.
+- Updated import of `github.com/cenkalti/backoff` to `github.com/cenk/backoff`
 
 ## v2.0.4 - 2016-05-22
 
