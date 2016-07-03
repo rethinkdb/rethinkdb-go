@@ -126,10 +126,14 @@ func (s *RethinkSuite) TestSessionConnectDatabase(c *test.C) {
 		Database: "test2",
 	})
 	c.Assert(err, test.IsNil)
+	c.Assert(session.Database(), test.Equals, "test2")
 
 	_, err = Table("test2").Run(session)
 	c.Assert(err, test.NotNil)
 	c.Assert(err.Error(), test.Equals, "gorethink: Database `test2` does not exist. in: \nr.Table(\"test2\")")
+
+	session.Use("test3")
+	c.Assert(session.Database(), test.Equals, "test3")
 }
 
 func (s *RethinkSuite) TestSessionConnectUsername(c *test.C) {

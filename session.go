@@ -132,6 +132,9 @@ func (o *CloseOpts) toMap() map[string]interface{} {
 
 // IsConnected returns true if session has a valid connection.
 func (s *Session) IsConnected() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	if s.cluster == nil || s.closed {
 		return false
 	}
@@ -221,10 +224,18 @@ func (s *Session) NoReplyWait() error {
 
 // Use changes the default database used
 func (s *Session) Use(database string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.opts.Database = database
+}
+
+// Database returns the selected database set by Use
+func (s *Session) Database() string {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
-	s.opts.Database = database
+	return s.opts.Database
 }
 
 // Query executes a ReQL query using the session to connect to the database
