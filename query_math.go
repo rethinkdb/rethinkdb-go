@@ -153,7 +153,7 @@ func Not(args ...interface{}) Term {
 
 // RandomOpts contains the optional arguments for the Random term.
 type RandomOpts struct {
-	Float bool `gorethink:"float,omitempty"`
+	Float interface{} `gorethink:"float,omitempty"`
 }
 
 func (o *RandomOpts) toMap() map[string]interface{} {
