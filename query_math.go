@@ -153,25 +153,34 @@ func Not(args ...interface{}) Term {
 
 // RandomOpts contains the optional arguments for the Random term.
 type RandomOpts struct {
-	Float interface{} `gorethink:"float,omitempty"`
+	Float bool `gorethink:"float,omitempty"`
 }
 
 func (o *RandomOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
-// Random generates a random number between the given bounds. If no arguments
-// are given, the result will be a floating-point number in the range [0,1).
+// Random generates a random number between given (or implied) bounds. Random
+// takes zero, one or two arguments.
 //
-// When passing a single argument, r.random(x), the result will be in the
-// range [0,x), and when passing two arguments, r.random(x,y), the range is
-// [x,y). If x and y are equal, an error will occur, unless generating a
-// floating-point number, for which x will be returned.
+// With zero arguments, the result will be a floating-point number in the range
+// [0,1).
 //
-// Note: The last argument given will always be the 'open' side of the range,
-// but when generating a floating-point number, the 'open' side may be less
-// than the 'closed' side.
-func (t Term) Random(args ...interface{}) Term {
+// With one argument x, the result will be in the range [0,x), and will be an
+// integer unless the Float option is set to true. Specifying a floating point
+// number without the Float option will raise an error.
+//
+// With two arguments x and y, the result will be in the range [x,y), and will
+// be an integer unless the Float option is set to true. If x and y are equal an
+// error will occur, unless the floating-point option has been specified, in
+// which case x will be returned. Specifying a floating point number without the
+// float option will raise an error.
+//
+// Note: Any integer responses can be be coerced to floating-points, when
+// unmarshaling to a Go floating-point type. The last argument given will always
+// be the ‘open’ side of the range,  but when generating a floating-point
+// number, the ‘open’ side may be less than the ‘closed’ side.
+func Random(args ...interface{}) Term {
 	var opts = map[string]interface{}{}
 
 	// Look for options map
@@ -182,7 +191,7 @@ func (t Term) Random(args ...interface{}) Term {
 		}
 	}
 
-	return constructMethodTerm(t, "Random", p.Term_RANDOM, args, opts)
+	return constructRootTerm("Random", p.Term_RANDOM, args, opts)
 }
 
 // Round causes the input number to be rounded the given value to the nearest whole integer.
