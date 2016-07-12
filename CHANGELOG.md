@@ -4,9 +4,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-### Added
+### v2.1.1 - 2016-07-12
 
  - Added `session.Database()` which returns the current default database
+
+### Changed
+ - Added more documentation
+
+### Fixed
+ - Fixed `Random()` not being implemented correctly and added tests (Thanks to @bakape for the PR)
 
 ## v2.1.0 - 2016-06-26
 
