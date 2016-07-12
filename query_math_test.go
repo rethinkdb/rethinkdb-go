@@ -1,8 +1,6 @@
 package gorethink
 
-import (
-	test "gopkg.in/check.v1"
-)
+import test "gopkg.in/check.v1"
 
 func (s *RethinkSuite) TestMathAdd(c *test.C) {
 	query := Expr(1).Add(2)
@@ -327,4 +325,60 @@ func (s *RethinkSuite) TestMathMethodFloor(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, test.Equals, 2)
+}
+
+func (s *RethinkSuite) TestMathRootRandom(c *test.C) {
+	samples := [...]struct {
+		args     []interface{}
+		isFloat  bool
+		min, max interface{}
+	}{
+		{
+			[]interface{}{},
+			true, float64(0), float64(1),
+		},
+		{
+			[]interface{}{2},
+			false, 0, 2,
+		},
+		{
+			[]interface{}{1, 3},
+			false, 1, 3,
+		},
+		{
+			[]interface{}{1, 3},
+			true, float64(1), float64(3),
+		},
+		{
+			[]interface{}{1, 3, RandomOpts{true}},
+			true, float64(1), float64(3),
+		},
+		{
+			[]interface{}{1.0, 3.0, RandomOpts{true}},
+			true, float64(1), float64(3),
+		},
+	}
+
+	for _, s := range samples {
+		r, err := Random(s.args...).Run(session)
+		c.Assert(err, test.IsNil)
+
+		if s.isFloat {
+			var res float64
+			c.Assert(r.One(&res), test.IsNil)
+			min := s.min.(float64)
+			max := s.max.(float64)
+			if !(res >= min && res < max) {
+				c.Fatalf("value outside range %g...%g: %g", min, max, res)
+			}
+		} else {
+			var res int
+			c.Assert(r.One(&res), test.IsNil)
+			min := s.min.(int)
+			max := s.max.(int)
+			if !(res >= min && res < max) {
+				c.Fatalf("value outside range %d...%d: %d", min, max, res)
+			}
+		}
+	}
 }
