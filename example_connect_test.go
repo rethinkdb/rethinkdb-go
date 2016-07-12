@@ -2,11 +2,21 @@ package gorethink_test
 
 import (
 	"log"
+	"os"
 
 	r "github.com/dancannon/gorethink"
 )
 
 var session *r.Session
+var url string
+
+func init() {
+	// If the test is being run by wercker look for the rethink url
+	url = os.Getenv("RETHINKDB_URL")
+	if url == "" {
+		url = "localhost:28015"
+	}
+}
 
 func ExampleConnect() {
 	var err error

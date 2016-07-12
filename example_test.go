@@ -8,14 +8,14 @@ import (
 )
 
 func Example() {
-	session, err := r.Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	res, err := Expr("Hello World").Run(session)
+	res, err := r.Expr("Hello World").Run(session)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -23,7 +23,7 @@ func Example() {
 	var response string
 	err = res.One(&response)
 	if err != nil {
-		Log.Fatalln(err)
+		log.Fatalln(err)
 	}
 
 	fmt.Println(response)
