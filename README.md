@@ -298,6 +298,13 @@ When encoding maps with non-string keys the key values are automatically convert
 
 If you wish to use the `json` tags for GoRethink then you can call `SetTags("gorethink", "json")` when starting your program, this will cause GoRethink to check for `json` tags after checking for `gorethink` tags. By default this feature is disabled. This function will also let you support any other tags, the driver will check for tags in the same order as the parameters.
 
+#### Pseudo-types
+
+RethinkDB contains some special types which can be used to store special value types, currently supports are binary values, times and geometry data types. GoRethink supports these data types natively however there are some gotchas:
+ - Time types: To store times in RethinkDB with GoRethink you must pass a `time.Time` value to your query, due to the way Go works type aliasing or embedding is not support here
+ - Binary types: To store binary data pass a byte slice (`[]byte`) to your query
+ - Geometry types: As Go does not include any built-in data structures for storing geometry data GoRethink includes its own in the `github.com/dancannon/gorethink/types` package, Any of the types (`Geometry`, `Point`, `Line` and `Lines`) can be passed to a query to create a RethinkDB geometry type.
+
 ### References
 
 Sometimes you may want to use a Go struct that references a document in another table, instead of creating a new struct which is just used when writing to RethinkDB you can annotate your struct with the reference tag option. This will tell GoRethink that when encoding your data it should "pluck" the ID field from the nested document and use that instead.
