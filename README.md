@@ -26,28 +26,65 @@ go get gopkg.in/dancannon/gorethink.v2
 go get gopkg.in/dancannon/gorethink.v1
 ```
 
+## Example
+
+[embedmd]:# (example_test.go go)
+```go
+package gorethink_test
+
+import (
+	"fmt"
+	"log"
+
+	r "github.com/dancannon/gorethink"
+)
+
+func Example() {
+	session, err := r.Connect(ConnectOpts{
+		Address: url,
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	res, err := Expr("Hello World").Run(session)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var response string
+	err = res.One(&response)
+	if err != nil {
+		Log.Fatalln(err)
+	}
+
+	fmt.Println(response)
+
+	// Output:
+	// Hello World
+}
+```
+
 ## Connection
 
 ### Basic Connection
 
 Setting up a basic connection with RethinkDB is simple:
 
+[embedmd]:# (example_connect_test.go go /func ExampleConnect\(\) {/ /(?m)^}/)
 ```go
-import (
-    r "github.com/dancannon/gorethink"
-    "log"
-)
+func ExampleConnect() {
+	var err error
 
-var session *r.Session
-
-session, err := r.Connect(r.ConnectOpts{
-    Address: "localhost:28015",
-})
-if err != nil {
-    log.Fatalln(err.Error())
+	session, err = r.Connect(r.ConnectOpts{
+		Address: url,
+	})
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }
-
 ```
+
 See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect) for a list of supported arguments to Connect().
 
 ### Connection Pool
@@ -56,37 +93,38 @@ The driver uses a connection pool at all times, by default it creates and frees 
 
 To configure the connection pool `MaxIdle`, `MaxOpen` and `Timeout` can be specified during connection. If you wish to change the value of `MaxIdle` or `MaxOpen` during runtime then the functions `SetMaxIdleConns` and `SetMaxOpenConns` can be used.
 
+[embedmd]:# (example_connect_test.go go /func ExampleConnect_connectionPool\(\) {/ /(?m)^}/)
 ```go
-var session *r.Session
+func ExampleConnect_connectionPool() {
+	var err error
 
-session, err := r.Connect(r.ConnectOpts{
-    Address: "localhost:28015",
-    Database: "test",
-    MaxIdle: 10,
-    MaxOpen: 10,
-})
-if err != nil {
-    log.Fatalln(err.Error())
+	session, err = r.Connect(r.ConnectOpts{
+		Address: url,
+		MaxIdle: 10,
+		MaxOpen: 10,
+	})
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }
-
-session.SetMaxOpenConns(5)
 ```
 
 ### Connect to a cluster
 
 To connect to a RethinkDB cluster which has multiple nodes you can use the following syntax. When connecting to a cluster with multiple nodes queries will be distributed between these nodes.
 
+[embedmd]:# (example_connect_test.go go /func ExampleConnect_cluster\(\) {/ /(?m)^}/)
 ```go
-var session *r.Session
+func ExampleConnect_cluster() {
+	var err error
 
-session, err := r.Connect(r.ConnectOpts{
-    Addresses: []string{"localhost:28015", "localhost:28016"},
-    Database: "test",
-    AuthKey:  "14daak1cad13dj",
-    DiscoverHosts: true,
-})
-if err != nil {
-    log.Fatalln(err.Error())
+	session, err = r.Connect(r.ConnectOpts{
+		Addresses: []string{url},
+		//  Addresses: []string{url1, url2, url3, ...},
+	})
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }
 ```
 
@@ -156,6 +194,18 @@ r.DB("database").Table("table").Between(1, 10, r.BetweenOpts{
     Index: "num",
     RightBound: "closed",
 }).Run(session)
+```
+
+For any queries which use callbacks the function signature is important as your function needs to be a valid GoRethink callback, you can see an example of this in the map example above. The simplified explanation is that all arguments must be of type `r.Term`, this is because of how the query is sent to the database (your callback is not actually executed in your Go application but encoded as JSON and executed by RethinkDB). The return argument can be anything you want it to be (as long as it is a valid return value for the current query) so it usually makes sense to return `interface{}`. Here is an example of a callback for the conflict callback of an insert operation:
+
+```go
+r.Table("test").Insert(doc, r.InsertOpts{
+    Conflict: func(id, oldDoc, newDoc r.Term) interface{} {
+        return newDoc.Merge(map[string]interface{}{
+            "count": oldDoc.Add(newDoc.Field("count")),
+        })
+    },
+})
 ```
 
 ### Optional Arguments
@@ -367,6 +417,8 @@ BenchmarkSequentialSoftWritesParallel10      10000                           263
 ## Examples
 
 Many functions have examples and are viewable in the godoc, alternatively view some more full features examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).
+
+Another good place to find examples are the tests, almost every term will have a couple of tests that demonstrate how they can be used.
 
 ## Further reading
 

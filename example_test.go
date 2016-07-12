@@ -1,26 +1,29 @@
-package gorethink
+package gorethink_test
 
 import (
 	"fmt"
+	"log"
+
+	r "github.com/dancannon/gorethink"
 )
 
 func Example() {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(ConnectOpts{
 		Address: url,
 	})
 	if err != nil {
-		Log.Fatalln(err.Error())
+		log.Fatalln(err)
 	}
 
 	res, err := Expr("Hello World").Run(session)
 	if err != nil {
-		Log.Fatalln(err.Error())
+		log.Fatalln(err)
 	}
 
 	var response string
 	err = res.One(&response)
 	if err != nil {
-		Log.Fatalln(err.Error())
+		Log.Fatalln(err)
 	}
 
 	fmt.Println(response)
