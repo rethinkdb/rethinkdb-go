@@ -375,9 +375,9 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 
 	rand.Seed(time.Now().UnixNano())
 	sess, _ := Connect(ConnectOpts{
-		Address: url,
-		MaxOpen: 200,
-		MaxIdle: 200,
+		Address:    url,
+		MaxOpen:    200,
+		InitialCap: 200,
 	})
 
 	// Ensure table + database exist

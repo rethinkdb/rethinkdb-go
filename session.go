@@ -60,9 +60,25 @@ type ConnectOpts struct {
 	// later. If you are using an older version then you can set the handshake
 	// version to 0.4
 	HandshakeVersion HandshakeVersion `gorethink:"handshake_version,omitempty"`
+	// UseJSONNumber indicates whether the cursors running in this session should
+	// use json.Number instead of float64 while unmarshaling documents with
+	// interface{}. The default is `false`.
+	UseJSONNumber bool
+	// NumRetries is the number of times a query is retried if a connection
+	// error is detected, queries are not retried if RethinkDB returns a
+	// runtime error.
+	NumRetries int
 
-	MaxIdle int `gorethink:"max_idle,omitempty"`
-	// By default a maximum of 2 connections are opened per host.
+	// InitialCap is used by the internal connection pool and is used to
+	// configure how many connections are created for each host when the
+	// session is created. If zero then no connections are created until
+	// the first query is executed.
+	InitialCap int `gorethink:"initial_cap,omitempty"`
+	// MaxOpen is used by the internal connection pool and is used to configure
+	// the maximum number of connections held in the pool. If all available
+	// connections are being used then the driver will open new connections as
+	// needed however they will not be returned to the pool. By default the
+	// maximum number of connections is 2
 	MaxOpen int `gorethink:"max_open,omitempty"`
 
 	// Below options are for cluster discovery, please note there is a high
@@ -72,24 +88,15 @@ type ConnectOpts struct {
 	// will attempt to discover any new nodes added to the cluster and then
 	// start sending queries to these new nodes.
 	DiscoverHosts bool `gorethink:"discover_hosts,omitempty"`
-	// NodeRefreshInterval is used to determine how often the driver should
-	// refresh the status of a node.
-	//
-	// Deprecated: This function is no longer used due to changes in the
-	// way hosts are selected.
-	NodeRefreshInterval time.Duration `gorethink:"node_refresh_interval,omitempty"`
 	// HostDecayDuration is used by the go-hostpool package to calculate a weighted
 	// score when selecting a host. By default a value of 5 minutes is used.
 	HostDecayDuration time.Duration
 
-	// Indicates whether the cursors running in this session should use json.Number instead of float64 while
-	// unmarshaling documents with interface{}. The default is `false`.
-	UseJSONNumber bool
-
-	// NumRetries is the number of times a query is retried if a connection
-	// error is detected, queries are not retried if RethinkDB returns a
-	// runtime error.
-	NumRetries int
+	// Deprecated: This function is no longer used due to changes in the
+	// way hosts are selected.
+	NodeRefreshInterval time.Duration `gorethink:"node_refresh_interval,omitempty"`
+	// Deprecated: Use InitialCap instead
+	MaxIdle int `gorethink:"max_idle,omitempty"`
 }
 
 func (o *ConnectOpts) toMap() map[string]interface{} {
@@ -211,6 +218,15 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	s.closed = true
 
 	return nil
+}
+
+// SetInitalPoolCap sets the initial capacity of the connection pool.
+func (s *Session) SetInitalPoolCap(n int) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.opts.InitialCap = n
+	s.cluster.SetInitalPoolCap(n)
 }
 
 // SetMaxIdleConns sets the maximum number of connections in the idle

@@ -40,14 +40,14 @@ import (
 )
 
 func Example() {
-	session, err := r.Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	res, err := Expr("Hello World").Run(session)
+	res, err := r.Expr("Hello World").Run(session)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -55,7 +55,7 @@ func Example() {
 	var response string
 	err = res.One(&response)
 	if err != nil {
-		Log.Fatalln(err)
+		log.Fatalln(err)
 	}
 
 	fmt.Println(response)
@@ -91,7 +91,7 @@ See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect)
 
 The driver uses a connection pool at all times, by default it creates and frees connections automatically. It's safe for concurrent use by multiple goroutines.
 
-To configure the connection pool `MaxIdle`, `MaxOpen` and `Timeout` can be specified during connection. If you wish to change the value of `MaxIdle` or `MaxOpen` during runtime then the functions `SetMaxIdleConns` and `SetMaxOpenConns` can be used.
+To configure the connection pool `InitlaCap`, `MaxOpen` and `Timeout` can be specified during connection. If you wish to change the value of `InitlaCap` or `MaxOpen` during runtime then the functions `SetInitalPoolCap` and `SetMaxOpenConns` can be used.
 
 [embedmd]:# (example_connect_test.go go /func ExampleConnect_connectionPool\(\) {/ /(?m)^}/)
 ```go
@@ -99,9 +99,9 @@ func ExampleConnect_connectionPool() {
 	var err error
 
 	session, err = r.Connect(r.ConnectOpts{
-		Address: url,
-		MaxIdle: 10,
-		MaxOpen: 10,
+		Address:   url,
+		InitalCap: 10,
+		MaxOpen:   10,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())

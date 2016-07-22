@@ -66,7 +66,7 @@ func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
 		Addresses:           []string{url1, url2, url3},
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
-		MaxIdle:             50,
+		InitialCap:          50,
 		MaxOpen:             200,
 	})
 	c.Assert(err, test.IsNil)

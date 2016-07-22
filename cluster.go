@@ -123,6 +123,13 @@ func (c *Cluster) Server() (response ServerResponse, err error) {
 	return response, err
 }
 
+// SetInitalPoolCap sets the initial capacity of the connection pool.
+func (c *Cluster) SetInitalPoolCap(n int) {
+	for _, node := range c.GetNodes() {
+		node.SetInitalPoolCap(n)
+	}
+}
+
 // SetMaxIdleConns sets the maximum number of connections in the idle
 // connection pool.
 func (c *Cluster) SetMaxIdleConns(n int) {

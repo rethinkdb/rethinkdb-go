@@ -20,20 +20,25 @@ type Pool struct {
 
 	pool pool.Pool
 
-	mu      sync.RWMutex // protects following fields
-	closed  bool
-	maxIdle int
-	maxOpen int
+	mu     sync.RWMutex // protects following fields
+	closed bool
 }
 
 // NewPool creates a new connection pool for the given host
 func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
+	initialCap := opts.InitialCap
+	if initialCap <= 0 {
+		// Fallback to MaxIdle if InitialCap is zero, this should be removed
+		// when MaxIdle is removed
+		initialCap = opts.MaxIdle
+	}
+
 	maxOpen := opts.MaxOpen
-	if maxOpen == 0 {
+	if maxOpen <= 0 {
 		maxOpen = 2
 	}
 
-	p, err := pool.NewChannelPool(opts.MaxIdle, maxOpen, func() (net.Conn, error) {
+	p, err := pool.NewChannelPool(initialCap, maxOpen, func() (net.Conn, error) {
 		conn, err := NewConnection(host.String(), opts)
 		if err != nil {
 			return nil, err
@@ -106,13 +111,15 @@ func (p *Pool) conn() (*Connection, *pool.PoolConn, error) {
 	return conn, pc, nil
 }
 
+// SetInitalPoolCap sets the initial capacity of the connection pool.
+//
+// Deprecated: This value should only be set when connecting
+func (p *Pool) SetInitalPoolCap(n int) {
+	return
+}
+
 // SetMaxIdleConns sets the maximum number of connections in the idle
 // connection pool.
-//
-// If MaxOpenConns is greater than 0 but less than the new MaxIdleConns
-// then the new MaxIdleConns will be reduced to match the MaxOpenConns limit
-//
-// If n <= 0, no idle connections are retained.
 //
 // Deprecated: This value should only be set when connecting
 func (p *Pool) SetMaxIdleConns(n int) {
@@ -120,13 +127,6 @@ func (p *Pool) SetMaxIdleConns(n int) {
 }
 
 // SetMaxOpenConns sets the maximum number of open connections to the database.
-//
-// If MaxIdleConns is greater than 0 and the new MaxOpenConns is less than
-// MaxIdleConns, then MaxIdleConns will be reduced to match the new
-// MaxOpenConns limit
-//
-// If n <= 0, then there is no limit on the number of open connections.
-// The default is 0 (unlimited).
 //
 // Deprecated: This value should only be set when connecting
 func (p *Pool) SetMaxOpenConns(n int) {
