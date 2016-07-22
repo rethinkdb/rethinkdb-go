@@ -36,7 +36,7 @@ import (
 	"fmt"
 	"log"
 
-	r "github.com/dancannon/gorethink"
+	r "gopkg.in/dancannon/gorethink.v2"
 )
 
 func Example() {
@@ -99,9 +99,9 @@ func ExampleConnect_connectionPool() {
 	var err error
 
 	session, err = r.Connect(r.ConnectOpts{
-		Address:   url,
-		InitalCap: 10,
-		MaxOpen:   10,
+		Address:    url,
+		InitialCap: 10,
+		MaxOpen:    10,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
