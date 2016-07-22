@@ -13,7 +13,8 @@ import (
 )
 
 const (
-	respHeaderLen = 12
+	respHeaderLen          = 12
+	defaultKeepAlivePeriod = time.Second * 30
 )
 
 // Response represents the raw response from a query, most of the time you
@@ -52,8 +53,14 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		opts:    opts,
 		cursors: make(map[int64]*Cursor),
 	}
+
+	keepAlivePeriod := defaultKeepAlivePeriod
+	if opts.KeepAlivePeriod > 0 {
+		keepAlivePeriod = opts.KeepAlivePeriod
+	}
+
 	// Connect to Server
-	nd := net.Dialer{Timeout: c.opts.Timeout, KeepAlive: opts.KeepAlivePeriod}
+	nd := net.Dialer{Timeout: c.opts.Timeout, KeepAlive: keepAlivePeriod}
 	if c.opts.TLSConfig == nil {
 		c.Conn, err = nd.Dial("tcp", address)
 	} else {
@@ -61,16 +68,6 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 	}
 	if err != nil {
 		return nil, RQLConnectionError{rqlError(err.Error())}
-	}
-
-	// Enable TCP Keepalives on TCP connections
-	if tc, ok := c.Conn.(*net.TCPConn); ok {
-		if err := tc.SetKeepAlive(true); err != nil {
-			// Don't send COM_QUIT before handshake.
-			c.Conn.Close()
-			c.Conn = nil
-			return nil, err
-		}
 	}
 
 	// Send handshake
