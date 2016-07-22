@@ -21,18 +21,44 @@ type Session struct {
 
 // ConnectOpts is used to specify optional arguments when connecting to a cluster.
 type ConnectOpts struct {
-	Address      string        `gorethink:"address,omitempty"`
-	Addresses    []string      `gorethink:"addresses,omitempty"`
-	Database     string        `gorethink:"database,omitempty"`
-	Username     string        `gorethink:"username,omitempty"`
-	Password     string        `gorethink:"password,omitempty"`
-	AuthKey      string        `gorethink:"authkey,omitempty"` // Deprecated
-	Timeout      time.Duration `gorethink:"timeout,omitempty"`
+	// Address holds the address of the server initially used when creating the
+	// session. Only used if Addresses is empty
+	Address string `gorethink:"address,omitempty"`
+	// Addresses holds the addresses of the servers initially used when creating
+	// the session.
+	Addresses []string `gorethink:"addresses,omitempty"`
+	// Database is the default database name used when executing queries, this
+	// value is only used if the query does not contain any DB term
+	Database string `gorethink:"database,omitempty"`
+	// Username holds the username used for authentication, if blank (and the v1
+	// handshake protocol is being used) then the admin user is used
+	Username string `gorethink:"username,omitempty"`
+	// Password holds the password used for authentication (only used when using
+	// the v1 handshake protocol)
+	Password string `gorethink:"password,omitempty"`
+	// AuthKey is used for authentication when using the v0.4 handshake protocol
+	// This field is no deprecated
+	AuthKey string `gorethink:"authkey,omitempty"`
+	// Timeout is the time the driver waits when creating new connections, to
+	// configure the timeout used when executing queries use WriteTimeout and
+	// ReadTimeout
+	Timeout time.Duration `gorethink:"timeout,omitempty"`
+	// WriteTimeout is the amount of time the driver will wait when sending the
+	// query to the server
 	WriteTimeout time.Duration `gorethink:"write_timeout,omitempty"`
-	ReadTimeout  time.Duration `gorethink:"read_timeout,omitempty"`
-	// The duration in which a connection should send a keep-alive.
-	KeepAlivePeriod  time.Duration    `gorethink:"keep_alive_timeout,omitempty"`
-	TLSConfig        *tls.Config      `gorethink:"tlsconfig,omitempty"`
+	// ReadTimeout is the amount of time the driver will wait for a response from
+	// the server when executing queries.
+	ReadTimeout time.Duration `gorethink:"read_timeout,omitempty"`
+	// KeepAlivePeriod is the keep alive period used by the connection, by default
+	// this is 30s. It is not possible to disable keep alive messages
+	KeepAlivePeriod time.Duration `gorethink:"keep_alive_timeout,omitempty"`
+	// TLSConfig holds the TLS configuration and can be used when connecting
+	// to a RethinkDB server protected by SSL
+	TLSConfig *tls.Config `gorethink:"tlsconfig,omitempty"`
+	// HandshakeVersion is used to specify which handshake version should be
+	// used, this currently defaults to v1 which is used by RethinkDB 2.3 and
+	// later. If you are using an older version then you can set the handshake
+	// version to 0.4
 	HandshakeVersion HandshakeVersion `gorethink:"handshake_version,omitempty"`
 
 	MaxIdle int `gorethink:"max_idle,omitempty"`
