@@ -4,7 +4,24 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
-### v2.1.1 - 2016-07-12
+### Added
+
+ - Added the `InitialCap` field to `ConnectOpts` to replace `MaxIdle` as the name no longer made sense.
+
+### Changed
+
+ - Improved documentation of ConnectOpts
+ - Default value for `KeepAlivePeriod` changed from `0` to `30s`
+
+### Deprecated
+
+ - Deprecated the field `MaxIdle` in `ConnectOpts`, it has now been replaced by `InitialCap` which has the same behaviour as before. Setting both fields will still work until the field is removed in a future version.
+
+### Fixed
+
+ - Fixed issue causing changefeeds to hang if no data was received
+
+## v2.1.1 - 2016-07-12
 
  - Added `session.Database()` which returns the current default database
 
