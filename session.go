@@ -99,7 +99,7 @@ type ConnectOpts struct {
 	MaxIdle int `gorethink:"max_idle,omitempty"`
 }
 
-func (o *ConnectOpts) toMap() map[string]interface{} {
+func (o ConnectOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -159,7 +159,7 @@ type CloseOpts struct {
 	NoReplyWait bool `gorethink:"noreplyWait,omitempty"`
 }
 
-func (o *CloseOpts) toMap() map[string]interface{} {
+func (o CloseOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

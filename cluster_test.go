@@ -59,5 +59,5 @@ func (s *RethinkSuite) TestClusterConnectDatabase(c *test.C) {
 
 	_, err = Table("test2").Run(session)
 	c.Assert(err, test.NotNil)
-	c.Assert(err.Error(), test.Equals, "gorethink: Database `test2` does not exist. in: \nr.Table(\"test2\")")
+	c.Assert(err.Error(), test.Equals, "gorethink: Database `test2` does not exist. in:\nr.Table(\"test2\")")
 }

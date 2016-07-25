@@ -16,7 +16,7 @@ type TableOpts struct {
 	IdentifierFormat interface{} `gorethink:"identifier_format,omitempty"`
 }
 
-func (o *TableOpts) toMap() map[string]interface{} {
+func (o TableOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -61,6 +61,15 @@ func (t Term) Get(args ...interface{}) Term {
 	return constructMethodTerm(t, "Get", p.Term_GET, args, map[string]interface{}{})
 }
 
+// GetAllOpts contains the optional arguments for the GetAll term
+type GetAllOpts struct {
+	Index interface{} `gorethink:"index,omitempty"`
+}
+
+func (o GetAllOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // GetAll gets all documents where the given value matches the value of the primary
 // index. Multiple values can be passed this function if you want to select multiple
 // documents. If the documents you are fetching have composite keys then each
@@ -82,7 +91,7 @@ type BetweenOpts struct {
 	RightBound interface{} `gorethink:"right_bound,omitempty"`
 }
 
-func (o *BetweenOpts) toMap() map[string]interface{} {
+func (o BetweenOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -111,7 +120,7 @@ type FilterOpts struct {
 	Default interface{} `gorethink:"default,omitempty"`
 }
 
-func (o *FilterOpts) toMap() map[string]interface{} {
+func (o FilterOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

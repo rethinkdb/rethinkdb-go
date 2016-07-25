@@ -23,7 +23,7 @@ type DistinctOpts struct {
 	Index interface{} `gorethink:"index,omitempty"`
 }
 
-func (o *DistinctOpts) toMap() map[string]interface{} {
+func (o DistinctOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -43,6 +43,16 @@ func (t Term) Distinct(optArgs ...DistinctOpts) Term {
 		opts = optArgs[0].toMap()
 	}
 	return constructMethodTerm(t, "Distinct", p.Term_DISTINCT, []interface{}{}, opts)
+}
+
+// GroupOpts contains the optional arguments for the Group term
+type GroupOpts struct {
+	Index interface{} `gorethink:"index,omitempty"`
+	Multi interface{} `gorethink:"multi,omitempty"`
+}
+
+func (o GroupOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
 }
 
 // Group takes a stream and partitions it into multiple groups based on the
@@ -148,14 +158,14 @@ func (t Term) Ungroup(args ...interface{}) Term {
 // or if functions are provided instead, returns whether or not a sequence
 // contains values matching all the specified functions.
 func Contains(args ...interface{}) Term {
-	return constructRootTerm("Contains", p.Term_CONTAINS, args, map[string]interface{}{})
+	return constructRootTerm("Contains", p.Term_CONTAINS, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Contains returns whether or not a sequence contains all the specified values,
 // or if functions are provided instead, returns whether or not a sequence
 // contains values matching all the specified functions.
 func (t Term) Contains(args ...interface{}) Term {
-	return constructMethodTerm(t, "Contains", p.Term_CONTAINS, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Contains", p.Term_CONTAINS, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Aggregators
@@ -213,6 +223,15 @@ func (t Term) Avg(args ...interface{}) Term {
 	return constructMethodTerm(t, "Avg", p.Term_AVG, funcWrapArgs(args), map[string]interface{}{})
 }
 
+// MinOpts contains the optional arguments for the Min term
+type MinOpts struct {
+	Index interface{} `gorethink:"index,omitempty"`
+}
+
+func (o MinOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // Min finds the minimum of a sequence. If called with a field name, finds the element
 // of that sequence with the smallest value in that field. If called with a function,
 // calls that function on every element of the sequence and returns the element
@@ -251,6 +270,15 @@ func (t Term) MinIndex(index interface{}, args ...interface{}) Term {
 	return constructMethodTerm(t, "Min", p.Term_MIN, funcWrapArgs(args), map[string]interface{}{
 		"index": index,
 	})
+}
+
+// MaxOpts contains the optional arguments for the Max term
+type MaxOpts struct {
+	Index interface{} `gorethink:"index,omitempty"`
+}
+
+func (o MaxOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
 }
 
 // Max finds the maximum of a sequence. If called with a field name, finds the element
@@ -299,7 +327,7 @@ type FoldOpts struct {
 	FinalEmit interface{} `gorethink:"final_emit,omitempty"`
 }
 
-func (o *FoldOpts) toMap() map[string]interface{} {
+func (o FoldOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

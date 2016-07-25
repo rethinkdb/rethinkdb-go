@@ -78,6 +78,34 @@ func ExampleTerm_GetAll_multiple() {
 }
 
 // Find all document with an indexed value.
+func ExampleTerm_GetAll_optArgs() {
+	// Fetch the row from the database
+	res, err := DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(GetAllOpts{
+		Index: "code_name",
+	}).Run(session)
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+	defer res.Close()
+
+	if res.IsNil() {
+		fmt.Print("Row not found")
+		return
+	}
+
+	var hero map[string]interface{}
+	err = res.One(&hero)
+	if err != nil {
+		fmt.Printf("Error scanning database result: %s", err)
+		return
+	}
+	fmt.Print(hero["name"])
+
+	// Output: Superman
+}
+
+// Find all document with an indexed value.
 func ExampleTerm_GetAllByIndex() {
 	// Fetch the row from the database
 	res, err := DB("examples").Table("heroes").GetAllByIndex("code_name", "man_of_steel").Run(session)

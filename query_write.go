@@ -11,7 +11,7 @@ type InsertOpts struct {
 	Conflict      interface{} `gorethink:"conflict,omitempty"`
 }
 
-func (o *InsertOpts) toMap() map[string]interface{} {
+func (o InsertOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -33,7 +33,7 @@ type UpdateOpts struct {
 	Conflict      interface{} `gorethink:"conflict,omitempty"`
 }
 
-func (o *UpdateOpts) toMap() map[string]interface{} {
+func (o UpdateOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -55,7 +55,7 @@ type ReplaceOpts struct {
 	NonAtomic     interface{} `gorethink:"non_atomic,omitempty"`
 }
 
-func (o *ReplaceOpts) toMap() map[string]interface{} {
+func (o ReplaceOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -76,7 +76,7 @@ type DeleteOpts struct {
 	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
 }
 
-func (o *DeleteOpts) toMap() map[string]interface{} {
+func (o DeleteOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

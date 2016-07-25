@@ -156,7 +156,7 @@ type RandomOpts struct {
 	Float interface{} `gorethink:"float,omitempty"`
 }
 
-func (o *RandomOpts) toMap() map[string]interface{} {
+func (o RandomOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

@@ -162,7 +162,7 @@ type JSOpts struct {
 	Timeout interface{} `gorethink:"timeout,omitempty"`
 }
 
-func (o *JSOpts) toMap() map[string]interface{} {
+func (o JSOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -197,7 +197,7 @@ type HTTPOpts struct {
 	PageLimit interface{} `gorethink:"page_limit,omitempty"`
 }
 
-func (o *HTTPOpts) toMap() map[string]interface{} {
+func (o HTTPOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

@@ -20,15 +20,28 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added root version of `Max`
  - Added root version of `MaxIndex`
  - Added `ReadMode` to `RunOpts`
+ - Added the `Interface` function to the `Cursor` which returns a queries result set as an `interface{}`
+ - Added `GroupOpts` type
+ - Added `GetAllOpts` type
+ - Added `MinOpts`/`MaxOpts` types
+ - Added `OptArgs` method to `Term` which allows optional arguments to be specified in an alternative way, for example:
+
+```go
+r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
+    Index: "code_name",
+})
+```
 
 ### Changed
 
  - Renamed `PrimaryTag` to `PrimaryReplicaTag` in `ReconfigureOpts`
  - Renamed `NotAtomic` to `NonAtomic` in `ReplaceOpts` and `UpdateOpts`
+ - Changed behaviour of function callbacks to allow arguments to be either of type `r.Term` or `interface {}` instead of only `r.Term`
 
 ### Fixed
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`
  - Fixed broken optional argument `FinalEmit` in `FoldOpts`
+ - Fixed bug causing some queries using `r.Row` to fail with the error `Cannot use r.row in nested queries.`
 
 ## v2.1.2 - 2016-07-22
 

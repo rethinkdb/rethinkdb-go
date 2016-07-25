@@ -28,7 +28,17 @@ func (q *Query) Build() []interface{} {
 	}
 
 	if len(q.Opts) > 0 {
-		res = append(res, q.Opts)
+		// Clone opts and remove custom gorethink options
+		opts := map[string]interface{}{}
+		for k, v := range q.Opts {
+			switch k {
+			case "geometry_format":
+			default:
+				opts[k] = v
+			}
+		}
+
+		res = append(res, opts)
 	}
 
 	return res
@@ -171,6 +181,17 @@ type OptArgs interface {
 	toMap() map[string]interface{}
 }
 
+func (t Term) OptArgs(args interface{}) Term {
+	switch args := args.(type) {
+	case OptArgs:
+		t.optArgs = convertTermObj(args.toMap())
+	case map[string]interface{}:
+		t.optArgs = convertTermObj(args)
+	}
+
+	return t
+}
+
 type QueryExecutor interface {
 	IsConnected() bool
 	Query(Query) (*Cursor, error)
@@ -230,7 +251,7 @@ type RunOpts struct {
 	FirstBatchScaledownFactor interface{} `gorethink:"first_batch_scaledown_factor,omitempty"`
 }
 
-func (o *RunOpts) toMap() map[string]interface{} {
+func (o RunOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -341,7 +362,7 @@ type ExecOpts struct {
 	NoReply interface{} `gorethink:"noreply,omitempty"`
 }
 
-func (o *ExecOpts) toMap() map[string]interface{} {
+func (o ExecOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

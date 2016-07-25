@@ -15,7 +15,6 @@ import (
 )
 
 var session *Session
-var debug = flag.Bool("gorethink.debug", false, "print query trees")
 var testdata = flag.Bool("gorethink.testdata", true, "create test data")
 var url, url1, url2, url3, db, authKey string
 
