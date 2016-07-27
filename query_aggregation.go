@@ -169,7 +169,7 @@ func (t Term) MaxIndex(index interface{}, args ...interface{}) Term {
 // FoldOpts contains the optional arguments for the Fold term
 type FoldOpts struct {
 	Emit      interface{} `gorethink:"emit,omitempty"`
-	FinalEmit interface{} `gorethink:"finalEmit,omitempty"`
+	FinalEmit interface{} `gorethink:"final_emit,omitempty"`
 }
 
 func (o *FoldOpts) toMap() map[string]interface{} {
