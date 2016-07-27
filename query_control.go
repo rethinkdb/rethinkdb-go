@@ -157,10 +157,23 @@ func Expr(val interface{}) Term {
 	}
 }
 
+// JSOpts contains the optional arguments for the JS term
+type JSOpts struct {
+	Timeout interface{} `gorethink:"timeout,omitempty"`
+}
+
+func (o *JSOpts) toMap() map[string]interface{} {
+	return optArgsToMap(o)
+}
+
 // JS creates a JavaScript expression which is evaluated by the database when
 // running the query.
-func JS(jssrc interface{}) Term {
-	return constructRootTerm("Js", p.Term_JAVASCRIPT, []interface{}{jssrc}, map[string]interface{}{})
+func JS(jssrc interface{}, optArgs ...JSOpts) Term {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return constructRootTerm("Js", p.Term_JAVASCRIPT, []interface{}{jssrc}, opts)
 }
 
 // HTTPOpts contains the optional arguments for the HTTP term
