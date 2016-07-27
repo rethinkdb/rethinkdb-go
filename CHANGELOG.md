@@ -8,6 +8,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
  - Added support for optional arguments to `r.JS()`
 
+### Fixed
+ - Fixed incorrectly named `Replicas` field in `TableCreateOpts`
+
 ## v2.1.2 - 2016-07-22
 
 ### Added
