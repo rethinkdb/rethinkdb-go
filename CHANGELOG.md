@@ -10,6 +10,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`
+ - Fixed broken optional argument `FinalEmit` in `FoldOpts`
 
 ## v2.1.2 - 2016-07-22
 
