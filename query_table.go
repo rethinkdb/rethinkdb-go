@@ -6,11 +6,12 @@ import (
 
 // TableCreateOpts contains the optional arguments for the TableCreate term
 type TableCreateOpts struct {
-	PrimaryKey        interface{} `gorethink:"primary_key,omitempty"`
-	Durability        interface{} `gorethink:"durability,omitempty"`
-	Shards            interface{} `gorethink:"shards,omitempty"`
-	Replicas          interface{} `gorethink:"replicas,omitempty"`
-	PrimaryReplicaTag interface{} `gorethink:"primary_replica_tag,omitempty"`
+	PrimaryKey           interface{} `gorethink:"primary_key,omitempty"`
+	Durability           interface{} `gorethink:"durability,omitempty"`
+	Shards               interface{} `gorethink:"shards,omitempty"`
+	Replicas             interface{} `gorethink:"replicas,omitempty"`
+	PrimaryReplicaTag    interface{} `gorethink:"primary_replica_tag,omitempty"`
+	NonVotingReplicaTags interface{} `gorethink:"nonvoting_replica_tags,omitempty"`
 }
 
 func (o *TableCreateOpts) toMap() map[string]interface{} {
