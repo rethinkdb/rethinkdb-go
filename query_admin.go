@@ -20,7 +20,6 @@ func (t Term) Rebalance() Term {
 type ReconfigureOpts struct {
 	Shards               interface{} `gorethink:"shards,omitempty"`
 	Replicas             interface{} `gorethink:"replicas,omitempty"`
-	PrimaryTag           interface{} `gorethink:"primary_replica_tag,omitempty"`
 	DryRun               interface{} `gorethink:"dry_run,omitempty"`
 	EmergencyRepair      interface{} `gorethink:"emergency_repair,omitempty"`
 	NonVotingReplicaTags interface{} `gorethink:"nonvoting_replica_tags,omitempty"`
