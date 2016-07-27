@@ -24,6 +24,7 @@ type ReconfigureOpts struct {
 	DryRun               interface{} `gorethink:"dry_run,omitempty"`
 	EmergencyRepair      interface{} `gorethink:"emergency_repair,omitempty"`
 	NonVotingReplicaTags interface{} `gorethink:"nonvoting_replica_tags,omitempty"`
+	PrimaryReplicaTag    interface{} `gorethink:"primary_replica_tag,omitempty"`
 }
 
 func (o *ReconfigureOpts) toMap() map[string]interface{} {
