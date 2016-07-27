@@ -8,6 +8,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
  - Added support for optional arguments to `r.JS()`
  - Added `NonVotingReplicaTags` optional argument to `TableCreateOpts`
+ - Added root term `TypeOf`, previously only the method term was supported 
 
 ### Fixed
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`

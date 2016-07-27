@@ -341,6 +341,11 @@ func (t Term) CoerceTo(args ...interface{}) Term {
 }
 
 // TypeOf gets the type of a value.
+func TypeOf(args ...interface{}) Term {
+	return constructRootTerm("TypeOf", p.Term_TYPE_OF, args, map[string]interface{}{})
+}
+
+// TypeOf gets the type of a value.
 func (t Term) TypeOf(args ...interface{}) Term {
 	return constructMethodTerm(t, "TypeOf", p.Term_TYPE_OF, args, map[string]interface{}{})
 }
