@@ -10,6 +10,15 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Added `NonVotingReplicaTags` optional argument to `TableCreateOpts`
  - Added root term `TypeOf`, previously only the method term was supported
  - Added root version of `Group` terms (`Group`, `GroupByIndex`, `MultiGroup`, `MultiGroupByIndex`)
+ - Added root version of `Distinct`
+ - Added root version of `Contains`
+ - Added root version of `Count`
+ - Added root version of `Sum`
+ - Added root version of `Avg`
+ - Added root version of `Min`
+ - Added root version of `MinIndex`
+ - Added root version of `Max`
+ - Added root version of `MaxIndex`
 
 ### Changed
 
