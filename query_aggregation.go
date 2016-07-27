@@ -39,6 +39,51 @@ func (t Term) Distinct(optArgs ...DistinctOpts) Term {
 // Group takes a stream and partitions it into multiple groups based on the
 // fields or functions provided. Commands chained after group will be
 // called on each of these grouped sub-streams, producing grouped data.
+func Group(fieldOrFunctions ...interface{}) Term {
+	return constructRootTerm("Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{})
+}
+
+// MultiGroup takes a stream and partitions it into multiple groups based on the
+// fields or functions provided. Commands chained after group will be
+// called on each of these grouped sub-streams, producing grouped data.
+//
+// Unlike Group single documents can be assigned to multiple groups, similar
+// to the behavior of multi-indexes. When the grouping value is an array, documents
+// will be placed in each group that corresponds to the elements of the array. If
+// the array is empty the row will be ignored.
+func MultiGroup(fieldOrFunctions ...interface{}) Term {
+	return constructRootTerm("Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{
+		"multi": true,
+	})
+}
+
+// GroupByIndex takes a stream and partitions it into multiple groups based on the
+// fields or functions provided. Commands chained after group will be
+// called on each of these grouped sub-streams, producing grouped data.
+func GroupByIndex(index interface{}, fieldOrFunctions ...interface{}) Term {
+	return constructRootTerm("Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{
+		"index": index,
+	})
+}
+
+// MultiGroupByIndex takes a stream and partitions it into multiple groups based on the
+// fields or functions provided. Commands chained after group will be
+// called on each of these grouped sub-streams, producing grouped data.
+//
+// Unlike Group single documents can be assigned to multiple groups, similar
+// to the behavior of multi-indexes. When the grouping value is an array, documents
+// will be placed in each group that corresponds to the elements of the array. If
+// the array is empty the row will be ignored.
+func MultiGroupByIndex(index interface{}, fieldOrFunctions ...interface{}) Term {
+	return constructRootTerm("Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{
+		"index": index,
+		"mutli": true,
+	})
+}
+
+// Group takes a stream and partitions it into multiple groups based on the
+// fields or functions provided. Commands chained after group will be
+// called on each of these grouped sub-streams, producing grouped data.
 func (t Term) Group(fieldOrFunctions ...interface{}) Term {
 	return constructMethodTerm(t, "Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{})
 }
