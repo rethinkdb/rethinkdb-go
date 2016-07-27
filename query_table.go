@@ -9,7 +9,7 @@ type TableCreateOpts struct {
 	PrimaryKey        interface{} `gorethink:"primary_key,omitempty"`
 	Durability        interface{} `gorethink:"durability,omitempty"`
 	Shards            interface{} `gorethink:"shards,omitempty"`
-	DataCenter        interface{} `gorethink:"replicas,omitempty"`
+	Replicas          interface{} `gorethink:"replicas,omitempty"`
 	PrimaryReplicaTag interface{} `gorethink:"primary_replica_tag,omitempty"`
 }
 
