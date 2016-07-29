@@ -21,9 +21,14 @@ func newCursor(conn *Connection, cursorType string, token int64, term *Term, opt
 		cursorType = "Cursor"
 	}
 
+	connOpts := &ConnectOpts{}
+	if conn != nil {
+		connOpts = conn.opts
+	}
+
 	cursor := &Cursor{
 		conn:       conn,
-		connOpts:   conn.opts,
+		connOpts:   connOpts,
 		token:      token,
 		cursorType: cursorType,
 		term:       term,
@@ -568,7 +573,7 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 	for {
 		c.applyPendingSkips(bufferResponse) // if we are buffering the responses, skip can drain from the buffer
 
-		if len(c.buffer) == 0 && len(c.responses) > 0 && !c.closed {
+		if bufferResponse && len(c.buffer) == 0 && len(c.responses) > 0 && !c.closed {
 			if err := c.bufferNextResponse(); err != nil {
 				return err
 			}
