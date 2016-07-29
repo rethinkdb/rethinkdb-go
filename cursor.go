@@ -23,6 +23,7 @@ func newCursor(conn *Connection, cursorType string, token int64, term *Term, opt
 
 	cursor := &Cursor{
 		conn:       conn,
+		connOpts:   conn.opts,
 		token:      token,
 		cursorType: cursorType,
 		term:       term,
@@ -53,6 +54,7 @@ type Cursor struct {
 	releaseConn func() error
 
 	conn       *Connection
+	connOpts   *ConnectOpts
 	token      int64
 	cursorType string
 	term       *Term
@@ -566,7 +568,7 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 	for {
 		c.applyPendingSkips(bufferResponse) // if we are buffering the responses, skip can drain from the buffer
 
-		if bufferResponse && len(c.buffer) == 0 && len(c.responses) > 0 {
+		if len(c.buffer) == 0 && len(c.responses) > 0 && !c.closed {
 			if err := c.bufferNextResponse(); err != nil {
 				return err
 			}
@@ -629,7 +631,7 @@ func (c *Cursor) bufferNextResponse() error {
 
 	var value interface{}
 	decoder := json.NewDecoder(bytes.NewBuffer(response))
-	if c.conn.opts.UseJSONNumber {
+	if c.connOpts.UseJSONNumber {
 		decoder.UseNumber()
 	}
 	err := decoder.Decode(&value)
