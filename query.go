@@ -221,6 +221,7 @@ type RunOpts struct {
 	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
 	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
 	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
+	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
 
 	MinBatchRows              interface{} `gorethink:"min_batch_rows,omitempty"`
 	MaxBatchRows              interface{} `gorethink:"max_batch_rows,omitempty"`
