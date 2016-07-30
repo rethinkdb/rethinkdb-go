@@ -16,7 +16,7 @@ func Map(args ...interface{}) Term {
 		args = append(args[:len(args)-1], funcWrapArgs(args[len(args)-1:])...)
 	}
 
-	return constructRootTerm("Map", p.Term_MAP, funcWrapArgs(args), map[string]interface{}{})
+	return constructRootTerm("Map", p.Term_MAP, args, map[string]interface{}{})
 }
 
 // Map transforms each element of the sequence by applying the given mapping

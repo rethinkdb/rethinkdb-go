@@ -102,8 +102,9 @@ func makeFunc(f interface{}) Term {
 		argNums[i] = varID
 
 		// make sure all input arguments are of type Term
-		if valueType.In(i).String() != "gorethink.Term" {
-			panic("Function argument is not of type Term")
+		argValueTypeName := valueType.In(i).String()
+		if argValueTypeName != "gorethink.Term" && argValueTypeName != "interface {}" {
+			panic("Function argument is not of type Term or interface {}")
 		}
 	}
 

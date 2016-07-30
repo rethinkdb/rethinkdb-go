@@ -94,7 +94,7 @@ func (t Term) Ungroup(args ...interface{}) Term {
 // or if functions are provided instead, returns whether or not a sequence
 // contains values matching all the specified functions.
 func (t Term) Contains(args ...interface{}) Term {
-	return constructMethodTerm(t, "Contains", p.Term_CONTAINS, args, map[string]interface{}{})
+	return constructMethodTerm(t, "Contains", p.Term_CONTAINS, funcWrapArgs(args), map[string]interface{}{})
 }
 
 // Aggregators
