@@ -23,6 +23,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
  - Renamed `PrimaryTag` to `PrimaryReplicaTag` in `ReconfigureOpts`
+ - Renamed `NotAtomic` to `NonAtomic` in `ReplaceOpts` and `UpdateOpts`
 
 ### Fixed
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`
