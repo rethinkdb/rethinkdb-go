@@ -111,10 +111,10 @@ func (p *Pool) conn() (*Connection, *pool.PoolConn, error) {
 	return conn, pc, nil
 }
 
-// SetInitalPoolCap sets the initial capacity of the connection pool.
+// SetInitialPoolCap sets the initial capacity of the connection pool.
 //
 // Deprecated: This value should only be set when connecting
-func (p *Pool) SetInitalPoolCap(n int) {
+func (p *Pool) SetInitialPoolCap(n int) {
 	return
 }
 
