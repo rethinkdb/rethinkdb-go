@@ -1,10 +1,10 @@
-# GoRethink - RethinkDB Driver for Go 
+# GoRethink - RethinkDB Driver for Go
 
 [![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)](https://github.com/dancannon/gorethink/releases)
 [![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
-[![build status](https://img.shields.io/travis/dancannon/gorethink/master.svg "build status")](https://travis-ci.org/dancannon/gorethink) 
+[![build status](https://img.shields.io/travis/dancannon/gorethink/master.svg "build status")](https://travis-ci.org/dancannon/gorethink)
 
-[Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/) 
+[Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/)
 
 ![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
@@ -91,7 +91,7 @@ See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect)
 
 The driver uses a connection pool at all times, by default it creates and frees connections automatically. It's safe for concurrent use by multiple goroutines.
 
-To configure the connection pool `InitlaCap`, `MaxOpen` and `Timeout` can be specified during connection. If you wish to change the value of `InitlaCap` or `MaxOpen` during runtime then the functions `SetInitalPoolCap` and `SetMaxOpenConns` can be used.
+To configure the connection pool `InitialCap`, `MaxOpen` and `Timeout` can be specified during connection. If you wish to change the value of `InitialCap` or `MaxOpen` during runtime then the functions `SetInitialPoolCap` and `SetMaxOpenConns` can be used.
 
 [embedmd]:# (example_connect_test.go go /func ExampleConnect_connectionPool\(\) {/ /(?m)^}/)
 ```go
@@ -391,7 +391,7 @@ The mocking implementation is based on amazing https://github.com/stretchr/testi
 
 ## Benchmarks
 
-Everyone wants their project's benchmarks to be speedy. And while we know that rethinkDb and the gorethink driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please. 
+Everyone wants their project's benchmarks to be speedy. And while we know that rethinkDb and the gorethink driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please.
 
 Thanks to @jaredfolkins for the contribution.
 
@@ -399,12 +399,12 @@ Thanks to @jaredfolkins for the contribution.
 | --- | --- |
 | **Model Name** | MacBook Pro |
 | **Model Identifier** | MacBookPro11,3 |
-| **Processor Name** | Intel Core i7 | 
-| **Processor Speed** | 2.3 GHz | 
+| **Processor Name** | Intel Core i7 |
+| **Processor Speed** | 2.3 GHz |
 | **Number of Processors** | 1 |
 | **Total Number of Cores** | 4 |
-| **L2 Cache (per Core)** | 256 KB | 
-| **L3 Cache** | 6 MB | 
+| **L2 Cache (per Core)** | 256 KB |
+| **L3 Cache** | 6 MB |
 | **Memory** | 16 GB |
 
 ```bash
@@ -451,4 +451,4 @@ limitations under the License.
 
 ## Donations
 
-[![Donations](https://pledgie.com/campaigns/29517.png "Donations")](https://pledgie.com/campaigns/29517) 
+[![Donations](https://pledgie.com/campaigns/29517.png "Donations")](https://pledgie.com/campaigns/29517)

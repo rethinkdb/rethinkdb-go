@@ -123,10 +123,10 @@ func (c *Cluster) Server() (response ServerResponse, err error) {
 	return response, err
 }
 
-// SetInitalPoolCap sets the initial capacity of the connection pool.
-func (c *Cluster) SetInitalPoolCap(n int) {
+// SetInitialPoolCap sets the initial capacity of the connection pool.
+func (c *Cluster) SetInitialPoolCap(n int) {
 	for _, node := range c.GetNodes() {
-		node.SetInitalPoolCap(n)
+		node.SetInitialPoolCap(n)
 	}
 }
 
