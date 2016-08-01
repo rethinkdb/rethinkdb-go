@@ -32,21 +32,6 @@ func (s *RethinkSuite) TestTransformationMapFunc(c *test.C) {
 	c.Assert(response, jsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
 }
 
-func (s *RethinkSuite) TestTransformationMapImplicitFunc(c *test.C) {
-	query := Expr(arr).Map(func(row interface{}) interface{} {
-		return Row.Add(1)
-	})
-
-	var response []interface{}
-	res, err := query.Run(session)
-	c.Assert(err, test.IsNil)
-
-	err = res.All(&response)
-
-	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, []interface{}{2, 3, 4, 5, 6, 7, 8, 9, 10})
-}
-
 func (s *RethinkSuite) TestTransformationWithFields(c *test.C) {
 	query := Expr(objList).WithFields("id", "num").OrderBy("id")
 
