@@ -65,6 +65,7 @@ func decodeValue(dv, sv reflect.Value, blank bool) {
 
 type decoderCacheKey struct {
 	dt, st reflect.Type
+	blank  bool
 }
 
 var decoderCache struct {
@@ -84,12 +85,12 @@ func valueDecoder(dv, sv reflect.Value, blank bool) decoderFunc {
 		}
 	}
 
-	return typeDecoder(dv.Type(), sv.Type())
+	return typeDecoder(dv.Type(), sv.Type(), blank)
 }
 
-func typeDecoder(dt, st reflect.Type) decoderFunc {
+func typeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 	decoderCache.RLock()
-	f := decoderCache.m[decoderCacheKey{dt, st}]
+	f := decoderCache.m[decoderCacheKey{dt, st, blank}]
 	decoderCache.RUnlock()
 	if f != nil {
 		return f
@@ -102,7 +103,7 @@ func typeDecoder(dt, st reflect.Type) decoderFunc {
 	decoderCache.Lock()
 	var wg sync.WaitGroup
 	wg.Add(1)
-	decoderCache.m[decoderCacheKey{dt, st}] = func(dv, sv reflect.Value) {
+	decoderCache.m[decoderCacheKey{dt, st, blank}] = func(dv, sv reflect.Value) {
 		wg.Wait()
 		f(dv, sv)
 	}
@@ -110,10 +111,10 @@ func typeDecoder(dt, st reflect.Type) decoderFunc {
 
 	// Compute fields without lock.
 	// Might duplicate effort but won't hold other computations back.
-	f = newTypeDecoder(dt, st)
+	f = newTypeDecoder(dt, st, blank)
 	wg.Done()
 	decoderCache.Lock()
-	decoderCache.m[decoderCacheKey{dt, st}] = f
+	decoderCache.m[decoderCacheKey{dt, st, blank}] = f
 	decoderCache.Unlock()
 	return f
 }
