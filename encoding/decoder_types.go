@@ -189,7 +189,7 @@ func interfaceAsTypeDecoder(dv, sv reflect.Value) {
 		dv = indirect(dv, false)
 		dv.Set(reflect.Zero(dv.Type()))
 
-		decode(dv, sv.Elem())
+		decodeValue(dv, sv.Elem(), true)
 	}
 }
 
