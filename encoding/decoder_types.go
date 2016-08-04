@@ -135,7 +135,7 @@ func newTypeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 
 		switch st.Kind() {
 		case reflect.Array, reflect.Slice:
-			return newSliceDecoder(dt, st, blank)
+			return newSliceDecoder(dt, st)
 		default:
 			return decodeTypeError
 		}
@@ -146,7 +146,7 @@ func newTypeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 
 		switch st.Kind() {
 		case reflect.Array, reflect.Slice:
-			return newArrayDecoder(dt, st, blank)
+			return newArrayDecoder(dt, st)
 		default:
 			return decodeTypeError
 		}
@@ -373,12 +373,12 @@ func (d *sliceDecoder) decode(dv, sv reflect.Value) {
 	}
 }
 
-func newSliceDecoder(dt, st reflect.Type, blank bool) decoderFunc {
+func newSliceDecoder(dt, st reflect.Type) decoderFunc {
 	// Byte slices get special treatment; arrays don't.
 	// if t.Elem().Kind() == reflect.Uint8 {
 	// 	return decodeByteSlice
 	// }
-	dec := &sliceDecoder{newArrayDecoder(dt, st, blank)}
+	dec := &sliceDecoder{newArrayDecoder(dt, st)}
 	return dec.decode
 }
 
@@ -429,8 +429,8 @@ func (d *arrayDecoder) decode(dv, sv reflect.Value) {
 	}
 }
 
-func newArrayDecoder(dt, st reflect.Type, blank bool) decoderFunc {
-	dec := &arrayDecoder{typeDecoder(dt.Elem(), st.Elem(), blank)}
+func newArrayDecoder(dt, st reflect.Type) decoderFunc {
+	dec := &arrayDecoder{typeDecoder(dt.Elem(), st.Elem(), true)}
 	return dec.decode
 }
 
@@ -438,11 +438,14 @@ func newArrayDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 
 type mapAsMapDecoder struct {
 	keyDec, elemDec decoderFunc
+	blank           bool
 }
 
 func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) {
 	dt := dv.Type()
-	dv.Set(reflect.MakeMap(reflect.MapOf(dt.Key(), dt.Elem())))
+	if d.blank {
+		dv.Set(reflect.MakeMap(reflect.MapOf(dt.Key(), dt.Elem())))
+	}
 
 	var mapKey reflect.Value
 	var mapElem reflect.Value
@@ -476,7 +479,7 @@ func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) {
 }
 
 func newMapAsMapDecoder(dt, st reflect.Type, blank bool) decoderFunc {
-	d := &mapAsMapDecoder{typeDecoder(dt.Key(), st.Key(), blank), typeDecoder(dt.Elem(), st.Elem(), blank)}
+	d := &mapAsMapDecoder{typeDecoder(dt.Key(), st.Key(), blank), typeDecoder(dt.Elem(), st.Elem(), blank), blank}
 	return d.decode
 }
 
