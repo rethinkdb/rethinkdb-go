@@ -347,3 +347,24 @@ func TestReferenceFieldArray(t *testing.T) {
 		t.Errorf("got %q, want %q", out, want)
 	}
 }
+
+type Compound struct {
+	PartA string `gorethink:"id[0]"`
+	PartB string `gorethink:"id[1]"`
+	ErrA  string `gorethink:"err_a[]"`
+	ErrB  string `gorethink:"err_b["`
+	ErrC  string `gorethink:"err_c]"`
+}
+
+func TestEncodeCompound(t *testing.T) {
+	input := Compound{"1", "2", "3", "4", "5"}
+	want := map[string]interface{}{"id": []string{"1", "2"}, "err_a[]": "3", "err_b[": "4", "err_c]": "5"}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
