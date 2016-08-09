@@ -37,6 +37,7 @@ r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
  - Renamed `PrimaryTag` to `PrimaryReplicaTag` in `ReconfigureOpts`
  - Renamed `NotAtomic` to `NonAtomic` in `ReplaceOpts` and `UpdateOpts`
  - Changed behaviour of function callbacks to allow arguments to be either of type `r.Term` or `interface {}` instead of only `r.Term`
+ - Changed logging to be disabled by default, to enable logs change the output writer of the logger. For example: `r.Log.Out = os.Stderr`
 
 ### Fixed
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`

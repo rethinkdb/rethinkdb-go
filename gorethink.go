@@ -1,6 +1,7 @@
 package gorethink
 
 import (
+	"io/ioutil"
 	"reflect"
 
 	"github.com/Sirupsen/logrus"
@@ -34,6 +35,7 @@ func init() {
 	encoding.IgnoreType(reflect.TypeOf(Term{}))
 
 	Log = logrus.New()
+	Log.Out = ioutil.Discard // By default don't log anything
 }
 
 // SetVerbose allows the driver logging level to be set. If true is passed then
