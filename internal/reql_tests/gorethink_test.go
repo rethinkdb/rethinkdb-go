@@ -1,3 +1,5 @@
+//go:generate ../gen_tests/gen_tests.sh
+
 package reql_tests
 
 import (

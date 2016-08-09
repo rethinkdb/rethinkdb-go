@@ -82,7 +82,7 @@ func (suite *${module_name}Suite) TestCases() {
 	%if item.run_if_query:
 	${item.varname} = maybeRun(${item.value}, suite.session, r.RunOpts{
 		%if item.runopts:
-		%for key, val in item.runopts.items():
+		%for key, val in sorted(item.runopts.items()):
 		${key}: ${val},
 		%endfor
 		%endif
@@ -93,7 +93,7 @@ func (suite *${module_name}Suite) TestCases() {
 	%elif item.run_if_query:
 	${item.varname} := maybeRun(${item.value}, suite.session, r.RunOpts{
 		%if item.runopts:
-		%for key, val in item.runopts.items():
+		%for key, val in sorted(item.runopts.items()):
 		${key}: ${val},
 		%endfor
 		%endif
@@ -125,7 +125,7 @@ func (suite *${module_name}Suite) TestCases() {
 		%else:
 		runAndAssert(suite.Suite, expected_, ${item.line.go}, suite.session, r.RunOpts{
 			%if item.runopts:
-			%for key, val in item.runopts.items():
+			%for key, val in sorted(item.runopts.items()):
 			${key}: ${val},
 			%endfor
 			%endif

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.4
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 '''Finds yaml tests, converts them to Go tests.'''
 from __future__ import print_function
@@ -90,17 +90,17 @@ def parse_args():
     parser.add_argument(
         "--test-dir",
         help="Directory where yaml tests are",
-        default="../../rethinkdb/rethinkdb/test/rql_test/src/test"
+        default=""
     )
     parser.add_argument(
         "--test-output-dir",
         help="Directory to render tests to",
-        default="./internal/reql_tests",
+        default=".",
     )
     parser.add_argument(
         "--python-driver-dir",
         help="Where the built python driver is located",
-        default="../../build/drivers/python"
+        default=""
     )
     parser.add_argument(
         "--test-file",
@@ -1026,7 +1026,7 @@ class Renderer(object):
     '''Manages rendering templates'''
 
     def __init__(self, invoking_filenames, source_files=None):
-        self.template_file = './internal/gen_tests/template.go.tpl'
+        self.template_file = './template.go.tpl'
         self.invoking_filenames = invoking_filenames
         self.source_files = source_files or []
         self.tpl = Template(filename=self.template_file)
