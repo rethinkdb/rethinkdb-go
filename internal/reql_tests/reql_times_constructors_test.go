@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Test basic time arithmetic
 func TestTimesConstructorsSuite(t *testing.T) {
-	suite.Run(t, new(TimesConstructorsSuite ))
+	suite.Run(t, new(TimesConstructorsSuite))
 }
 
 type TimesConstructorsSuite struct {
@@ -28,7 +28,7 @@ func (suite *TimesConstructorsSuite) SetupTest() {
 	suite.T().Log("Setting up TimesConstructorsSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *TimesConstructorsSuite) TearDownSuite() {
 func (suite *TimesConstructorsSuite) TestCases() {
 	suite.T().Log("Running TimesConstructorsSuite: Test basic time arithmetic")
 
-
-
 	{
 		// times/constructors.yaml line #5
 		/* datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00')) */
@@ -70,7 +68,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.EpochTime(896571240)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #5")
 	}
@@ -78,14 +76,14 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #11
 		/* {'stuff':datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00')), 'more':[datetime.fromtimestamp(996571240, r.ast.RqlTzinfo('00:00'))]} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), "more": []interface{}{Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00"))}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), "more": []interface{}{Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00"))}}
 		/* r.expr({'stuff':r.epoch_time(896571240), 'more':[r.epoch_time(996571240)]}) */
 
 		suite.T().Log("About to run line #11: r.Expr(map[interface{}]interface{}{'stuff': r.EpochTime(896571240), 'more': []interface{}{r.EpochTime(996571240)}, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"stuff": r.EpochTime(896571240), "more": []interface{}{r.EpochTime(996571240)}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"stuff": r.EpochTime(896571240), "more": []interface{}{r.EpochTime(996571240)}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -93,14 +91,14 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #17
 		/* [datetime.fromtimestamp(796571240, r.ast.RqlTzinfo('00:00')), datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00')), {'stuff':datetime.fromtimestamp(996571240, r.ast.RqlTzinfo('00:00'))}] */
-		var expected_ []interface{} = []interface{}{Ast.Fromtimestamp(796571240, Ast.RqlTzinfo("00:00")), Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00")), }}
+		var expected_ []interface{} = []interface{}{Ast.Fromtimestamp(796571240, Ast.RqlTzinfo("00:00")), Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00"))}}
 		/* r.expr([r.epoch_time(796571240), r.epoch_time(896571240), {'stuff':r.epoch_time(996571240)}]) */
 
 		suite.T().Log("About to run line #17: r.Expr([]interface{}{r.EpochTime(796571240), r.EpochTime(896571240), map[interface{}]interface{}{'stuff': r.EpochTime(996571240), }})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.EpochTime(796571240), r.EpochTime(896571240), map[interface{}]interface{}{"stuff": r.EpochTime(996571240), }}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.EpochTime(796571240), r.EpochTime(896571240), map[interface{}]interface{}{"stuff": r.EpochTime(996571240)}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}
@@ -108,14 +106,14 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #23
 		/* {'nested':{'time':datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00'))}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"nested": map[interface{}]interface{}{"time": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), }, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"nested": map[interface{}]interface{}{"time": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00"))}}
 		/* r.expr({'nested':{'time':r.epoch_time(896571240)}}) */
 
 		suite.T().Log("About to run line #23: r.Expr(map[interface{}]interface{}{'nested': map[interface{}]interface{}{'time': r.EpochTime(896571240), }, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"nested": map[interface{}]interface{}{"time": r.EpochTime(896571240), }, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"nested": map[interface{}]interface{}{"time": r.EpochTime(896571240)}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #23")
 	}
@@ -130,7 +128,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, "two", []interface{}{"a", r.EpochTime(896571240), 3}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #29")
 	}
@@ -145,7 +143,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(1).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #35")
 	}
@@ -160,7 +158,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(-1).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -175,7 +173,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(1.4444445).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #39")
 	}
@@ -190,7 +188,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(1.4444445).ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #42")
 	}
@@ -205,7 +203,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(1.4444445).Seconds(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #45")
 	}
@@ -220,7 +218,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(253430000000).Year(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #48")
 	}
@@ -235,7 +233,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(253430000000).ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -250,7 +248,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(253440000000).Year(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #53")
 	}
@@ -265,7 +263,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(253440000000).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #55")
 	}
@@ -280,7 +278,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(-17980000000).Year(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #57")
 	}
@@ -295,7 +293,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(-17990000000).Year(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #59")
 	}
@@ -310,7 +308,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(-17990000000).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #61")
 	}
@@ -322,14 +320,12 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	cdate := "2013-01-01"
 	_ = cdate // Prevent any noused variable errors
 
-
 	// times/constructors.yaml line #66
 	// dates = ["2013", "2013-01", "2013-01-01", "20130101", "2013-001", "2013001"]
 	suite.T().Log("Possibly executing: var dates []interface{} = []interface{}{'2013', '2013-01', '2013-01-01', '20130101', '2013-001', '2013001'}")
 
 	dates := []interface{}{"2013", "2013-01", "2013-01-01", "20130101", "2013-001", "2013001"}
 	_ = dates // Prevent any noused variable errors
-
 
 	// times/constructors.yaml line #67
 	// ctime = "13:00:00"
@@ -338,14 +334,12 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	ctime := "13:00:00"
 	_ = ctime // Prevent any noused variable errors
 
-
 	// times/constructors.yaml line #68
 	// times = ["13", "13:00", "1300", "13:00:00", "13:00:00.000000", "130000.000000"]
 	suite.T().Log("Possibly executing: var times []interface{} = []interface{}{'13', '13:00', '1300', '13:00:00', '13:00:00.000000', '130000.000000'}")
 
 	times := []interface{}{"13", "13:00", "1300", "13:00:00", "13:00:00.000000", "130000.000000"}
 	_ = times // Prevent any noused variable errors
-
 
 	// times/constructors.yaml line #69
 	// ctz = "+00:00"
@@ -354,14 +348,12 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	ctz := "+00:00"
 	_ = ctz // Prevent any noused variable errors
 
-
 	// times/constructors.yaml line #70
 	// tzs = ["Z", "+00", "+0000", "+00:00"]
 	suite.T().Log("Possibly executing: var tzs []interface{} = []interface{}{'Z', '+00', '+0000', '+00:00'}")
 
 	tzs := []interface{}{"Z", "+00", "+0000", "+00:00"}
 	_ = tzs // Prevent any noused variable errors
-
 
 	// times/constructors.yaml line #71
 	// cdt = [cdate+"T"+ctime+ctz]
@@ -370,7 +362,6 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	cdt := []interface{}{cdate + "T" + ctime + ctz}
 	_ = cdt // Prevent any noused variable errors
 
-
 	// times/constructors.yaml line #81
 	// bad_dates = ["201301", "2013-0101", "2a13", "2013+01", "2013-01-01.1"]
 	suite.T().Log("Possibly executing: var bad_dates []interface{} = []interface{}{'201301', '2013-0101', '2a13', '2013+01', '2013-01-01.1'}")
@@ -378,14 +369,12 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	bad_dates := []interface{}{"201301", "2013-0101", "2a13", "2013+01", "2013-01-01.1"}
 	_ = bad_dates // Prevent any noused variable errors
 
-
 	// times/constructors.yaml line #82
 	// bad_times = ["a3", "13:0000", "13:000", "13:00.00", "130000.00000000a"]
 	suite.T().Log("Possibly executing: var bad_times []interface{} = []interface{}{'a3', '13:0000', '13:000', '13:00.00', '130000.00000000a'}")
 
 	bad_times := []interface{}{"a3", "13:0000", "13:000", "13:00.00", "130000.00000000a"}
 	_ = bad_times // Prevent any noused variable errors
-
 
 	// times/constructors.yaml line #83
 	// bad_tzs = ["X", "-7", "-07:-1", "+07+01", "PST", "UTC", "Z+00"]

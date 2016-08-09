@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests meta queries for databases
 func TestMetaDbsSuite(t *testing.T) {
-	suite.Run(t, new(MetaDbsSuite ))
+	suite.Run(t, new(MetaDbsSuite))
 }
 
 type MetaDbsSuite struct {
@@ -28,7 +28,7 @@ func (suite *MetaDbsSuite) SetupTest() {
 	suite.T().Log("Setting up MetaDbsSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MetaDbsSuite) TearDownSuite() {
 func (suite *MetaDbsSuite) TestCases() {
 	suite.T().Log("Running MetaDbsSuite: Tests meta queries for databases")
 
-
-
 	{
 		// meta/dbs.yaml line #6
 		/* bag(['rethinkdb', 'test']) */
@@ -70,7 +68,7 @@ func (suite *MetaDbsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -78,14 +76,14 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #11
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create('a') */
 
 		suite.T().Log("About to run line #11: r.DBCreate('a')")
 
 		runAndAssert(suite.Suite, expected_, r.DBCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -93,14 +91,14 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #13
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create('b') */
 
 		suite.T().Log("About to run line #13: r.DBCreate('b')")
 
 		runAndAssert(suite.Suite, expected_, r.DBCreate("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #13")
 	}
@@ -115,7 +113,7 @@ func (suite *MetaDbsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #18")
 	}
@@ -123,14 +121,14 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #23
 		/* {'name':'a','id':uuid()} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"name": "a", "id": compare.IsUUID(), }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"name": "a", "id": compare.IsUUID()}
 		/* r.db('a').config() */
 
 		suite.T().Log("About to run line #23: r.DB('a').Config()")
 
 		runAndAssert(suite.Suite, expected_, r.DB("a").Config(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #23")
 	}
@@ -138,14 +136,14 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #28
 		/* partial({'dbs_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
 		/* r.db_drop('b') */
 
 		suite.T().Log("About to run line #28: r.DBDrop('b')")
 
 		runAndAssert(suite.Suite, expected_, r.DBDrop("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -160,7 +158,7 @@ func (suite *MetaDbsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -168,14 +166,14 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #34
 		/* partial({'dbs_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
 		/* r.db_drop('a') */
 
 		suite.T().Log("About to run line #34: r.DBDrop('a')")
 
 		runAndAssert(suite.Suite, expected_, r.DBDrop("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -190,7 +188,7 @@ func (suite *MetaDbsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -198,14 +196,14 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #41
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create('bar') */
 
 		suite.T().Log("About to run line #41: r.DBCreate('bar')")
 
 		runAndAssert(suite.Suite, expected_, r.DBCreate("bar"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #41")
 	}
@@ -220,7 +218,7 @@ func (suite *MetaDbsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.DBCreate("bar"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #44")
 	}
@@ -228,14 +226,14 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #47
 		/* partial({'dbs_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
 		/* r.db_drop('bar') */
 
 		suite.T().Log("About to run line #47: r.DBDrop('bar')")
 
 		runAndAssert(suite.Suite, expected_, r.DBDrop("bar"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #47")
 	}
@@ -250,7 +248,7 @@ func (suite *MetaDbsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.DBDrop("bar"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}

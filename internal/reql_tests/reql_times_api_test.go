@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // date/time api (#977)
 func TestTimesApiSuite(t *testing.T) {
-	suite.Run(t, new(TimesApiSuite ))
+	suite.Run(t, new(TimesApiSuite))
 }
 
 type TimesApiSuite struct {
@@ -28,7 +28,7 @@ func (suite *TimesApiSuite) SetupTest() {
 	suite.T().Log("Setting up TimesApiSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,15 +58,12 @@ func (suite *TimesApiSuite) TearDownSuite() {
 func (suite *TimesApiSuite) TestCases() {
 	suite.T().Log("Running TimesApiSuite: date/time api (#977)")
 
-
-
 	// times/api.yaml line #6
 	// rt1 = 1375147296.6812
 	suite.T().Log("Possibly executing: var rt1 float64 = 1375147296.6812")
 
 	rt1 := 1375147296.6812
 	_ = rt1 // Prevent any noused variable errors
-
 
 	// times/api.yaml line #7
 	// t1 = r.epoch_time(rt1)
@@ -75,14 +72,12 @@ func (suite *TimesApiSuite) TestCases() {
 	t1 := r.EpochTime(rt1)
 	_ = t1 // Prevent any noused variable errors
 
-
 	// times/api.yaml line #8
 	// t2 = r.epoch_time(rt1 + 1000)
 	suite.T().Log("Possibly executing: var t2 r.Term = r.EpochTime(r.Add(rt1, 1000))")
 
 	t2 := r.EpochTime(r.Add(rt1, 1000))
 	_ = t2 // Prevent any noused variable errors
-
 
 	{
 		// times/api.yaml line #11
@@ -94,7 +89,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Add(t1, 1000).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -109,7 +104,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Sub(t1, 1000).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #14")
 	}
@@ -124,7 +119,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Sub(t1, r.Sub(t1, 1000)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}
@@ -139,7 +134,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Lt(t1, t1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #22")
 	}
@@ -154,7 +149,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Le(t1, t1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #25")
 	}
@@ -169,7 +164,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Eq(t1, t1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #29")
 	}
@@ -184,7 +179,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Ne(t1, t1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #32")
 	}
@@ -199,7 +194,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Ge(t1, t1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -214,7 +209,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Gt(t1, t1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -229,7 +224,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Lt(t1, t2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -244,7 +239,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Le(t1, t2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #43")
 	}
@@ -259,7 +254,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Eq(t1, t2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #47")
 	}
@@ -274,7 +269,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Ne(t1, t2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -289,7 +284,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Ge(t1, t2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -304,7 +299,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Gt(t1, t2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #55")
 	}
@@ -319,7 +314,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.During(t1, r.Add(t1, 1000)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #60")
 	}
@@ -332,9 +327,9 @@ func (suite *TimesApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #64: t1.During(t1, r.Add(t1, 1000)).OptArgs(r.DuringOpts{LeftBound: 'open', })")
 
-		runAndAssert(suite.Suite, expected_, t1.During(t1, r.Add(t1, 1000)).OptArgs(r.DuringOpts{LeftBound: "open", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, t1.During(t1, r.Add(t1, 1000)).OptArgs(r.DuringOpts{LeftBound: "open"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #64")
 	}
@@ -349,7 +344,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.During(t1, t1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #67")
 	}
@@ -362,9 +357,9 @@ func (suite *TimesApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #70: t1.During(t1, t1).OptArgs(r.DuringOpts{RightBound: 'closed', })")
 
-		runAndAssert(suite.Suite, expected_, t1.During(t1, t1).OptArgs(r.DuringOpts{RightBound: "closed", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, t1.During(t1, t1).OptArgs(r.DuringOpts{RightBound: "closed"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #70")
 	}
@@ -379,7 +374,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.Date().ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #77")
 	}
@@ -394,7 +389,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.TimeOfDay(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #79")
 	}
@@ -409,7 +404,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.Year(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #81")
 	}
@@ -424,7 +419,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.Month(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #83")
 	}
@@ -439,7 +434,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.Day(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #85")
 	}
@@ -454,7 +449,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.DayOfWeek(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #87")
 	}
@@ -469,7 +464,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.DayOfYear(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #89")
 	}
@@ -484,7 +479,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.Hours(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #91")
 	}
@@ -499,7 +494,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.Minutes(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #93")
 	}
@@ -514,7 +509,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, t1.Seconds(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #95")
 	}
@@ -529,7 +524,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, 23, 30, 0.1, "-07:00").ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #99")
 	}
@@ -544,7 +539,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, 23, 30, 0.1, "-07:00").Timezone(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #101")
 	}
@@ -559,7 +554,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, 23, 30, 0.1).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #103")
 	}
@@ -574,7 +569,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, 23, 30, 0.1).Timezone(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #105")
 	}
@@ -589,7 +584,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, 23, 30).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #107")
 	}
@@ -604,7 +599,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, 23).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #109")
 	}
@@ -619,7 +614,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, "-07:00").ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #111")
 	}
@@ -634,7 +629,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, r.July, 29, "-07:00").Timezone(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #113")
 	}
@@ -649,7 +644,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.ISO8601("2013-07-30T20:56:05-07:00").ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #119")
 	}
@@ -664,7 +659,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(1375242965).InTimezone("-07:00").ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #122")
 	}
@@ -679,7 +674,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #125")
 	}
@@ -694,7 +689,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().Sub(r.Now()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #127")
 	}
@@ -709,7 +704,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.ISO8601("2013-07-30T20:56:05").ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #132")
 	}
@@ -722,9 +717,9 @@ func (suite *TimesApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #136: r.ISO8601('2013-07-30T20:56:05').OptArgs(r.ISO8601Opts{DefaultTimezone: '-07', }).ToISO8601()")
 
-		runAndAssert(suite.Suite, expected_, r.ISO8601("2013-07-30T20:56:05").OptArgs(r.ISO8601Opts{DefaultTimezone: "-07", }).ToISO8601(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.ISO8601("2013-07-30T20:56:05").OptArgs(r.ISO8601Opts{DefaultTimezone: "-07"}).ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #136")
 	}
@@ -739,7 +734,7 @@ func (suite *TimesApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Monday, r.Tuesday, r.Wednesday, r.Thursday, r.Friday, r.Saturday, r.Sunday}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #140")
 	}
@@ -749,13 +744,13 @@ func (suite *TimesApiSuite) TestCases() {
 		/* ([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]) */
 		var expected_ []interface{} = []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 		/* r.expr([r.january, r.february, r.march, r.april, r.may, r.june,
-r.july, r.august, r.september, r.october, r.november, r.december]) */
+		r.july, r.august, r.september, r.october, r.november, r.december]) */
 
 		suite.T().Log("About to run line #142: r.Expr([]interface{}{r.January, r.February, r.March, r.April, r.May, r.June, r.July, r.August, r.September, r.October, r.November, r.December})")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.January, r.February, r.March, r.April, r.May, r.June, r.July, r.August, r.September, r.October, r.November, r.December}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #142")
 	}

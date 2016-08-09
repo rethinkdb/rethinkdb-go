@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests manipulation operations on tables
 func TestTransformTableSuite(t *testing.T) {
-	suite.Run(t, new(TransformTableSuite ))
+	suite.Run(t, new(TransformTableSuite))
 }
 
 type TransformTableSuite struct {
@@ -28,7 +28,7 @@ func (suite *TransformTableSuite) SetupTest() {
 	suite.T().Log("Setting up TransformTableSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -54,7 +54,7 @@ func (suite *TransformTableSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		 r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
 		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
@@ -67,7 +67,6 @@ func (suite *TransformTableSuite) TestCases() {
 	tbl := r.DB("test").Table("tbl")
 	_ = tbl // Prevent any noused variable errors
 
-
 	{
 		// transform/table.yaml line #5
 		/* AnythingIsFine */
@@ -76,9 +75,9 @@ func (suite *TransformTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #5: tbl.Insert([]interface{}{map[interface{}]interface{}{'a': []interface{}{'k1', 'v1'}, }, map[interface{}]interface{}{'a': []interface{}{'k2', 'v2'}, }})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"a": []interface{}{"k1", "v1"}, }, map[interface{}]interface{}{"a": []interface{}{"k2", "v2"}, }}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"a": []interface{}{"k1", "v1"}}, map[interface{}]interface{}{"a": []interface{}{"k2", "v2"}}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #5")
 	}
@@ -86,14 +85,14 @@ func (suite *TransformTableSuite) TestCases() {
 	{
 		// transform/table.yaml line #10
 		/* {"k1":"v1","k2":"v2"} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"k1": "v1", "k2": "v2", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"k1": "v1", "k2": "v2"}
 		/* tbl.map(r.row["a"]).coerce_to("object") */
 
 		suite.T().Log("About to run line #10: tbl.Map(r.Row.AtIndex('a')).CoerceTo('object')")
 
 		runAndAssert(suite.Suite, expected_, tbl.Map(r.Row.AtIndex("a")).CoerceTo("object"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -108,7 +107,7 @@ func (suite *TransformTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Limit(1).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #14")
 	}
@@ -123,7 +122,7 @@ func (suite *TransformTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Limit(1).CoerceTo("array").TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}

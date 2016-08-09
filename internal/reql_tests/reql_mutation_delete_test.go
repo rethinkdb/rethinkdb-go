@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests deletes of selections
 func TestMutationDeleteSuite(t *testing.T) {
-	suite.Run(t, new(MutationDeleteSuite ))
+	suite.Run(t, new(MutationDeleteSuite))
 }
 
 type MutationDeleteSuite struct {
@@ -28,7 +28,7 @@ func (suite *MutationDeleteSuite) SetupTest() {
 	suite.T().Log("Setting up MutationDeleteSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -54,7 +54,7 @@ func (suite *MutationDeleteSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		 r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
 		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
@@ -67,25 +67,24 @@ func (suite *MutationDeleteSuite) TestCases() {
 	tbl := r.DB("test").Table("tbl")
 	_ = tbl // Prevent any noused variable errors
 
-
 	{
 		// mutation/delete.yaml line #7
 		/* ({'deleted':0,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':100}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 100, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 100}
 		/* tbl.insert([{'id':i} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #7: tbl.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, })\n    }\n    return res\n}()))")
 
 		runAndAssert(suite.Suite, expected_, tbl.Insert((func() []interface{} {
-    res := []interface{}{}
-    for iterator_ := 0; iterator_ < 100; iterator_++ {
-        i := iterator_
-        res = append(res, map[interface{}]interface{}{"id": i, })
-    }
-    return res
-}())), suite.session, r.RunOpts{
+			res := []interface{}{}
+			for iterator_ := 0; iterator_ < 100; iterator_++ {
+				i := iterator_
+				res = append(res, map[interface{}]interface{}{"id": i})
+			}
+			return res
+		}())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -100,7 +99,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #19")
 	}
@@ -108,14 +107,14 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #24
 		/* ({'deleted':1,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 1, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 1, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
 		/* tbl.get(12).delete() */
 
 		suite.T().Log("About to run line #24: tbl.Get(12).Delete()")
 
 		runAndAssert(suite.Suite, expected_, tbl.Get(12).Delete(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -128,9 +127,9 @@ func (suite *MutationDeleteSuite) TestCases() {
 
 		suite.T().Log("About to run line #31: tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: 'wrong', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: "wrong", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: "wrong"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -138,14 +137,14 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #38
 		/* ({'deleted':49,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 49, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 49, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
 		/* tbl.skip(50).delete(durability='soft') */
 
 		suite.T().Log("About to run line #38: tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: 'soft', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: "soft", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: "soft"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #38")
 	}
@@ -153,14 +152,14 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #45
 		/* ({'deleted':50,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 50, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 50, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
 		/* tbl.delete(durability='hard') */
 
 		suite.T().Log("About to run line #45: tbl.Delete().OptArgs(r.DeleteOpts{Durability: 'hard', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Delete().OptArgs(r.DeleteOpts{Durability: "hard", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Delete().OptArgs(r.DeleteOpts{Durability: "hard"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #45")
 	}
@@ -175,7 +174,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Delete(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}

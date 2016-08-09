@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests that manipulation data in tables
 func TestTransformationSuite(t *testing.T) {
-	suite.Run(t, new(TransformationSuite ))
+	suite.Run(t, new(TransformationSuite))
 }
 
 type TransformationSuite struct {
@@ -28,7 +28,7 @@ func (suite *TransformationSuite) SetupTest() {
 	suite.T().Log("Setting up TransformationSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -64,9 +64,9 @@ func (suite *TransformationSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		 r.DB("test").TableDrop("tbl").Exec(suite.session)
-		 r.DB("test").TableDrop("tbl2").Exec(suite.session)
-		 r.DB("test").TableDrop("tbl3").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl2").Exec(suite.session)
+		r.DB("test").TableDrop("tbl3").Exec(suite.session)
 		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
@@ -83,25 +83,24 @@ func (suite *TransformationSuite) TestCases() {
 	tbl3 := r.DB("test").Table("tbl3")
 	_ = tbl3 // Prevent any noused variable errors
 
-
 	{
 		// transformation.yaml line #6
 		/* {'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
 		/* tbl.insert([{'id':i, 'a':i%4} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #6: tbl.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), })\n    }\n    return res\n}()))")
 
 		runAndAssert(suite.Suite, expected_, tbl.Insert((func() []interface{} {
-    res := []interface{}{}
-    for iterator_ := 0; iterator_ < 100; iterator_++ {
-        i := iterator_
-        res = append(res, map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4), })
-    }
-    return res
-}())), suite.session, r.RunOpts{
+			res := []interface{}{}
+			for iterator_ := 0; iterator_ < 100; iterator_++ {
+				i := iterator_
+				res = append(res, map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4)})
+			}
+			return res
+		}())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -109,14 +108,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #18
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('a') */
 
 		suite.T().Log("About to run line #18: tbl.IndexCreate('a')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #18")
 	}
@@ -124,14 +123,16 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #21
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('truncated_a', lambda x: ['a' * 300, x['a']]) */
 
 		suite.T().Log("About to run line #21: tbl.IndexCreateFunc('truncated_a', func(x r.Term) interface{} { return []interface{}{'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', x.AtIndex('a')}})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("truncated_a", func(x r.Term) interface{} { return []interface{}{"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", x.AtIndex("a")}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("truncated_a", func(x r.Term) interface{} {
+			return []interface{}{"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", x.AtIndex("a")}
+		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -139,14 +140,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #24
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('error_prone', lambda x: 1/x['a']) */
 
 		suite.T().Log("About to run line #24: tbl.IndexCreateFunc('error_prone', func(x r.Term) interface{} { return r.Div(1, x.AtIndex('a'))})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("error_prone", func(x r.Term) interface{} { return r.Div(1, x.AtIndex("a"))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("error_prone", func(x r.Term) interface{} { return r.Div(1, x.AtIndex("a")) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -161,7 +162,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait().Pluck("index", "ready"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -169,21 +170,21 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #29
 		/* {'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
 		/* tbl2.insert([{'id':i, 'b':i%4} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #29: tbl2.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'b': r.Mod(i, 4), })\n    }\n    return res\n}()))")
 
 		runAndAssert(suite.Suite, expected_, tbl2.Insert((func() []interface{} {
-    res := []interface{}{}
-    for iterator_ := 0; iterator_ < 100; iterator_++ {
-        i := iterator_
-        res = append(res, map[interface{}]interface{}{"id": i, "b": r.Mod(i, 4), })
-    }
-    return res
-}())), suite.session, r.RunOpts{
+			res := []interface{}{}
+			for iterator_ := 0; iterator_ < 100; iterator_++ {
+				i := iterator_
+				res = append(res, map[interface{}]interface{}{"id": i, "b": r.Mod(i, 4)})
+			}
+			return res
+		}())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #29")
 	}
@@ -191,21 +192,21 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #41
 		/* {'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
 		/* tbl3.insert([{'id':i, 'a':i%4, 'b':{'c':i%5}} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #41: tbl3.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), 'b': map[interface{}]interface{}{'c': r.Mod(i, 5), }, })\n    }\n    return res\n}()))")
 
 		runAndAssert(suite.Suite, expected_, tbl3.Insert((func() []interface{} {
-    res := []interface{}{}
-    for iterator_ := 0; iterator_ < 100; iterator_++ {
-        i := iterator_
-        res = append(res, map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4), "b": map[interface{}]interface{}{"c": r.Mod(i, 5), }, })
-    }
-    return res
-}())), suite.session, r.RunOpts{
+			res := []interface{}{}
+			for iterator_ := 0; iterator_ < 100; iterator_++ {
+				i := iterator_
+				res = append(res, map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4), "b": map[interface{}]interface{}{"c": r.Mod(i, 5)}})
+			}
+			return res
+		}())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #41")
 	}
@@ -218,9 +219,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #55: tbl.Map(func(row r.Term) interface{} { return row.AtIndex('id')}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Map(func(row r.Term) interface{} { return row.AtIndex("id")}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Map(func(row r.Term) interface{} { return row.AtIndex("id") }).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #55")
 	}
@@ -233,9 +234,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #56: tbl.Map(r.Row.AtIndex('id')).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #56")
 	}
@@ -248,9 +249,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #65: tbl.Union(tbl).Map(func(row r.Term) interface{} { return row.AtIndex('id')}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Union(tbl).Map(func(row r.Term) interface{} { return row.AtIndex("id")}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Union(tbl).Map(func(row r.Term) interface{} { return row.AtIndex("id") }).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #65")
 	}
@@ -263,9 +264,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #66: tbl.Union(tbl).Map(r.Row.AtIndex('id')).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Union(tbl).Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Union(tbl).Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #66")
 	}
@@ -278,9 +279,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #75: tbl.CoerceTo('array').Union(tbl).Map(func(row r.Term) interface{} { return row.AtIndex('id')}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Union(tbl).Map(func(row r.Term) interface{} { return row.AtIndex("id")}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Union(tbl).Map(func(row r.Term) interface{} { return row.AtIndex("id") }).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #75")
 	}
@@ -293,9 +294,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #76: tbl.CoerceTo('array').Union(tbl).Map(r.Row.AtIndex('id')).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Union(tbl).Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Union(tbl).Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #76")
 	}
@@ -308,9 +309,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #85: tbl.Union(tbl.CoerceTo('array')).Map(func(row r.Term) interface{} { return row.AtIndex('id')}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Union(tbl.CoerceTo("array")).Map(func(row r.Term) interface{} { return row.AtIndex("id")}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Union(tbl.CoerceTo("array")).Map(func(row r.Term) interface{} { return row.AtIndex("id") }).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #85")
 	}
@@ -323,9 +324,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #86: tbl.Union(tbl.CoerceTo('array')).Map(r.Row.AtIndex('id')).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Union(tbl.CoerceTo("array")).Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Union(tbl.CoerceTo("array")).Map(r.Row.AtIndex("id")).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #86")
 	}
@@ -338,9 +339,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #94: tbl.GetAll().Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return []interface{}{acc}}, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll().Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return []interface{}{acc}}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll().Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1) }).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return []interface{}{acc} }}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #94")
 	}
@@ -353,9 +354,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #97: r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return acc}, })")
 
-		runAndAssert(suite.Suite, expected_, r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return acc}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1) }).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return acc }}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #97")
 	}
@@ -368,9 +369,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #100: r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return r.Range()}, })")
 
-		runAndAssert(suite.Suite, expected_, r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return r.Range()}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1) }).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return r.Range() }}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #100")
 	}
@@ -383,9 +384,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #103: r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return []interface{}{acc}}, }).Changes()")
 
-		runAndAssert(suite.Suite, expected_, r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return []interface{}{acc}}, }).Changes(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Range(0, 10).Fold(0, func(acc r.Term, _ r.Term) interface{} { return acc.Add(1) }).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return []interface{}{acc} }}).Changes(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #103")
 	}
@@ -398,9 +399,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #111: tbl.ConcatMap(func(row r.Term) interface{} { return []interface{}{}})")
 
-		runAndAssert(suite.Suite, expected_, tbl.ConcatMap(func(row r.Term) interface{} { return []interface{}{}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.ConcatMap(func(row r.Term) interface{} { return []interface{}{} }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #111")
 	}
@@ -409,9 +410,8 @@ func (suite *TransformationSuite) TestCases() {
 	// ccm = tbl.concat_map(lambda row:[row['a'], (row['a'] + 1) % 4])
 	suite.T().Log("Possibly executing: var ccm r.Term = tbl.ConcatMap(func(row r.Term) interface{} { return []interface{}{row.AtIndex('a'), row.AtIndex('a').Add(1).Mod(4)}})")
 
-	ccm := tbl.ConcatMap(func(row r.Term) interface{} { return []interface{}{row.AtIndex("a"), row.AtIndex("a").Add(1).Mod(4)}})
+	ccm := tbl.ConcatMap(func(row r.Term) interface{} { return []interface{}{row.AtIndex("a"), row.AtIndex("a").Add(1).Mod(4)} })
 	_ = ccm // Prevent any noused variable errors
-
 
 	{
 		// transformation.yaml line #119
@@ -423,7 +423,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, ccm.Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #119")
 	}
@@ -436,9 +436,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #121: ccm.Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b).Mod(4)})")
 
-		runAndAssert(suite.Suite, expected_, ccm.Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b).Mod(4)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ccm.Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b).Mod(4) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #121")
 	}
@@ -446,14 +446,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #127
 		/* {'id':0, 'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by('id')[0] */
 
 		suite.T().Log("About to run line #127: tbl.OrderBy('id').AtIndex(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #127")
 	}
@@ -468,7 +468,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy([]interface{}{1, 2, 3}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #132")
 	}
@@ -476,14 +476,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #137
 		/* {'id':0, 'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by(index='id')[0] */
 
 		suite.T().Log("About to run line #137: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #137")
 	}
@@ -496,9 +496,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #142: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).AtIndex(0).Update(map[interface{}]interface{}{'a': 0, }).AtIndex('unchanged')")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).AtIndex(0).Update(map[interface{}]interface{}{"a": 0, }).AtIndex("unchanged"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).AtIndex(0).Update(map[interface{}]interface{}{"a": 0}).AtIndex("unchanged"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #142")
 	}
@@ -511,9 +511,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #147: tbl.GetAll(0).Update(map[interface{}]interface{}{'a': 0, }).AtIndex('unchanged')")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).Update(map[interface{}]interface{}{"a": 0, }).AtIndex("unchanged"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).Update(map[interface{}]interface{}{"a": 0}).AtIndex("unchanged"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #147")
 	}
@@ -526,9 +526,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #152: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #152")
 	}
@@ -541,9 +541,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #158: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #158")
 	}
@@ -556,9 +556,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #163: tbl.OrderBy('id').OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #163")
 	}
@@ -571,9 +571,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #168: tbl.OrderBy('id').OrderBy().OptArgs(r.OrderByOpts{Index: 'a', }).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OrderBy().OptArgs(r.OrderByOpts{Index: "a", }).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OrderBy().OptArgs(r.OrderByOpts{Index: "a"}).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #168")
 	}
@@ -581,14 +581,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #173
 		/* {'id':5, 'a':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 5, "a": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 5, "a": 1}
 		/* tbl.between(5, r.maxval, index='id').order_by(index='id')[0] */
 
 		suite.T().Log("About to run line #173: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #173")
 	}
@@ -601,9 +601,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #178: tbl.OrderBy('a').OptArgs(r.OrderByOpts{Index: 'id', }).Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("a").OptArgs(r.OrderByOpts{Index: "id", }).Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", }).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("a").OptArgs(r.OrderByOpts{Index: "id"}).Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id"}).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #178")
 	}
@@ -611,14 +611,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #183
 		/* {'id':0, 'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by(lambda x: x['id'])[0] */
 
 		suite.T().Log("About to run line #183: tbl.OrderBy(func(x r.Term) interface{} { return x.AtIndex('id')}).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy(func(x r.Term) interface{} { return x.AtIndex("id")}).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy(func(x r.Term) interface{} { return x.AtIndex("id") }).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #183")
 	}
@@ -626,14 +626,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #188
 		/* {'id':0,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by('a', 'id').nth(0) */
 
 		suite.T().Log("About to run line #188: tbl.OrderBy('a', 'id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("a", "id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #188")
 	}
@@ -641,14 +641,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #191
 		/* {'id':0,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by('id', index='a').nth(0) */
 
 		suite.T().Log("About to run line #191: tbl.OrderBy('id').OptArgs(r.OrderByOpts{Index: 'a', }).Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: "a", }).Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: "a"}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #191")
 	}
@@ -656,14 +656,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #196
 		/* {'id':0,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by('id', index='truncated_a').nth(0) */
 
 		suite.T().Log("About to run line #196: tbl.OrderBy('id').OptArgs(r.OrderByOpts{Index: 'truncated_a', }).Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: "truncated_a", }).Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: "truncated_a"}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #196")
 	}
@@ -671,14 +671,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #199
 		/* {'id':3,'a':3} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3}
 		/* tbl.order_by('id', index='error_prone').nth(0) */
 
 		suite.T().Log("About to run line #199: tbl.OrderBy('id').OptArgs(r.OrderByOpts{Index: 'error_prone', }).Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: "error_prone", }).Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: "error_prone"}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #199")
 	}
@@ -686,14 +686,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #202
 		/* {'id':0, 'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by(lambda x: [x['a'], x['id']])[0] */
 
 		suite.T().Log("About to run line #202: tbl.OrderBy(func(x r.Term) interface{} { return []interface{}{x.AtIndex('a'), x.AtIndex('id')}}).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy(func(x r.Term) interface{} { return []interface{}{x.AtIndex("a"), x.AtIndex("id")}}).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy(func(x r.Term) interface{} { return []interface{}{x.AtIndex("a"), x.AtIndex("id")} }).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #202")
 	}
@@ -701,14 +701,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #207
 		/* {'id':3,'a':3} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3}
 		/* tbl.order_by(r.desc('a'), r.asc('id')).nth(0) */
 
 		suite.T().Log("About to run line #207: tbl.OrderBy(r.Desc('a'), r.Asc('id')).Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Desc("a"), r.Asc("id")).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #207")
 	}
@@ -716,14 +716,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #210
 		/* {'id':3,'a':3} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3}
 		/* tbl.order_by('id', index=r.desc('a')).nth(0) */
 
 		suite.T().Log("About to run line #210: tbl.OrderBy('id').OptArgs(r.OrderByOpts{Index: r.Desc('a'), }).Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: r.Desc("a"), }).Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").OptArgs(r.OrderByOpts{Index: r.Desc("a")}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #210")
 	}
@@ -731,14 +731,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #215
 		/* {'id':3, 'a':3} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 3, "a": 3}
 		/* tbl.order_by(r.desc(lambda x: x['a']), lambda x: x['id'])[0] */
 
 		suite.T().Log("About to run line #215: tbl.OrderBy(r.Desc(func(x r.Term) interface{} { return x.AtIndex('a')}), func(x r.Term) interface{} { return x.AtIndex('id')}).AtIndex(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Desc(func(x r.Term) interface{} { return x.AtIndex("a")}), func(x r.Term) interface{} { return x.AtIndex("id")}).AtIndex(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Desc(func(x r.Term) interface{} { return x.AtIndex("a") }), func(x r.Term) interface{} { return x.AtIndex("id") }).AtIndex(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #215")
 	}
@@ -746,14 +746,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #220
 		/* {'id':96,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 96, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 96, "a": 0}
 		/* tbl.order_by(r.asc('a'), r.desc('id')).nth(0) */
 
 		suite.T().Log("About to run line #220: tbl.OrderBy(r.Asc('a'), r.Desc('id')).Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Asc("a"), r.Desc("id")).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #220")
 	}
@@ -761,14 +761,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #223
 		/* {'id':96,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 96, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 96, "a": 0}
 		/* tbl.order_by(r.desc('id'), index='a').nth(0) */
 
 		suite.T().Log("About to run line #223: tbl.OrderBy(r.Desc('id')).OptArgs(r.OrderByOpts{Index: 'a', }).Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Desc("id")).OptArgs(r.OrderByOpts{Index: "a", }).Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Desc("id")).OptArgs(r.OrderByOpts{Index: "a"}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #223")
 	}
@@ -783,7 +783,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #228")
 	}
@@ -791,14 +791,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #231
 		/* {'id':0, 'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by('missing').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #231: tbl.OrderBy('missing').OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("missing").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #231")
 	}
@@ -811,9 +811,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #234: tbl.OrderBy('missing').OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("missing").OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("missing").OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #234")
 	}
@@ -821,14 +821,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #239
 		/* {'id':0, 'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by('id', 'missing').nth(0) */
 
 		suite.T().Log("About to run line #239: tbl.OrderBy('id', 'missing').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id", "missing").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #239")
 	}
@@ -836,14 +836,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #242
 		/* {'id':0, 'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.order_by('missing', index='id').nth(0) */
 
 		suite.T().Log("About to run line #242: tbl.OrderBy('missing').OptArgs(r.OrderByOpts{Index: 'id', }).Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy("missing").OptArgs(r.OrderByOpts{Index: "id", }).Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy("missing").OptArgs(r.OrderByOpts{Index: "id"}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #242")
 	}
@@ -856,9 +856,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #247: tbl.OrderBy(r.Desc('id')).CoerceTo('ARRAY').Eq(tbl.OrderBy(func(x r.Term) interface{} { return r.Sub(0, x.AtIndex('id'))}).CoerceTo('ARRAY'))")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Desc("id")).CoerceTo("ARRAY").Eq(tbl.OrderBy(func(x r.Term) interface{} { return r.Sub(0, x.AtIndex("id"))}).CoerceTo("ARRAY")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy(r.Desc("id")).CoerceTo("ARRAY").Eq(tbl.OrderBy(func(x r.Term) interface{} { return r.Sub(0, x.AtIndex("id")) }).CoerceTo("ARRAY")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #247")
 	}
@@ -871,9 +871,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #252: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc('id'), }).CoerceTo('ARRAY').Eq(tbl.OrderBy(func(x r.Term) interface{} { return r.Sub(0, x.AtIndex('id'))}).CoerceTo('ARRAY'))")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc("id"), }).CoerceTo("ARRAY").Eq(tbl.OrderBy(func(x r.Term) interface{} { return r.Sub(0, x.AtIndex("id"))}).CoerceTo("ARRAY")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc("id")}).CoerceTo("ARRAY").Eq(tbl.OrderBy(func(x r.Term) interface{} { return r.Sub(0, x.AtIndex("id")) }).CoerceTo("ARRAY")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #252")
 	}
@@ -886,9 +886,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #257: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc('id'), }).CoerceTo('ARRAY').Eq(tbl.OrderBy(r.Desc('id')).CoerceTo('ARRAY'))")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc("id"), }).CoerceTo("ARRAY").Eq(tbl.OrderBy(r.Desc("id")).CoerceTo("ARRAY")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc("id")}).CoerceTo("ARRAY").Eq(tbl.OrderBy(r.Desc("id")).CoerceTo("ARRAY")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #257")
 	}
@@ -903,7 +903,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Skip(1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #263")
 	}
@@ -918,7 +918,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Skip(-1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #265")
 	}
@@ -933,7 +933,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Skip("foo").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #267")
 	}
@@ -948,7 +948,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Limit(1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #271")
 	}
@@ -963,7 +963,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Limit(-1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #273")
 	}
@@ -978,7 +978,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Limit("foo").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #275")
 	}
@@ -993,7 +993,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(1, 3).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #279")
 	}
@@ -1008,7 +1008,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(5).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #281")
 	}
@@ -1023,7 +1023,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(-1, -3).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #283")
 	}
@@ -1038,7 +1038,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(0, -3).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #285")
 	}
@@ -1053,7 +1053,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(0, -1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #287")
 	}
@@ -1068,7 +1068,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice("foo", "bar").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #289")
 	}
@@ -1083,7 +1083,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(1, nil).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #291")
 	}
@@ -1098,7 +1098,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(nil, 1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #293")
 	}
@@ -1113,7 +1113,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(12, 20).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #296")
 	}
@@ -1126,9 +1126,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #299: tbl.Slice(12, 20).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Slice(12, 20).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Slice(12, 20).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #299")
 	}
@@ -1141,9 +1141,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #303: tbl.Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: 'open', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #303")
 	}
@@ -1156,9 +1156,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #307: tbl.Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: 'open', RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open", RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open", RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #307")
 	}
@@ -1173,7 +1173,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(12, -1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #311")
 	}
@@ -1186,9 +1186,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #314: tbl.Slice(12, -1).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Slice(12, -1).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Slice(12, -1).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #314")
 	}
@@ -1203,7 +1203,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(12, -2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #318")
 	}
@@ -1216,9 +1216,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #321: tbl.Slice(12, -2).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Slice(12, -2).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Slice(12, -2).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #321")
 	}
@@ -1233,7 +1233,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Slice(-12, -2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #325")
 	}
@@ -1246,9 +1246,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #328: tbl.Slice(-12, -2).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Slice(-12, -2).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Slice(-12, -2).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #328")
 	}
@@ -1263,7 +1263,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, 20).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #332")
 	}
@@ -1276,9 +1276,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #335: tbl.CoerceTo('array').Slice(12, 20).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, 20).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, 20).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #335")
 	}
@@ -1291,9 +1291,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #339: tbl.CoerceTo('array').Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: 'open', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #339")
 	}
@@ -1306,9 +1306,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #343: tbl.CoerceTo('array').Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: 'open', RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open", RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, 20).OptArgs(r.SliceOpts{LeftBound: "open", RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #343")
 	}
@@ -1323,7 +1323,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, -1).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #347")
 	}
@@ -1336,9 +1336,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #350: tbl.CoerceTo('array').Slice(12, -1).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, -1).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, -1).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #350")
 	}
@@ -1353,7 +1353,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, -2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #354")
 	}
@@ -1366,9 +1366,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #357: tbl.CoerceTo('array').Slice(12, -2).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, -2).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(12, -2).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #357")
 	}
@@ -1383,7 +1383,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(-12, -2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #361")
 	}
@@ -1396,9 +1396,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #364: tbl.CoerceTo('array').Slice(-12, -2).OptArgs(r.SliceOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(-12, -2).OptArgs(r.SliceOpts{RightBound: "closed", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.CoerceTo("array").Slice(-12, -2).OptArgs(r.SliceOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #364")
 	}
@@ -1410,7 +1410,6 @@ func (suite *TransformationSuite) TestCases() {
 	arr := r.Expr([]interface{}{1, 2, 3, 4, 5})
 	_ = arr // Prevent any noused variable errors
 
-
 	{
 		// transformation.yaml line #372
 		/* [2, 3] */
@@ -1421,7 +1420,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, arr.Slice(1, 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #372")
 	}
@@ -1436,7 +1435,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, arr.Slice(1, -3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #377")
 	}
@@ -1451,7 +1450,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, arr.Slice(1, -1, r.SliceOpts{RightBound: "closed"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #380")
 	}
@@ -1466,7 +1465,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, arr.Slice(1, -1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #383")
 	}
@@ -1474,14 +1473,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #387
 		/* {'id':1,'a':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 1, "a": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 1, "a": 1}
 		/* tbl.order_by('id').nth(1) */
 
 		suite.T().Log("About to run line #387: tbl.OrderBy('id').Nth(1)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").Nth(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #387")
 	}
@@ -1489,14 +1488,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #389
 		/* {'id':99,'a':3} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 99, "a": 3, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 99, "a": 3}
 		/* tbl.order_by('id').nth(-1) */
 
 		suite.T().Log("About to run line #389: tbl.OrderBy('id').Nth(-1)")
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").Nth(-1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #389")
 	}
@@ -1511,7 +1510,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.OrderBy("id").Nth("foo").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #391")
 	}
@@ -1526,7 +1525,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IsEmpty(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #395")
 	}
@@ -1541,7 +1540,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Limit(0).IsEmpty(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #397")
 	}
@@ -1556,7 +1555,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).IsEmpty(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #399")
 	}
@@ -1571,7 +1570,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").IsEmpty(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #401")
 	}
@@ -1586,7 +1585,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck().Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #405")
 	}
@@ -1601,7 +1600,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck(map[interface{}]interface{}{}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #408")
 	}
@@ -1616,7 +1615,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck([]interface{}{}).Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #411")
 	}
@@ -1624,14 +1623,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #414
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.pluck('id').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #414: tbl3.Pluck('id').OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck("id").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #414")
 	}
@@ -1639,14 +1638,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #417
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.pluck(['id']).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #417: tbl3.Pluck([]interface{}{'id'}).OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck([]interface{}{"id"}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #417")
 	}
@@ -1654,14 +1653,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #420
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.pluck({'id':True}).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #420: tbl3.Pluck(map[interface{}]interface{}{'id': true, }).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Pluck(map[interface{}]interface{}{"id": true, }).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Pluck(map[interface{}]interface{}{"id": true}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #420")
 	}
@@ -1669,14 +1668,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #425
 		/* {'id':0,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl3.pluck('id', 'a').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #425: tbl3.Pluck('id', 'a').OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck("id", "a").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #425")
 	}
@@ -1684,14 +1683,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #428
 		/* {'id':0,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl3.pluck(['id', 'a']).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #428: tbl3.Pluck([]interface{}{'id', 'a'}).OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck([]interface{}{"id", "a"}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #428")
 	}
@@ -1699,14 +1698,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #431
 		/* {'id':0,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl3.pluck({'id':True, 'a':True}).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #431: tbl3.Pluck(map[interface{}]interface{}{'id': true, 'a': true, }).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Pluck(map[interface{}]interface{}{"id": true, "a": true, }).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Pluck(map[interface{}]interface{}{"id": true, "a": true}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #431")
 	}
@@ -1714,14 +1713,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #436
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.pluck('id', 'missing').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #436: tbl3.Pluck('id', 'missing').OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck("id", "missing").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #436")
 	}
@@ -1729,14 +1728,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #439
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.pluck(['id', 'missing']).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #439: tbl3.Pluck([]interface{}{'id', 'missing'}).OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck([]interface{}{"id", "missing"}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #439")
 	}
@@ -1744,14 +1743,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #442
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.pluck({'id':True, 'missing':True}).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #442: tbl3.Pluck(map[interface{}]interface{}{'id': true, 'missing': true, }).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Pluck(map[interface{}]interface{}{"id": true, "missing": true, }).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Pluck(map[interface{}]interface{}{"id": true, "missing": true}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #442")
 	}
@@ -1759,14 +1758,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #447
 		/* {'id':0, 'b':{'c':0}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{"c": 0, }, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{"c": 0}}
 		/* tbl3.pluck('id', {'b':'c'}).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #447: tbl3.Pluck('id', map[interface{}]interface{}{'b': 'c', }).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Pluck("id", map[interface{}]interface{}{"b": "c", }).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Pluck("id", map[interface{}]interface{}{"b": "c"}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #447")
 	}
@@ -1774,14 +1773,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #450
 		/* {'id':0, 'b':{'c':0}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{"c": 0, }, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{"c": 0}}
 		/* tbl3.pluck(['id', {'b':'c'}]).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #450: tbl3.Pluck([]interface{}{'id', map[interface{}]interface{}{'b': 'c', }}).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Pluck([]interface{}{"id", map[interface{}]interface{}{"b": "c", }}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Pluck([]interface{}{"id", map[interface{}]interface{}{"b": "c"}}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #450")
 	}
@@ -1796,7 +1795,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl3.Pluck(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #453")
 	}
@@ -1809,9 +1808,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #456: r.Expr([]interface{}{[]interface{}{map[interface{}]interface{}{'foo': 1, }}}).Pluck('foo')")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{[]interface{}{map[interface{}]interface{}{"foo": 1, }}}).Pluck("foo"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{[]interface{}{map[interface{}]interface{}{"foo": 1}}}).Pluck("foo"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #456")
 	}
@@ -1819,14 +1818,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #461
 		/* [{'a':1},{'b':2}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, }, map[interface{}]interface{}{"b": 2, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"b": 2}}
 		/* r.expr(['a','b']).map(lambda x:r.expr({'a':1,'b':2}).pluck(x)) */
 
 		suite.T().Log("About to run line #461: r.Expr([]interface{}{'a', 'b'}).Map(func(x r.Term) interface{} { return r.Expr(map[interface{}]interface{}{'a': 1, 'b': 2, }).Pluck(x)})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{"a", "b"}).Map(func(x r.Term) interface{} { return r.Expr(map[interface{}]interface{}{"a": 1, "b": 2, }).Pluck(x)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{"a", "b"}).Map(func(x r.Term) interface{} { return r.Expr(map[interface{}]interface{}{"a": 1, "b": 2}).Pluck(x) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #461")
 	}
@@ -1834,14 +1833,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #466
 		/* {"foo":{}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"foo": map[interface{}]interface{}{}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"foo": map[interface{}]interface{}{}}
 		/* r.expr({"foo":{"bar":1}}).pluck({"foo":{"bar":"buzz"}}) */
 
 		suite.T().Log("About to run line #466: r.Expr(map[interface{}]interface{}{'foo': map[interface{}]interface{}{'bar': 1, }, }).Pluck(map[interface{}]interface{}{'foo': map[interface{}]interface{}{'bar': 'buzz', }, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"foo": map[interface{}]interface{}{"bar": 1, }, }).Pluck(map[interface{}]interface{}{"foo": map[interface{}]interface{}{"bar": "buzz", }, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"foo": map[interface{}]interface{}{"bar": 1}}).Pluck(map[interface{}]interface{}{"foo": map[interface{}]interface{}{"bar": "buzz"}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #466")
 	}
@@ -1849,14 +1848,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #470
 		/* {'id':0,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "a": 0}
 		/* tbl.without().order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #470: tbl.Without().OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.Without().OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #470")
 	}
@@ -1864,14 +1863,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #473
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl.without('a').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #473: tbl.Without('a').OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.Without("a").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #473")
 	}
@@ -1886,7 +1885,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Without("id", "a").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #476")
 	}
@@ -1894,14 +1893,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #479
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl.without('a', 'missing').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #479: tbl.Without('a', 'missing').OrderBy('id').Nth(0)")
 
 		runAndAssert(suite.Suite, expected_, tbl.Without("a", "missing").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #479")
 	}
@@ -1909,14 +1908,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #482
 		/* {'id':0, 'b':{}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{}}
 		/* tbl3.without('a', {'b':'c'}).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #482: tbl3.Without('a', map[interface{}]interface{}{'b': 'c', }).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Without("a", map[interface{}]interface{}{"b": "c", }).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Without("a", map[interface{}]interface{}{"b": "c"}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #482")
 	}
@@ -1924,14 +1923,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #485
 		/* {'id':0, 'b':{}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{}}
 		/* tbl3.without(['a', {'b':'c'}]).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #485: tbl3.Without([]interface{}{'a', map[interface{}]interface{}{'b': 'c', }}).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Without([]interface{}{"a", map[interface{}]interface{}{"b": "c", }}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Without([]interface{}{"a", map[interface{}]interface{}{"b": "c"}}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #485")
 	}
@@ -1939,14 +1938,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #488
 		/* {'id':0, 'b':{'c':0}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{"c": 0, }, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "b": map[interface{}]interface{}{"c": 0}}
 		/* tbl3.without(['a', {'b':'d'}]).order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #488: tbl3.Without([]interface{}{'a', map[interface{}]interface{}{'b': 'd', }}).OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Without([]interface{}{"a", map[interface{}]interface{}{"b": "d", }}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Without([]interface{}{"a", map[interface{}]interface{}{"b": "d"}}).OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #488")
 	}
@@ -1961,7 +1960,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Union(tbl2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #492")
 	}
@@ -1976,7 +1975,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Union([]interface{}{1, 2, 3}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #494")
 	}
@@ -1991,7 +1990,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).Union(tbl2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #496")
 	}
@@ -2003,7 +2002,6 @@ func (suite *TransformationSuite) TestCases() {
 	ord := tbl.OrderBy("id")
 	_ = ord // Prevent any noused variable errors
 
-
 	{
 		// transformation.yaml line #502
 		/* [0,1] */
@@ -2014,7 +2012,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, ord.OffsetsOf(r.Row.AtIndex("id").Lt(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #502")
 	}
@@ -2029,7 +2027,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).OffsetsOf(3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #506")
 	}
@@ -2044,7 +2042,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1}).OffsetsOf(tbl), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #509")
 	}
@@ -2057,9 +2055,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #512: r.Expr(1).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{2, 1, 0}).OffsetsOf(x)})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{2, 1, 0}).OffsetsOf(x)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{2, 1, 0}).OffsetsOf(x) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #512")
 	}
@@ -2074,7 +2072,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Contains(tbl.AtIndex(0)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #518")
 	}
@@ -2089,7 +2087,7 @@ func (suite *TransformationSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Contains(tbl.AtIndex(0).Pluck("id")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #521")
 	}
@@ -2097,14 +2095,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #533
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.filter({'b':{'c':0}}).pluck('id').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #533: tbl3.Filter(map[interface{}]interface{}{'b': map[interface{}]interface{}{'c': 0, }, }).Pluck('id').OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Filter(map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 0, }, }).Pluck("id").OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Filter(map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 0}}).Pluck("id").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #533")
 	}
@@ -2117,9 +2115,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #536: tbl3.Filter(map[interface{}]interface{}{'b': map[interface{}]interface{}{'c': 6, }, })")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Filter(map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 6, }, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Filter(map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 6}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #536")
 	}
@@ -2132,9 +2130,9 @@ func (suite *TransformationSuite) TestCases() {
 
 		suite.T().Log("About to run line #539: tbl3.Filter(r.Literal(map[interface{}]interface{}{'id': 0, }))")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Filter(r.Literal(map[interface{}]interface{}{"id": 0, })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Filter(r.Literal(map[interface{}]interface{}{"id": 0})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #539")
 	}
@@ -2142,14 +2140,14 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #542
 		/* {'id':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
 		/* tbl3.filter({'b':r.literal({'c':0})}).pluck('id').order_by('id').nth(0) */
 
 		suite.T().Log("About to run line #542: tbl3.Filter(map[interface{}]interface{}{'b': r.Literal(map[interface{}]interface{}{'c': 0, }), }).Pluck('id').OrderBy('id').Nth(0)")
 
-		runAndAssert(suite.Suite, expected_, tbl3.Filter(map[interface{}]interface{}{"b": r.Literal(map[interface{}]interface{}{"c": 0, }), }).Pluck("id").OrderBy("id").Nth(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Filter(map[interface{}]interface{}{"b": r.Literal(map[interface{}]interface{}{"c": 0})}).Pluck("id").OrderBy("id").Nth(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #542")
 	}

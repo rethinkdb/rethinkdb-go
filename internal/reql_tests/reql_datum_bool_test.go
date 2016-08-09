@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests of conversion to and from the RQL bool type
 func TestDatumBoolSuite(t *testing.T) {
-	suite.Run(t, new(DatumBoolSuite ))
+	suite.Run(t, new(DatumBoolSuite))
 }
 
 type DatumBoolSuite struct {
@@ -28,7 +28,7 @@ func (suite *DatumBoolSuite) SetupTest() {
 	suite.T().Log("Setting up DatumBoolSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *DatumBoolSuite) TearDownSuite() {
 func (suite *DatumBoolSuite) TestCases() {
 	suite.T().Log("Running DatumBoolSuite: Tests of conversion to and from the RQL bool type")
 
-
-
 	{
 		// datum/bool.yaml line #3
 		/* true */
@@ -70,7 +68,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #3")
 	}
@@ -85,7 +83,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -100,7 +98,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}
@@ -115,7 +113,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).CoerceTo("string"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -130,7 +128,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -145,7 +143,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -160,7 +158,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -175,7 +173,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(0).CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #33")
 	}
@@ -190,7 +188,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("false").CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #36")
 	}
@@ -205,7 +203,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("foo").CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #39")
 	}
@@ -220,7 +218,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}).CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #42")
 	}
@@ -235,7 +233,7 @@ func (suite *DatumBoolSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{}).CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #45")
 	}

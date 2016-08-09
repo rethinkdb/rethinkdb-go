@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Test the native shims.
 func TestTimesShimSuite(t *testing.T) {
-	suite.Run(t, new(TimesShimSuite ))
+	suite.Run(t, new(TimesShimSuite))
 }
 
 type TimesShimSuite struct {
@@ -28,7 +28,7 @@ func (suite *TimesShimSuite) SetupTest() {
 	suite.T().Log("Setting up TimesShimSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,15 +58,12 @@ func (suite *TimesShimSuite) TearDownSuite() {
 func (suite *TimesShimSuite) TestCases() {
 	suite.T().Log("Running TimesShimSuite: Test the native shims.")
 
-
-
 	// times/shim.yaml line #4
 	// t = 1375147296.68
 	suite.T().Log("Possibly executing: var t float64 = 1375147296.68")
 
 	t := 1375147296.68
 	_ = t // Prevent any noused variable errors
-
 
 	{
 		// times/shim.yaml line #8
@@ -78,7 +75,7 @@ func (suite *TimesShimSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(Ast.Fromtimestamp(t, PacificTimeZone())).ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -93,7 +90,7 @@ func (suite *TimesShimSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(Ast.Fromtimestamp(t, UTCTimeZone())).ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #12")
 	}
@@ -108,7 +105,7 @@ func (suite *TimesShimSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(Ast.Fromtimestamp(t, PacificTimeZone())).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -123,7 +120,7 @@ func (suite *TimesShimSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(Ast.Fromtimestamp(t, UTCTimeZone())).ToEpochTime(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #20")
 	}

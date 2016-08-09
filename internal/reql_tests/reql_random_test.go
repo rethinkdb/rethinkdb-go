@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests randomization functions
 func TestRandomSuite(t *testing.T) {
-	suite.Run(t, new(RandomSuite ))
+	suite.Run(t, new(RandomSuite))
 }
 
 type RandomSuite struct {
@@ -28,7 +28,7 @@ func (suite *RandomSuite) SetupTest() {
 	suite.T().Log("Setting up RandomSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *RandomSuite) TearDownSuite() {
 func (suite *RandomSuite) TestCases() {
 	suite.T().Log("Running RandomSuite: Tests randomization functions")
 
-
-
 	{
 		// random.yaml line #5
 		/* 3 */
@@ -70,7 +68,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).Sample(3).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #5")
 	}
@@ -85,7 +83,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).Sample(3).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -100,7 +98,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4, 5, 6}).Sample(3).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -115,7 +113,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).Sample(4).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -130,7 +128,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).Sample(-1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #15")
 	}
@@ -145,7 +143,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Sample(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}
@@ -160,7 +158,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{}).Sample(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #19")
 	}
@@ -173,9 +171,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #25: r.Random().Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random().Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random().Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #25")
 	}
@@ -188,9 +186,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #26: r.Random(1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(1).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #26")
 	}
@@ -203,9 +201,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #27: r.Random(0, 1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(0, 1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(0, 1).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -218,9 +216,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #28: r.Random(1, 0).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(1, 0).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(1, 0).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -233,9 +231,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #29: r.Random(r.Expr(0), 1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(0), 1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(0), 1).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #29")
 	}
@@ -248,9 +246,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #30: r.Random(1, r.Expr(0)).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(1, r.Expr(0)).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(1, r.Expr(0)).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -263,9 +261,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #31: r.Random(r.Expr(1), r.Expr(0)).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(1), r.Expr(0)).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(1), r.Expr(0)).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(1), x.Gt(0)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -278,9 +276,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #36: r.Random(0.495).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(0.495))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(0.495).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(0.495))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(0.495).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(0.495)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #36")
 	}
@@ -293,9 +291,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #37: r.Random(-0.495).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(0), x.Gt(-0.495))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-0.495).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(0), x.Gt(-0.495))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-0.495).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(0), x.Gt(-0.495)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -308,9 +306,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #38: r.Random(1823756.24).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1823756.24))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(1823756.24).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1823756.24))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(1823756.24).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(1823756.24)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #38")
 	}
@@ -323,9 +321,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #39: r.Random(-1823756.24).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(0), x.Gt(-1823756.24))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-1823756.24).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(0), x.Gt(-1823756.24))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-1823756.24).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(0), x.Gt(-1823756.24)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #39")
 	}
@@ -338,9 +336,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #44: r.Random(10.5, 20.153).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(10.5), x.Lt(20.153))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(10.5, 20.153).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(10.5), x.Lt(20.153))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(10.5, 20.153).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(10.5), x.Lt(20.153)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #44")
 	}
@@ -353,9 +351,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #45: r.Random(20.153, 10.5).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(20.153), x.Gt(10.5))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(20.153, 10.5).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(20.153), x.Gt(10.5))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(20.153, 10.5).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(20.153), x.Gt(10.5)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #45")
 	}
@@ -368,9 +366,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #46: r.Random(31415926.1, 31415926).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(31415926.1), x.Gt(31415926))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(31415926.1, 31415926).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(31415926.1), x.Gt(31415926))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(31415926.1, 31415926).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(31415926.1), x.Gt(31415926)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #46")
 	}
@@ -383,9 +381,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #51: r.Random(-10.5, 20.153).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-10.5), x.Lt(20.153))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-10.5, 20.153).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-10.5), x.Lt(20.153))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-10.5, 20.153).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(-10.5), x.Lt(20.153)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #51")
 	}
@@ -398,9 +396,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #52: r.Random(-20.153, -10.5).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-20.153), x.Lt(-10.5))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-20.153, -10.5).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-20.153), x.Lt(-10.5))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-20.153, -10.5).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(-20.153), x.Lt(-10.5)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -413,9 +411,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #53: r.Random(-31415926, -31415926.1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(-31415926), x.Gt(-31415926.1))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-31415926, -31415926.1).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(-31415926), x.Gt(-31415926.1))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-31415926, -31415926.1).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(-31415926), x.Gt(-31415926.1)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #53")
 	}
@@ -430,7 +428,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Random(), r.Random()}).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #58")
 	}
@@ -443,9 +441,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #59: r.Expr([]interface{}{r.Random(1).OptArgs(r.RandomOpts{Float: true, }), r.Random(1).OptArgs(r.RandomOpts{Float: true, })}).Distinct().Count()")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Random(1).OptArgs(r.RandomOpts{Float: true, }), r.Random(1).OptArgs(r.RandomOpts{Float: true, })}).Distinct().Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Random(1).OptArgs(r.RandomOpts{Float: true}), r.Random(1).OptArgs(r.RandomOpts{Float: true})}).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #59")
 	}
@@ -458,9 +456,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #60: r.Expr([]interface{}{r.Random(0, 1).OptArgs(r.RandomOpts{Float: true, }), r.Random(0, 1).OptArgs(r.RandomOpts{Float: true, })}).Distinct().Count()")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Random(0, 1).OptArgs(r.RandomOpts{Float: true, }), r.Random(0, 1).OptArgs(r.RandomOpts{Float: true, })}).Distinct().Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Random(0, 1).OptArgs(r.RandomOpts{Float: true}), r.Random(0, 1).OptArgs(r.RandomOpts{Float: true})}).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #60")
 	}
@@ -473,9 +471,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #65: r.Random(0).OptArgs(r.RandomOpts{Float: true, }).Eq(0)")
 
-		runAndAssert(suite.Suite, expected_, r.Random(0).OptArgs(r.RandomOpts{Float: true, }).Eq(0), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(0).OptArgs(r.RandomOpts{Float: true}).Eq(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #65")
 	}
@@ -488,9 +486,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #66: r.Random(5, 5).OptArgs(r.RandomOpts{Float: true, }).Eq(5)")
 
-		runAndAssert(suite.Suite, expected_, r.Random(5, 5).OptArgs(r.RandomOpts{Float: true, }).Eq(5), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(5, 5).OptArgs(r.RandomOpts{Float: true}).Eq(5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #66")
 	}
@@ -503,9 +501,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #67: r.Random(-499384756758, -499384756758).OptArgs(r.RandomOpts{Float: true, }).Eq(-499384756758)")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-499384756758, -499384756758).OptArgs(r.RandomOpts{Float: true, }).Eq(-499384756758), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-499384756758, -499384756758).OptArgs(r.RandomOpts{Float: true}).Eq(-499384756758), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #67")
 	}
@@ -518,9 +516,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #68: r.Random(-93.94757, -93.94757).OptArgs(r.RandomOpts{Float: true, }).Eq(-93.94757)")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-93.94757, -93.94757).OptArgs(r.RandomOpts{Float: true, }).Eq(-93.94757), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-93.94757, -93.94757).OptArgs(r.RandomOpts{Float: true}).Eq(-93.94757), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #68")
 	}
@@ -533,9 +531,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #69: r.Random(294.69148, 294.69148).OptArgs(r.RandomOpts{Float: true, }).Eq(294.69148)")
 
-		runAndAssert(suite.Suite, expected_, r.Random(294.69148, 294.69148).OptArgs(r.RandomOpts{Float: true, }).Eq(294.69148), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(294.69148, 294.69148).OptArgs(r.RandomOpts{Float: true}).Eq(294.69148), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #69")
 	}
@@ -547,14 +545,12 @@ func (suite *RandomSuite) TestCases() {
 	float_max := sys.FloatInfo.Max
 	_ = float_max // Prevent any noused variable errors
 
-
 	// random.yaml line #78
 	// float_min = sys.float_info.min
 	suite.T().Log("Possibly executing: var float_min float64 = sys.FloatInfo.Min")
 
 	float_min := sys.FloatInfo.Min
 	_ = float_min // Prevent any noused variable errors
-
 
 	{
 		// random.yaml line #82
@@ -564,9 +560,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #82: r.Random(-float_max, float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-float_max), x.Lt(float_max))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-float_max, float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-float_max), x.Lt(float_max))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-float_max, float_max).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(-float_max), x.Lt(float_max)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #82")
 	}
@@ -579,9 +575,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #83: r.Random(float_max, -float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(float_max), x.Gt(-float_max))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(float_max, -float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(float_max), x.Gt(-float_max))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(float_max, -float_max).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(float_max), x.Gt(-float_max)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #83")
 	}
@@ -594,9 +590,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #84: r.Random(float_min, float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(float_min), x.Lt(float_max))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(float_min, float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(float_min), x.Lt(float_max))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(float_min, float_max).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(float_min), x.Lt(float_max)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #84")
 	}
@@ -609,9 +605,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #85: r.Random(float_min, -float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(float_min), x.Gt(-float_max))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(float_min, -float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(float_min), x.Gt(-float_max))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(float_min, -float_max).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(float_min), x.Gt(-float_max)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #85")
 	}
@@ -624,9 +620,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #86: r.Random(-float_min, float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-float_min), x.Lt(float_max))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-float_min, float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Ge(-float_min), x.Lt(float_max))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-float_min, float_max).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Ge(-float_min), x.Lt(float_max)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #86")
 	}
@@ -639,9 +635,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #87: r.Random(-float_min, -float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(-float_min), x.Gt(-float_max))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-float_min, -float_max).OptArgs(r.RandomOpts{Float: true, }).Do(func(x r.Term) interface{} { return r.And(x.Le(-float_min), x.Gt(-float_max))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-float_min, -float_max).OptArgs(r.RandomOpts{Float: true}).Do(func(x r.Term) interface{} { return r.And(x.Le(-float_min), x.Gt(-float_max)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #87")
 	}
@@ -653,14 +649,12 @@ func (suite *RandomSuite) TestCases() {
 	upper_limit := 2<<52 - 1
 	_ = upper_limit // Prevent any noused variable errors
 
-
 	// random.yaml line #96
 	// lower_limit = 1 - (2**53)
 	suite.T().Log("Possibly executing: var lower_limit int = 1 - 2<<52")
 
 	lower_limit := 1 - 2<<52
 	_ = lower_limit // Prevent any noused variable errors
-
 
 	{
 		// random.yaml line #101
@@ -670,9 +664,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #101: r.Random(256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #101")
 	}
@@ -685,9 +679,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #102: r.Random(0, 256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(0, 256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(0, 256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #102")
 	}
@@ -700,9 +694,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #103: r.Random(r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #103")
 	}
@@ -715,9 +709,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #104: r.Random(r.Expr(0), 256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(0), 256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(0), 256).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #104")
 	}
@@ -730,9 +724,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #105: r.Random(0, r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(0, r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(0, r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #105")
 	}
@@ -745,9 +739,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #106: r.Random(r.Expr(0), r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(0), r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(r.Expr(0), r.Expr(256)).Do(func(x r.Term) interface{} { return r.And(x.Ge(0), x.Lt(256)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #106")
 	}
@@ -760,9 +754,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #111: r.Random(10, 20).Do(func(x r.Term) interface{} { return r.And(x.Ge(10), x.Lt(20))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(10, 20).Do(func(x r.Term) interface{} { return r.And(x.Ge(10), x.Lt(20))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(10, 20).Do(func(x r.Term) interface{} { return r.And(x.Ge(10), x.Lt(20)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #111")
 	}
@@ -775,9 +769,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #112: r.Random(9347849, 120937493).Do(func(x r.Term) interface{} { return r.And(x.Ge(9347849), x.Lt(120937493))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(9347849, 120937493).Do(func(x r.Term) interface{} { return r.And(x.Ge(9347849), x.Lt(120937493))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(9347849, 120937493).Do(func(x r.Term) interface{} { return r.And(x.Ge(9347849), x.Lt(120937493)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #112")
 	}
@@ -790,9 +784,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #123: r.Random(-10, 20).Do(func(x r.Term) interface{} { return r.And(x.Ge(-10), x.Lt(20))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-10, 20).Do(func(x r.Term) interface{} { return r.And(x.Ge(-10), x.Lt(20))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-10, 20).Do(func(x r.Term) interface{} { return r.And(x.Ge(-10), x.Lt(20)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #123")
 	}
@@ -805,9 +799,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #124: r.Random(-20, -10).Do(func(x r.Term) interface{} { return r.And(x.Ge(-20), x.Lt(-10))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-20, -10).Do(func(x r.Term) interface{} { return r.And(x.Ge(-20), x.Lt(-10))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-20, -10).Do(func(x r.Term) interface{} { return r.And(x.Ge(-20), x.Lt(-10)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #124")
 	}
@@ -820,9 +814,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #125: r.Random(-120937493, -9347849).Do(func(x r.Term) interface{} { return r.And(x.Ge(-120937493), x.Lt(-9347849))})")
 
-		runAndAssert(suite.Suite, expected_, r.Random(-120937493, -9347849).Do(func(x r.Term) interface{} { return r.And(x.Ge(-120937493), x.Lt(-9347849))}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random(-120937493, -9347849).Do(func(x r.Term) interface{} { return r.And(x.Ge(-120937493), x.Lt(-9347849)) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #125")
 	}
@@ -837,7 +831,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Random(upper_limit), r.Random(upper_limit)}).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #137")
 	}
@@ -850,9 +844,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #139: r.Expr([]interface{}{upper_limit, upper_limit}).Map(func(x r.Term) interface{} { return r.Random(x)}).Distinct().Count()")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{upper_limit, upper_limit}).Map(func(x r.Term) interface{} { return r.Random(x)}).Distinct().Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{upper_limit, upper_limit}).Map(func(x r.Term) interface{} { return r.Random(x) }).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #139")
 	}
@@ -867,7 +861,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(-0.5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #147")
 	}
@@ -882,7 +876,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(0.25), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #149")
 	}
@@ -897,7 +891,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(-10, 0.75), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #151")
 	}
@@ -912,7 +906,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(-120549.25, 39458), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #153")
 	}
@@ -927,7 +921,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(-6.5, 8.125), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #155")
 	}
@@ -940,9 +934,9 @@ func (suite *RandomSuite) TestCases() {
 
 		suite.T().Log("About to run line #159: r.Random().OptArgs(r.RandomOpts{Float: false, })")
 
-		runAndAssert(suite.Suite, expected_, r.Random().OptArgs(r.RandomOpts{Float: false, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Random().OptArgs(r.RandomOpts{Float: false}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #159")
 	}
@@ -957,7 +951,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #165")
 	}
@@ -972,7 +966,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(0, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #167")
 	}
@@ -987,7 +981,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(515, 515), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #169")
 	}
@@ -1002,7 +996,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(-956, -956), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #171")
 	}
@@ -1017,7 +1011,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(-10), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #173")
 	}
@@ -1032,7 +1026,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(20, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #175")
 	}
@@ -1047,7 +1041,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(2, -20), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #177")
 	}
@@ -1062,7 +1056,7 @@ func (suite *RandomSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Random(1456, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #179")
 	}

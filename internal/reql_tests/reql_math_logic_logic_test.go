@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // These tests are aimed at &&, ||, and !
 func TestMathLogicLogicSuite(t *testing.T) {
-	suite.Run(t, new(MathLogicLogicSuite ))
+	suite.Run(t, new(MathLogicLogicSuite))
 }
 
 type MathLogicLogicSuite struct {
@@ -28,7 +28,7 @@ func (suite *MathLogicLogicSuite) SetupTest() {
 	suite.T().Log("Setting up MathLogicLogicSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MathLogicLogicSuite) TearDownSuite() {
 func (suite *MathLogicLogicSuite) TestCases() {
 	suite.T().Log("Running MathLogicLogicSuite: These tests are aimed at &&, ||, and !")
 
-
-
 	{
 		// math_logic/logic.yaml line #8
 		/* true */
@@ -70,7 +68,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).And(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -85,7 +83,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, r.Expr(true)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -100,7 +98,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -115,7 +113,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).And(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -130,7 +128,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).And(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #22")
 	}
@@ -145,7 +143,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).And(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #23")
 	}
@@ -160,7 +158,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, r.Expr(false)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -175,7 +173,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(false, r.Expr(false)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #25")
 	}
@@ -190,7 +188,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #26")
 	}
@@ -205,7 +203,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(false, false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -220,7 +218,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).And(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -235,7 +233,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).And(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #29")
 	}
@@ -250,7 +248,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).Or(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #48")
 	}
@@ -265,7 +263,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).Or(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}
@@ -280,7 +278,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(true, r.Expr(true)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -295,7 +293,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(true, r.Expr(false)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #51")
 	}
@@ -310,7 +308,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(true, true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -325,7 +323,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(true, false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #53")
 	}
@@ -340,7 +338,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).Or(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #54")
 	}
@@ -355,7 +353,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).Or(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #55")
 	}
@@ -370,7 +368,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).Or(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #72")
 	}
@@ -385,7 +383,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(false, r.Expr(false)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #73")
 	}
@@ -400,7 +398,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(false, false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #74")
 	}
@@ -415,7 +413,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).And(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #75")
 	}
@@ -430,7 +428,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #88")
 	}
@@ -445,7 +443,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Not(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #89")
 	}
@@ -460,7 +458,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #93")
 	}
@@ -475,7 +473,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Not(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #94")
 	}
@@ -490,7 +488,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(true).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #97")
 	}
@@ -505,7 +503,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #100")
 	}
@@ -520,7 +518,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, true).Not().Eq(r.Or(r.Expr(true).Not(), r.Expr(true).Not())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #107")
 	}
@@ -535,7 +533,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, false).Not().Eq(r.Or(r.Expr(true).Not(), r.Expr(false).Not())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #108")
 	}
@@ -550,7 +548,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(false, false).Not().Eq(r.Or(r.Expr(false).Not(), r.Expr(false).Not())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #109")
 	}
@@ -565,7 +563,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(false, true).Not().Eq(r.Or(r.Expr(false).Not(), r.Expr(true).Not())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #110")
 	}
@@ -580,7 +578,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, true, true, true, true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #120")
 	}
@@ -595,7 +593,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, true, true, false, true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #123")
 	}
@@ -610,7 +608,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(true, false, true, false, true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #126")
 	}
@@ -625,7 +623,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(false, false, false, false, false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #129")
 	}
@@ -640,7 +638,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(false, false, false, true, false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #132")
 	}
@@ -655,7 +653,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(false, true, false, true, false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #135")
 	}
@@ -670,7 +668,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.Expr("a").AtIndex("b")).Default(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #140")
 	}
@@ -685,7 +683,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.And(true, false).Eq(r.Or(false, true))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #145")
 	}
@@ -700,7 +698,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.And(true, false).Ge(r.Or(false, true))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #151")
 	}
@@ -715,7 +713,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).And(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #155")
 	}
@@ -730,7 +728,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).Or("str"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #159")
 	}
@@ -745,7 +743,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #163")
 	}
@@ -760,7 +758,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #167")
 	}

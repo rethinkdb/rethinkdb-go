@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests of comparison operators
 func TestMathLogicComparisonSuite(t *testing.T) {
-	suite.Run(t, new(MathLogicComparisonSuite ))
+	suite.Run(t, new(MathLogicComparisonSuite))
 }
 
 type MathLogicComparisonSuite struct {
@@ -28,7 +28,7 @@ func (suite *MathLogicComparisonSuite) SetupTest() {
 	suite.T().Log("Setting up MathLogicComparisonSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MathLogicComparisonSuite) TearDownSuite() {
 func (suite *MathLogicComparisonSuite) TestCases() {
 	suite.T().Log("Running MathLogicComparisonSuite: Tests of comparison operators")
 
-
-
 	{
 		// math_logic/comparison.yaml line #10
 		/* true */
@@ -70,7 +68,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Lt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -85,7 +83,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Lt(1, r.Expr(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -100,7 +98,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Lt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #12")
 	}
@@ -115,7 +113,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(3).Lt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #19")
 	}
@@ -130,7 +128,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(2).Lt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #22")
 	}
@@ -145,7 +143,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Gt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #38")
 	}
@@ -160,7 +158,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Gt(1, r.Expr(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #39")
 	}
@@ -175,7 +173,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Gt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -190,7 +188,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(3).Gt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #45")
 	}
@@ -205,7 +203,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(2).Gt(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}
@@ -220,7 +218,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Eq(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #63")
 	}
@@ -235,7 +233,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Eq(1, r.Expr(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #64")
 	}
@@ -250,7 +248,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Eq(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #65")
 	}
@@ -265,7 +263,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(3).Eq(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #68")
 	}
@@ -280,7 +278,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(2).Eq(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #72")
 	}
@@ -295,7 +293,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Ne(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #86")
 	}
@@ -310,7 +308,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Ne(1, r.Expr(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #87")
 	}
@@ -325,7 +323,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Ne(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #88")
 	}
@@ -340,7 +338,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(3).Ne(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #91")
 	}
@@ -355,7 +353,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(2).Ne(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #95")
 	}
@@ -370,7 +368,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Le(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #109")
 	}
@@ -385,7 +383,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Le(1, r.Expr(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #110")
 	}
@@ -400,7 +398,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Le(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #111")
 	}
@@ -415,7 +413,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(3).Le(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #116")
 	}
@@ -430,7 +428,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(2).Le(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #120")
 	}
@@ -445,7 +443,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Ge(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #134")
 	}
@@ -460,7 +458,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Ge(1, r.Expr(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #135")
 	}
@@ -475,7 +473,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Ge(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #136")
 	}
@@ -490,7 +488,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(3).Ge(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #141")
 	}
@@ -505,7 +503,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(2).Ge(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #145")
 	}
@@ -520,7 +518,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Eq(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #158")
 	}
@@ -535,7 +533,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Eq(nil, r.Expr(nil)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #159")
 	}
@@ -550,7 +548,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Lt(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #164")
 	}
@@ -565,7 +563,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Lt(nil, r.Expr(nil)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #165")
 	}
@@ -580,7 +578,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Lt(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #166")
 	}
@@ -595,7 +593,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Gt(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #172")
 	}
@@ -610,7 +608,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Gt(nil, r.Expr(nil)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #173")
 	}
@@ -625,7 +623,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Gt(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #174")
 	}
@@ -640,7 +638,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Eq("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #180")
 	}
@@ -655,7 +653,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Eq("aa"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #184")
 	}
@@ -670,7 +668,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Lt("aa"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #188")
 	}
@@ -685,7 +683,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Lt("bb"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #192")
 	}
@@ -700,7 +698,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("bb").Gt("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #196")
 	}
@@ -715,7 +713,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("abcdef").Lt("abcdeg"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #200")
 	}
@@ -730,7 +728,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("abcdefg").Gt("abcdeg"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #204")
 	}
@@ -745,7 +743,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("A quick brown fox").Gt("A quick brawn fox"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #208")
 	}
@@ -760,7 +758,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1}).Lt([]interface{}{2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #216")
 	}
@@ -775,7 +773,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1}).Gt([]interface{}{2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #221")
 	}
@@ -790,7 +788,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 0}).Lt([]interface{}{2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #226")
 	}
@@ -805,7 +803,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 0}).Lt([]interface{}{1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #231")
 	}
@@ -820,7 +818,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 0}).Gt([]interface{}{0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #236")
 	}
@@ -835,7 +833,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, "a"}).Lt([]interface{}{1, "b"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #241")
 	}
@@ -850,7 +848,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{0, "z"}).Lt([]interface{}{1, "b"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #246")
 	}
@@ -865,7 +863,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 1, 1}).Lt([]interface{}{1, 0, 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #251")
 	}
@@ -880,7 +878,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 0, 2}).Lt([]interface{}{1, 1, 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #256")
 	}
@@ -893,9 +891,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #263: r.Expr(map[interface{}]interface{}{'a': 0, }).Eq(map[interface{}]interface{}{'a': 0, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, }).Eq(map[interface{}]interface{}{"a": 0, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0}).Eq(map[interface{}]interface{}{"a": 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #263")
 	}
@@ -908,9 +906,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #267: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, }).Eq(map[interface{}]interface{}{"b": 1, "a": 0, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1}).Eq(map[interface{}]interface{}{"b": 1, "a": 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #267")
 	}
@@ -923,9 +921,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #271: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, }).Eq(map[interface{}]interface{}{"b": 1, "a": 0, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2}).Eq(map[interface{}]interface{}{"b": 1, "a": 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #271")
 	}
@@ -938,9 +936,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #275: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, 'c': 2, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, }).Eq(map[interface{}]interface{}{"b": 1, "a": 0, "c": 2, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1}).Eq(map[interface{}]interface{}{"b": 1, "a": 0, "c": 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #275")
 	}
@@ -953,9 +951,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #279: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'd': 2, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, 'c': 2, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "d": 2, }).Eq(map[interface{}]interface{}{"b": 1, "a": 0, "c": 2, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "d": 2}).Eq(map[interface{}]interface{}{"b": 1, "a": 0, "c": 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #279")
 	}
@@ -968,9 +966,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #283: r.Expr(map[interface{}]interface{}{'a': 0, }).Lt(map[interface{}]interface{}{'b': 0, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, }).Lt(map[interface{}]interface{}{"b": 0, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0}).Lt(map[interface{}]interface{}{"b": 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #283")
 	}
@@ -983,9 +981,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #287: r.Expr(map[interface{}]interface{}{'a': 1, }).Lt(map[interface{}]interface{}{'b': 0, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 1, }).Lt(map[interface{}]interface{}{"b": 0, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 1}).Lt(map[interface{}]interface{}{"b": 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #287")
 	}
@@ -998,9 +996,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #291: r.Expr(map[interface{}]interface{}{'b': 1, }).Lt(map[interface{}]interface{}{'b': 0, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"b": 1, }).Lt(map[interface{}]interface{}{"b": 0, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"b": 1}).Lt(map[interface{}]interface{}{"b": 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #291")
 	}
@@ -1013,9 +1011,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #295: r.Expr(map[interface{}]interface{}{'b': 1, }).Lt(map[interface{}]interface{}{'a': 0, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"b": 1, }).Lt(map[interface{}]interface{}{"a": 0, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"b": 1}).Lt(map[interface{}]interface{}{"a": 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #295")
 	}
@@ -1028,9 +1026,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #299: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, }).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2}).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #299")
 	}
@@ -1043,9 +1041,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #303: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, 'd': 3, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, "d": 3, }).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, "d": 3}).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #303")
 	}
@@ -1058,9 +1056,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #307: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, 'd': 3, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, }).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, "d": 3, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2}).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, "d": 3}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #307")
 	}
@@ -1073,9 +1071,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #311: r.Expr(map[interface{}]interface{}{'a': 0, 'c': 2, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "c": 2, }).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "c": 2}).Lt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #311")
 	}
@@ -1088,9 +1086,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #315: r.Expr(map[interface{}]interface{}{'a': 0, 'c': 2, }).Gt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "c": 2, }).Gt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"a": 0, "c": 2}).Gt(map[interface{}]interface{}{"a": 0, "b": 1, "c": 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #315")
 	}
@@ -1102,7 +1100,6 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	everything := r.Expr([]interface{}{[]interface{}{}, r.Now(), r.Binary([]byte{0}), false, nil, -5, map[interface{}]interface{}{}, "a", r.MaxVal})
 	_ = everything // Prevent any noused variable errors
 
-
 	{
 		// math_logic/comparison.yaml line #336
 		/* true */
@@ -1113,7 +1110,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(r.Args(everything.Map(r.Lt(r.MinVal, r.Row)))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #336")
 	}
@@ -1128,7 +1125,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(r.Args(everything.Map(r.Gt(r.MinVal, r.Row)))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #341")
 	}
@@ -1143,7 +1140,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Eq(r.MinVal, r.MinVal), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #345")
 	}
@@ -1158,7 +1155,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}).Lt(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #348")
 	}
@@ -1173,7 +1170,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Lt(false), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #353")
 	}
@@ -1188,7 +1185,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).Lt([]interface{}{}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #358")
 	}
@@ -1203,7 +1200,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}).Lt(r.Binary([]byte{174})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #363")
 	}
@@ -1218,7 +1215,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Lt(r.Binary([]byte{174})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #368")
 	}
@@ -1233,7 +1230,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Lt(true, r.Expr(nil)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #373")
 	}
@@ -1248,7 +1245,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Gt([]interface{}{}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #378")
 	}
@@ -1263,7 +1260,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Lt(12), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #383")
 	}
@@ -1278,7 +1275,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Lt(-2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #388")
 	}
@@ -1293,7 +1290,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(-12).Lt(map[interface{}]interface{}{}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #393")
 	}
@@ -1306,9 +1303,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #398: r.Expr(100).Lt(map[interface{}]interface{}{'a': -12, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(100).Lt(map[interface{}]interface{}{"a": -12, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(100).Lt(map[interface{}]interface{}{"a": -12}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #398")
 	}
@@ -1323,7 +1320,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.Binary([]byte{174})).Lt(12), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #403")
 	}
@@ -1336,9 +1333,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #408: r.Binary([]byte{48,120,65,69}).Lt('abc')")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{48,120,65,69}).Lt("abc"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{48, 120, 65, 69}).Lt("abc"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #408")
 	}
@@ -1351,9 +1348,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #413: r.Binary([]byte{48,120,65,69}).Gt(r.Now())")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{48,120,65,69}).Gt(r.Now()), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{48, 120, 65, 69}).Gt(r.Now()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #413")
 	}
@@ -1368,7 +1365,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().Gt(12), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #418")
 	}
@@ -1383,7 +1380,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().Gt("abc"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #422")
 	}
@@ -1396,9 +1393,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #426: r.Expr('abc').Gt(map[interface{}]interface{}{'a': -12, })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr("abc").Gt(map[interface{}]interface{}{"a": -12, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr("abc").Gt(map[interface{}]interface{}{"a": -12}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #426")
 	}
@@ -1411,9 +1408,9 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		suite.T().Log("About to run line #431: r.Expr('abc').Gt(map[interface{}]interface{}{'abc': 'abc', })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr("abc").Gt(map[interface{}]interface{}{"abc": "abc", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr("abc").Gt(map[interface{}]interface{}{"abc": "abc"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #431")
 	}
@@ -1428,7 +1425,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("zzz").Gt(128), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #436")
 	}
@@ -1443,7 +1440,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("zzz").Gt(map[interface{}]interface{}{}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #441")
 	}
@@ -1458,7 +1455,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Gt("zzz", r.Expr(-152)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #446")
 	}
@@ -1473,7 +1470,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Gt("zzz", r.Expr(nil)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #451")
 	}
@@ -1488,7 +1485,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Gt("zzz", r.Expr([]interface{}{})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #456")
 	}
@@ -1500,7 +1497,6 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	everything2 := r.Expr([]interface{}{r.MinVal, []interface{}{}, r.Now(), r.Binary([]byte{0}), false, nil, -5, map[interface{}]interface{}{}, "a"})
 	_ = everything2 // Prevent any noused variable errors
 
-
 	{
 		// math_logic/comparison.yaml line #467
 		/* true */
@@ -1511,7 +1507,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.And(r.Args(everything2.Map(r.Gt(r.MaxVal, r.Row)))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #467")
 	}
@@ -1526,7 +1522,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Or(r.Args(everything2.Map(r.Lt(r.MaxVal, r.Row)))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #472")
 	}
@@ -1541,7 +1537,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Eq(r.MaxVal, r.MaxVal), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #476")
 	}

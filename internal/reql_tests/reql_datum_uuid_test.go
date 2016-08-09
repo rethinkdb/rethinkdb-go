@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Test that UUIDs work
 func TestDatumUuidSuite(t *testing.T) {
-	suite.Run(t, new(DatumUuidSuite ))
+	suite.Run(t, new(DatumUuidSuite))
 }
 
 type DatumUuidSuite struct {
@@ -28,7 +28,7 @@ func (suite *DatumUuidSuite) SetupTest() {
 	suite.T().Log("Setting up DatumUuidSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *DatumUuidSuite) TearDownSuite() {
 func (suite *DatumUuidSuite) TestCases() {
 	suite.T().Log("Running DatumUuidSuite: Test that UUIDs work")
 
-
-
 	{
 		// datum/uuid.yaml line #3
 		/* uuid() */
@@ -70,7 +68,7 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.UUID(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #3")
 	}
@@ -85,7 +83,7 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.UUID()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #5")
 	}
@@ -100,7 +98,7 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.TypeOf(r.UUID()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -115,7 +113,7 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.UUID().Ne(r.UUID()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -130,7 +128,7 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.UUID("magic"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -145,7 +143,7 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.UUID("magic").Eq(r.UUID("magic")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #13")
 	}
@@ -160,7 +158,7 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.UUID("magic").Ne(r.UUID("beans")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #15")
 	}
@@ -173,9 +171,9 @@ func (suite *DatumUuidSuite) TestCases() {
 
 		suite.T().Log("About to run line #17: r.Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).Map(func(u r.Term) interface{} { return r.UUID()}).Distinct().Count()")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).Map(func(u r.Term) interface{} { return r.UUID()}).Distinct().Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).Map(func(u r.Term) interface{} { return r.UUID() }).Distinct().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}

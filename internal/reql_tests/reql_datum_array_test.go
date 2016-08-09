@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests conversion to and from the RQL array type
 func TestDatumArraySuite(t *testing.T) {
-	suite.Run(t, new(DatumArraySuite ))
+	suite.Run(t, new(DatumArraySuite))
 }
 
 type DatumArraySuite struct {
@@ -28,7 +28,7 @@ func (suite *DatumArraySuite) SetupTest() {
 	suite.T().Log("Setting up DatumArraySuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *DatumArraySuite) TearDownSuite() {
 func (suite *DatumArraySuite) TestCases() {
 	suite.T().Log("Running DatumArraySuite: Tests conversion to and from the RQL array type")
 
-
-
 	{
 		// datum/array.yaml line #6
 		/* [] */
@@ -70,7 +68,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -85,7 +83,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -100,7 +98,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4, 5}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #14")
 	}
@@ -115,7 +113,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #19")
 	}
@@ -130,7 +128,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).CoerceTo("string"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -145,7 +143,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #25")
 	}
@@ -160,7 +158,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).CoerceTo("array"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -175,7 +173,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).CoerceTo("number"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -183,14 +181,14 @@ func (suite *DatumArraySuite) TestCases() {
 	{
 		// datum/array.yaml line #34
 		/* {'a':1,'b':2} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2}
 		/* r.expr([['a', 1], ['b', 2]]).coerce_to('object') */
 
 		suite.T().Log("About to run line #34: r.Expr([]interface{}{[]interface{}{'a', 1}, []interface{}{'b', 2}}).CoerceTo('object')")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{[]interface{}{"a", 1}, []interface{}{"b", 2}}).CoerceTo("object"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -205,7 +203,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{[]interface{}{}}).CoerceTo("object"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -220,7 +218,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{[]interface{}{"1", 2, 3}}).CoerceTo("object"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -235,7 +233,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{r.Expr(1)}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #44")
 	}
@@ -250,7 +248,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 3, 4}).InsertAt(1, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #47")
 	}
@@ -265,7 +263,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{2, 3}).InsertAt(0, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}
@@ -280,7 +278,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).InsertAt(-1, 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #51")
 	}
@@ -295,7 +293,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).InsertAt(3, 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #53")
 	}
@@ -308,9 +306,9 @@ func (suite *DatumArraySuite) TestCases() {
 
 		suite.T().Log("About to run line #55: r.Expr(3).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2, 3}).InsertAt(x, 4)})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(3).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2, 3}).InsertAt(x, 4)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(3).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2, 3}).InsertAt(x, 4) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #55")
 	}
@@ -325,7 +323,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).InsertAt(4, 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #59")
 	}
@@ -340,7 +338,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).InsertAt(-5, -1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #61")
 	}
@@ -355,7 +353,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).InsertAt(1.5, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #63")
 	}
@@ -370,7 +368,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).InsertAt(nil, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #65")
 	}
@@ -385,7 +383,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 4}).SpliceAt(1, []interface{}{2, 3}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #68")
 	}
@@ -400,7 +398,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{3, 4}).SpliceAt(0, []interface{}{1, 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #70")
 	}
@@ -415,7 +413,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).SpliceAt(2, []interface{}{3, 4}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #72")
 	}
@@ -430,7 +428,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).SpliceAt(-1, []interface{}{3, 4}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #74")
 	}
@@ -443,9 +441,9 @@ func (suite *DatumArraySuite) TestCases() {
 
 		suite.T().Log("About to run line #76: r.Expr(2).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2}).SpliceAt(x, []interface{}{3, 4})})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(2).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2}).SpliceAt(x, []interface{}{3, 4})}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(2).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2}).SpliceAt(x, []interface{}{3, 4}) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #76")
 	}
@@ -460,7 +458,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).SpliceAt(3, []interface{}{3, 4}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #80")
 	}
@@ -475,7 +473,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).SpliceAt(-4, []interface{}{3, 4}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #82")
 	}
@@ -490,7 +488,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).SpliceAt(1.5, []interface{}{1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #84")
 	}
@@ -505,7 +503,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).SpliceAt(nil, []interface{}{1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #86")
 	}
@@ -520,7 +518,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 4}).SpliceAt(1, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #88")
 	}
@@ -535,7 +533,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #91")
 	}
@@ -548,9 +546,9 @@ func (suite *DatumArraySuite) TestCases() {
 
 		suite.T().Log("About to run line #93: r.Expr(0).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(x)})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(0).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(x)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(0).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(x) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #93")
 	}
@@ -565,7 +563,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(-1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #97")
 	}
@@ -580,7 +578,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(1, 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #99")
 	}
@@ -595,7 +593,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(4, 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #101")
 	}
@@ -610,7 +608,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}).DeleteAt(0, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #103")
 	}
@@ -625,7 +623,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(1, -1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #105")
 	}
@@ -640,7 +638,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #107")
 	}
@@ -655,7 +653,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).DeleteAt(-5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #109")
 	}
@@ -670,7 +668,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).DeleteAt(1.5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #111")
 	}
@@ -685,7 +683,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).DeleteAt(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #113")
 	}
@@ -700,7 +698,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{0, 2, 3}).ChangeAt(0, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #116")
 	}
@@ -713,9 +711,9 @@ func (suite *DatumArraySuite) TestCases() {
 
 		suite.T().Log("About to run line #118: r.Expr(1).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{0, 2, 3}).ChangeAt(0, x)})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{0, 2, 3}).ChangeAt(0, x)}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(func(x r.Term) interface{} { return r.Expr([]interface{}{0, 2, 3}).ChangeAt(0, x) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #118")
 	}
@@ -730,7 +728,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 0, 3}).ChangeAt(1, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #122")
 	}
@@ -745,7 +743,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 0}).ChangeAt(2, 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #124")
 	}
@@ -760,7 +758,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ChangeAt(3, 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #126")
 	}
@@ -775,7 +773,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3, 4}).ChangeAt(-5, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #128")
 	}
@@ -790,7 +788,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ChangeAt(1.5, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #130")
 	}
@@ -805,7 +803,7 @@ func (suite *DatumArraySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ChangeAt(nil, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #132")
 	}

@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // accessing portions
 func TestTimesPortionsSuite(t *testing.T) {
-	suite.Run(t, new(TimesPortionsSuite ))
+	suite.Run(t, new(TimesPortionsSuite))
 }
 
 type TimesPortionsSuite struct {
@@ -28,7 +28,7 @@ func (suite *TimesPortionsSuite) SetupTest() {
 	suite.T().Log("Setting up TimesPortionsSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,15 +58,12 @@ func (suite *TimesPortionsSuite) TearDownSuite() {
 func (suite *TimesPortionsSuite) TestCases() {
 	suite.T().Log("Running TimesPortionsSuite: accessing portions")
 
-
-
 	// times/portions.yaml line #3
 	// rt1 = 1375147296.681
 	suite.T().Log("Possibly executing: var rt1 float64 = 1375147296.681")
 
 	rt1 := 1375147296.681
 	_ = rt1 // Prevent any noused variable errors
-
 
 	// times/portions.yaml line #4
 	// rt2 = 1375147296.682
@@ -75,14 +72,12 @@ func (suite *TimesPortionsSuite) TestCases() {
 	rt2 := 1375147296.682
 	_ = rt2 // Prevent any noused variable errors
 
-
 	// times/portions.yaml line #5
 	// rt3 = 1375147297.681
 	suite.T().Log("Possibly executing: var rt3 float64 = 1375147297.681")
 
 	rt3 := 1375147297.681
 	_ = rt3 // Prevent any noused variable errors
-
 
 	// times/portions.yaml line #6
 	// rt4 = 2375147296.681
@@ -91,14 +86,12 @@ func (suite *TimesPortionsSuite) TestCases() {
 	rt4 := 2375147296.681
 	_ = rt4 // Prevent any noused variable errors
 
-
 	// times/portions.yaml line #7
 	// rts = [rt1, rt2, rt3, rt4]
 	suite.T().Log("Possibly executing: var rts []interface{} = []interface{}{rt1, rt2, rt3, rt4}")
 
 	rts := []interface{}{rt1, rt2, rt3, rt4}
 	_ = rts // Prevent any noused variable errors
-
 
 	// times/portions.yaml line #9
 	// t1 = r.epoch_time(rt1)
@@ -107,14 +100,12 @@ func (suite *TimesPortionsSuite) TestCases() {
 	t1 := r.EpochTime(rt1)
 	_ = t1 // Prevent any noused variable errors
 
-
 	// times/portions.yaml line #10
 	// t2 = r.epoch_time(rt2)
 	suite.T().Log("Possibly executing: var t2 r.Term = r.EpochTime(rt2)")
 
 	t2 := r.EpochTime(rt2)
 	_ = t2 // Prevent any noused variable errors
-
 
 	// times/portions.yaml line #11
 	// t3 = r.epoch_time(rt3)
@@ -123,7 +114,6 @@ func (suite *TimesPortionsSuite) TestCases() {
 	t3 := r.EpochTime(rt3)
 	_ = t3 // Prevent any noused variable errors
 
-
 	// times/portions.yaml line #12
 	// t4 = r.epoch_time(rt4)
 	suite.T().Log("Possibly executing: var t4 r.Term = r.EpochTime(rt4)")
@@ -131,14 +121,12 @@ func (suite *TimesPortionsSuite) TestCases() {
 	t4 := r.EpochTime(rt4)
 	_ = t4 // Prevent any noused variable errors
 
-
 	// times/portions.yaml line #13
 	// ts = r.expr([t1, t2, t3, t4])
 	suite.T().Log("Possibly executing: var ts r.Term = r.Expr([]interface{}{t1, t2, t3, t4})")
 
 	ts := r.Expr([]interface{}{t1, t2, t3, t4})
 	_ = ts // Prevent any noused variable errors
-
 
 	{
 		// times/portions.yaml line #16
@@ -148,9 +136,9 @@ func (suite *TimesPortionsSuite) TestCases() {
 
 		suite.T().Log("About to run line #16: ts.Map(func(x r.Term) interface{} { return x.Date()}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
 
-		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return x.Date()}).Map(func(x r.Term) interface{} { return x.ToEpochTime()}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return x.Date() }).Map(func(x r.Term) interface{} { return x.ToEpochTime() }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -163,9 +151,9 @@ func (suite *TimesPortionsSuite) TestCases() {
 
 		suite.T().Log("About to run line #20: ts.Map(func(x r.Term) interface{} { return x.Date().TimeOfDay()})")
 
-		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return x.Date().TimeOfDay()}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return x.Date().TimeOfDay() }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #20")
 	}
@@ -178,9 +166,9 @@ func (suite *TimesPortionsSuite) TestCases() {
 
 		suite.T().Log("About to run line #24: ts.Map(func(x r.Term) interface{} { return x.TimeOfDay()})")
 
-		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return x.TimeOfDay()}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return x.TimeOfDay() }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -188,17 +176,19 @@ func (suite *TimesPortionsSuite) TestCases() {
 	{
 		// times/portions.yaml line #29
 		/* ([[2013, 7, 30, 1, 21, 36.681],
-[2013, 7, 30, 1, 21, 36.682],
-[2013, 7, 30, 1, 21, 37.681],
-[2045, 4, 7, 3, 8, 16.681]]) */
+		[2013, 7, 30, 1, 21, 36.682],
+		[2013, 7, 30, 1, 21, 37.681],
+		[2045, 4, 7, 3, 8, 16.681]]) */
 		var expected_ []interface{} = []interface{}{[]interface{}{2013, 7, 30, 1, 21, 36.681}, []interface{}{2013, 7, 30, 1, 21, 36.682}, []interface{}{2013, 7, 30, 1, 21, 37.681}, []interface{}{2045, 4, 7, 3, 8, 16.681}}
 		/* ts.map(lambda x:[x.year(), x.month(), x.day(), x.hours(), x.minutes(), x.seconds()]) */
 
 		suite.T().Log("About to run line #29: ts.Map(func(x r.Term) interface{} { return []interface{}{x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds()}})")
 
-		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return []interface{}{x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds()}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} {
+			return []interface{}{x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds()}
+		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #29")
 	}
@@ -211,9 +201,11 @@ func (suite *TimesPortionsSuite) TestCases() {
 
 		suite.T().Log("About to run line #36: ts.Map(func(x r.Term) interface{} { return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
 
-		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())}).Map(func(x r.Term) interface{} { return x.ToEpochTime()}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} {
+			return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())
+		}).Map(func(x r.Term) interface{} { return x.ToEpochTime() }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #36")
 	}
@@ -226,9 +218,11 @@ func (suite *TimesPortionsSuite) TestCases() {
 
 		suite.T().Log("About to run line #40: ts.Map(func(x r.Term) interface{} { return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())}).Union(ts).Map(func(x r.Term) interface{} { return x.ToISO8601()}).Distinct().Count().Sub(ts.Count())")
 
-		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} { return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())}).Union(ts).Map(func(x r.Term) interface{} { return x.ToISO8601()}).Distinct().Count().Sub(ts.Count()), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ts.Map(func(x r.Term) interface{} {
+			return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())
+		}).Union(ts).Map(func(x r.Term) interface{} { return x.ToISO8601() }).Distinct().Count().Sub(ts.Count()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -243,7 +237,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, ts.Map([]interface{}{r.Row.DayOfWeek(), r.Row.DayOfYear()}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #44")
 	}

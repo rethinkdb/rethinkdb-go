@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Test basic timezone manipulation
 func TestTimesTimezonesSuite(t *testing.T) {
-	suite.Run(t, new(TimesTimezonesSuite ))
+	suite.Run(t, new(TimesTimezonesSuite))
 }
 
 type TimesTimezonesSuite struct {
@@ -28,7 +28,7 @@ func (suite *TimesTimezonesSuite) SetupTest() {
 	suite.T().Log("Setting up TimesTimezonesSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,15 +58,12 @@ func (suite *TimesTimezonesSuite) TearDownSuite() {
 func (suite *TimesTimezonesSuite) TestCases() {
 	suite.T().Log("Running TimesTimezonesSuite: Test basic timezone manipulation")
 
-
-
 	// times/timezones.yaml line #3
 	// t1 = r.time(2013, r.july, 29, 23, 30, 0, "+00:00")
 	suite.T().Log("Possibly executing: var t1 r.Term = r.Time(2013, r.July, 29, 23, 30, 0, '+00:00')")
 
 	t1 := r.Time(2013, r.July, 29, 23, 30, 0, "+00:00")
 	_ = t1 // Prevent any noused variable errors
-
 
 	// times/timezones.yaml line #5
 	// tutc1 = t1.in_timezone("Z")
@@ -75,14 +72,12 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	tutc1 := t1.InTimezone("Z")
 	_ = tutc1 // Prevent any noused variable errors
 
-
 	// times/timezones.yaml line #6
 	// tutc2 = t1.in_timezone("+00:00")
 	suite.T().Log("Possibly executing: var tutc2 r.Term = t1.InTimezone('+00:00')")
 
 	tutc2 := t1.InTimezone("+00:00")
 	_ = tutc2 // Prevent any noused variable errors
-
 
 	// times/timezones.yaml line #7
 	// tutc3 = t1.in_timezone("+00")
@@ -91,14 +86,12 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	tutc3 := t1.InTimezone("+00")
 	_ = tutc3 // Prevent any noused variable errors
 
-
 	// times/timezones.yaml line #8
 	// tutcs = r.expr([tutc1, tutc2, tutc3])
 	suite.T().Log("Possibly executing: var tutcs r.Term = r.Expr([]interface{}{tutc1, tutc2, tutc3})")
 
 	tutcs := r.Expr([]interface{}{tutc1, tutc2, tutc3})
 	_ = tutcs // Prevent any noused variable errors
-
 
 	// times/timezones.yaml line #10
 	// tm1 = t1.in_timezone("-00:59")
@@ -107,14 +100,12 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	tm1 := t1.InTimezone("-00:59")
 	_ = tm1 // Prevent any noused variable errors
 
-
 	// times/timezones.yaml line #11
 	// tm2 = t1.in_timezone("-01:00")
 	suite.T().Log("Possibly executing: var tm2 r.Term = t1.InTimezone('-01:00')")
 
 	tm2 := t1.InTimezone("-01:00")
 	_ = tm2 // Prevent any noused variable errors
-
 
 	// times/timezones.yaml line #12
 	// tm3 = t1.in_timezone("-01:01")
@@ -123,14 +114,12 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	tm3 := t1.InTimezone("-01:01")
 	_ = tm3 // Prevent any noused variable errors
 
-
 	// times/timezones.yaml line #13
 	// tms = r.expr([tm1, tm2, tm3])
 	suite.T().Log("Possibly executing: var tms r.Term = r.Expr([]interface{}{tm1, tm2, tm3})")
 
 	tms := r.Expr([]interface{}{tm1, tm2, tm3})
 	_ = tms // Prevent any noused variable errors
-
 
 	// times/timezones.yaml line #15
 	// tp1 = t1.in_timezone("+00:59")
@@ -139,14 +128,12 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	tp1 := t1.InTimezone("+00:59")
 	_ = tp1 // Prevent any noused variable errors
 
-
 	// times/timezones.yaml line #16
 	// tp2 = t1.in_timezone("+01:00")
 	suite.T().Log("Possibly executing: var tp2 r.Term = t1.InTimezone('+01:00')")
 
 	tp2 := t1.InTimezone("+01:00")
 	_ = tp2 // Prevent any noused variable errors
-
 
 	// times/timezones.yaml line #17
 	// tp3 = t1.in_timezone("+01:01")
@@ -155,7 +142,6 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	tp3 := t1.InTimezone("+01:01")
 	_ = tp3 // Prevent any noused variable errors
 
-
 	// times/timezones.yaml line #18
 	// tps = r.expr([tp1, tp2, tp3])
 	suite.T().Log("Possibly executing: var tps r.Term = r.Expr([]interface{}{tp1, tp2, tp3})")
@@ -163,14 +149,12 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	tps := r.Expr([]interface{}{tp1, tp2, tp3})
 	_ = tps // Prevent any noused variable errors
 
-
 	// times/timezones.yaml line #20
 	// ts = tutcs.union(tms).union(tps).union([t1])
 	suite.T().Log("Possibly executing: var ts r.Term = tutcs.Union(tms).Union(tps).Union([]interface{}{t1})")
 
 	ts := tutcs.Union(tms).Union(tps).Union([]interface{}{t1})
 	_ = ts // Prevent any noused variable errors
-
 
 	{
 		// times/timezones.yaml line #23
@@ -180,9 +164,9 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		suite.T().Log("About to run line #23: tutcs.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}})")
 
-		runAndAssert(suite.Suite, expected_, tutcs.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tutcs.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()} }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #23")
 	}
@@ -195,9 +179,9 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		suite.T().Log("About to run line #27: tms.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}})")
 
-		runAndAssert(suite.Suite, expected_, tms.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tms.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()} }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -210,9 +194,9 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		suite.T().Log("About to run line #31: tps.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}})")
 
-		runAndAssert(suite.Suite, expected_, tps.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tps.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()} }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -225,9 +209,9 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		suite.T().Log("About to run line #38: ts.ConcatMap(func(x r.Term) interface{} { return ts.Map(func(y r.Term) interface{} { return r.Sub(x, y)})}).Distinct()")
 
-		runAndAssert(suite.Suite, expected_, ts.ConcatMap(func(x r.Term) interface{} { return ts.Map(func(y r.Term) interface{} { return r.Sub(x, y)})}).Distinct(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, ts.ConcatMap(func(x r.Term) interface{} { return ts.Map(func(y r.Term) interface{} { return r.Sub(x, y) }) }).Distinct(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #38")
 	}
@@ -242,7 +226,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().InTimezone(""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #44")
 	}
@@ -257,7 +241,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().InTimezone("-00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #47")
 	}
@@ -272,7 +256,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().InTimezone("-00:00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -287,7 +271,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().InTimezone("UTC+00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #53")
 	}
@@ -302,7 +286,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().InTimezone("+00:60"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #56")
 	}
@@ -317,7 +301,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Now().InTimezone("+25:00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #59")
 	}
@@ -332,7 +316,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, 1, 1, ""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #63")
 	}
@@ -347,7 +331,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, 1, 1, "-00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #66")
 	}
@@ -362,7 +346,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, 1, 1, "-00:00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #69")
 	}
@@ -377,7 +361,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, 1, 1, "UTC+00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #72")
 	}
@@ -392,7 +376,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, 1, 1, "+00:60"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #75")
 	}
@@ -407,7 +391,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2013, 1, 1, "+25:00"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #78")
 	}
@@ -422,7 +406,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(1436428422.339).InTimezone("-08:00").Date().ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #81")
 	}
@@ -437,7 +421,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.EpochTime(1436428422.339).InTimezone("-07:00").Date().ToISO8601(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #85")
 	}

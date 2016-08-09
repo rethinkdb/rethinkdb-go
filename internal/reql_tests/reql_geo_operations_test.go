@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Test basic geometry operators
 func TestGeoOperationsSuite(t *testing.T) {
-	suite.Run(t, new(GeoOperationsSuite ))
+	suite.Run(t, new(GeoOperationsSuite))
 }
 
 type GeoOperationsSuite struct {
@@ -28,7 +28,7 @@ func (suite *GeoOperationsSuite) SetupTest() {
 	suite.T().Log("Setting up GeoOperationsSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *GeoOperationsSuite) TearDownSuite() {
 func (suite *GeoOperationsSuite) TestCases() {
 	suite.T().Log("Running GeoOperationsSuite: Test basic geometry operators")
 
-
-
 	{
 		// geo/operations.yaml line #5
 		/* ("89011.26253835332") */
@@ -70,7 +68,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(-122, 37), r.Point(-123, 37)).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #5")
 	}
@@ -85,7 +83,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(-122, 37), r.Point(-122, 36)).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -100,7 +98,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(-122, 37), r.Point(-122, 36)).Eq(r.Distance(r.Point(-122, 36), r.Point(-122, 37))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -115,7 +113,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Point(-122, 37).Distance(r.Point(-123, 37)).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -127,7 +125,6 @@ func (suite *GeoOperationsSuite) TestCases() {
 	someDist := r.Distance(r.Point(-122, 37), r.Point(-123, 37))
 	_ = someDist // Prevent any noused variable errors
 
-
 	{
 		// geo/operations.yaml line #15
 		/* true */
@@ -136,9 +133,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #15: someDist.Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: 'm', }))")
 
-		runAndAssert(suite.Suite, expected_, someDist.Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "m", })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, someDist.Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "m"})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #15")
 	}
@@ -151,9 +148,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #19: someDist.Mul(r.Div(1.0, 1000.0)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: 'km', }))")
 
-		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 1000.0)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "km", })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 1000.0)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "km"})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #19")
 	}
@@ -166,9 +163,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #23: someDist.Mul(r.Div(1.0, 1609.344)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: 'mi', }))")
 
-		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 1609.344)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "mi", })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 1609.344)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "mi"})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #23")
 	}
@@ -181,9 +178,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #27: someDist.Mul(r.Div(1.0, 0.3048)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: 'ft', }))")
 
-		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 0.3048)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "ft", })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 0.3048)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "ft"})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -196,9 +193,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #31: someDist.Mul(r.Div(1.0, 1852.0)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: 'nm', }))")
 
-		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 1852.0)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "nm", })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, someDist.Mul(r.Div(1.0, 1852.0)).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{Unit: "nm"})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -211,9 +208,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #35: someDist.Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: 'WGS84', }))")
 
-		runAndAssert(suite.Suite, expected_, someDist.Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: "WGS84", })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, someDist.Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: "WGS84"})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #35")
 	}
@@ -226,9 +223,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #40: someDist.Div(10).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: map[interface{}]interface{}{'a': 637813.7, 'f': r.Div(1.0, 298.257223563), }, }))")
 
-		runAndAssert(suite.Suite, expected_, someDist.Div(10).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: map[interface{}]interface{}{"a": 637813.7, "f": r.Div(1.0, 298.257223563), }, })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, someDist.Div(10).Eq(r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: map[interface{}]interface{}{"a": 637813.7, "f": r.Div(1.0, 298.257223563)}})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -241,9 +238,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #43: r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: 'unit_sphere', }).CoerceTo('STRING')")
 
-		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: "unit_sphere", }).CoerceTo("STRING"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(-122, 37), r.Point(-123, 37)).OptArgs(r.DistanceOpts{GeoSystem: "unit_sphere"}).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #43")
 	}
@@ -258,7 +255,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, 0), r.Point(0, 0)).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #47")
 	}
@@ -273,7 +270,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, 0), r.Point(180, 0)).Mul(2).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -288,7 +285,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, -90), r.Point(0, 90)).Mul(2).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -303,7 +300,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, 0), r.Line([]interface{}{0, 0}, []interface{}{0, 1})).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #54")
 	}
@@ -318,7 +315,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Line([]interface{}{0, 0}, []interface{}{0, 1}), r.Point(0, 0)).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #56")
 	}
@@ -333,7 +330,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, 0), r.Line([]interface{}{0.1, 0}, []interface{}{1, 0})).Eq(r.Distance(r.Point(0, 0), r.Point(0.1, 0))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #58")
 	}
@@ -348,7 +345,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, 0), r.Line([]interface{}{5, -1}, []interface{}{4, 2})).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #60")
 	}
@@ -363,7 +360,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, 0), r.Polygon([]interface{}{5, -1}, []interface{}{4, 2}, []interface{}{10, 10})).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #62")
 	}
@@ -378,7 +375,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0, 0), r.Polygon([]interface{}{0, -1}, []interface{}{0, 1}, []interface{}{10, 10})).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #64")
 	}
@@ -393,7 +390,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Distance(r.Point(0.5, 0.5), r.Polygon([]interface{}{0, -1}, []interface{}{0, 1}, []interface{}{10, 10})).CoerceTo("STRING"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #66")
 	}
@@ -406,9 +403,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #71: r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: false, }).Eq(r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: true, }))")
 
-		runAndAssert(suite.Suite, expected_, r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: false, }).Eq(r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: true, })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: false}).Eq(r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: true})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #71")
 	}
@@ -421,9 +418,9 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		suite.T().Log("About to run line #75: r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: false, }).Fill().Eq(r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: true, }))")
 
-		runAndAssert(suite.Suite, expected_, r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: false, }).Fill().Eq(r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: true, })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: false}).Fill().Eq(r.Circle([]interface{}{0, 0}, 1).OptArgs(r.CircleOpts{Fill: true})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #75")
 	}
@@ -431,14 +428,14 @@ func (suite *GeoOperationsSuite) TestCases() {
 	{
 		// geo/operations.yaml line #80
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[[0,0],[1,0],[1,1],[0,1],[0,0]],[[0.1,0.1],[0.9,0.1],[0.9,0.9],[0.1,0.9],[0.1,0.1]]], 'type':'Polygon'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}, []interface{}{0, 0}}, []interface{}{[]interface{}{0.1, 0.1}, []interface{}{0.9, 0.1}, []interface{}{0.9, 0.9}, []interface{}{0.1, 0.9}, []interface{}{0.1, 0.1}}}, "type": "Polygon", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}, []interface{}{0, 0}}, []interface{}{[]interface{}{0.1, 0.1}, []interface{}{0.9, 0.1}, []interface{}{0.9, 0.9}, []interface{}{0.1, 0.9}, []interface{}{0.1, 0.1}}}, "type": "Polygon"}
 		/* r.polygon([0,0], [1,0], [1,1], [0,1]).polygon_sub(r.polygon([0.1,0.1], [0.9,0.1], [0.9,0.9], [0.1,0.9])) */
 
 		suite.T().Log("About to run line #80: r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0.1, 0.1}, []interface{}{0.9, 0.1}, []interface{}{0.9, 0.9}, []interface{}{0.1, 0.9}))")
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0.1, 0.1}, []interface{}{0.9, 0.1}, []interface{}{0.9, 0.9}, []interface{}{0.1, 0.9})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #80")
 	}
@@ -453,7 +450,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0.1, 0.9}, []interface{}{0.9, 0.0}, []interface{}{0.9, 0.9}, []interface{}{0.1, 0.9})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #82")
 	}
@@ -468,7 +465,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0, 0}, []interface{}{2, 0}, []interface{}{2, 2}, []interface{}{0, 2})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #84")
 	}
@@ -483,7 +480,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0, -2}, []interface{}{1, -2}, []interface{}{-1, 1}, []interface{}{0, -1})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #86")
 	}
@@ -498,7 +495,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0, -1}, []interface{}{1, -1}, []interface{}{1, 0}, []interface{}{0, 0})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #88")
 	}
@@ -513,7 +510,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0.1, -1}, []interface{}{0.9, -1}, []interface{}{0.9, 0.5}, []interface{}{0.1, 0.5})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #90")
 	}
@@ -521,14 +518,14 @@ func (suite *GeoOperationsSuite) TestCases() {
 	{
 		// geo/operations.yaml line #92
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[[0,0],[1,0],[1,1],[0,1],[0,0]],[[0,0],[0.1,0.9],[0.9,0.9],[0.9,0.1],[0,0]]], 'type':'Polygon'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}, []interface{}{0, 0}}, []interface{}{[]interface{}{0, 0}, []interface{}{0.1, 0.9}, []interface{}{0.9, 0.9}, []interface{}{0.9, 0.1}, []interface{}{0, 0}}}, "type": "Polygon", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}, []interface{}{0, 0}}, []interface{}{[]interface{}{0, 0}, []interface{}{0.1, 0.9}, []interface{}{0.9, 0.9}, []interface{}{0.9, 0.1}, []interface{}{0, 0}}}, "type": "Polygon"}
 		/* r.polygon([0,0], [1,0], [1,1], [0,1]).polygon_sub(r.polygon([0,0],[0.1,0.9],[0.9,0.9],[0.9,0.1])) */
 
 		suite.T().Log("About to run line #92: r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0, 0}, []interface{}{0.1, 0.9}, []interface{}{0.9, 0.9}, []interface{}{0.9, 0.1}))")
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0, 0}, []interface{}{0.1, 0.9}, []interface{}{0.9, 0.9}, []interface{}{0.9, 0.1})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #92")
 	}
@@ -543,7 +540,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Polygon([]interface{}{0, 0}, []interface{}{0.1, 0.9}, []interface{}{0.9, 0.9}, []interface{}{0.9, 0.1}).PolygonSub(r.Polygon([]interface{}{0.2, 0.2}, []interface{}{0.5, 0.8}, []interface{}{0.8, 0.2}))), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #94")
 	}
@@ -558,7 +555,7 @@ func (suite *GeoOperationsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1}).PolygonSub(r.Line([]interface{}{0, 0}, []interface{}{0.9, 0.1}, []interface{}{0.9, 0.9}, []interface{}{0.1, 0.9})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #96")
 	}

@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests for ordered_union
 func TestTransformUnorderedMapSuite(t *testing.T) {
-	suite.Run(t, new(TransformUnorderedMapSuite ))
+	suite.Run(t, new(TransformUnorderedMapSuite))
 }
 
 type TransformUnorderedMapSuite struct {
@@ -28,7 +28,7 @@ func (suite *TransformUnorderedMapSuite) SetupTest() {
 	suite.T().Log("Setting up TransformUnorderedMapSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -64,9 +64,9 @@ func (suite *TransformUnorderedMapSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		 r.DB("test").TableDrop("even").Exec(suite.session)
-		 r.DB("test").TableDrop("odd").Exec(suite.session)
-		 r.DB("test").TableDrop("odd2").Exec(suite.session)
+		r.DB("test").TableDrop("even").Exec(suite.session)
+		r.DB("test").TableDrop("odd").Exec(suite.session)
+		r.DB("test").TableDrop("odd2").Exec(suite.session)
 		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
@@ -83,7 +83,6 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	odd2 := r.DB("test").Table("odd2")
 	_ = odd2 // Prevent any noused variable errors
 
-
 	{
 		// transform/unordered_map.yaml line #6
 		/* AnythingIsFine */
@@ -92,9 +91,9 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 
 		suite.T().Log("About to run line #6: odd.Insert([]interface{}{map[interface{}]interface{}{'id': 1, 'num': 1, }, map[interface{}]interface{}{'id': 3, 'num': 3, }, map[interface{}]interface{}{'id': 5, 'num': 5, }})")
 
-		runAndAssert(suite.Suite, expected_, odd.Insert([]interface{}{map[interface{}]interface{}{"id": 1, "num": 1, }, map[interface{}]interface{}{"id": 3, "num": 3, }, map[interface{}]interface{}{"id": 5, "num": 5, }}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.Insert([]interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 5, "num": 5}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -107,9 +106,9 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 
 		suite.T().Log("About to run line #7: even.Insert([]interface{}{map[interface{}]interface{}{'id': 2, 'num': 2, }, map[interface{}]interface{}{'id': 4, 'num': 4, }, map[interface{}]interface{}{'id': 6, 'num': 6, }})")
 
-		runAndAssert(suite.Suite, expected_, even.Insert([]interface{}{map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 6, "num": 6, }}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, even.Insert([]interface{}{map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -122,9 +121,9 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 
 		suite.T().Log("About to run line #8: odd2.Insert([]interface{}{map[interface{}]interface{}{'id': 7, 'num': 1, }, map[interface{}]interface{}{'id': 8, 'num': 3, }, map[interface{}]interface{}{'id': 9, 'num': 2, }})")
 
-		runAndAssert(suite.Suite, expected_, odd2.Insert([]interface{}{map[interface{}]interface{}{"id": 7, "num": 1, }, map[interface{}]interface{}{"id": 8, "num": 3, }, map[interface{}]interface{}{"id": 9, "num": 2, }}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd2.Insert([]interface{}{map[interface{}]interface{}{"id": 7, "num": 1}, map[interface{}]interface{}{"id": 8, "num": 3}, map[interface{}]interface{}{"id": 9, "num": 2}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -132,14 +131,14 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #11
 		/* [{"id":1, "num":1}, {"id":3, "num":3}, {"id":5, "num":5}, {"id":2, "num":2}, {"id":4, "num":4}, {"id":6, "num":6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1, }, map[interface{}]interface{}{"id": 3, "num": 3, }, map[interface{}]interface{}{"id": 5, "num": 5, }, map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 6, "num": 6, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num").union(even.order_by("num"), interleave = false) */
 
 		suite.T().Log("About to run line #11: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: false, })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: false, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: false}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -147,14 +146,14 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #16
 		/* [{"id":2, "num":2}, {"id":4, "num":4}, {"id":6, "num":6}, {"id":1, "num":1}, {"id":3, "num":3}, {"id":5, "num":5}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 6, "num": 6, }, map[interface{}]interface{}{"id": 1, "num": 1, }, map[interface{}]interface{}{"id": 3, "num": 3, }, map[interface{}]interface{}{"id": 5, "num": 5, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}, map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 5, "num": 5}}
 		/* even.order_by("num").union(odd.order_by("num"), interleave = false) */
 
 		suite.T().Log("About to run line #16: even.OrderBy('num').Union(odd.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: false, })")
 
-		runAndAssert(suite.Suite, expected_, even.OrderBy("num").Union(odd.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: false, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, even.OrderBy("num").Union(odd.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: false}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -162,14 +161,14 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #22
 		/* [{"id":1, "num":1}, {"id":2, "num":2}, {"id":3, "num":3}, {"id":4, "num":4}, {"id":5, "num":5}, {"id":6, "num":6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1, }, map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 3, "num": 3, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 5, "num": 5, }, map[interface{}]interface{}{"id": 6, "num": 6, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num").union(even.order_by("num"), interleave="num") */
 
 		suite.T().Log("About to run line #22: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: 'num', })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: "num", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: "num"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #22")
 	}
@@ -182,9 +181,9 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 
 		suite.T().Log("About to run line #28: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: r.Desc('num'), })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: r.Desc("num"), }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: r.Desc("num")}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -192,14 +191,14 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #34
 		/* [{"id":1, "num":1}, {"id":2, "num":2}, {"id":3, "num":3}, {"id":4, "num":4}, {"id":5, "num":5}, {"id":6, "num":6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1, }, map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 3, "num": 3, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 5, "num": 5, }, map[interface{}]interface{}{"id": 6, "num": 6, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num").union(even.order_by("num"), interleave=lambda x: x["num"]) */
 
 		suite.T().Log("About to run line #34: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return x.AtIndex('num')}, })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return x.AtIndex("num")}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return x.AtIndex("num") }}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -207,14 +206,14 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #40
 		/* [{"id": 7, "num": 1}, {"id": 2, "num": 2}, {"id": 9, "num": 2}, {"id": 8, "num": 3}, {"id": 4, "num": 4}, {"id": 6, "num": 6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 7, "num": 1, }, map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 9, "num": 2, }, map[interface{}]interface{}{"id": 8, "num": 3, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 6, "num": 6, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 7, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 9, "num": 2}, map[interface{}]interface{}{"id": 8, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd2.order_by("num", r.desc("id")).union(even.order_by("num", r.desc("id")), interleave=[lambda x: x["num"], lambda x: x["id"]]) */
 
 		suite.T().Log("About to run line #40: odd2.OrderBy('num', r.Desc('id')).Union(even.OrderBy('num', r.Desc('id'))).OptArgs(r.UnionOpts{Interleave: []interface{}{func(x r.Term) interface{} { return x.AtIndex('num')}, func(x r.Term) interface{} { return x.AtIndex('id')}}, })")
 
-		runAndAssert(suite.Suite, expected_, odd2.OrderBy("num", r.Desc("id")).Union(even.OrderBy("num", r.Desc("id"))).OptArgs(r.UnionOpts{Interleave: []interface{}{func(x r.Term) interface{} { return x.AtIndex("num")}, func(x r.Term) interface{} { return x.AtIndex("id")}}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd2.OrderBy("num", r.Desc("id")).Union(even.OrderBy("num", r.Desc("id"))).OptArgs(r.UnionOpts{Interleave: []interface{}{func(x r.Term) interface{} { return x.AtIndex("num") }, func(x r.Term) interface{} { return x.AtIndex("id") }}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -227,9 +226,9 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 
 		suite.T().Log("About to run line #46: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return r.Desc(x.AtIndex('num'))}, })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return r.Desc(x.AtIndex("num"))}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy("num").Union(even.OrderBy("num")).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return r.Desc(x.AtIndex("num")) }}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #46")
 	}
@@ -237,14 +236,14 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #50
 		/* [{"id":6, "num":6}, {"id":5, "num":5}, {"id":4, "num":4}, {"id":3, "num":3}, {"id":2, "num":2}, {"id":1, "num":1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 6, "num": 6, }, map[interface{}]interface{}{"id": 5, "num": 5, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 3, "num": 3, }, map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 1, "num": 1, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 6, "num": 6}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 1, "num": 1}}
 		/* odd.order_by(r.desc("num")).union(even.order_by(r.desc("num")), interleave= [r.desc(lambda x: x["num"])]) */
 
 		suite.T().Log("About to run line #50: odd.OrderBy(r.Desc('num')).Union(even.OrderBy(r.Desc('num'))).OptArgs(r.UnionOpts{Interleave: []interface{}{r.Desc(func(x r.Term) interface{} { return x.AtIndex('num')})}, })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy(r.Desc("num")).Union(even.OrderBy(r.Desc("num"))).OptArgs(r.UnionOpts{Interleave: []interface{}{r.Desc(func(x r.Term) interface{} { return x.AtIndex("num")})}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy(r.Desc("num")).Union(even.OrderBy(r.Desc("num"))).OptArgs(r.UnionOpts{Interleave: []interface{}{r.Desc(func(x r.Term) interface{} { return x.AtIndex("num") })}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -252,14 +251,14 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #54
 		/* [{"id":1, "num":1}, {"id":7, "num":1}, {"id":2, "num":2}, {"id":9, "num":2}, {"id":3, "num":3}, {"id":8, "num":3}, {"id":4, "num":4}, {"id":5, "num":5}, {"id":6, "num":6}, ] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1, }, map[interface{}]interface{}{"id": 7, "num": 1, }, map[interface{}]interface{}{"id": 2, "num": 2, }, map[interface{}]interface{}{"id": 9, "num": 2, }, map[interface{}]interface{}{"id": 3, "num": 3, }, map[interface{}]interface{}{"id": 8, "num": 3, }, map[interface{}]interface{}{"id": 4, "num": 4, }, map[interface{}]interface{}{"id": 5, "num": 5, }, map[interface{}]interface{}{"id": 6, "num": 6, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 7, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 9, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 8, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num", "id").union(even.order_by("num", "id"), odd2.order_by("num", "id"), interleave= ["num", "id"]) */
 
 		suite.T().Log("About to run line #54: odd.OrderBy('num', 'id').Union(even.OrderBy('num', 'id'), odd2.OrderBy('num', 'id')).OptArgs(r.UnionOpts{Interleave: []interface{}{'num', 'id'}, })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy("num", "id").Union(even.OrderBy("num", "id"), odd2.OrderBy("num", "id")).OptArgs(r.UnionOpts{Interleave: []interface{}{"num", "id"}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy("num", "id").Union(even.OrderBy("num", "id"), odd2.OrderBy("num", "id")).OptArgs(r.UnionOpts{Interleave: []interface{}{"num", "id"}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #54")
 	}
@@ -272,9 +271,9 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 
 		suite.T().Log("About to run line #58: odd.OrderBy('num', 'id').Union(even.OrderBy('num', 'id'), odd2.OrderBy(r.Desc('num'), 'id')).OptArgs(r.UnionOpts{Interleave: []interface{}{'num', 'id'}, })")
 
-		runAndAssert(suite.Suite, expected_, odd.OrderBy("num", "id").Union(even.OrderBy("num", "id"), odd2.OrderBy(r.Desc("num"), "id")).OptArgs(r.UnionOpts{Interleave: []interface{}{"num", "id"}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, odd.OrderBy("num", "id").Union(even.OrderBy("num", "id"), odd2.OrderBy(r.Desc("num"), "id")).OptArgs(r.UnionOpts{Interleave: []interface{}{"num", "id"}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #58")
 	}

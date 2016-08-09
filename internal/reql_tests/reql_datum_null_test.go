@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests of conversion to and from the RQL null type
 func TestDatumNullSuite(t *testing.T) {
-	suite.Run(t, new(DatumNullSuite ))
+	suite.Run(t, new(DatumNullSuite))
 }
 
 type DatumNullSuite struct {
@@ -28,7 +28,7 @@ func (suite *DatumNullSuite) SetupTest() {
 	suite.T().Log("Setting up DatumNullSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *DatumNullSuite) TearDownSuite() {
 func (suite *DatumNullSuite) TestCases() {
 	suite.T().Log("Running DatumNullSuite: Tests of conversion to and from the RQL null type")
 
-
-
 	{
 		// datum/null.yaml line #6
 		/* (null) */
@@ -70,7 +68,7 @@ func (suite *DatumNullSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -85,7 +83,7 @@ func (suite *DatumNullSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -100,7 +98,7 @@ func (suite *DatumNullSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).CoerceTo("string"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #14")
 	}
@@ -115,7 +113,7 @@ func (suite *DatumNullSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).CoerceTo("null"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}

@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dancannon/gorethink/internal/compare"
 	"github.com/stretchr/testify/suite"
 	r "gopkg.in/dancannon/gorethink.v2"
+	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 func maybeRun(query interface{}, session *r.Session, opts r.RunOpts) interface{} {

@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests of converstion to and from the RQL string type
 func TestDatumStringSuite(t *testing.T) {
-	suite.Run(t, new(DatumStringSuite ))
+	suite.Run(t, new(DatumStringSuite))
 }
 
 type DatumStringSuite struct {
@@ -28,7 +28,7 @@ func (suite *DatumStringSuite) SetupTest() {
 	suite.T().Log("Setting up DatumStringSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,15 +58,12 @@ func (suite *DatumStringSuite) TearDownSuite() {
 func (suite *DatumStringSuite) TestCases() {
 	suite.T().Log("Running DatumStringSuite: Tests of converstion to and from the RQL string type")
 
-
-
 	// datum/string.yaml line #7
 	// japanese_hello = u'こんにちは'
 	suite.T().Log("Possibly executing: var japanese_hello string = 'こんにちは'")
 
 	japanese_hello := "こんにちは"
 	_ = japanese_hello // Prevent any noused variable errors
-
 
 	{
 		// datum/string.yaml line #16
@@ -78,7 +75,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("str"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -93,7 +90,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("str"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -108,7 +105,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("str"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -123,7 +120,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(japanese_hello), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #35")
 	}
@@ -138,7 +135,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("foo").TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #43")
 	}
@@ -153,7 +150,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("foo").CoerceTo("string"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #47")
 	}
@@ -168,7 +165,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("-1.2").CoerceTo("NUMBER"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}
@@ -183,7 +180,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("--1.2").CoerceTo("NUMBER"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #51")
 	}
@@ -198,7 +195,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("-1.2-").CoerceTo("NUMBER"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #53")
 	}
@@ -213,7 +210,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("0xa").CoerceTo("NUMBER"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #55")
 	}
@@ -228,7 +225,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("inf").CoerceTo("NUMBER"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #57")
 	}
@@ -243,7 +240,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("hello, world!").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #61")
 	}
@@ -258,7 +255,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(japanese_hello).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #63")
 	}
@@ -273,7 +270,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("hello").Slice(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #67")
 	}
@@ -288,7 +285,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("hello").Slice(-1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #69")
 	}
@@ -303,7 +300,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("hello").Slice(-4, 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #71")
 	}
@@ -318,7 +315,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("hello").Slice(-99), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #73")
 	}
@@ -333,7 +330,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("hello").Slice(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #75")
 	}
@@ -348,7 +345,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(japanese_hello).Slice(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #77")
 	}
@@ -363,7 +360,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(japanese_hello).Slice(1, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #84")
 	}
@@ -378,7 +375,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(japanese_hello).Slice(-3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #91")
 	}
@@ -393,7 +390,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Split(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #100")
 	}
@@ -408,7 +405,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Split(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #102")
 	}
@@ -423,7 +420,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Split(" "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #104")
 	}
@@ -438,7 +435,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Split(""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #106")
 	}
@@ -453,7 +450,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Split(nil, 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #108")
 	}
@@ -468,7 +465,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Split(" ", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #110")
 	}
@@ -483,7 +480,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Split("", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #112")
 	}
@@ -498,7 +495,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #115")
 	}
@@ -513,7 +510,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #117")
 	}
@@ -528,7 +525,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #119")
 	}
@@ -543,7 +540,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #121")
 	}
@@ -558,7 +555,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #123")
 	}
@@ -573,7 +570,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("bb"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #125")
 	}
@@ -588,7 +585,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" bbbb  "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #127")
 	}
@@ -603,7 +600,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split("bb"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #129")
 	}
@@ -618,7 +615,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #131")
 	}
@@ -633,7 +630,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #133")
 	}
@@ -648,7 +645,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(nil, 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #136")
 	}
@@ -663,7 +660,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" ", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #138")
 	}
@@ -678,7 +675,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #140")
 	}
@@ -693,7 +690,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("b", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #142")
 	}
@@ -708,7 +705,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("bb", 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #144")
 	}
@@ -723,7 +720,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #146")
 	}
@@ -738,7 +735,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split("bb", 6), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #148")
 	}
@@ -753,7 +750,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #150")
 	}
@@ -768,7 +765,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  ", 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #152")
 	}
@@ -783,7 +780,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(nil, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #155")
 	}
@@ -798,7 +795,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a  b  ").Split(nil, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #157")
 	}
@@ -813,7 +810,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" ", 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #159")
 	}
@@ -828,7 +825,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("", 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #161")
 	}
@@ -843,7 +840,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("b", 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #163")
 	}
@@ -858,7 +855,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("bb", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #165")
 	}
@@ -873,7 +870,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" bbbb  ", 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #167")
 	}
@@ -888,7 +885,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split("bb", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #169")
 	}
@@ -903,7 +900,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  ", 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #171")
 	}
@@ -918,7 +915,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #173")
 	}
@@ -933,7 +930,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(nil, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #176")
 	}
@@ -948,7 +945,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #178")
 	}
@@ -963,7 +960,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #180")
 	}
@@ -978,7 +975,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("b", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #182")
 	}
@@ -993,7 +990,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split("bb", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #184")
 	}
@@ -1008,7 +1005,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc ").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #186")
 	}
@@ -1023,7 +1020,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split("bb", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #188")
 	}
@@ -1038,7 +1035,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #190")
 	}
@@ -1053,7 +1050,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #192")
 	}
@@ -1068,7 +1065,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  ").Split(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #195")
 	}
@@ -1083,7 +1080,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  ").Split(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #197")
 	}
@@ -1098,7 +1095,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  ").Split(" "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #199")
 	}
@@ -1113,7 +1110,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  ").Split(nil, 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #201")
 	}
@@ -1128,7 +1125,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  ").Split(" ", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #203")
 	}
@@ -1143,7 +1140,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #206")
 	}
@@ -1158,7 +1155,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #208")
 	}
@@ -1173,7 +1170,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #210")
 	}
@@ -1188,7 +1185,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #212")
 	}
@@ -1203,7 +1200,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("bb"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #214")
 	}
@@ -1218,7 +1215,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" bbbb  "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #216")
 	}
@@ -1233,7 +1230,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split("bb"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #218")
 	}
@@ -1248,7 +1245,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #220")
 	}
@@ -1263,7 +1260,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  "), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #222")
 	}
@@ -1278,7 +1275,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(nil, 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #225")
 	}
@@ -1293,7 +1290,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" ", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #227")
 	}
@@ -1308,7 +1305,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("b", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #229")
 	}
@@ -1323,7 +1320,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("bb", 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #231")
 	}
@@ -1338,7 +1335,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #233")
 	}
@@ -1353,7 +1350,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split("bb", 6), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #235")
 	}
@@ -1368,7 +1365,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #237")
 	}
@@ -1383,7 +1380,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  ", 3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #239")
 	}
@@ -1398,7 +1395,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(nil, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #242")
 	}
@@ -1413,7 +1410,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a  b  ").Split(nil, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #244")
 	}
@@ -1428,7 +1425,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" ", 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #246")
 	}
@@ -1443,7 +1440,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("b", 4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #248")
 	}
@@ -1458,7 +1455,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("bb", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #250")
 	}
@@ -1473,7 +1470,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" bbbb  ", 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #252")
 	}
@@ -1488,7 +1485,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split("bb", 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #254")
 	}
@@ -1503,7 +1500,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  ", 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #256")
 	}
@@ -1518,7 +1515,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #258")
 	}
@@ -1533,7 +1530,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(nil, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #261")
 	}
@@ -1548,7 +1545,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #263")
 	}
@@ -1563,7 +1560,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("b", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #265")
 	}
@@ -1578,7 +1575,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split("bb", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #267")
 	}
@@ -1593,7 +1590,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc ").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #269")
 	}
@@ -1608,7 +1605,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split("bb", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #271")
 	}
@@ -1623,7 +1620,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #273")
 	}
@@ -1638,7 +1635,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("  aaaa bbbb  cccc b d bb e bbbb  f").Split(" bbbb  ", 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #275")
 	}
@@ -1653,7 +1650,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("abc-dEf-GHJ").Upcase(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #278")
 	}
@@ -1668,7 +1665,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("abc-dEf-GHJ").Downcase(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #280")
 	}
@@ -1683,7 +1680,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("féoo").Split(""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #285")
 	}
@@ -1698,7 +1695,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("féoo").Split(""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #294")
 	}
@@ -1713,7 +1710,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("foo bar\tbaz\nquux\rfred\u000bbarney\u000cwilma").Split(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #307")
 	}
@@ -1728,7 +1725,7 @@ func (suite *DatumStringSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("foo\u00a0bar\u2001baz\u2060quux\u2028fred\u2028barney\u2029wilma\u0085betty\u200b").Split(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #323")
 	}

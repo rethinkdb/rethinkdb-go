@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Test geo constructors
 func TestGeoConstructorsSuite(t *testing.T) {
-	suite.Run(t, new(GeoConstructorsSuite ))
+	suite.Run(t, new(GeoConstructorsSuite))
 }
 
 type GeoConstructorsSuite struct {
@@ -28,7 +28,7 @@ func (suite *GeoConstructorsSuite) SetupTest() {
 	suite.T().Log("Setting up GeoConstructorsSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,19 +58,17 @@ func (suite *GeoConstructorsSuite) TearDownSuite() {
 func (suite *GeoConstructorsSuite) TestCases() {
 	suite.T().Log("Running GeoConstructorsSuite: Test geo constructors")
 
-
-
 	{
 		// geo/constructors.yaml line #4
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[0, 0], 'type':'Point'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point"}
 		/* r.point(0, 0) */
 
 		suite.T().Log("About to run line #4: r.Point(0, 0)")
 
 		runAndAssert(suite.Suite, expected_, r.Point(0, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #4")
 	}
@@ -78,14 +76,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #6
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[0, -90], 'type':'Point'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, -90}, "type": "Point", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, -90}, "type": "Point"}
 		/* r.point(0, -90) */
 
 		suite.T().Log("About to run line #6: r.Point(0, -90)")
 
 		runAndAssert(suite.Suite, expected_, r.Point(0, -90), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -93,14 +91,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #8
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[0, 90], 'type':'Point'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 90}, "type": "Point", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 90}, "type": "Point"}
 		/* r.point(0, 90) */
 
 		suite.T().Log("About to run line #8: r.Point(0, 90)")
 
 		runAndAssert(suite.Suite, expected_, r.Point(0, 90), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -108,14 +106,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #10
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[-180, 0], 'type':'Point'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{-180, 0}, "type": "Point", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{-180, 0}, "type": "Point"}
 		/* r.point(-180, 0) */
 
 		suite.T().Log("About to run line #10: r.Point(-180, 0)")
 
 		runAndAssert(suite.Suite, expected_, r.Point(-180, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -123,14 +121,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #12
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[180, 0], 'type':'Point'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{180, 0}, "type": "Point", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{180, 0}, "type": "Point"}
 		/* r.point(180, 0) */
 
 		suite.T().Log("About to run line #12: r.Point(180, 0)")
 
 		runAndAssert(suite.Suite, expected_, r.Point(180, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #12")
 	}
@@ -145,7 +143,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Point(0, -91), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #14")
 	}
@@ -160,7 +158,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Point(0, 91), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -175,7 +173,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Point(-181, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #18")
 	}
@@ -190,7 +188,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Point(181, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #20")
 	}
@@ -205,7 +203,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Line([]interface{}{0, 0}, []interface{}{0, 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -213,14 +211,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #30
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[0,0], [0,1]], 'type':'LineString'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}}, "type": "LineString", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}}, "type": "LineString"}
 		/* r.line([0,0], [0,1]) */
 
 		suite.T().Log("About to run line #30: r.Line([]interface{}{0, 0}, []interface{}{0, 1})")
 
 		runAndAssert(suite.Suite, expected_, r.Line([]interface{}{0, 0}, []interface{}{0, 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -235,7 +233,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Line([]interface{}{0, 0}, []interface{}{1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #32")
 	}
@@ -250,7 +248,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Line([]interface{}{0, 0}, []interface{}{1, 0, 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -258,14 +256,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #36
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[0,0], [0,1], [0,0]], 'type':'LineString'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0, 0}}, "type": "LineString", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0, 0}}, "type": "LineString"}
 		/* r.line([0,0], [0,1], [0,0]) */
 
 		suite.T().Log("About to run line #36: r.Line([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0, 0})")
 
 		runAndAssert(suite.Suite, expected_, r.Line([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0, 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #36")
 	}
@@ -273,14 +271,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #38
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[0,0], [0,1], [0,0]], 'type':'LineString'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0, 0}}, "type": "LineString", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0, 0}}, "type": "LineString"}
 		/* r.line(r.point(0,0), r.point(0,1), r.point(0,0)) */
 
 		suite.T().Log("About to run line #38: r.Line(r.Point(0, 0), r.Point(0, 1), r.Point(0, 0))")
 
 		runAndAssert(suite.Suite, expected_, r.Line(r.Point(0, 0), r.Point(0, 1), r.Point(0, 0)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #38")
 	}
@@ -295,7 +293,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Line(r.Point(0, 0), r.Point(1, 0), r.Line([]interface{}{0, 0}, []interface{}{1, 0})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -310,7 +308,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{0, 0}, []interface{}{0, 0}, []interface{}{0, 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -318,14 +316,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #52
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[[0,0], [0,1], [1,0], [0,0]]], 'type':'Polygon'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}}}, "type": "Polygon", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}}}, "type": "Polygon"}
 		/* r.polygon([0,0], [0,1], [1,0]) */
 
 		suite.T().Log("About to run line #52: r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0})")
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -333,14 +331,14 @@ func (suite *GeoConstructorsSuite) TestCases() {
 	{
 		// geo/constructors.yaml line #54
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[[0,0], [0,1], [1,0], [0,0]]], 'type':'Polygon'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}}}, "type": "Polygon", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}}}, "type": "Polygon"}
 		/* r.polygon([0,0], [0,1], [1,0], [0,0]) */
 
 		suite.T().Log("About to run line #54: r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0})")
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #54")
 	}
@@ -355,7 +353,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{-1, 0.5}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #56")
 	}
@@ -370,7 +368,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #58")
 	}
@@ -385,7 +383,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{0, 1, 0}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #60")
 	}
@@ -400,7 +398,7 @@ func (suite *GeoConstructorsSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Polygon(r.Point(0, 0), r.Point(0, 1), r.Line([]interface{}{0, 0}, []interface{}{0, 1})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #62")
 	}

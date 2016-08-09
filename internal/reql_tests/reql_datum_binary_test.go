@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests of converstion to and from the RQL binary type
 func TestDatumBinarySuite(t *testing.T) {
-	suite.Run(t, new(DatumBinarySuite ))
+	suite.Run(t, new(DatumBinarySuite))
 }
 
 type DatumBinarySuite struct {
@@ -28,7 +28,7 @@ func (suite *DatumBinarySuite) SetupTest() {
 	suite.T().Log("Setting up DatumBinarySuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,15 +58,12 @@ func (suite *DatumBinarySuite) TearDownSuite() {
 func (suite *DatumBinarySuite) TestCases() {
 	suite.T().Log("Running DatumBinarySuite: Tests of converstion to and from the RQL binary type")
 
-
-
 	// datum/binary.yaml line #8
 	// s = b''
 	suite.T().Log("Possibly executing: var s []byte = []byte{}")
 
 	s := []byte{}
 	_ = s // Prevent any noused variable errors
-
 
 	{
 		// datum/binary.yaml line #10
@@ -78,7 +75,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -93,7 +90,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #12")
 	}
@@ -103,7 +100,6 @@ func (suite *DatumBinarySuite) TestCases() {
 	suite.T().Log("Possibly executing: var s []byte = []byte{0}")
 
 	s = []byte{0}
-
 
 	{
 		// datum/binary.yaml line #19
@@ -115,7 +111,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #19")
 	}
@@ -130,7 +126,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -139,8 +135,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x00\x42'
 	suite.T().Log("Possibly executing: var s []byte = []byte{0,66}")
 
-	s = []byte{0,66}
-
+	s = []byte{0, 66}
 
 	{
 		// datum/binary.yaml line #28
@@ -152,7 +147,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -167,7 +162,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -176,8 +171,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x00\xfe\x7a'
 	suite.T().Log("Possibly executing: var s []byte = []byte{0,254,122}")
 
-	s = []byte{0,254,122}
-
+	s = []byte{0, 254, 122}
 
 	{
 		// datum/binary.yaml line #37
@@ -189,7 +183,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -204,7 +198,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #39")
 	}
@@ -213,8 +207,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\xed\xfe\x00\xba'
 	suite.T().Log("Possibly executing: var s []byte = []byte{237,254,0,186}")
 
-	s = []byte{237,254,0,186}
-
+	s = []byte{237, 254, 0, 186}
 
 	{
 		// datum/binary.yaml line #46
@@ -226,7 +219,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #46")
 	}
@@ -241,7 +234,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #48")
 	}
@@ -250,8 +243,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x50\xf9\x00\x77\xf9'
 	suite.T().Log("Possibly executing: var s []byte = []byte{80,249,0,119,249}")
 
-	s = []byte{80,249,0,119,249}
-
+	s = []byte{80, 249, 0, 119, 249}
 
 	{
 		// datum/binary.yaml line #55
@@ -263,7 +255,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #55")
 	}
@@ -278,7 +270,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #57")
 	}
@@ -287,8 +279,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x2f\xe3\xb5\x57\x00\x92'
 	suite.T().Log("Possibly executing: var s []byte = []byte{47,227,181,87,0,146}")
 
-	s = []byte{47,227,181,87,0,146}
-
+	s = []byte{47, 227, 181, 87, 0, 146}
 
 	{
 		// datum/binary.yaml line #64
@@ -300,7 +291,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #64")
 	}
@@ -315,7 +306,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #66")
 	}
@@ -324,8 +315,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\xa9\x43\x54\xe9\x00\xf8\xfb'
 	suite.T().Log("Possibly executing: var s []byte = []byte{169,67,84,233,0,248,251}")
 
-	s = []byte{169,67,84,233,0,248,251}
-
+	s = []byte{169, 67, 84, 233, 0, 248, 251}
 
 	{
 		// datum/binary.yaml line #73
@@ -337,7 +327,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #73")
 	}
@@ -352,7 +342,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #75")
 	}
@@ -361,8 +351,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x57\xbb\xe5\x82\x8b\xd3\x00\xf9'
 	suite.T().Log("Possibly executing: var s []byte = []byte{87,187,229,130,139,211,0,249}")
 
-	s = []byte{87,187,229,130,139,211,0,249}
-
+	s = []byte{87, 187, 229, 130, 139, 211, 0, 249}
 
 	{
 		// datum/binary.yaml line #82
@@ -374,7 +363,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #82")
 	}
@@ -389,7 +378,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #84")
 	}
@@ -398,8 +387,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x44\x1b\x3e\x00\x13\x19\x29\x2a\xbf'
 	suite.T().Log("Possibly executing: var s []byte = []byte{68,27,62,0,19,25,41,42,191}")
 
-	s = []byte{68,27,62,0,19,25,41,42,191}
-
+	s = []byte{68, 27, 62, 0, 19, 25, 41, 42, 191}
 
 	{
 		// datum/binary.yaml line #91
@@ -411,7 +399,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #91")
 	}
@@ -426,7 +414,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #93")
 	}
@@ -435,8 +423,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x8a\x1d\x09\x00\x5d\x60\x6b\x2e\x70\xd9'
 	suite.T().Log("Possibly executing: var s []byte = []byte{138,29,9,0,93,96,107,46,112,217}")
 
-	s = []byte{138,29,9,0,93,96,107,46,112,217}
-
+	s = []byte{138, 29, 9, 0, 93, 96, 107, 46, 112, 217}
 
 	{
 		// datum/binary.yaml line #100
@@ -448,7 +435,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #100")
 	}
@@ -463,7 +450,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #102")
 	}
@@ -472,8 +459,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x00\xaf\x47\x4b\x38\x99\x14\x8d\x8f\x10\x51'
 	suite.T().Log("Possibly executing: var s []byte = []byte{0,175,71,75,56,153,20,141,143,16,81}")
 
-	s = []byte{0,175,71,75,56,153,20,141,143,16,81}
-
+	s = []byte{0, 175, 71, 75, 56, 153, 20, 141, 143, 16, 81}
 
 	{
 		// datum/binary.yaml line #109
@@ -485,7 +471,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #109")
 	}
@@ -500,7 +486,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #111")
 	}
@@ -509,8 +495,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	// s = b'\x45\x39\x00\xf7\xc2\x37\xfd\xe0\x38\x82\x40\xa9'
 	suite.T().Log("Possibly executing: var s []byte = []byte{69,57,0,247,194,55,253,224,56,130,64,169}")
 
-	s = []byte{69,57,0,247,194,55,253,224,56,130,64,169}
-
+	s = []byte{69, 57, 0, 247, 194, 55, 253, 224, 56, 130, 64, 169}
 
 	{
 		// datum/binary.yaml line #118
@@ -522,7 +507,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #118")
 	}
@@ -537,7 +522,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #120")
 	}
@@ -549,14 +534,12 @@ func (suite *DatumBinarySuite) TestCases() {
 	a := []byte{0}
 	_ = a // Prevent any noused variable errors
 
-
 	// datum/binary.yaml line #132
 	// b = b'\x00\x01'
 	suite.T().Log("Possibly executing: var b []byte = []byte{0,1}")
 
-	b := []byte{0,1}
+	b := []byte{0, 1}
 	_ = b // Prevent any noused variable errors
-
 
 	// datum/binary.yaml line #136
 	// c = b'\x01'
@@ -565,14 +548,12 @@ func (suite *DatumBinarySuite) TestCases() {
 	c := []byte{1}
 	_ = c // Prevent any noused variable errors
 
-
 	// datum/binary.yaml line #140
 	// d = b'\x70\x22'
 	suite.T().Log("Possibly executing: var d []byte = []byte{112,34}")
 
-	d := []byte{112,34}
+	d := []byte{112, 34}
 	_ = d // Prevent any noused variable errors
-
 
 	// datum/binary.yaml line #144
 	// e = b'\x80'
@@ -581,14 +562,12 @@ func (suite *DatumBinarySuite) TestCases() {
 	e := []byte{128}
 	_ = e // Prevent any noused variable errors
 
-
 	// datum/binary.yaml line #148
 	// f = b'\xFE'
 	suite.T().Log("Possibly executing: var f []byte = []byte{254}")
 
 	f := []byte{254}
 	_ = f // Prevent any noused variable errors
-
 
 	{
 		// datum/binary.yaml line #151
@@ -600,7 +579,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Eq(r.Binary(a)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #151")
 	}
@@ -615,7 +594,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Le(r.Binary(a)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #153")
 	}
@@ -630,7 +609,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Ge(r.Binary(a)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #155")
 	}
@@ -645,7 +624,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Ne(r.Binary(a)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #157")
 	}
@@ -660,7 +639,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Lt(r.Binary(a)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #159")
 	}
@@ -675,7 +654,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Gt(r.Binary(a)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #161")
 	}
@@ -690,7 +669,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Ne(r.Binary(b)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #165")
 	}
@@ -705,7 +684,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Lt(r.Binary(b)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #167")
 	}
@@ -720,7 +699,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Le(r.Binary(b)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #169")
 	}
@@ -735,7 +714,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Ge(r.Binary(b)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #171")
 	}
@@ -750,7 +729,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Gt(r.Binary(b)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #173")
 	}
@@ -765,7 +744,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).Eq(r.Binary(b)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #175")
 	}
@@ -780,7 +759,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b).Ne(r.Binary(c)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #179")
 	}
@@ -795,7 +774,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b).Lt(r.Binary(c)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #181")
 	}
@@ -810,7 +789,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b).Le(r.Binary(c)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #183")
 	}
@@ -825,7 +804,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b).Ge(r.Binary(c)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #185")
 	}
@@ -840,7 +819,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b).Gt(r.Binary(c)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #187")
 	}
@@ -855,7 +834,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b).Eq(r.Binary(c)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #189")
 	}
@@ -870,7 +849,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(c).Ne(r.Binary(d)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #193")
 	}
@@ -885,7 +864,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(c).Lt(r.Binary(d)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #195")
 	}
@@ -900,7 +879,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(c).Le(r.Binary(d)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #197")
 	}
@@ -915,7 +894,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(c).Ge(r.Binary(d)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #199")
 	}
@@ -930,7 +909,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(c).Gt(r.Binary(d)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #201")
 	}
@@ -945,7 +924,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(c).Eq(r.Binary(d)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #203")
 	}
@@ -960,7 +939,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(d).Ne(r.Binary(e)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #207")
 	}
@@ -975,7 +954,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(d).Lt(r.Binary(e)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #209")
 	}
@@ -990,7 +969,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(d).Le(r.Binary(e)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #211")
 	}
@@ -1005,7 +984,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(d).Ge(r.Binary(e)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #213")
 	}
@@ -1020,7 +999,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(d).Gt(r.Binary(e)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #215")
 	}
@@ -1035,7 +1014,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(d).Eq(r.Binary(e)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #217")
 	}
@@ -1050,7 +1029,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(e).Ne(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #221")
 	}
@@ -1065,7 +1044,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(e).Lt(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #223")
 	}
@@ -1080,7 +1059,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(e).Le(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #225")
 	}
@@ -1095,7 +1074,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(e).Ge(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #227")
 	}
@@ -1110,7 +1089,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(e).Gt(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #229")
 	}
@@ -1125,7 +1104,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(e).Eq(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #231")
 	}
@@ -1140,7 +1119,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(f).Eq(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #235")
 	}
@@ -1155,7 +1134,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(f).Le(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #237")
 	}
@@ -1170,7 +1149,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(f).Ge(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #239")
 	}
@@ -1185,7 +1164,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(f).Ne(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #241")
 	}
@@ -1200,7 +1179,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(f).Lt(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #243")
 	}
@@ -1215,7 +1194,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(f).Gt(r.Binary(f)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #245")
 	}
@@ -1228,9 +1207,9 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		suite.T().Log("About to run line #269: r.Binary([]byte{102,111,111}).CoerceTo('string')")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{102,111,111}).CoerceTo("string"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{102, 111, 111}).CoerceTo("string"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #269")
 	}
@@ -1238,14 +1217,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #284
 		/* b'foo' */
-		var expected_ []byte = []byte{102,111,111}
+		var expected_ []byte = []byte{102, 111, 111}
 		/* r.expr('foo').coerce_to('binary') */
 
 		suite.T().Log("About to run line #284: r.Expr('foo').CoerceTo('binary')")
 
 		runAndAssert(suite.Suite, expected_, r.Expr("foo").CoerceTo("binary"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #284")
 	}
@@ -1260,7 +1239,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).CoerceTo("bool"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #287")
 	}
@@ -1268,14 +1247,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #290
 		/* b'foo' */
-		var expected_ []byte = []byte{102,111,111}
+		var expected_ []byte = []byte{102, 111, 111}
 		/* r.binary(b'foo').coerce_to('binary') */
 
 		suite.T().Log("About to run line #290: r.Binary([]byte{102,111,111}).CoerceTo('binary')")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{102,111,111}).CoerceTo("binary"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{102, 111, 111}).CoerceTo("binary"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #290")
 	}
@@ -1283,14 +1262,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #294
 		/* b'ef' */
-		var expected_ []byte = []byte{101,102}
+		var expected_ []byte = []byte{101, 102}
 		/* r.binary(b'abcdefg').slice(-3,-1) */
 
 		suite.T().Log("About to run line #294: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-3, -1)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-3, -1), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(-3, -1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #294")
 	}
@@ -1298,14 +1277,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #296
 		/* b'ab' */
-		var expected_ []byte = []byte{97,98}
+		var expected_ []byte = []byte{97, 98}
 		/* r.binary(b'abcdefg').slice(0, 2) */
 
 		suite.T().Log("About to run line #296: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(0, 2)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(0, 2), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(0, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #296")
 	}
@@ -1313,14 +1292,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #298
 		/* b'def' */
-		var expected_ []byte = []byte{100,101,102}
+		var expected_ []byte = []byte{100, 101, 102}
 		/* r.binary(b'abcdefg').slice(3, -1) */
 
 		suite.T().Log("About to run line #298: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(3, -1)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(3, -1), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(3, -1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #298")
 	}
@@ -1328,14 +1307,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #300
 		/* b'cde' */
-		var expected_ []byte = []byte{99,100,101}
+		var expected_ []byte = []byte{99, 100, 101}
 		/* r.binary(b'abcdefg').slice(-5, 5) */
 
 		suite.T().Log("About to run line #300: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-5, 5)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-5, 5), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(-5, 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #300")
 	}
@@ -1343,14 +1322,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #302
 		/* b'ab' */
-		var expected_ []byte = []byte{97,98}
+		var expected_ []byte = []byte{97, 98}
 		/* r.binary(b'abcdefg').slice(-8, 2) */
 
 		suite.T().Log("About to run line #302: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-8, 2)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-8, 2), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(-8, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #302")
 	}
@@ -1358,14 +1337,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #304
 		/* b'fg' */
-		var expected_ []byte = []byte{102,103}
+		var expected_ []byte = []byte{102, 103}
 		/* r.binary(b'abcdefg').slice(5, 7) */
 
 		suite.T().Log("About to run line #304: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(5, 7)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(5, 7), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(5, 7), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #304")
 	}
@@ -1373,14 +1352,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #308
 		/* b'ab' */
-		var expected_ []byte = []byte{97,98}
+		var expected_ []byte = []byte{97, 98}
 		/* r.binary(b'abcdefg').slice(-9, 2) */
 
 		suite.T().Log("About to run line #308: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-9, 2)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-9, 2), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(-9, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #308")
 	}
@@ -1388,14 +1367,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #312
 		/* b'fg' */
-		var expected_ []byte = []byte{102,103}
+		var expected_ []byte = []byte{102, 103}
 		/* r.binary(b'abcdefg').slice(5, 9) */
 
 		suite.T().Log("About to run line #312: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(5, 9)")
 
-		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97,98,99,100,101,102,103}).Slice(5, 9), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Binary([]byte{97, 98, 99, 100, 101, 102, 103}).Slice(5, 9), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #312")
 	}
@@ -1410,8 +1389,8 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
-			BinaryFormat: "native",
+			GroupFormat:    "map",
+			BinaryFormat:   "native",
 		})
 		suite.T().Log("Finished running line #316")
 	}
@@ -1419,15 +1398,15 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #320
 		/* {'$reql_type$':'BINARY','data':'AAE='} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "AAE=", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "AAE="}
 		/* r.binary(b) */
 
 		suite.T().Log("About to run line #320: r.Binary(b)")
 
 		runAndAssert(suite.Suite, expected_, r.Binary(b), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
-			BinaryFormat: "raw",
+			GroupFormat:    "map",
+			BinaryFormat:   "raw",
 		})
 		suite.T().Log("Finished running line #320")
 	}
@@ -1435,14 +1414,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #326
 		/* b"data" */
-		var expected_ []byte = []byte{100,97,116,97}
+		var expected_ []byte = []byte{100, 97, 116, 97}
 		/* r.binary(r.expr("data")) */
 
 		suite.T().Log("About to run line #326: r.Binary(r.Expr('data'))")
 
 		runAndAssert(suite.Suite, expected_, r.Binary(r.Expr("data")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #326")
 	}
@@ -1457,7 +1436,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(r.Expr(map[interface{}]interface{}{})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #332")
 	}
@@ -1472,7 +1451,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(r.Expr([]interface{}{})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #335")
 	}
@@ -1480,14 +1459,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #341
 		/* err('ReqlQueryLogicError','Invalid binary pseudotype:'+' lacking `data` key.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid binary pseudotype:" + " lacking `data` key.")
+		var expected_ Err = err("ReqlQueryLogicError", "Invalid binary pseudotype:"+" lacking `data` key.")
 		/* r.expr({'$reql_type$':'BINARY'}) */
 
 		suite.T().Log("About to run line #341: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #341")
 	}
@@ -1500,9 +1479,9 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		suite.T().Log("About to run line #346: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'ABCDEFGH==AA', })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "ABCDEFGH==AA", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "ABCDEFGH==AA"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #346")
 	}
@@ -1515,9 +1494,9 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		suite.T().Log("About to run line #348: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'ABCDEF==$', })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "ABCDEF==$", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "ABCDEF==$"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #348")
 	}
@@ -1525,14 +1504,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #350
 		/* err('ReqlQueryLogicError','Invalid base64 character found:'+' \'^\'.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 character found:" + " '^'.")
+		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 character found:"+" '^'.")
 		/* r.expr({'$reql_type$':'BINARY','data':'A^CDEFGH'}) */
 
 		suite.T().Log("About to run line #350: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'A^CDEFGH', })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "A^CDEFGH", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "A^CDEFGH"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #350")
 	}
@@ -1540,14 +1519,14 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #352
 		/* err('ReqlQueryLogicError','Invalid base64 length:'+' 1 character remaining, cannot decode a full byte.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 length:" + " 1 character remaining, cannot decode a full byte.")
+		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 length:"+" 1 character remaining, cannot decode a full byte.")
 		/* r.expr({'$reql_type$':'BINARY','data':'ABCDE'}) */
 
 		suite.T().Log("About to run line #352: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'ABCDE', })")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "ABCDE", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "ABCDE"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #352")
 	}
@@ -1562,7 +1541,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).CoerceTo("array"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #356")
 	}
@@ -1577,7 +1556,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).CoerceTo("object"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #358")
 	}
@@ -1592,7 +1571,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).CoerceTo("number"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #360")
 	}
@@ -1607,7 +1586,7 @@ func (suite *DatumBinarySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(a).CoerceTo(r.Add("nu", "ll")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #362")
 	}

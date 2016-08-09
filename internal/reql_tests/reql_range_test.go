@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests RQL range generation
 func TestRangeSuite(t *testing.T) {
-	suite.Run(t, new(RangeSuite ))
+	suite.Run(t, new(RangeSuite))
 }
 
 type RangeSuite struct {
@@ -28,7 +28,7 @@ func (suite *RangeSuite) SetupTest() {
 	suite.T().Log("Setting up RangeSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *RangeSuite) TearDownSuite() {
 func (suite *RangeSuite) TestCases() {
 	suite.T().Log("Running RangeSuite: Tests RQL range generation")
 
-
-
 	{
 		// range.yaml line #3
 		/* 'STREAM' */
@@ -70,7 +68,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range().TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #3")
 	}
@@ -85,7 +83,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range().Limit(4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -100,7 +98,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(4), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -115,7 +113,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(2, 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #12")
 	}
@@ -130,7 +128,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #15")
 	}
@@ -145,7 +143,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(5, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #18")
 	}
@@ -160,7 +158,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(-5, -2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -175,7 +173,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(-5, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -190,7 +188,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range("foo"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -205,7 +203,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(9007199254740994), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -220,7 +218,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(-9007199254740994), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -235,7 +233,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(0.5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -250,7 +248,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range().Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #43")
 	}
@@ -265,7 +263,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range().CoerceTo("ARRAY"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #46")
 	}
@@ -280,7 +278,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range().CoerceTo("OBJECT"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}
@@ -295,7 +293,7 @@ func (suite *RangeSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Range(4).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}

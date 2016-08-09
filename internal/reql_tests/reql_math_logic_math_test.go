@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests of nested arithmetic expressions
 func TestMathLogicMathSuite(t *testing.T) {
-	suite.Run(t, new(MathLogicMathSuite ))
+	suite.Run(t, new(MathLogicMathSuite))
 }
 
 type MathLogicMathSuite struct {
@@ -28,7 +28,7 @@ func (suite *MathLogicMathSuite) SetupTest() {
 	suite.T().Log("Setting up MathLogicMathSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MathLogicMathSuite) TearDownSuite() {
 func (suite *MathLogicMathSuite) TestCases() {
 	suite.T().Log("Running MathLogicMathSuite: Tests of nested arithmetic expressions")
 
-
-
 	{
 		// math_logic/math.yaml line #4
 		/* 1 */
@@ -70,7 +68,7 @@ func (suite *MathLogicMathSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Add(4, r.Mul(2, r.Expr(26).Mod(18))).Div(5).Sub(3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #4")
 	}

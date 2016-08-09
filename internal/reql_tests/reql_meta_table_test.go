@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests meta queries for creating and deleting tables
 func TestMetaTableSuite(t *testing.T) {
-	suite.Run(t, new(MetaTableSuite ))
+	suite.Run(t, new(MetaTableSuite))
 }
 
 type MetaTableSuite struct {
@@ -28,7 +28,7 @@ func (suite *MetaTableSuite) SetupTest() {
 	suite.T().Log("Setting up MetaTableSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,15 +58,12 @@ func (suite *MetaTableSuite) TearDownSuite() {
 func (suite *MetaTableSuite) TestCases() {
 	suite.T().Log("Running MetaTableSuite: Tests meta queries for creating and deleting tables")
 
-
-
 	// meta/table.yaml line #4
 	// db = r.db('test')
 	suite.T().Log("Possibly executing: var db r.Term = r.DB('test')")
 
 	db := r.DB("test")
 	_ = db // Prevent any noused variable errors
-
 
 	{
 		// meta/table.yaml line #6
@@ -78,7 +75,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -86,14 +83,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #9
 		/* ({'type':'DB','name':'rethinkdb','id':null}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": nil, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": nil}
 		/* r.db('rethinkdb').info() */
 
 		suite.T().Log("About to run line #9: r.DB('rethinkdb').Info()")
 
 		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Info(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -101,16 +98,16 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #12
 		/* partial({'db':{'type':'DB','name':'rethinkdb','id':null},
-'type':'TABLE','id':null,'name':'stats',
-'indexes':[],'primary_key':'id'}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"db": map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": nil, }, "type": "TABLE", "id": nil, "name": "stats", "indexes": []interface{}{}, "primary_key": "id", })
+		'type':'TABLE','id':null,'name':'stats',
+		'indexes':[],'primary_key':'id'}) */
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"db": map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": nil}, "type": "TABLE", "id": nil, "name": "stats", "indexes": []interface{}{}, "primary_key": "id"})
 		/* r.db('rethinkdb').table('stats').info() */
 
 		suite.T().Log("About to run line #12: r.DB('rethinkdb').Table('stats').Info()")
 
 		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("stats").Info(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #12")
 	}
@@ -118,14 +115,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #18
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('a') */
 
 		suite.T().Log("About to run line #18: db.TableCreate('a')")
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #18")
 	}
@@ -140,7 +137,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -148,14 +145,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #24
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('b') */
 
 		suite.T().Log("About to run line #24: db.TableCreate('b')")
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -170,7 +167,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -178,14 +175,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #31
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #31: db.TableDrop('a')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -200,7 +197,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -208,14 +205,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #37
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('b') */
 
 		suite.T().Log("About to run line #37: db.TableDrop('b')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -230,7 +227,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -238,14 +235,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #44
 		/* partial({'tables_created':1,'config_changes':[partial({'new_val':partial({'durability':'soft'})})]}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "soft", }), })}, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "soft"})})}})
 		/* db.table_create('ab', durability='soft') */
 
 		suite.T().Log("About to run line #44: db.TableCreate('ab').OptArgs(r.TableCreateOpts{Durability: 'soft', })")
 
-		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{Durability: "soft", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{Durability: "soft"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #44")
 	}
@@ -253,14 +250,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #49
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #49: db.TableDrop('ab')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("ab"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}
@@ -268,14 +265,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #52
 		/* partial({'tables_created':1,'config_changes':[partial({'new_val':partial({'durability':'hard'})})]}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "hard", }), })}, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "hard"})})}})
 		/* db.table_create('ab', durability='hard') */
 
 		suite.T().Log("About to run line #52: db.TableCreate('ab').OptArgs(r.TableCreateOpts{Durability: 'hard', })")
 
-		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{Durability: "hard", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{Durability: "hard"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -283,14 +280,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #57
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #57: db.TableDrop('ab')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("ab"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #57")
 	}
@@ -303,9 +300,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #60: db.TableCreate('ab').OptArgs(r.TableCreateOpts{Durability: 'fake', })")
 
-		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{Durability: "fake", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{Durability: "fake"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #60")
 	}
@@ -313,14 +310,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #65
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('ab', primary_key='bar', shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #65: db.TableCreate('ab').OptArgs(r.TableCreateOpts{PrimaryKey: 'bar', Shards: 2, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{PrimaryKey: "bar", Shards: 2, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{PrimaryKey: "bar", Shards: 2, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #65")
 	}
@@ -328,14 +325,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #70
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #70: db.TableDrop('ab')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("ab"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #70")
 	}
@@ -343,14 +340,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #73
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('ab', primary_key='bar', primary_replica_tag='default') */
 
 		suite.T().Log("About to run line #73: db.TableCreate('ab').OptArgs(r.TableCreateOpts{PrimaryKey: 'bar', PrimaryReplicaTag: 'default', })")
 
-		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{PrimaryKey: "bar", PrimaryReplicaTag: "default", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{PrimaryKey: "bar", PrimaryReplicaTag: "default"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #73")
 	}
@@ -358,14 +355,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #78
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #78: db.TableDrop('ab')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("ab"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #78")
 	}
@@ -373,14 +370,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #81
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('ab', nonvoting_replica_tags=['default']) */
 
 		suite.T().Log("About to run line #81: db.TableCreate('ab').OptArgs(r.TableCreateOpts{NonVotingReplicaTags: []interface{}{'default'}, })")
 
-		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{NonVotingReplicaTags: []interface{}{"default"}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.TableCreate("ab").OptArgs(r.TableCreateOpts{NonVotingReplicaTags: []interface{}{"default"}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #81")
 	}
@@ -388,14 +385,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #86
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #86: db.TableDrop('ab')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("ab"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #86")
 	}
@@ -403,14 +400,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #90
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('a') */
 
 		suite.T().Log("About to run line #90: db.TableCreate('a')")
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #90")
 	}
@@ -418,14 +415,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #93
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=1, replicas=1) */
 
 		suite.T().Log("About to run line #93: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #93")
 	}
@@ -433,14 +430,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #98
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=1, replicas={"default":1}, nonvoting_replica_tags=['default'], primary_replica_tag='default') */
 
 		suite.T().Log("About to run line #98: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 1, }, NonVotingReplicaTags: []interface{}{'default'}, PrimaryReplicaTag: 'default', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 1, }, NonVotingReplicaTags: []interface{}{"default"}, PrimaryReplicaTag: "default", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 1}, NonVotingReplicaTags: []interface{}{"default"}, PrimaryReplicaTag: "default"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #98")
 	}
@@ -448,14 +445,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #103
 		/* partial({'reconfigured':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0})
 		/* db.table('a').reconfigure(shards=1, replicas=1, dry_run=True) */
 
 		suite.T().Log("About to run line #103: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1, DryRun: true, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1, DryRun: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1, DryRun: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #103")
 	}
@@ -468,9 +465,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #108: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #108")
 	}
@@ -483,9 +480,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #113: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', DryRun: true, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback", DryRun: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback", DryRun: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #113")
 	}
@@ -498,9 +495,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #118: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback_or_erase', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback_or_erase", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback_or_erase"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #118")
 	}
@@ -508,14 +505,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #123
 		/* partial({'reconfigured':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0})
 		/* db.table('a').reconfigure(emergency_repair=None, shards=1, replicas=1, dry_run=True) */
 
 		suite.T().Log("About to run line #123: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: nil, Shards: 1, Replicas: 1, DryRun: true, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: nil, Shards: 1, Replicas: 1, DryRun: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: nil, Shards: 1, Replicas: 1, DryRun: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #123")
 	}
@@ -523,14 +520,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #128
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #128: db.TableDrop('a')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #128")
 	}
@@ -538,14 +535,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #132
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('foo') */
 
 		suite.T().Log("About to run line #132: db.TableCreate('foo')")
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("foo"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #132")
 	}
@@ -560,7 +557,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("foo"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #135")
 	}
@@ -568,14 +565,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #138
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('foo') */
 
 		suite.T().Log("About to run line #138: db.TableDrop('foo')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("foo"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #138")
 	}
@@ -590,7 +587,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("foo"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #141")
 	}
@@ -598,14 +595,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #158
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('a') */
 
 		suite.T().Log("About to run line #158: db.TableCreate('a')")
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #158")
 	}
@@ -618,9 +615,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #161: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #161")
 	}
@@ -633,9 +630,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #166: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 1, }, PrimaryReplicaTag: 'foo', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 1, }, PrimaryReplicaTag: "foo", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 1}, PrimaryReplicaTag: "foo"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #166")
 	}
@@ -648,9 +645,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #171: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 1, }, PrimaryReplicaTag: 'default', NonVotingReplicaTags: []interface{}{'foo'}, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 1, }, PrimaryReplicaTag: "default", NonVotingReplicaTags: []interface{}{"foo"}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 1}, PrimaryReplicaTag: "default", NonVotingReplicaTags: []interface{}{"foo"}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #171")
 	}
@@ -663,9 +660,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #176: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'foo': 0, }, PrimaryReplicaTag: 'foo', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"foo": 0, }, PrimaryReplicaTag: "foo", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"foo": 0}, PrimaryReplicaTag: "foo"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #176")
 	}
@@ -678,9 +675,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #181: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 0, }, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 0, }, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 0}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #181")
 	}
@@ -693,9 +690,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #186: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': -3, }, PrimaryReplicaTag: 'default', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": -3, }, PrimaryReplicaTag: "default", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": -3}, PrimaryReplicaTag: "default"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #186")
 	}
@@ -708,9 +705,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #191: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: 'foo', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: "foo", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: "foo"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #191")
 	}
@@ -723,9 +720,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #196: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, NonVotingReplicaTags: []interface{}{'foo'}, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, NonVotingReplicaTags: []interface{}{"foo"}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, NonVotingReplicaTags: []interface{}{"foo"}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #196")
 	}
@@ -738,9 +735,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #201: db.Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', })")
 
-		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #201")
 	}
@@ -753,9 +750,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #206: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'foo', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "foo", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "foo"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #206")
 	}
@@ -768,9 +765,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #211: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', Shards: 1, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback", Shards: 1, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: "unsafe_rollback", Shards: 1, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #211")
 	}
@@ -778,14 +775,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #217
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #217: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #217")
 	}
@@ -793,14 +790,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #222
 		/* {"ready":1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1}
 		/* db.table('a').wait(wait_for="all_replicas_ready") */
 
 		suite.T().Log("About to run line #222: db.Table('a').Wait().OptArgs(r.WaitOpts{WaitFor: 'all_replicas_ready', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Wait().OptArgs(r.WaitOpts{WaitFor: "all_replicas_ready", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Wait().OptArgs(r.WaitOpts{WaitFor: "all_replicas_ready"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #222")
 	}
@@ -808,14 +805,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #228
 		/* partial({"inserted":4}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 4, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 4})
 		/* db.table('a').insert([{"id":1}, {"id":2}, {"id":3}, {"id":4}]) */
 
 		suite.T().Log("About to run line #228: db.Table('a').Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }, map[interface{}]interface{}{'id': 3, }, map[interface{}]interface{}{'id': 4, }})")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Insert([]interface{}{map[interface{}]interface{}{"id": 1, }, map[interface{}]interface{}{"id": 2, }, map[interface{}]interface{}{"id": 3, }, map[interface{}]interface{}{"id": 4, }}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Insert([]interface{}{map[interface{}]interface{}{"id": 1}, map[interface{}]interface{}{"id": 2}, map[interface{}]interface{}{"id": 3}, map[interface{}]interface{}{"id": 4}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #228")
 	}
@@ -823,14 +820,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #233
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #233: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #233")
 	}
@@ -843,9 +840,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #238: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 2, })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 2, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #238")
 	}
@@ -853,14 +850,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #244
 		/* {"ready":1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1}
 		/* db.table('a').wait(wait_for="all_replicas_ready") */
 
 		suite.T().Log("About to run line #244: db.Table('a').Wait().OptArgs(r.WaitOpts{WaitFor: 'all_replicas_ready', })")
 
-		runAndAssert(suite.Suite, expected_, db.Table("a").Wait().OptArgs(r.WaitOpts{WaitFor: "all_replicas_ready", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("a").Wait().OptArgs(r.WaitOpts{WaitFor: "all_replicas_ready"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #244")
 	}
@@ -868,14 +865,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #248
 		/* partial({'rebalanced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1})
 		/* db.table('a').rebalance() */
 
 		suite.T().Log("About to run line #248: db.Table('a').Rebalance()")
 
 		runAndAssert(suite.Suite, expected_, db.Table("a").Rebalance(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #248")
 	}
@@ -883,14 +880,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #251
 		/* {"ready":1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1}
 		/* db.wait(wait_for="all_replicas_ready") */
 
 		suite.T().Log("About to run line #251: db.Wait().OptArgs(r.WaitOpts{WaitFor: 'all_replicas_ready', })")
 
-		runAndAssert(suite.Suite, expected_, db.Wait().OptArgs(r.WaitOpts{WaitFor: "all_replicas_ready", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Wait().OptArgs(r.WaitOpts{WaitFor: "all_replicas_ready"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #251")
 	}
@@ -898,14 +895,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #255
 		/* partial({'rebalanced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1})
 		/* db.rebalance() */
 
 		suite.T().Log("About to run line #255: db.Rebalance()")
 
 		runAndAssert(suite.Suite, expected_, db.Rebalance(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #255")
 	}
@@ -913,14 +910,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #271
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #271: db.TableDrop('a')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #271")
 	}
@@ -935,7 +932,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #275")
 	}
@@ -950,7 +947,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #276")
 	}
@@ -965,7 +962,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("c"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #277")
 	}
@@ -978,9 +975,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #279: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #279")
 	}
@@ -993,9 +990,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #284: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 0, }, })")
 
-		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 0, }, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": 0}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #284")
 	}
@@ -1008,9 +1005,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #289: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': -3, }, PrimaryReplicaTag: 'default', })")
 
-		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": -3, }, PrimaryReplicaTag: "default", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{"default": -3}, PrimaryReplicaTag: "default"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #289")
 	}
@@ -1023,9 +1020,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #294: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: 'foo', })")
 
-		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: "foo", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: "foo"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #294")
 	}
@@ -1033,14 +1030,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #299
 		/* partial({'reconfigured':3}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 3, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 3})
 		/* db.reconfigure(shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #299: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, })")
 
-		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #299")
 	}
@@ -1048,14 +1045,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #304
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #304: db.TableDrop('a')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #304")
 	}
@@ -1063,14 +1060,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #306
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('b') */
 
 		suite.T().Log("About to run line #306: db.TableDrop('b')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #306")
 	}
@@ -1078,14 +1075,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #308
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('c') */
 
 		suite.T().Log("About to run line #308: db.TableDrop('c')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("c"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #308")
 	}
@@ -1093,14 +1090,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #312
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create("test2") */
 
 		suite.T().Log("About to run line #312: r.DBCreate('test2')")
 
 		runAndAssert(suite.Suite, expected_, r.DBCreate("test2"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #312")
 	}
@@ -1112,18 +1109,17 @@ func (suite *MetaTableSuite) TestCases() {
 	db2 := r.DB("test2")
 	_ = db2 // Prevent any noused variable errors
 
-
 	{
 		// meta/table.yaml line #317
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create("testA") */
 
 		suite.T().Log("About to run line #317: db.TableCreate('testA')")
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("testA"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #317")
 	}
@@ -1131,14 +1127,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #319
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create("testB") */
 
 		suite.T().Log("About to run line #319: db.TableCreate('testB')")
 
 		runAndAssert(suite.Suite, expected_, db.TableCreate("testB"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #319")
 	}
@@ -1146,14 +1142,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #321
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db2.table_create("test2B") */
 
 		suite.T().Log("About to run line #321: db2.TableCreate('test2B')")
 
 		runAndAssert(suite.Suite, expected_, db2.TableCreate("test2B"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #321")
 	}
@@ -1161,14 +1157,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #324
 		/* {'db':'test','name':'testA'} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"db": "test", "name": "testA", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"db": "test", "name": "testA"}
 		/* r.table('testA').config().pluck('db','name') */
 
 		suite.T().Log("About to run line #324: r.Table('testA').Config().Pluck('db', 'name')")
 
 		runAndAssert(suite.Suite, expected_, r.Table("testA").Config().Pluck("db", "name"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #324")
 	}
@@ -1183,7 +1179,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Table("doesntexist").Config(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #327")
 	}
@@ -1198,7 +1194,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Table("test2B").Config(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #330")
 	}
@@ -1211,9 +1207,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #333: r.DB('rethinkdb').Table('table_config').Filter(map[interface{}]interface{}{'name': 'testA', }).Nth(0).Eq(r.Table('testA').Config())")
 
-		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_config").Filter(map[interface{}]interface{}{"name": "testA", }).Nth(0).Eq(r.Table("testA").Config()), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_config").Filter(map[interface{}]interface{}{"name": "testA"}).Nth(0).Eq(r.Table("testA").Config()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #333")
 	}
@@ -1226,9 +1222,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #336: r.DB('rethinkdb').Table('table_status').Filter(map[interface{}]interface{}{'name': 'testA', }).Nth(0).Eq(r.Table('testA').Status())")
 
-		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_status").Filter(map[interface{}]interface{}{"name": "testA", }).Nth(0).Eq(r.Table("testA").Status()), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_status").Filter(map[interface{}]interface{}{"name": "testA"}).Nth(0).Eq(r.Table("testA").Status()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #336")
 	}
@@ -1241,9 +1237,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #339: r.DB('rethinkdb').Table('table_config').OptArgs(r.TableOpts{IdentifierFormat: 'uuid', }).Nth(0).AtIndex('db')")
 
-		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_config").OptArgs(r.TableOpts{IdentifierFormat: "uuid", }).Nth(0).AtIndex("db"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_config").OptArgs(r.TableOpts{IdentifierFormat: "uuid"}).Nth(0).AtIndex("db"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #339")
 	}
@@ -1256,9 +1252,9 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #344: r.Table('testA').OptArgs(r.TableOpts{IdentifierFormat: 'uuid', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, r.Table("testA").OptArgs(r.TableOpts{IdentifierFormat: "uuid", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Table("testA").OptArgs(r.TableOpts{IdentifierFormat: "uuid"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #344")
 	}
@@ -1266,14 +1262,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #358
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('testA') */
 
 		suite.T().Log("About to run line #358: db.TableDrop('testA')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("testA"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #358")
 	}
@@ -1281,14 +1277,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #361
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('testB') */
 
 		suite.T().Log("About to run line #361: db.TableDrop('testB')")
 
 		runAndAssert(suite.Suite, expected_, db.TableDrop("testB"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #361")
 	}
@@ -1296,14 +1292,14 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #364
 		/* partial({'dbs_dropped':1,'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1, "tables_dropped": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1, "tables_dropped": 1})
 		/* r.db_drop('test2') */
 
 		suite.T().Log("About to run line #364: r.DBDrop('test2')")
 
 		runAndAssert(suite.Suite, expected_, r.DBDrop("test2"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #364")
 	}

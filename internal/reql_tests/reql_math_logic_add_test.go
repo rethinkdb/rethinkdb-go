@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests for basic usage of the add operation
 func TestMathLogicAddSuite(t *testing.T) {
-	suite.Run(t, new(MathLogicAddSuite ))
+	suite.Run(t, new(MathLogicAddSuite))
 }
 
 type MathLogicAddSuite struct {
@@ -28,7 +28,7 @@ func (suite *MathLogicAddSuite) SetupTest() {
 	suite.T().Log("Setting up MathLogicAddSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MathLogicAddSuite) TearDownSuite() {
 func (suite *MathLogicAddSuite) TestCases() {
 	suite.T().Log("Running MathLogicAddSuite: Tests for basic usage of the add operation")
 
-
-
 	{
 		// math_logic/add.yaml line #3
 		/* 2 */
@@ -70,7 +68,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Add(1, 1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #3")
 	}
@@ -85,7 +83,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Add(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -100,7 +98,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Add(1, r.Expr(1)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}
@@ -115,7 +113,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Add(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -130,7 +128,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(-1).Add(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -145,7 +143,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1.75).Add(8.5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -160,7 +158,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("").Add(""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -175,7 +173,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("abc").Add("def"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #32")
 	}
@@ -190,7 +188,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Add("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -205,7 +203,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Add(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #57")
 	}
@@ -220,7 +218,7 @@ func (suite *MathLogicAddSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}).Add(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #62")
 	}

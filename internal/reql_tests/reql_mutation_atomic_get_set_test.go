@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests replacement of selections
 func TestMutationAtomicGetSetSuite(t *testing.T) {
-	suite.Run(t, new(MutationAtomicGetSetSuite ))
+	suite.Run(t, new(MutationAtomicGetSetSuite))
 }
 
 type MutationAtomicGetSetSuite struct {
@@ -28,7 +28,7 @@ func (suite *MutationAtomicGetSetSuite) SetupTest() {
 	suite.T().Log("Setting up MutationAtomicGetSetSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -54,7 +54,7 @@ func (suite *MutationAtomicGetSetSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		 r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
 		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
@@ -67,18 +67,17 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	tbl := r.DB("test").Table("tbl")
 	_ = tbl // Prevent any noused variable errors
 
-
 	{
 		// mutation/atomic_get_set.yaml line #12
 		/* ({'changes':[{'old_val':null,'new_val':{'id':0}}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 0, }, }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 0}}}}
 		/* tbl.insert({'id':0}, return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #12: tbl.Insert(map[interface{}]interface{}{'id': 0, }).OptArgs(r.InsertOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 0, }).OptArgs(r.InsertOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 0}).OptArgs(r.InsertOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #12")
 	}
@@ -86,14 +85,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #16
 		/* ({'changes':[], 'first_error':"Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}"}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}"}
 		/* tbl.insert({'id':0}, return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #16: tbl.Insert(map[interface{}]interface{}{'id': 0, }).OptArgs(r.InsertOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 0, }).OptArgs(r.InsertOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 0}).OptArgs(r.InsertOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -101,14 +100,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #20
 		/* ({'first_error':"Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}",'changes':[{'old_val':{'id':0},'new_val':{'id':0},'error':"Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}"}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}", "changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, }, "new_val": map[interface{}]interface{}{"id": 0, }, "error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}", }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}", "changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0}, "new_val": map[interface{}]interface{}{"id": 0}, "error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}"}}}
 		/* tbl.insert({'id':0}, return_changes='always').pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #20: tbl.Insert(map[interface{}]interface{}{'id': 0, }).OptArgs(r.InsertOpts{ReturnChanges: 'always', }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 0, }).OptArgs(r.InsertOpts{ReturnChanges: "always", }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 0}).OptArgs(r.InsertOpts{ReturnChanges: "always"}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #20")
 	}
@@ -116,14 +115,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #24
 		/* ({'changes':[{'new_val':{'id':1},'old_val':null}], 'errors':0, 'deleted':0, 'unchanged':0, 'skipped':0, 'replaced':0, 'inserted':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1, }, "old_val": nil, }}, "errors": 0, "deleted": 0, "unchanged": 0, "skipped": 0, "replaced": 0, "inserted": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}, "old_val": nil}}, "errors": 0, "deleted": 0, "unchanged": 0, "skipped": 0, "replaced": 0, "inserted": 1}
 		/* tbl.insert([{'id':1}], return_changes=True) */
 
 		suite.T().Log("About to run line #24: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 1, }}).OptArgs(r.InsertOpts{ReturnChanges: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 1, }}).OptArgs(r.InsertOpts{ReturnChanges: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 1}}).OptArgs(r.InsertOpts{ReturnChanges: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #24")
 	}
@@ -131,14 +130,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #28
 		/* ({'changes':[],'first_error':"Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}"}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "Duplicate primary key `id`:\n{\n\t\"id\":\t0\n}\n{\n\t\"id\":\t0\n}"}
 		/* tbl.insert([{'id':0}], return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #28: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 0, }}).OptArgs(r.InsertOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 0, }}).OptArgs(r.InsertOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 0}}).OptArgs(r.InsertOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -146,14 +145,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #33
 		/* ({'changes':[{'old_val':{'id':0},'new_val':{'id':0,'x':1}}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, }, "new_val": map[interface{}]interface{}{"id": 0, "x": 1, }, }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0}, "new_val": map[interface{}]interface{}{"id": 0, "x": 1}}}}
 		/* tbl.get(0).update({'x':1}, return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #33: tbl.Get(0).Update(map[interface{}]interface{}{'x': 1, }).OptArgs(r.UpdateOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(0).Update(map[interface{}]interface{}{"x": 1, }).OptArgs(r.UpdateOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(0).Update(map[interface{}]interface{}{"x": 1}).OptArgs(r.UpdateOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #33")
 	}
@@ -161,14 +160,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #37
 		/* ({'changes':[],'first_error':'a'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "a", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "a"}
 		/* tbl.get(0).update({'x':r.error("a")}, return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #37: tbl.Get(0).Update(map[interface{}]interface{}{'x': r.Error('a'), }).OptArgs(r.UpdateOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(0).Update(map[interface{}]interface{}{"x": r.Error("a"), }).OptArgs(r.UpdateOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(0).Update(map[interface{}]interface{}{"x": r.Error("a")}).OptArgs(r.UpdateOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -176,14 +175,16 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #41
 		/* ({'changes':[{'old_val':{'id':0, 'x':1},'new_val':{'id':0, 'x':3}}, {'old_val':{'id':1},'new_val':{'id':1, 'x':3}}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, "x": 1, }, "new_val": map[interface{}]interface{}{"id": 0, "x": 3, }, }, map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, }, "new_val": map[interface{}]interface{}{"id": 1, "x": 3, }, }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, "x": 1}, "new_val": map[interface{}]interface{}{"id": 0, "x": 3}}, map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "x": 3}}}}
 		/* tbl.update({'x':3}, return_changes=True).pluck('changes', 'first_error').do(lambda d:d.merge({'changes':d['changes'].order_by(lambda a:a['old_val']['id'])})) */
 
 		suite.T().Log("About to run line #41: tbl.Update(map[interface{}]interface{}{'x': 3, }).OptArgs(r.UpdateOpts{ReturnChanges: true, }).Pluck('changes', 'first_error').Do(func(d r.Term) interface{} { return d.Merge(map[interface{}]interface{}{'changes': d.AtIndex('changes').OrderBy(func(a r.Term) interface{} { return a.AtIndex('old_val').AtIndex('id')}), })})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Update(map[interface{}]interface{}{"x": 3, }).OptArgs(r.UpdateOpts{ReturnChanges: true, }).Pluck("changes", "first_error").Do(func(d r.Term) interface{} { return d.Merge(map[interface{}]interface{}{"changes": d.AtIndex("changes").OrderBy(func(a r.Term) interface{} { return a.AtIndex("old_val").AtIndex("id")}), })}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Update(map[interface{}]interface{}{"x": 3}).OptArgs(r.UpdateOpts{ReturnChanges: true}).Pluck("changes", "first_error").Do(func(d r.Term) interface{} {
+			return d.Merge(map[interface{}]interface{}{"changes": d.AtIndex("changes").OrderBy(func(a r.Term) interface{} { return a.AtIndex("old_val").AtIndex("id") })})
+		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #41")
 	}
@@ -191,14 +192,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #46
 		/* ({'changes':[{'old_val':{'id':0,'x':3},'new_val':{'id':0,'x':2}}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, "x": 3, }, "new_val": map[interface{}]interface{}{"id": 0, "x": 2, }, }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, "x": 3}, "new_val": map[interface{}]interface{}{"id": 0, "x": 2}}}}
 		/* tbl.get(0).replace({'id':0,'x':2}, return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #46: tbl.Get(0).Replace(map[interface{}]interface{}{'id': 0, 'x': 2, }).OptArgs(r.ReplaceOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(0).Replace(map[interface{}]interface{}{"id": 0, "x": 2, }).OptArgs(r.ReplaceOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(0).Replace(map[interface{}]interface{}{"id": 0, "x": 2}).OptArgs(r.ReplaceOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #46")
 	}
@@ -206,14 +207,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #50
 		/* ({'changes':[],'first_error':'a'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "a", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{}, "first_error": "a"}
 		/* tbl.get(0).replace(lambda y:{'x':r.error('a')}, return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #50: tbl.Get(0).Replace(func(y r.Term) interface{} { return map[interface{}]interface{}{'x': r.Error('a'), }}).OptArgs(r.ReplaceOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(0).Replace(func(y r.Term) interface{} { return map[interface{}]interface{}{"x": r.Error("a"), }}).OptArgs(r.ReplaceOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(0).Replace(func(y r.Term) interface{} { return map[interface{}]interface{}{"x": r.Error("a")} }).OptArgs(r.ReplaceOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -221,14 +222,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #54
 		/* ({'first_error':'a','changes':[{'old_val':{'id':0,'x':2},'new_val':{'id':0,'x':2},'error':'a'}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "a", "changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, "x": 2, }, "new_val": map[interface{}]interface{}{"id": 0, "x": 2, }, "error": "a", }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "a", "changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, "x": 2}, "new_val": map[interface{}]interface{}{"id": 0, "x": 2}, "error": "a"}}}
 		/* tbl.get(0).replace(lambda y:{'x':r.error('a')}, return_changes='always').pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #54: tbl.Get(0).Replace(func(y r.Term) interface{} { return map[interface{}]interface{}{'x': r.Error('a'), }}).OptArgs(r.ReplaceOpts{ReturnChanges: 'always', }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(0).Replace(func(y r.Term) interface{} { return map[interface{}]interface{}{"x": r.Error("a"), }}).OptArgs(r.ReplaceOpts{ReturnChanges: "always", }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(0).Replace(func(y r.Term) interface{} { return map[interface{}]interface{}{"x": r.Error("a")} }).OptArgs(r.ReplaceOpts{ReturnChanges: "always"}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #54")
 	}
@@ -236,14 +237,16 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #58
 		/* ({'changes':[{'new_val':{'id':0},'old_val':{'id':0, 'x':2}}, {'new_val':{'id':1},'old_val':{'id':1,'x':3}}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 0, }, "old_val": map[interface{}]interface{}{"id": 0, "x": 2, }, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1, }, "old_val": map[interface{}]interface{}{"id": 1, "x": 3, }, }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 0}, "old_val": map[interface{}]interface{}{"id": 0, "x": 2}}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}, "old_val": map[interface{}]interface{}{"id": 1, "x": 3}}}}
 		/* tbl.replace(lambda y:y.without('x'), return_changes=True).pluck('changes', 'first_error').do(lambda d:d.merge({'changes':d['changes'].order_by(lambda a:a['old_val']['id'])})) */
 
 		suite.T().Log("About to run line #58: tbl.Replace(func(y r.Term) interface{} { return y.Without('x')}).OptArgs(r.ReplaceOpts{ReturnChanges: true, }).Pluck('changes', 'first_error').Do(func(d r.Term) interface{} { return d.Merge(map[interface{}]interface{}{'changes': d.AtIndex('changes').OrderBy(func(a r.Term) interface{} { return a.AtIndex('old_val').AtIndex('id')}), })})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Replace(func(y r.Term) interface{} { return y.Without("x")}).OptArgs(r.ReplaceOpts{ReturnChanges: true, }).Pluck("changes", "first_error").Do(func(d r.Term) interface{} { return d.Merge(map[interface{}]interface{}{"changes": d.AtIndex("changes").OrderBy(func(a r.Term) interface{} { return a.AtIndex("old_val").AtIndex("id")}), })}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Replace(func(y r.Term) interface{} { return y.Without("x") }).OptArgs(r.ReplaceOpts{ReturnChanges: true}).Pluck("changes", "first_error").Do(func(d r.Term) interface{} {
+			return d.Merge(map[interface{}]interface{}{"changes": d.AtIndex("changes").OrderBy(func(a r.Term) interface{} { return a.AtIndex("old_val").AtIndex("id") })})
+		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #58")
 	}
@@ -251,14 +254,16 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #62
 		/* ({'first_error':"Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}", 'changes':[{'new_val':{'id':0},'old_val':{'id':0}, 'error':"Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}"}, {'new_val':{'id':1},'old_val':{'id':1},'error':"Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}"}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}", "changes": []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 0, }, "old_val": map[interface{}]interface{}{"id": 0, }, "error": "Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}", }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1, }, "old_val": map[interface{}]interface{}{"id": 1, }, "error": "Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}", }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}", "changes": []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 0}, "old_val": map[interface{}]interface{}{"id": 0}, "error": "Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}, "old_val": map[interface{}]interface{}{"id": 1}, "error": "Inserted object must have primary key `id`:\n{\n\t\"x\":\t1\n}"}}}
 		/* tbl.replace({'x':1}, return_changes='always').pluck('changes', 'first_error').do(lambda d:d.merge({'changes':d['changes'].order_by(lambda a:a['old_val']['id'])})) */
 
 		suite.T().Log("About to run line #62: tbl.Replace(map[interface{}]interface{}{'x': 1, }).OptArgs(r.ReplaceOpts{ReturnChanges: 'always', }).Pluck('changes', 'first_error').Do(func(d r.Term) interface{} { return d.Merge(map[interface{}]interface{}{'changes': d.AtIndex('changes').OrderBy(func(a r.Term) interface{} { return a.AtIndex('old_val').AtIndex('id')}), })})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Replace(map[interface{}]interface{}{"x": 1, }).OptArgs(r.ReplaceOpts{ReturnChanges: "always", }).Pluck("changes", "first_error").Do(func(d r.Term) interface{} { return d.Merge(map[interface{}]interface{}{"changes": d.AtIndex("changes").OrderBy(func(a r.Term) interface{} { return a.AtIndex("old_val").AtIndex("id")}), })}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Replace(map[interface{}]interface{}{"x": 1}).OptArgs(r.ReplaceOpts{ReturnChanges: "always"}).Pluck("changes", "first_error").Do(func(d r.Term) interface{} {
+			return d.Merge(map[interface{}]interface{}{"changes": d.AtIndex("changes").OrderBy(func(a r.Term) interface{} { return a.AtIndex("old_val").AtIndex("id") })})
+		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #62")
 	}
@@ -266,14 +271,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #86
 		/* ({'changes':[{'old_val':{'id':0},'new_val':null}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0, }, "new_val": nil, }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"changes": []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 0}, "new_val": nil}}}
 		/* tbl.get(0).delete(return_changes=True).pluck('changes', 'first_error') */
 
 		suite.T().Log("About to run line #86: tbl.Get(0).Delete().OptArgs(r.DeleteOpts{ReturnChanges: true, }).Pluck('changes', 'first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(0).Delete().OptArgs(r.DeleteOpts{ReturnChanges: true, }).Pluck("changes", "first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(0).Delete().OptArgs(r.DeleteOpts{ReturnChanges: true}).Pluck("changes", "first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #86")
 	}
@@ -281,14 +286,14 @@ func (suite *MutationAtomicGetSetSuite) TestCases() {
 	{
 		// mutation/atomic_get_set.yaml line #90
 		/* ({'deleted':1,'errors':0,'inserted':0,'replaced':0,'skipped':0,'unchanged':0,'changes':[{'new_val':null, 'old_val':{'id':1}}]}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 1, "errors": 0, "inserted": 0, "replaced": 0, "skipped": 0, "unchanged": 0, "changes": []interface{}{map[interface{}]interface{}{"new_val": nil, "old_val": map[interface{}]interface{}{"id": 1, }, }}, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 1, "errors": 0, "inserted": 0, "replaced": 0, "skipped": 0, "unchanged": 0, "changes": []interface{}{map[interface{}]interface{}{"new_val": nil, "old_val": map[interface{}]interface{}{"id": 1}}}}
 		/* tbl.delete(return_changes=True) */
 
 		suite.T().Log("About to run line #90: tbl.Delete().OptArgs(r.DeleteOpts{ReturnChanges: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Delete().OptArgs(r.DeleteOpts{ReturnChanges: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Delete().OptArgs(r.DeleteOpts{ReturnChanges: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #90")
 	}

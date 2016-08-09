@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests for the basic usage of the multiplication operation
 func TestMathLogicMulSuite(t *testing.T) {
-	suite.Run(t, new(MathLogicMulSuite ))
+	suite.Run(t, new(MathLogicMulSuite))
 }
 
 type MathLogicMulSuite struct {
@@ -28,7 +28,7 @@ func (suite *MathLogicMulSuite) SetupTest() {
 	suite.T().Log("Setting up MathLogicMulSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MathLogicMulSuite) TearDownSuite() {
 func (suite *MathLogicMulSuite) TestCases() {
 	suite.T().Log("Running MathLogicMulSuite: Tests for the basic usage of the multiplication operation")
 
-
-
 	{
 		// math_logic/mul.yaml line #6
 		/* 2 */
@@ -70,7 +68,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Mul(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -85,7 +83,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Mul(1, r.Expr(2)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -100,7 +98,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Mul(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -115,7 +113,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(-1).Mul(-1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #15")
 	}
@@ -130,7 +128,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1.5).Mul(4.5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #21")
 	}
@@ -145,7 +143,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).Mul(3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #25")
 	}
@@ -160,7 +158,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Mul(2, 3, 4, 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -175,7 +173,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Mul(0.8), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #46")
 	}
@@ -190,7 +188,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Mul("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #50")
 	}
@@ -205,7 +203,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("b").Mul("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #54")
 	}
@@ -220,7 +218,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{}).Mul(1.5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #58")
 	}

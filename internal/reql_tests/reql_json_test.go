@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests RQL json parsing
 func TestJsonSuite(t *testing.T) {
-	suite.Run(t, new(JsonSuite ))
+	suite.Run(t, new(JsonSuite))
 }
 
 type JsonSuite struct {
@@ -28,7 +28,7 @@ func (suite *JsonSuite) SetupTest() {
 	suite.T().Log("Setting up JsonSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *JsonSuite) TearDownSuite() {
 func (suite *JsonSuite) TestCases() {
 	suite.T().Log("Running JsonSuite: Tests RQL json parsing")
 
-
-
 	{
 		// json.yaml line #4
 		/* [1,2,3] */
@@ -70,7 +68,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("[1,2,3]"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #4")
 	}
@@ -85,7 +83,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("1"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -100,7 +98,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("{}"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #10")
 	}
@@ -115,7 +113,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("\"foo\""), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #13")
 	}
@@ -123,14 +121,14 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #16
 		/* err("ReqlQueryLogicError", 'Failed to parse "[1,2" as JSON:' + ' Missing a comma or \']\' after an array element.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Failed to parse \"[1,2\" as JSON:" + " Missing a comma or ']' after an array element.")
+		var expected_ Err = err("ReqlQueryLogicError", "Failed to parse \"[1,2\" as JSON:"+" Missing a comma or ']' after an array element.")
 		/* r.json("[1,2") */
 
 		suite.T().Log("About to run line #16: r.JSON('[1,2')")
 
 		runAndAssert(suite.Suite, expected_, r.JSON("[1,2"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -145,7 +143,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("[1,2,3]").ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #19")
 	}
@@ -160,7 +158,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("[1,2,3]").ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #23")
 	}
@@ -175,7 +173,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("{\"foo\":4}").ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #26")
 	}
@@ -190,7 +188,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON("{\"foo\":4}").ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -202,14 +200,12 @@ func (suite *JsonSuite) TestCases() {
 	text := "[{\"id\":1,\"first_name\":\"Harry\",\"last_name\":\"Riley\",\"email\":\"hriley0@usgs.gov\",\"country\":\"Andorra\",\"ip_address\":\"221.25.65.136\"},{\"id\":2,\"first_name\":\"Bonnie\",\"last_name\":\"Anderson\",\"email\":\"banderson1@list-manage.com\",\"country\":\"Tuvalu\",\"ip_address\":\"116.162.43.150\"},{\"id\":3,\"first_name\":\"Marie\",\"last_name\":\"Schmidt\",\"email\":\"mschmidt2@diigo.com\",\"country\":\"Iraq\",\"ip_address\":\"181.105.59.57\"},{\"id\":4,\"first_name\":\"Phillip\",\"last_name\":\"Willis\",\"email\":\"pwillis3@com.com\",\"country\":\"Montenegro\",\"ip_address\":\"24.223.139.156\"}]"
 	_ = text // Prevent any noused variable errors
 
-
 	// json.yaml line #35
 	// sorted = '[{"country":"Andorra","email":"hriley0@usgs.gov","first_name":"Harry","id":1,"ip_address":"221.25.65.136","last_name":"Riley"},{"country":"Tuvalu","email":"banderson1@list-manage.com","first_name":"Bonnie","id":2,"ip_address":"116.162.43.150","last_name":"Anderson"},{"country":"Iraq","email":"mschmidt2@diigo.com","first_name":"Marie","id":3,"ip_address":"181.105.59.57","last_name":"Schmidt"},{"country":"Montenegro","email":"pwillis3@com.com","first_name":"Phillip","id":4,"ip_address":"24.223.139.156","last_name":"Willis"}]'
 	suite.T().Log("Possibly executing: var sorted string = '[{\\'country\\':\\'Andorra\\',\\'email\\':\\'hriley0@usgs.gov\\',\\'first_name\\':\\'Harry\\',\\'id\\':1,\\'ip_address\\':\\'221.25.65.136\\',\\'last_name\\':\\'Riley\\'},{\\'country\\':\\'Tuvalu\\',\\'email\\':\\'banderson1@list-manage.com\\',\\'first_name\\':\\'Bonnie\\',\\'id\\':2,\\'ip_address\\':\\'116.162.43.150\\',\\'last_name\\':\\'Anderson\\'},{\\'country\\':\\'Iraq\\',\\'email\\':\\'mschmidt2@diigo.com\\',\\'first_name\\':\\'Marie\\',\\'id\\':3,\\'ip_address\\':\\'181.105.59.57\\',\\'last_name\\':\\'Schmidt\\'},{\\'country\\':\\'Montenegro\\',\\'email\\':\\'pwillis3@com.com\\',\\'first_name\\':\\'Phillip\\',\\'id\\':4,\\'ip_address\\':\\'24.223.139.156\\',\\'last_name\\':\\'Willis\\'}]'")
 
 	sorted := "[{\"country\":\"Andorra\",\"email\":\"hriley0@usgs.gov\",\"first_name\":\"Harry\",\"id\":1,\"ip_address\":\"221.25.65.136\",\"last_name\":\"Riley\"},{\"country\":\"Tuvalu\",\"email\":\"banderson1@list-manage.com\",\"first_name\":\"Bonnie\",\"id\":2,\"ip_address\":\"116.162.43.150\",\"last_name\":\"Anderson\"},{\"country\":\"Iraq\",\"email\":\"mschmidt2@diigo.com\",\"first_name\":\"Marie\",\"id\":3,\"ip_address\":\"181.105.59.57\",\"last_name\":\"Schmidt\"},{\"country\":\"Montenegro\",\"email\":\"pwillis3@com.com\",\"first_name\":\"Phillip\",\"id\":4,\"ip_address\":\"24.223.139.156\",\"last_name\":\"Willis\"}]"
 	_ = sorted // Prevent any noused variable errors
-
 
 	{
 		// json.yaml line #37
@@ -221,7 +217,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.JSON(text).ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -236,7 +232,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.MinVal).ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -251,7 +247,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.MaxVal).ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #43")
 	}
@@ -266,7 +262,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.MinVal).CoerceTo("string"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #46")
 	}
@@ -281,7 +277,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(r.MaxVal).CoerceTo("string"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #49")
 	}
@@ -289,15 +285,15 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #52
 		/* {'timezone':'+00:00','$reql_type$':'TIME','epoch_time':1410393600} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"timezone": "+00:00", "$reql_type$": "TIME", "epoch_time": 1410393600, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"timezone": "+00:00", "$reql_type$": "TIME", "epoch_time": 1410393600}
 		/* r.time(2014,9,11, 'Z') */
 
 		suite.T().Log("About to run line #52: r.Time(2014, 9, 11, 'Z')")
 
 		runAndAssert(suite.Suite, expected_, r.Time(2014, 9, 11, "Z"), suite.session, r.RunOpts{
-			TimeFormat: "raw",
+			TimeFormat:     "raw",
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #52")
 	}
@@ -312,7 +308,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Time(2014, 9, 11, "Z").ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #57")
 	}
@@ -320,14 +316,14 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #60
 		/* {'$reql_type$':'GEOMETRY','coordinates':[0,0],'type':'Point'} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point", }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point"}
 		/* r.point(0,0) */
 
 		suite.T().Log("About to run line #60: r.Point(0, 0)")
 
 		runAndAssert(suite.Suite, expected_, r.Point(0, 0), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #60")
 	}
@@ -342,7 +338,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Point(0, 0).ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #63")
 	}
@@ -351,9 +347,8 @@ func (suite *JsonSuite) TestCases() {
 	// s = b'\x66\x6f\x6f'
 	suite.T().Log("Possibly executing: var s []byte = []byte{102,111,111}")
 
-	s := []byte{102,111,111}
+	s := []byte{102, 111, 111}
 	_ = s // Prevent any noused variable errors
-
 
 	{
 		// json.yaml line #70
@@ -365,7 +360,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Binary(s), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #70")
 	}
@@ -380,7 +375,7 @@ func (suite *JsonSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("foo").CoerceTo("binary").ToJSON(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #73")
 	}

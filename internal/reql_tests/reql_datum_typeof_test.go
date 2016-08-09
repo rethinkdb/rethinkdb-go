@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // These tests test the type of command
 func TestDatumTypeofSuite(t *testing.T) {
-	suite.Run(t, new(DatumTypeofSuite ))
+	suite.Run(t, new(DatumTypeofSuite))
 }
 
 type DatumTypeofSuite struct {
@@ -28,7 +28,7 @@ func (suite *DatumTypeofSuite) SetupTest() {
 	suite.T().Log("Setting up DatumTypeofSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *DatumTypeofSuite) TearDownSuite() {
 func (suite *DatumTypeofSuite) TestCases() {
 	suite.T().Log("Running DatumTypeofSuite: These tests test the type of command")
 
-
-
 	{
 		// datum/typeof.yaml line #5
 		/* 'NULL' */
@@ -70,7 +68,7 @@ func (suite *DatumTypeofSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #5")
 	}
@@ -85,7 +83,7 @@ func (suite *DatumTypeofSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.TypeOf(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #9")
 	}

@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Test duplicate indexes with squashing
 func TestChangefeedsIdxcopySuite(t *testing.T) {
-	suite.Run(t, new(ChangefeedsIdxcopySuite ))
+	suite.Run(t, new(ChangefeedsIdxcopySuite))
 }
 
 type ChangefeedsIdxcopySuite struct {
@@ -28,7 +28,7 @@ func (suite *ChangefeedsIdxcopySuite) SetupTest() {
 	suite.T().Log("Setting up ChangefeedsIdxcopySuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -54,7 +54,7 @@ func (suite *ChangefeedsIdxcopySuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		 r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
 		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
@@ -67,18 +67,17 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	tbl := r.DB("test").Table("tbl")
 	_ = tbl // Prevent any noused variable errors
 
-
 	{
 		// changefeeds/idxcopy.yaml line #4
 		/* partial({'created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"created": 1, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"created": 1})
 		/* tbl.index_create('a') */
 
 		suite.T().Log("About to run line #4: tbl.IndexCreate('a')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #4")
 	}
@@ -93,7 +92,7 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -102,23 +101,22 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	// feed = tbl.order_by(index='a').limit(10).changes(squash=2).limit(9)
 	suite.T().Log("Possibly executing: var feed r.Term = tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'a', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: 2, }).Limit(9)")
 
-	feed := maybeRun(tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "a", }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: 2, }).Limit(9), suite.session, r.RunOpts{
+	feed := maybeRun(tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "a"}).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: 2}).Limit(9), suite.session, r.RunOpts{
 		MaxBatchRows: 1,
-	});
+	})
 	_ = feed // Prevent any noused variable errors
-
 
 	{
 		// changefeeds/idxcopy.yaml line #15
 		/* partial({'inserted':12, 'errors':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 12, "errors": 0, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 12, "errors": 0})
 		/* tbl.insert(r.range(0, 12).map({'id':r.row, 'a':5})) */
 
 		suite.T().Log("About to run line #15: tbl.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{'id': r.Row, 'a': 5, }))")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{"id": r.Row, "a": 5, })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{"id": r.Row, "a": 5})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #15")
 	}
@@ -126,14 +124,14 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	{
 		// changefeeds/idxcopy.yaml line #20
 		/* partial({'deleted':3, 'errors':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"deleted": 3, "errors": 0, })
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"deleted": 3, "errors": 0})
 		/* tbl.get_all(1, 8, 9, index='id').delete() */
 
 		suite.T().Log("About to run line #20: tbl.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: 'id', }).Delete()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: "id", }).Delete(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: "id"}).Delete(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #20")
 	}
@@ -155,16 +153,16 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	{
 		// changefeeds/idxcopy.yaml line #28
 		/* bag([
-{"new_val":{"a":5, "id":0}, "old_val":nil},
-{"new_val":{"a":5, "id":2}, "old_val":nil},
-{"new_val":{"a":5, "id":3}, "old_val":nil},
-{"new_val":{"a":5, "id":4}, "old_val":nil},
-{"new_val":{"a":5, "id":5}, "old_val":nil},
-{"new_val":{"a":5, "id":6}, "old_val":nil},
-{"new_val":{"a":5, "id":7}, "old_val":nil},
-{"new_val":{"a":5, "id":10}, "old_val":nil},
-{"new_val":{"a":5, "id":11}, "old_val":nil}]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 0, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 2, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 3, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 4, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 5, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 6, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 7, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 10, }, "old_val": nil, }, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 11, }, "old_val": nil, }})
+		{"new_val":{"a":5, "id":0}, "old_val":nil},
+		{"new_val":{"a":5, "id":2}, "old_val":nil},
+		{"new_val":{"a":5, "id":3}, "old_val":nil},
+		{"new_val":{"a":5, "id":4}, "old_val":nil},
+		{"new_val":{"a":5, "id":5}, "old_val":nil},
+		{"new_val":{"a":5, "id":6}, "old_val":nil},
+		{"new_val":{"a":5, "id":7}, "old_val":nil},
+		{"new_val":{"a":5, "id":10}, "old_val":nil},
+		{"new_val":{"a":5, "id":11}, "old_val":nil}]) */
+		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 0}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 2}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 3}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 4}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 5}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 6}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 7}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 10}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 5, "id": 11}, "old_val": nil}})
 		/* fetch(feed) */
 
 		suite.T().Log("About to run line #28: fetch(feed, 0)")

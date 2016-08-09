@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests for basic usage of the subtraction operation
 func TestMathLogicSubSuite(t *testing.T) {
-	suite.Run(t, new(MathLogicSubSuite ))
+	suite.Run(t, new(MathLogicSubSuite))
 }
 
 type MathLogicSubSuite struct {
@@ -28,7 +28,7 @@ func (suite *MathLogicSubSuite) SetupTest() {
 	suite.T().Log("Setting up MathLogicSubSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MathLogicSubSuite) TearDownSuite() {
 func (suite *MathLogicSubSuite) TestCases() {
 	suite.T().Log("Running MathLogicSubSuite: Tests for basic usage of the subtraction operation")
 
-
-
 	{
 		// math_logic/sub.yaml line #6
 		/* 0 */
@@ -70,7 +68,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Sub(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -85,7 +83,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Sub(1, r.Expr(1)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -100,7 +98,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Sub(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -115,7 +113,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(-1).Sub(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #17")
 	}
@@ -130,7 +128,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1.75).Sub(8.5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #22")
 	}
@@ -145,7 +143,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Sub(2, 3, 4, 5), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #26")
 	}
@@ -160,7 +158,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Sub(0.8), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #30")
 	}
@@ -175,7 +173,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Sub("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #33")
 	}
@@ -190,7 +188,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("b").Sub("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #36")
 	}

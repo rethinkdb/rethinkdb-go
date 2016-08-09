@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // Tests for the basic usage of the mod operation
 func TestMathLogicModSuite(t *testing.T) {
-	suite.Run(t, new(MathLogicModSuite ))
+	suite.Run(t, new(MathLogicModSuite))
 }
 
 type MathLogicModSuite struct {
@@ -28,7 +28,7 @@ func (suite *MathLogicModSuite) SetupTest() {
 	suite.T().Log("Setting up MathLogicModSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -58,8 +58,6 @@ func (suite *MathLogicModSuite) TearDownSuite() {
 func (suite *MathLogicModSuite) TestCases() {
 	suite.T().Log("Running MathLogicModSuite: Tests for the basic usage of the mod operation")
 
-
-
 	{
 		// math_logic/mod.yaml line #6
 		/* 1 */
@@ -70,7 +68,7 @@ func (suite *MathLogicModSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(10).Mod(3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #6")
 	}
@@ -85,7 +83,7 @@ func (suite *MathLogicModSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Mod(10, r.Expr(3)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #7")
 	}
@@ -100,7 +98,7 @@ func (suite *MathLogicModSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(10).Mod(3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #8")
 	}
@@ -115,7 +113,7 @@ func (suite *MathLogicModSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(-10).Mod(-3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #16")
 	}
@@ -130,7 +128,7 @@ func (suite *MathLogicModSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr(4).Mod("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #22")
 	}
@@ -145,7 +143,7 @@ func (suite *MathLogicModSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Mod(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #27")
 	}
@@ -160,7 +158,7 @@ func (suite *MathLogicModSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, r.Expr("a").Mod("b"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #32")
 	}

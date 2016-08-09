@@ -9,13 +9,13 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-    r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/dancannon/gorethink.v2"
 	"gopkg.in/dancannon/gorethink.v2/internal/compare"
 )
 
 // sindex api (#602)
 func TestSindexApiSuite(t *testing.T) {
-	suite.Run(t, new(SindexApiSuite ))
+	suite.Run(t, new(SindexApiSuite))
 }
 
 type SindexApiSuite struct {
@@ -28,7 +28,7 @@ func (suite *SindexApiSuite) SetupTest() {
 	suite.T().Log("Setting up SindexApiSuite")
 	// Use imports to prevent errors
 	_ = time.Time{}
-    _ = compare.AnythingIsFine
+	_ = compare.AnythingIsFine
 
 	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
@@ -54,7 +54,7 @@ func (suite *SindexApiSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		 r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
 		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
@@ -67,29 +67,27 @@ func (suite *SindexApiSuite) TestCases() {
 	tbl := r.DB("test").Table("tbl")
 	_ = tbl // Prevent any noused variable errors
 
-
 	// sindex/api.yaml line #5
 	// rows = [{'id':0, 'a':0, 'b':0, 'c':0, 'm':[1,2,3]},{'id':1, 'a':0, 'b':0, 'c':0, 'm':[4,5,6]},{'id':2, 'a':0, 'b':0, 'c':1, 'm':7},{'id':3, 'a':0, 'b':1, 'c':1, 'm':[10,11,12]},{'id':4, 'a':4, 'b':4, 'c':4, 'm':[14,15,16]}]
 	suite.T().Log("Possibly executing: var rows []interface{} = []interface{}{map[interface{}]interface{}{'id': 0, 'a': 0, 'b': 0, 'c': 0, 'm': []interface{}{1, 2, 3}, }, map[interface{}]interface{}{'id': 1, 'a': 0, 'b': 0, 'c': 0, 'm': []interface{}{4, 5, 6}, }, map[interface{}]interface{}{'id': 2, 'a': 0, 'b': 0, 'c': 1, 'm': 7, }, map[interface{}]interface{}{'id': 3, 'a': 0, 'b': 1, 'c': 1, 'm': []interface{}{10, 11, 12}, }, map[interface{}]interface{}{'id': 4, 'a': 4, 'b': 4, 'c': 4, 'm': []interface{}{14, 15, 16}, }}")
 
-	rows := []interface{}{map[interface{}]interface{}{"id": 0, "a": 0, "b": 0, "c": 0, "m": []interface{}{1, 2, 3}, }, map[interface{}]interface{}{"id": 1, "a": 0, "b": 0, "c": 0, "m": []interface{}{4, 5, 6}, }, map[interface{}]interface{}{"id": 2, "a": 0, "b": 0, "c": 1, "m": 7, }, map[interface{}]interface{}{"id": 3, "a": 0, "b": 1, "c": 1, "m": []interface{}{10, 11, 12}, }, map[interface{}]interface{}{"id": 4, "a": 4, "b": 4, "c": 4, "m": []interface{}{14, 15, 16}, }}
+	rows := []interface{}{map[interface{}]interface{}{"id": 0, "a": 0, "b": 0, "c": 0, "m": []interface{}{1, 2, 3}}, map[interface{}]interface{}{"id": 1, "a": 0, "b": 0, "c": 0, "m": []interface{}{4, 5, 6}}, map[interface{}]interface{}{"id": 2, "a": 0, "b": 0, "c": 1, "m": 7}, map[interface{}]interface{}{"id": 3, "a": 0, "b": 1, "c": 1, "m": []interface{}{10, 11, 12}}, map[interface{}]interface{}{"id": 4, "a": 4, "b": 4, "c": 4, "m": []interface{}{14, 15, 16}}}
 	_ = rows // Prevent any noused variable errors
-
 
 	{
 		// sindex/api.yaml line #11
 		/* ({'deleted':0,'inserted':4,'skipped':0,'errors':0,'replaced':0,'unchanged':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "inserted": 4, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "inserted": 4, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0}
 		/* tbl.insert([{'id':0, 'a':0, 'b':0, 'c':0, 'm':[1,2,3]},
-{'id':1, 'a':0, 'b':0, 'c':0, 'm':[4,5,6]},
-{'id':2, 'a':0, 'b':0, 'c':1, 'm':7},
-{'id':3, 'a':0, 'b':1, 'c':1, 'm':[10,11,12]}]) */
+		{'id':1, 'a':0, 'b':0, 'c':0, 'm':[4,5,6]},
+		{'id':2, 'a':0, 'b':0, 'c':1, 'm':7},
+		{'id':3, 'a':0, 'b':1, 'c':1, 'm':[10,11,12]}]) */
 
 		suite.T().Log("About to run line #11: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 0, 'a': 0, 'b': 0, 'c': 0, 'm': []interface{}{1, 2, 3}, }, map[interface{}]interface{}{'id': 1, 'a': 0, 'b': 0, 'c': 0, 'm': []interface{}{4, 5, 6}, }, map[interface{}]interface{}{'id': 2, 'a': 0, 'b': 0, 'c': 1, 'm': 7, }, map[interface{}]interface{}{'id': 3, 'a': 0, 'b': 1, 'c': 1, 'm': []interface{}{10, 11, 12}, }})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 0, "a": 0, "b": 0, "c": 0, "m": []interface{}{1, 2, 3}, }, map[interface{}]interface{}{"id": 1, "a": 0, "b": 0, "c": 0, "m": []interface{}{4, 5, 6}, }, map[interface{}]interface{}{"id": 2, "a": 0, "b": 0, "c": 1, "m": 7, }, map[interface{}]interface{}{"id": 3, "a": 0, "b": 1, "c": 1, "m": []interface{}{10, 11, 12}, }}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 0, "a": 0, "b": 0, "c": 0, "m": []interface{}{1, 2, 3}}, map[interface{}]interface{}{"id": 1, "a": 0, "b": 0, "c": 0, "m": []interface{}{4, 5, 6}}, map[interface{}]interface{}{"id": 2, "a": 0, "b": 0, "c": 1, "m": 7}, map[interface{}]interface{}{"id": 3, "a": 0, "b": 1, "c": 1, "m": []interface{}{10, 11, 12}}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #11")
 	}
@@ -97,14 +95,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #18
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('rename-foo', r.row['b']) */
 
 		suite.T().Log("About to run line #18: tbl.IndexCreateFunc('rename-foo', r.Row.AtIndex('b'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("rename-foo", r.Row.AtIndex("b")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #18")
 	}
@@ -112,14 +110,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #23
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('rename-bar', r.row['c']) */
 
 		suite.T().Log("About to run line #23: tbl.IndexCreateFunc('rename-bar', r.Row.AtIndex('c'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("rename-bar", r.Row.AtIndex("c")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #23")
 	}
@@ -134,7 +132,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-foo", "rename-bar"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #28")
 	}
@@ -149,7 +147,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-fake", "rename-stuff"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #31")
 	}
@@ -157,14 +155,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #34
 		/* err('ReqlQueryLogicError','Index name conflict:'+' `id` is the name of the primary key.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Index name conflict:" + " `id` is the name of the primary key.")
+		var expected_ Err = err("ReqlQueryLogicError", "Index name conflict:"+" `id` is the name of the primary key.")
 		/* tbl.index_rename('id','rename-stuff') */
 
 		suite.T().Log("About to run line #34: tbl.IndexRename('id', 'rename-stuff')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexRename("id", "rename-stuff"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
 	}
@@ -172,14 +170,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #37
 		/* err('ReqlQueryLogicError','Index name conflict:'+' `id` is the name of the primary key.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Index name conflict:" + " `id` is the name of the primary key.")
+		var expected_ Err = err("ReqlQueryLogicError", "Index name conflict:"+" `id` is the name of the primary key.")
 		/* tbl.index_rename('rename-stuff','id') */
 
 		suite.T().Log("About to run line #37: tbl.IndexRename('rename-stuff', 'id')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-stuff", "id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #37")
 	}
@@ -187,14 +185,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #40
 		/* {'renamed':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 0}
 		/* tbl.index_rename('rename-foo','rename-foo') */
 
 		suite.T().Log("About to run line #40: tbl.IndexRename('rename-foo', 'rename-foo')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-foo", "rename-foo"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #40")
 	}
@@ -202,14 +200,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #43
 		/* {'renamed':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 0}
 		/* tbl.index_rename('rename-foo','rename-foo',overwrite=True) */
 
 		suite.T().Log("About to run line #43: tbl.IndexRename('rename-foo', 'rename-foo').OptArgs(r.IndexRenameOpts{Overwrite: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-foo", "rename-foo").OptArgs(r.IndexRenameOpts{Overwrite: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-foo", "rename-foo").OptArgs(r.IndexRenameOpts{Overwrite: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #43")
 	}
@@ -217,14 +215,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #48
 		/* {'renamed':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1}
 		/* tbl.index_rename('rename-foo','rename-bar',overwrite=True) */
 
 		suite.T().Log("About to run line #48: tbl.IndexRename('rename-foo', 'rename-bar').OptArgs(r.IndexRenameOpts{Overwrite: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-foo", "rename-bar").OptArgs(r.IndexRenameOpts{Overwrite: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-foo", "rename-bar").OptArgs(r.IndexRenameOpts{Overwrite: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #48")
 	}
@@ -232,14 +230,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #53
 		/* {'renamed':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1}
 		/* tbl.index_rename('rename-bar','rename-stuff',overwrite=True) */
 
 		suite.T().Log("About to run line #53: tbl.IndexRename('rename-bar', 'rename-stuff').OptArgs(r.IndexRenameOpts{Overwrite: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-bar", "rename-stuff").OptArgs(r.IndexRenameOpts{Overwrite: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-bar", "rename-stuff").OptArgs(r.IndexRenameOpts{Overwrite: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #53")
 	}
@@ -247,14 +245,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #58
 		/* {'renamed':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1}
 		/* tbl.index_rename('rename-stuff','rename-last') */
 
 		suite.T().Log("About to run line #58: tbl.IndexRename('rename-stuff', 'rename-last')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexRename("rename-stuff", "rename-last"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #58")
 	}
@@ -262,14 +260,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #62
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('minval', lambda:r.minval) */
 
 		suite.T().Log("About to run line #62: tbl.IndexCreateFunc('minval', func() interface{} { return r.MinVal})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("minval", func() interface{} { return r.MinVal}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("minval", func() interface{} { return r.MinVal }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #62")
 	}
@@ -277,14 +275,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #67
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('maxval', lambda:r.maxval) */
 
 		suite.T().Log("About to run line #67: tbl.IndexCreateFunc('maxval', func() interface{} { return r.MaxVal})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("maxval", func() interface{} { return r.MaxVal}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("maxval", func() interface{} { return r.MaxVal }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #67")
 	}
@@ -292,16 +290,16 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #71
 		/* bag([{'index':'rename-last','ready':true},
-{'index':'minval','ready':true},
-{'index':'maxval','ready':true}]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"index": "rename-last", "ready": true, }, map[interface{}]interface{}{"index": "minval", "ready": true, }, map[interface{}]interface{}{"index": "maxval", "ready": true, }})
+		{'index':'minval','ready':true},
+		{'index':'maxval','ready':true}]) */
+		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"index": "rename-last", "ready": true}, map[interface{}]interface{}{"index": "minval", "ready": true}, map[interface{}]interface{}{"index": "maxval", "ready": true}})
 		/* tbl.index_wait('rename-last', 'minval', 'maxval').pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #71: tbl.IndexWait('rename-last', 'minval', 'maxval').Pluck('index', 'ready')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait("rename-last", "minval", "maxval").Pluck("index", "ready"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #71")
 	}
@@ -314,9 +312,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #76: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: 'rename-last', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: "rename-last", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: "rename-last"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #76")
 	}
@@ -329,9 +327,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #82: tbl.GetAll(r.MinVal).OptArgs(r.GetAllOpts{Index: 'minval', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(r.MinVal).OptArgs(r.GetAllOpts{Index: "minval", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(r.MinVal).OptArgs(r.GetAllOpts{Index: "minval"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #82")
 	}
@@ -344,9 +342,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #87: tbl.GetAll(r.MaxVal).OptArgs(r.GetAllOpts{Index: 'maxval', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(r.MaxVal).OptArgs(r.GetAllOpts{Index: "maxval", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(r.MaxVal).OptArgs(r.GetAllOpts{Index: "maxval"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #87")
 	}
@@ -359,9 +357,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #92: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'minval', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "minval", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "minval"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #92")
 	}
@@ -369,14 +367,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #97
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('rename-last-dup', tbl.index_status('rename-last').nth(0).get_field('function')) */
 
 		suite.T().Log("About to run line #97: tbl.IndexCreateFunc('rename-last-dup', tbl.IndexStatus('rename-last').Nth(0).Field('function'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("rename-last-dup", tbl.IndexStatus("rename-last").Nth(0).Field("function")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #97")
 	}
@@ -384,14 +382,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #100
 		/* [{'index':'rename-last-dup','ready':true}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"index": "rename-last-dup", "ready": true, }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"index": "rename-last-dup", "ready": true}}
 		/* tbl.index_wait('rename-last-dup').pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #100: tbl.IndexWait('rename-last-dup').Pluck('index', 'ready')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait("rename-last-dup").Pluck("index", "ready"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #100")
 	}
@@ -404,9 +402,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #103: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: 'rename-last-dup', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: "rename-last-dup", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: "rename-last-dup"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #103")
 	}
@@ -414,14 +412,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #109
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('rename-last-dup') */
 
 		suite.T().Log("About to run line #109: tbl.IndexDrop('rename-last-dup')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexDrop("rename-last-dup"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #109")
 	}
@@ -429,14 +427,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #110
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('minval') */
 
 		suite.T().Log("About to run line #110: tbl.IndexDrop('minval')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexDrop("minval"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #110")
 	}
@@ -444,14 +442,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #111
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('maxval') */
 
 		suite.T().Log("About to run line #111: tbl.IndexDrop('maxval')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexDrop("maxval"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #111")
 	}
@@ -466,7 +464,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexList(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #114")
 	}
@@ -474,14 +472,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #117
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('rename-last') */
 
 		suite.T().Log("About to run line #117: tbl.IndexDrop('rename-last')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexDrop("rename-last"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #117")
 	}
@@ -489,14 +487,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #121
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('ai', r.row['a']) */
 
 		suite.T().Log("About to run line #121: tbl.IndexCreateFunc('ai', r.Row.AtIndex('a'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("ai", r.Row.AtIndex("a")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #121")
 	}
@@ -511,7 +509,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("ai", r.Row.AtIndex("a")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #125")
 	}
@@ -519,14 +517,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #129
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('bi', r.row['b']) */
 
 		suite.T().Log("About to run line #129: tbl.IndexCreateFunc('bi', r.Row.AtIndex('b'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("bi", r.Row.AtIndex("b")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #129")
 	}
@@ -534,14 +532,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #133
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('ci', r.row['c']) */
 
 		suite.T().Log("About to run line #133: tbl.IndexCreateFunc('ci', r.Row.AtIndex('c'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("ci", r.Row.AtIndex("c")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #133")
 	}
@@ -549,14 +547,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #137
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('idi', r.row['id']) */
 
 		suite.T().Log("About to run line #137: tbl.IndexCreateFunc('idi', r.Row.AtIndex('id'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("idi", r.Row.AtIndex("id")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #137")
 	}
@@ -564,14 +562,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #141
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('kdi', [r.row['id']]) */
 
 		suite.T().Log("About to run line #141: tbl.IndexCreateFunc('kdi', []interface{}{r.Row.AtIndex('id')})")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("kdi", []interface{}{r.Row.AtIndex("id")}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #141")
 	}
@@ -579,14 +577,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #145
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('mi', r.row['m'], multi=True) */
 
 		suite.T().Log("About to run line #145: tbl.IndexCreateFunc('mi', r.Row.AtIndex('m')).OptArgs(r.IndexCreateOpts{Multi: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("mi", r.Row.AtIndex("m")).OptArgs(r.IndexCreateOpts{Multi: true, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("mi", r.Row.AtIndex("m")).OptArgs(r.IndexCreateOpts{Multi: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #145")
 	}
@@ -594,14 +592,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #149
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('brokeni', r.row['broken']) */
 
 		suite.T().Log("About to run line #149: tbl.IndexCreateFunc('brokeni', r.Row.AtIndex('broken'))")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("brokeni", r.Row.AtIndex("broken")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #149")
 	}
@@ -616,7 +614,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait().Pluck("index", "ready"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #153")
 	}
@@ -631,7 +629,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Get(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #156")
 	}
@@ -646,7 +644,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Get([]interface{}{}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #159")
 	}
@@ -661,7 +659,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Get(-1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #161")
 	}
@@ -676,7 +674,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Get(1).AtIndex("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #164")
 	}
@@ -691,7 +689,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.Get(1).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #168")
 	}
@@ -699,14 +697,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #172
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':1,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
 		/* tbl.get(1).update(lambda x:null) */
 
 		suite.T().Log("About to run line #172: tbl.Get(1).Update(func(x r.Term) interface{} { return nil})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(1).Update(func(x r.Term) interface{} { return nil}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(1).Update(func(x r.Term) interface{} { return nil }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #172")
 	}
@@ -719,9 +717,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #180: tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: "id", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #180")
 	}
@@ -734,9 +732,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #185: tbl.GetAll(-1).OptArgs(r.GetAllOpts{Index: 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(-1).OptArgs(r.GetAllOpts{Index: "id", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(-1).OptArgs(r.GetAllOpts{Index: "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #185")
 	}
@@ -751,7 +749,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.GetAll(-1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #189")
 	}
@@ -766,7 +764,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.GetAll([]interface{}{-1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #193")
 	}
@@ -779,9 +777,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #197: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).AtIndex(0).AtIndex('id')")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id", }).AtIndex(0).AtIndex("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id"}).AtIndex(0).AtIndex("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #197")
 	}
@@ -796,7 +794,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).AtIndex(0).AtIndex("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #201")
 	}
@@ -809,9 +807,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #205: tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')}).CoerceTo('ARRAY')")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: "id", }).Map(func(x r.Term) interface{} { return x.AtIndex("id")}).CoerceTo("ARRAY"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: "id"}).Map(func(x r.Term) interface{} { return x.AtIndex("id") }).CoerceTo("ARRAY"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #205")
 	}
@@ -824,9 +822,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #209: tbl.GetAll(1, 2, 3).Map(func(x r.Term) interface{} { return x.AtIndex('id')}).CoerceTo('ARRAY')")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).Map(func(x r.Term) interface{} { return x.AtIndex("id")}).CoerceTo("ARRAY"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).Map(func(x r.Term) interface{} { return x.AtIndex("id") }).CoerceTo("ARRAY"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #209")
 	}
@@ -839,9 +837,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #213: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id", }).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id"}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #213")
 	}
@@ -856,7 +854,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #217")
 	}
@@ -864,14 +862,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #221
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':1,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1, index='id').update(lambda x:null) */
 
 		suite.T().Log("About to run line #221: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).Update(func(x r.Term) interface{} { return nil})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id", }).Update(func(x r.Term) interface{} { return nil}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id"}).Update(func(x r.Term) interface{} { return nil }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #221")
 	}
@@ -879,14 +877,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #225
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':1,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1).update(lambda x:null) */
 
 		suite.T().Log("About to run line #225: tbl.GetAll(1).Update(func(x r.Term) interface{} { return nil})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).Update(func(x r.Term) interface{} { return nil}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).Update(func(x r.Term) interface{} { return nil }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #225")
 	}
@@ -894,14 +892,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #229
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':3,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1,2,3, index='id').update(lambda x:null) */
 
 		suite.T().Log("About to run line #229: tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: 'id', }).Update(func(x r.Term) interface{} { return nil})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: "id", }).Update(func(x r.Term) interface{} { return nil}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: "id"}).Update(func(x r.Term) interface{} { return nil }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #229")
 	}
@@ -909,14 +907,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #233
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':3,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1,2,3).update(lambda x:null) */
 
 		suite.T().Log("About to run line #233: tbl.GetAll(1, 2, 3).Update(func(x r.Term) interface{} { return nil})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).Update(func(x r.Term) interface{} { return nil}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 2, 3).Update(func(x r.Term) interface{} { return nil }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #233")
 	}
@@ -929,9 +927,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #238: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: 'fake', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: "fake", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: "fake"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #238")
 	}
@@ -946,7 +944,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.GetAll(r.Point(0, 0)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #242")
 	}
@@ -959,9 +957,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #246: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: false, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: false, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: false}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #246")
 	}
@@ -974,9 +972,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #251: tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: "id", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #251")
 	}
@@ -989,9 +987,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #256: tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: "id", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #256")
 	}
@@ -1004,9 +1002,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #260: tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: 'idi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: "idi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: "idi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #260")
 	}
@@ -1019,9 +1017,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #265: tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: 'idi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: "idi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: "idi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #265")
 	}
@@ -1034,9 +1032,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #270: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).AtIndex(0).AtIndex('id')")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id", }).AtIndex(0).AtIndex("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "id"}).AtIndex(0).AtIndex("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #270")
 	}
@@ -1049,9 +1047,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #274: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'idi', }).AtIndex(0).AtIndex('id')")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "idi", }).AtIndex(0).AtIndex("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "idi"}).AtIndex(0).AtIndex("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #274")
 	}
@@ -1064,9 +1062,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #278: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ai', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ai", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ai"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #278")
 	}
@@ -1079,9 +1077,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #282: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'bi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "bi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "bi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #282")
 	}
@@ -1094,9 +1092,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #286: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'bi', }).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "bi", }).OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "bi"}).OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #286")
 	}
@@ -1109,9 +1107,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #290: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'bi', }).Between(1, 1).OptArgs(r.BetweenOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "bi", }).Between(1, 1).OptArgs(r.BetweenOpts{Index: "id", }).Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "bi"}).Between(1, 1).OptArgs(r.BetweenOpts{Index: "id"}).Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #290")
 	}
@@ -1124,9 +1122,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #294: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ci', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ci", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ci"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #294")
 	}
@@ -1139,9 +1137,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #298: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ci', }).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ci", }).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ci"}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #298")
 	}
@@ -1149,14 +1147,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #302
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':2,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 2, "errors": 0, "inserted": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 2, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1, index='ci').update(lambda x:null) */
 
 		suite.T().Log("About to run line #302: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ci', }).Update(func(x r.Term) interface{} { return nil})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ci", }).Update(func(x r.Term) interface{} { return nil}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "ci"}).Update(func(x r.Term) interface{} { return nil }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #302")
 	}
@@ -1169,9 +1167,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #306: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'brokeni', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "brokeni", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "brokeni"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #306")
 	}
@@ -1184,9 +1182,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #311: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'mi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "mi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "mi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #311")
 	}
@@ -1199,9 +1197,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #316: tbl.GetAll(2).OptArgs(r.GetAllOpts{Index: 'mi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(2).OptArgs(r.GetAllOpts{Index: "mi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(2).OptArgs(r.GetAllOpts{Index: "mi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #316")
 	}
@@ -1214,9 +1212,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #321: tbl.GetAll(5).OptArgs(r.GetAllOpts{Index: 'mi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(5).OptArgs(r.GetAllOpts{Index: "mi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(5).OptArgs(r.GetAllOpts{Index: "mi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #321")
 	}
@@ -1229,9 +1227,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #326: tbl.GetAll(7).OptArgs(r.GetAllOpts{Index: 'mi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(7).OptArgs(r.GetAllOpts{Index: "mi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(7).OptArgs(r.GetAllOpts{Index: "mi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #326")
 	}
@@ -1244,9 +1242,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #331: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'fake', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "fake", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "fake"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #331")
 	}
@@ -1259,9 +1257,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #335: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: false, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: false, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: false}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #335")
 	}
@@ -1269,14 +1267,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #340
 		/* [{'left':rows[1],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[1], "right": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[1], "right": rows[0]}}
 		/* tbl.filter({'id':1}).eq_join('id', tbl, index='mi') */
 
 		suite.T().Log("About to run line #340: tbl.Filter(map[interface{}]interface{}{'id': 1, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'mi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 1, }).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "mi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 1}).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "mi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #340")
 	}
@@ -1284,14 +1282,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #345
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl) */
 
 		suite.T().Log("About to run line #345: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl)")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin("id", tbl), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin("id", tbl), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #345")
 	}
@@ -1299,14 +1297,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #350
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join(lambda x:x['id'], tbl) */
 
 		suite.T().Log("About to run line #350: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex('id')}, tbl)")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex("id")}, tbl), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin(func(x r.Term) interface{} { return x.AtIndex("id") }, tbl), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #350")
 	}
@@ -1314,14 +1312,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #355
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='id') */
 
 		suite.T().Log("About to run line #355: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "id", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #355")
 	}
@@ -1329,14 +1327,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #360
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join(lambda x:x['id'], tbl, index='id') */
 
 		suite.T().Log("About to run line #360: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex('id')}, tbl).OptArgs(r.EqJoinOpts{Index: 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex("id")}, tbl).OptArgs(r.EqJoinOpts{Index: "id", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin(func(x r.Term) interface{} { return x.AtIndex("id") }, tbl).OptArgs(r.EqJoinOpts{Index: "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #360")
 	}
@@ -1344,14 +1342,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #365
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='idi') */
 
 		suite.T().Log("About to run line #365: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'idi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "idi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "idi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #365")
 	}
@@ -1359,14 +1357,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #370
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join(lambda x:x['id'], tbl, index='idi') */
 
 		suite.T().Log("About to run line #370: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex('id')}, tbl).OptArgs(r.EqJoinOpts{Index: 'idi', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex("id")}, tbl).OptArgs(r.EqJoinOpts{Index: "idi", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin(func(x r.Term) interface{} { return x.AtIndex("id") }, tbl).OptArgs(r.EqJoinOpts{Index: "idi"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #370")
 	}
@@ -1374,17 +1372,17 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #375
 		/* [{'right':rows[0],'left':rows[0]},
-{'right':rows[1],'left':rows[0]},
-{'right':rows[2],'left':rows[0]},
-{'right':rows[3],'left':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0], }, map[interface{}]interface{}{"right": rows[1], "left": rows[0], }, map[interface{}]interface{}{"right": rows[2], "left": rows[0], }, map[interface{}]interface{}{"right": rows[3], "left": rows[0], }}
+		{'right':rows[1],'left':rows[0]},
+		{'right':rows[2],'left':rows[0]},
+		{'right':rows[3],'left':rows[0]}] */
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[0]}, map[interface{}]interface{}{"right": rows[3], "left": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='ai').order_by('right') */
 
 		suite.T().Log("About to run line #375: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'ai', }).OrderBy('right')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "ai", }).OrderBy("right"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "ai"}).OrderBy("right"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #375")
 	}
@@ -1392,16 +1390,16 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #382
 		/* ([{'right':rows[0],'left':rows[0]},
-{'right':rows[1],'left':rows[0]},
-{'right':rows[2],'left':rows[0]}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0], }, map[interface{}]interface{}{"right": rows[1], "left": rows[0], }, map[interface{}]interface{}{"right": rows[2], "left": rows[0], }}
+		{'right':rows[1],'left':rows[0]},
+		{'right':rows[2],'left':rows[0]}]) */
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='bi').order_by('right') */
 
 		suite.T().Log("About to run line #382: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'bi', }).OrderBy('right')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "bi", }).OrderBy("right"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "bi"}).OrderBy("right"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #382")
 	}
@@ -1409,14 +1407,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #388
 		/* [{'right':rows[0],'left':rows[0]}, {'right':rows[1],'left':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0], }, map[interface{}]interface{}{"right": rows[1], "left": rows[0], }}
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='ci').order_by('right') */
 
 		suite.T().Log("About to run line #388: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'ci', }).OrderBy('right')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "ci", }).OrderBy("right"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "ci"}).OrderBy("right"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #388")
 	}
@@ -1429,9 +1427,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #392: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'brokeni', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0, }).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "brokeni", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(map[interface{}]interface{}{"id": 0}).EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "brokeni"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #392")
 	}
@@ -1439,21 +1437,21 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #397
 		/* [{'left':rows[0],'right':rows[0]},
-{'left':rows[1],'right':rows[0]},
-{'left':rows[0],'right':rows[1]},
-{'left':rows[1],'right':rows[1]},
-{'left':rows[0],'right':rows[2]},
-{'left':rows[1],'right':rows[2]},
-{'left':rows[2],'right':rows[3]},
-{'left':rows[3],'right':rows[3]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0], }, map[interface{}]interface{}{"left": rows[1], "right": rows[0], }, map[interface{}]interface{}{"left": rows[0], "right": rows[1], }, map[interface{}]interface{}{"left": rows[1], "right": rows[1], }, map[interface{}]interface{}{"left": rows[0], "right": rows[2], }, map[interface{}]interface{}{"left": rows[1], "right": rows[2], }, map[interface{}]interface{}{"left": rows[2], "right": rows[3], }, map[interface{}]interface{}{"left": rows[3], "right": rows[3], }}
+		{'left':rows[1],'right':rows[0]},
+		{'left':rows[0],'right':rows[1]},
+		{'left':rows[1],'right':rows[1]},
+		{'left':rows[0],'right':rows[2]},
+		{'left':rows[1],'right':rows[2]},
+		{'left':rows[2],'right':rows[3]},
+		{'left':rows[3],'right':rows[3]}] */
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}, map[interface{}]interface{}{"left": rows[1], "right": rows[0]}, map[interface{}]interface{}{"left": rows[0], "right": rows[1]}, map[interface{}]interface{}{"left": rows[1], "right": rows[1]}, map[interface{}]interface{}{"left": rows[0], "right": rows[2]}, map[interface{}]interface{}{"left": rows[1], "right": rows[2]}, map[interface{}]interface{}{"left": rows[2], "right": rows[3]}, map[interface{}]interface{}{"left": rows[3], "right": rows[3]}}
 		/* tbl.eq_join('c', tbl, index='bi').order_by('right', 'left') */
 
 		suite.T().Log("About to run line #397: tbl.EqJoin('c', tbl).OptArgs(r.EqJoinOpts{Index: 'bi', }).OrderBy('right', 'left')")
 
-		runAndAssert(suite.Suite, expected_, tbl.EqJoin("c", tbl).OptArgs(r.EqJoinOpts{Index: "bi", }).OrderBy("right", "left"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.EqJoin("c", tbl).OptArgs(r.EqJoinOpts{Index: "bi"}).OrderBy("right", "left"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #397")
 	}
@@ -1468,7 +1466,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #408")
 	}
@@ -1476,14 +1474,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #411
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('c') */
 
 		suite.T().Log("About to run line #411: tbl.IndexCreate('c')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("c"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #411")
 	}
@@ -1491,14 +1489,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #413
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('broken') */
 
 		suite.T().Log("About to run line #413: tbl.IndexCreate('broken')")
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("broken"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #413")
 	}
@@ -1513,7 +1511,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait("broken"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #416")
 	}
@@ -1526,9 +1524,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #419: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #419")
 	}
@@ -1541,9 +1539,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #423: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'broken', }).OrderBy('broken').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "broken", }).OrderBy("broken").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: "broken"}).OrderBy("broken").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #423")
 	}
@@ -1551,14 +1549,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #428
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('nil', lambda x:null) */
 
 		suite.T().Log("About to run line #428: tbl.IndexCreateFunc('nil', func(x r.Term) interface{} { return nil})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("nil", func(x r.Term) interface{} { return nil}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("nil", func(x r.Term) interface{} { return nil }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #428")
 	}
@@ -1573,7 +1571,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait().Pluck("index", "ready"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #431")
 	}
@@ -1586,9 +1584,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #434: tbl.GetAll(nil).OptArgs(r.GetAllOpts{Index: 'nil', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(nil).OptArgs(r.GetAllOpts{Index: "nil", }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(nil).OptArgs(r.GetAllOpts{Index: "nil"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #434")
 	}
@@ -1596,14 +1594,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #439
 		/* {'deleted':0,'inserted':1,'skipped':0,'errors':0,'replaced':0,'unchanged':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "inserted": 1, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "inserted": 1, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0}
 		/* tbl.insert({'id':4, 'a':4, 'b':4, 'c':4, 'm':[14,15,16]}) */
 
 		suite.T().Log("About to run line #439: tbl.Insert(map[interface{}]interface{}{'id': 4, 'a': 4, 'b': 4, 'c': 4, 'm': []interface{}{14, 15, 16}, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 4, "a": 4, "b": 4, "c": 4, "m": []interface{}{14, 15, 16}, }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 4, "a": 4, "b": 4, "c": 4, "m": []interface{}{14, 15, 16}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #439")
 	}
@@ -1611,18 +1609,18 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #446
 		/* [{'right':rows[0],'left':rows[0]},
-{'right':rows[1],'left':rows[0]},
-{'right':rows[2],'left':rows[1]},
-{'right':rows[3],'left':rows[1]},
-{'right':rows[4],'left':rows[4]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0], }, map[interface{}]interface{}{"right": rows[1], "left": rows[0], }, map[interface{}]interface{}{"right": rows[2], "left": rows[1], }, map[interface{}]interface{}{"right": rows[3], "left": rows[1], }, map[interface{}]interface{}{"right": rows[4], "left": rows[4], }}
+		{'right':rows[1],'left':rows[0]},
+		{'right':rows[2],'left':rows[1]},
+		{'right':rows[3],'left':rows[1]},
+		{'right':rows[4],'left':rows[4]}] */
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[1]}, map[interface{}]interface{}{"right": rows[3], "left": rows[1]}, map[interface{}]interface{}{"right": rows[4], "left": rows[4]}}
 		/* tbl.eq_join('id', tbl, index='c').order_by('left', 'right').coerce_to("ARRAY") */
 
 		suite.T().Log("About to run line #446: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'c', }).OrderBy('left', 'right').CoerceTo('ARRAY')")
 
-		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "c", }).OrderBy("left", "right").CoerceTo("ARRAY"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "c"}).OrderBy("left", "right").CoerceTo("ARRAY"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #446")
 	}
@@ -1630,18 +1628,18 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #455
 		/* [{'right':rows[0],'left':rows[0]},
-{'right':rows[1],'left':rows[0]},
-{'right':rows[2],'left':rows[1]},
-{'right':rows[3],'left':rows[1]},
-{'right':rows[4],'left':rows[4]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0], }, map[interface{}]interface{}{"right": rows[1], "left": rows[0], }, map[interface{}]interface{}{"right": rows[2], "left": rows[1], }, map[interface{}]interface{}{"right": rows[3], "left": rows[1], }, map[interface{}]interface{}{"right": rows[4], "left": rows[4], }}
+		{'right':rows[1],'left':rows[0]},
+		{'right':rows[2],'left':rows[1]},
+		{'right':rows[3],'left':rows[1]},
+		{'right':rows[4],'left':rows[4]}] */
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[1]}, map[interface{}]interface{}{"right": rows[3], "left": rows[1]}, map[interface{}]interface{}{"right": rows[4], "left": rows[4]}}
 		/* tbl.eq_join('id', tbl, index='ci').order_by('left', 'right') */
 
 		suite.T().Log("About to run line #455: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'ci', }).OrderBy('left', 'right')")
 
-		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "ci", }).OrderBy("left", "right"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.EqJoin("id", tbl).OptArgs(r.EqJoinOpts{Index: "ci"}).OrderBy("left", "right"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #455")
 	}
@@ -1649,14 +1647,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #465
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu" + "ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(null, 2, index='id').count() */
 
 		suite.T().Log("About to run line #465: tbl.Between(nil, 2).OptArgs(r.BetweenOpts{Index: 'id', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(nil, 2).OptArgs(r.BetweenOpts{Index: "id", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(nil, 2).OptArgs(r.BetweenOpts{Index: "id"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #465")
 	}
@@ -1664,14 +1662,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #466
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu" + "ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(2, null, index='id').count() */
 
 		suite.T().Log("About to run line #466: tbl.Between(2, nil).OptArgs(r.BetweenOpts{Index: 'id', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(2, nil).OptArgs(r.BetweenOpts{Index: "id", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(2, nil).OptArgs(r.BetweenOpts{Index: "id"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #466")
 	}
@@ -1679,14 +1677,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #467
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu" + "ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(null, null, index='id').count() */
 
 		suite.T().Log("About to run line #467: tbl.Between(nil, nil).OptArgs(r.BetweenOpts{Index: 'id', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(nil, nil).OptArgs(r.BetweenOpts{Index: "id", }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(nil, nil).OptArgs(r.BetweenOpts{Index: "id"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #467")
 	}
@@ -1699,9 +1697,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #479: tbl.Between(r.MinVal, r.MaxVal).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #479")
 	}
@@ -1714,9 +1712,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #483: tbl.Between(r.MinVal, r.MaxVal).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #483")
 	}
@@ -1729,9 +1727,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #487: tbl.Between(r.MinVal, r.MaxVal).Between(r.MinVal, r.MaxVal).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).Between(r.MinVal, r.MaxVal).Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).Between(r.MinVal, r.MaxVal).Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #487")
 	}
@@ -1744,9 +1742,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #491: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Between(r.MinVal, 3).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id", }).Between(r.MinVal, 3).Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Between(r.MinVal, 3).Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #491")
 	}
@@ -1759,9 +1757,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #495: tbl.Between(0, r.MaxVal).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #495")
 	}
@@ -1774,9 +1772,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #499: tbl.Between(r.MinVal, 4).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #499")
 	}
@@ -1789,9 +1787,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #503: tbl.Between(0, 4).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #503")
 	}
@@ -1804,9 +1802,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #507: tbl.Between(-1, 5).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #507")
 	}
@@ -1819,9 +1817,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #511: tbl.Between(5, 5).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #511")
 	}
@@ -1834,9 +1832,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #515: tbl.Between(5, r.MaxVal).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #515")
 	}
@@ -1849,9 +1847,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #519: tbl.Between(-1, -1).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #519")
 	}
@@ -1864,9 +1862,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #523: tbl.Between(r.MinVal, -1).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #523")
 	}
@@ -1879,9 +1877,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #528: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #528")
 	}
@@ -1894,9 +1892,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #532: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #532")
 	}
@@ -1909,9 +1907,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #536: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #536")
 	}
@@ -1924,9 +1922,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #540: tbl.Between(0, 4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #540")
 	}
@@ -1939,9 +1937,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #544: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #544")
 	}
@@ -1954,9 +1952,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #548: tbl.Between(5, 5).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #548")
 	}
@@ -1969,9 +1967,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #552: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #552")
 	}
@@ -1984,9 +1982,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #556: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #556")
 	}
@@ -1999,9 +1997,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #560: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #560")
 	}
@@ -2014,9 +2012,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #565: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #565")
 	}
@@ -2029,9 +2027,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #569: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #569")
 	}
@@ -2044,9 +2042,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #573: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #573")
 	}
@@ -2059,9 +2057,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #577: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #577")
 	}
@@ -2074,9 +2072,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #581: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #581")
 	}
@@ -2089,9 +2087,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #585: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #585")
 	}
@@ -2104,9 +2102,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #589: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #589")
 	}
@@ -2119,9 +2117,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #593: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #593")
 	}
@@ -2134,9 +2132,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #597: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "id", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "id"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #597")
 	}
@@ -2149,9 +2147,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #602: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #602")
 	}
@@ -2164,9 +2162,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #606: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #606")
 	}
@@ -2179,9 +2177,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #610: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #610")
 	}
@@ -2194,9 +2192,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #614: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #614")
 	}
@@ -2209,9 +2207,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #618: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #618")
 	}
@@ -2224,9 +2222,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #622: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #622")
 	}
@@ -2239,9 +2237,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #626: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #626")
 	}
@@ -2254,9 +2252,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #630: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #630")
 	}
@@ -2269,9 +2267,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #634: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #634")
 	}
@@ -2284,9 +2282,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #639: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #639")
 	}
@@ -2299,9 +2297,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #643: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #643")
 	}
@@ -2314,9 +2312,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #647: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #647")
 	}
@@ -2329,9 +2327,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #651: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #651")
 	}
@@ -2344,9 +2342,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #655: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #655")
 	}
@@ -2359,9 +2357,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #659: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #659")
 	}
@@ -2374,9 +2372,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #663: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #663")
 	}
@@ -2389,9 +2387,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #667: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #667")
 	}
@@ -2404,9 +2402,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #671: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "idi", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "idi"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #671")
 	}
@@ -2419,9 +2417,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #676: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #676")
 	}
@@ -2434,9 +2432,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #680: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #680")
 	}
@@ -2449,9 +2447,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #684: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #684")
 	}
@@ -2464,9 +2462,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #688: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #688")
 	}
@@ -2479,9 +2477,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #692: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #692")
 	}
@@ -2494,9 +2492,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #696: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #696")
 	}
@@ -2509,9 +2507,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #700: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #700")
 	}
@@ -2524,9 +2522,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #704: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #704")
 	}
@@ -2539,9 +2537,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #708: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "idi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #708")
 	}
@@ -2554,9 +2552,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #713: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #713")
 	}
@@ -2569,9 +2567,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #717: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #717")
 	}
@@ -2584,9 +2582,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #721: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #721")
 	}
@@ -2599,9 +2597,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #725: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #725")
 	}
@@ -2614,9 +2612,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #729: tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #729")
 	}
@@ -2629,9 +2627,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #734: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #734")
 	}
@@ -2644,9 +2642,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #738: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #738")
 	}
@@ -2659,9 +2657,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #742: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #742")
 	}
@@ -2674,9 +2672,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #746: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #746")
 	}
@@ -2689,9 +2687,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #750: tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #750")
 	}
@@ -2704,9 +2702,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #755: tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #755")
 	}
@@ -2719,9 +2717,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #759: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #759")
 	}
@@ -2734,9 +2732,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #763: tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #763")
 	}
@@ -2749,9 +2747,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #767: tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #767")
 	}
@@ -2764,9 +2762,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #772: tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #772")
 	}
@@ -2779,9 +2777,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #776: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #776")
 	}
@@ -2794,9 +2792,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #780: tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #780")
 	}
@@ -2809,9 +2807,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #784: tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #784")
 	}
@@ -2824,9 +2822,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #789: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #789")
 	}
@@ -2839,9 +2837,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #793: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #793")
 	}
@@ -2854,9 +2852,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #797: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #797")
 	}
@@ -2869,9 +2867,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #801: tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #801")
 	}
@@ -2884,9 +2882,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #805: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #805")
 	}
@@ -2899,9 +2897,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #809: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "ai", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "ai"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #809")
 	}
@@ -2914,9 +2912,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #814: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #814")
 	}
@@ -2929,9 +2927,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #818: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #818")
 	}
@@ -2944,9 +2942,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #822: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #822")
 	}
@@ -2959,9 +2957,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #826: tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #826")
 	}
@@ -2974,9 +2972,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #830: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #830")
 	}
@@ -2989,9 +2987,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #834: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: "ai", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #834")
 	}
@@ -3004,9 +3002,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #839: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #839")
 	}
@@ -3019,9 +3017,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #843: tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #843")
 	}
@@ -3034,9 +3032,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #847: tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #847")
 	}
@@ -3049,9 +3047,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #851: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #851")
 	}
@@ -3064,9 +3062,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #855: tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #855")
 	}
@@ -3079,9 +3077,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #859: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #859")
 	}
@@ -3094,9 +3092,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #863: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #863")
 	}
@@ -3109,9 +3107,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #867: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "c", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "c"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #867")
 	}
@@ -3124,9 +3122,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #872: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #872")
 	}
@@ -3139,9 +3137,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #876: tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #876")
 	}
@@ -3154,9 +3152,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #880: tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #880")
 	}
@@ -3169,9 +3167,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #884: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #884")
 	}
@@ -3184,9 +3182,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #888: tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #888")
 	}
@@ -3199,9 +3197,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #892: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #892")
 	}
@@ -3214,9 +3212,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #896: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #896")
 	}
@@ -3229,9 +3227,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #900: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #900")
 	}
@@ -3239,14 +3237,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #905
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('bc', lambda row:[row['b'], row['c']]) */
 
 		suite.T().Log("About to run line #905: tbl.IndexCreateFunc('bc', func(row r.Term) interface{} { return []interface{}{row.AtIndex('b'), row.AtIndex('c')}})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("bc", func(row r.Term) interface{} { return []interface{}{row.AtIndex("b"), row.AtIndex("c")}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("bc", func(row r.Term) interface{} { return []interface{}{row.AtIndex("b"), row.AtIndex("c")} }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #905")
 	}
@@ -3254,14 +3252,14 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #909
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1, }
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('cb', lambda row:[row['c'], row['b']]) */
 
 		suite.T().Log("About to run line #909: tbl.IndexCreateFunc('cb', func(row r.Term) interface{} { return []interface{}{row.AtIndex('c'), row.AtIndex('b')}})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("cb", func(row r.Term) interface{} { return []interface{}{row.AtIndex("c"), row.AtIndex("b")}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("cb", func(row r.Term) interface{} { return []interface{}{row.AtIndex("c"), row.AtIndex("b")} }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #909")
 	}
@@ -3276,7 +3274,7 @@ func (suite *SindexApiSuite) TestCases() {
 
 		runAndAssert(suite.Suite, expected_, tbl.IndexWait().Pluck("index", "ready"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #912")
 	}
@@ -3289,9 +3287,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #915: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #915")
 	}
@@ -3304,9 +3302,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #919: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #919")
 	}
@@ -3319,9 +3317,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #923: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #923")
 	}
@@ -3334,9 +3332,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #927: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #927")
 	}
@@ -3349,9 +3347,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #931: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #931")
 	}
@@ -3364,9 +3362,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #935: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #935")
 	}
@@ -3379,9 +3377,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #939: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #939")
 	}
@@ -3394,9 +3392,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #943: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #943")
 	}
@@ -3409,9 +3407,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #947: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #947")
 	}
@@ -3424,9 +3422,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #951: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #951")
 	}
@@ -3439,9 +3437,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #956: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #956")
 	}
@@ -3454,9 +3452,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #960: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #960")
 	}
@@ -3469,9 +3467,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #964: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #964")
 	}
@@ -3484,9 +3482,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #968: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #968")
 	}
@@ -3499,9 +3497,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #972: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #972")
 	}
@@ -3514,9 +3512,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #976: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #976")
 	}
@@ -3529,9 +3527,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #980: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #980")
 	}
@@ -3544,9 +3542,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #984: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #984")
 	}
@@ -3559,9 +3557,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #988: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #988")
 	}
@@ -3574,9 +3572,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #992: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #992")
 	}
@@ -3589,9 +3587,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #997: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #997")
 	}
@@ -3604,9 +3602,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1001: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1001")
 	}
@@ -3619,9 +3617,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1005: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1005")
 	}
@@ -3634,9 +3632,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1009: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1009")
 	}
@@ -3649,9 +3647,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1013: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1013")
 	}
@@ -3664,9 +3662,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1017: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1017")
 	}
@@ -3679,9 +3677,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1021: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1021")
 	}
@@ -3694,9 +3692,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1025: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1025")
 	}
@@ -3709,9 +3707,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1029: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1029")
 	}
@@ -3724,9 +3722,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1033: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1033")
 	}
@@ -3739,9 +3737,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1038: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1038")
 	}
@@ -3754,9 +3752,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1042: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1042")
 	}
@@ -3769,9 +3767,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1046: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1046")
 	}
@@ -3784,9 +3782,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1050: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1050")
 	}
@@ -3799,9 +3797,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1054: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1054")
 	}
@@ -3814,9 +3812,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1058: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1058")
 	}
@@ -3829,9 +3827,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1062: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1062")
 	}
@@ -3844,9 +3842,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1066: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1066")
 	}
@@ -3859,9 +3857,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1070: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1070")
 	}
@@ -3874,9 +3872,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1074: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1074")
 	}
@@ -3889,9 +3887,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1079: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1079")
 	}
@@ -3904,9 +3902,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1083: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1083")
 	}
@@ -3919,9 +3917,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1087: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1087")
 	}
@@ -3934,9 +3932,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1091: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1091")
 	}
@@ -3949,9 +3947,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1095: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1095")
 	}
@@ -3964,9 +3962,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1099: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1099")
 	}
@@ -3979,9 +3977,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1103: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1103")
 	}
@@ -3994,9 +3992,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1107: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1107")
 	}
@@ -4009,9 +4007,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1111: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1111")
 	}
@@ -4024,9 +4022,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1115: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1115")
 	}
@@ -4039,9 +4037,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1120: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1120")
 	}
@@ -4054,9 +4052,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1124: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1124")
 	}
@@ -4069,9 +4067,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1128: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1128")
 	}
@@ -4084,9 +4082,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1132: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1132")
 	}
@@ -4099,9 +4097,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1136: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1136")
 	}
@@ -4114,9 +4112,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1140: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1140")
 	}
@@ -4129,9 +4127,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1144: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1144")
 	}
@@ -4144,9 +4142,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1148: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1148")
 	}
@@ -4159,9 +4157,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1152: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1152")
 	}
@@ -4174,9 +4172,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1156: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1156")
 	}
@@ -4189,9 +4187,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1161: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1161")
 	}
@@ -4204,9 +4202,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1165: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1165")
 	}
@@ -4219,9 +4217,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1169: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1169")
 	}
@@ -4234,9 +4232,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1173: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1173")
 	}
@@ -4249,9 +4247,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1177: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1177")
 	}
@@ -4264,9 +4262,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1181: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1181")
 	}
@@ -4279,9 +4277,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1185: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1185")
 	}
@@ -4294,9 +4292,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1189: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1189")
 	}
@@ -4309,9 +4307,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1193: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1193")
 	}
@@ -4324,9 +4322,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1197: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1197")
 	}
@@ -4339,9 +4337,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1202: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1202")
 	}
@@ -4354,9 +4352,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1206: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1206")
 	}
@@ -4369,9 +4367,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1210: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1210")
 	}
@@ -4384,9 +4382,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1214: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1214")
 	}
@@ -4399,9 +4397,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1218: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1218")
 	}
@@ -4414,9 +4412,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1222: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1222")
 	}
@@ -4429,9 +4427,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1226: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1226")
 	}
@@ -4444,9 +4442,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1230: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1230")
 	}
@@ -4459,9 +4457,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1234: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1234")
 	}
@@ -4474,9 +4472,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1238: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1238")
 	}
@@ -4489,9 +4487,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1243: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1243")
 	}
@@ -4504,9 +4502,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1247: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1247")
 	}
@@ -4519,9 +4517,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1251: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1251")
 	}
@@ -4534,9 +4532,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1255: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1255")
 	}
@@ -4549,9 +4547,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1259: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1259")
 	}
@@ -4564,9 +4562,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1263: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1263")
 	}
@@ -4579,9 +4577,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1267: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1267")
 	}
@@ -4594,9 +4592,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1271: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1271")
 	}
@@ -4609,9 +4607,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1275: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1275")
 	}
@@ -4624,9 +4622,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1279: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1279")
 	}
@@ -4639,9 +4637,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1284: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1284")
 	}
@@ -4654,9 +4652,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1288: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1288")
 	}
@@ -4669,9 +4667,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1292: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1292")
 	}
@@ -4684,9 +4682,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1296: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1296")
 	}
@@ -4699,9 +4697,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1300: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1300")
 	}
@@ -4714,9 +4712,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1304: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1304")
 	}
@@ -4729,9 +4727,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1308: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1308")
 	}
@@ -4744,9 +4742,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1312: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1312")
 	}
@@ -4759,9 +4757,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1316: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "bc", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1316")
 	}
@@ -4774,9 +4772,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1320: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: "cb", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1320")
 	}
@@ -4789,9 +4787,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1325: tbl.Between(1, 3).OptArgs(r.BetweenOpts{Index: 'mi', RightBound: 'closed', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, 3).OptArgs(r.BetweenOpts{Index: "mi", RightBound: "closed", }).Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 3).OptArgs(r.BetweenOpts{Index: "mi", RightBound: "closed"}).Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1325")
 	}
@@ -4804,9 +4802,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1330: tbl.Between(1, 16).OptArgs(r.BetweenOpts{Index: 'mi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(1, 16).OptArgs(r.BetweenOpts{Index: "mi", RightBound: "closed", }).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 16).OptArgs(r.BetweenOpts{Index: "mi", RightBound: "closed"}).OrderBy("id").Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1330")
 	}
@@ -4819,9 +4817,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1335: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'mi', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "mi", }).Map(func(x r.Term) interface{} { return x.AtIndex("id")}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "mi"}).Map(func(x r.Term) interface{} { return x.AtIndex("id") }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1335")
 	}
@@ -4834,9 +4832,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1341: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', LeftBound: 'open', }).OrderBy('id').AtIndex('id')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", LeftBound: "open", }).OrderBy("id").AtIndex("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "c", RightBound: "closed", LeftBound: "open"}).OrderBy("id").AtIndex("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1341")
 	}
@@ -4849,9 +4847,9 @@ func (suite *SindexApiSuite) TestCases() {
 
 		suite.T().Log("About to run line #1345: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', LeftBound: 'open', }).OrderBy('id').AtIndex('id')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", LeftBound: "open", }).OrderBy("id").AtIndex("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "id", RightBound: "closed", LeftBound: "open"}).OrderBy("id").AtIndex("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat: "map",
+			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #1345")
 	}
