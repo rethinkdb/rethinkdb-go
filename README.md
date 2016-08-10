@@ -267,6 +267,36 @@ if err != nil {
 }
 ```
 
+## Geospatial Queries
+RethinkDB supports spatial and geographic queries through geometry object support.  You can read more about them here:
+[RethinkDB Geospatial Queries](http://rethinkdb.com/docs/geo-support/javascript/)
+
+One of the most popular types of geospatial queries are ones that return records within a given distance. Here is a basic example:
+
+```go
+	...
+	/*
+	 The Origional Query From The Admin Data Explorer:
+	 var point = r.point(-122.422876,37.777128);//San Francisco
+	 r.db('geo_test').table('geo').getNearest(point, {index: 'location', maxDist: 500, unit: 'mi'})
+	*/
+
+	var point = r.Point(-122.422876, 37.777128)
+
+	result, err := r.DB("geo_test").Table("geo").GetNearest(point, r.GetNearestOpts{Index: "location", MaxDist: 500, Unit: "mi"}).Run(session)
+
+	var row interface{}
+
+	for result.Next(&row) {
+		fmt.Println(row)
+	}
+	...
+```
+
+In the example query above, all the records within the maximum distance of five hundred miles will be returned.  It's often benificial to prove out your queries in the Data Explorer, then translate them in your Go code.  One nice thing about this example is that it will return each result as a map.
+
+>map[doc:map[name:San Francisco id:1 location:{Point {-122.423246 37.779388} [] []}] dist:0.15717678104184743]                  map[dist:456.03440837130563 doc:map[id:2 location:{Point {-117.220406 32.719464} [] []} name:San Diego]]  
+
 ## Encoding/Decoding
 When passing structs to Expr(And functions that use Expr such as Insert, Update) the structs are encoded into a map before being sent to the server. Each exported field is added to the map unless
 
