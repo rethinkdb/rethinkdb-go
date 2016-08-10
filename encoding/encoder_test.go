@@ -368,3 +368,21 @@ func TestEncodeCompound(t *testing.T) {
 		t.Errorf("got %q, want %q", out, want)
 	}
 }
+
+type CompoundRef struct {
+	PartA string `gorethink:"id[0]"`
+	PartB *RefB  `gorethink:"id[1],reference" gorethink_ref:"id"`
+}
+
+func TestEncodeCompoundRef(t *testing.T) {
+	input := CompoundRef{"1", &RefB{"2", "Name"}}
+	want := map[string]interface{}{"id": []string{"1", "2"}}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
