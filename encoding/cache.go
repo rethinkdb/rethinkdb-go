@@ -148,6 +148,7 @@ func typeFields(t reflect.Type) []field {
 						typ:           ft,
 						omitEmpty:     opts.Contains("omitempty"),
 						reference:     opts.Contains("reference"),
+						refName:       ref,
 						compound:      isCompound,
 						compoundIndex: compoundIndex,
 					}))
