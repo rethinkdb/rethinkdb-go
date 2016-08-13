@@ -43,6 +43,7 @@ r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`
  - Fixed broken optional argument `FinalEmit` in `FoldOpts`
  - Fixed bug causing some queries using `r.Row` to fail with the error `Cannot use r.row in nested queries.`
+ - Fixed `All` not working correctly when the cursor is created by `Mock`
 
 ## v2.1.2 - 2016-07-22
 

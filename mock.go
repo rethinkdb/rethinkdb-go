@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"sync"
 	"time"
 )
@@ -309,10 +310,18 @@ func (m *Mock) Query(q Query) (*Cursor, error) {
 
 	// Build cursor and return
 	c := newCursor(nil, "", query.Query.Token, query.Query.Term, query.Query.Opts)
-	c.buffer = append(c.buffer, query.Response)
 	c.finished = true
 	c.fetching = false
 	c.isAtom = true
+
+	responseVal := reflect.ValueOf(query.Response)
+	if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
+		for i := 0; i < responseVal.Len(); i++ {
+			c.buffer = append(c.buffer, responseVal.Index(i).Interface())
+		}
+	} else {
+		c.buffer = append(c.buffer, query.Response)
+	}
 
 	return c, nil
 }

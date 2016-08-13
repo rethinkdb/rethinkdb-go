@@ -61,10 +61,33 @@ func (s *RethinkSuite) TestMockRunSuccessMultipleResults(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	var response []interface{}
-	err = res.One(&response)
+	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, jsonEquals, []interface{}{map[string]interface{}{"id": "mocked"}})
+	mock.AssertExpectations(c)
+
+	res.Close()
+}
+
+func (s *RethinkSuite) TestMockRunSuccessMultipleResults_type(c *test.C) {
+	type document struct {
+		Id string
+	}
+
+	mock := NewMock()
+	mock.On(DB("test").Table("test")).Return([]document{
+		document{"mocked"},
+	}, nil)
+
+	res, err := DB("test").Table("test").Run(mock)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, jsonEquals, []document{document{"mocked"}})
 	mock.AssertExpectations(c)
 
 	res.Close()
