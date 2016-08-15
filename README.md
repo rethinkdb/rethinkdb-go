@@ -328,8 +328,8 @@ The resulting data in RethinkDB should look something like this:
 
 ```json
 {
-    "author_id": "c2182a10-6b9d-4ea1-a70c-d6649bb5f8d7",
-    "id":  "eeb006d6-7fec-46c8-9d29-45b83f07ca14",
+    "author_id": "author_1",
+    "id":  "book_1",
     "title":  "The Hobbit"
 }
 ```
@@ -342,6 +342,34 @@ r.Table("books").Get("1").Merge(func(p r.Term) interface{} {
         "author_id": r.Table("authors").Get(p.Field("author_id")),
     }
 }).Run(session)
+```
+
+You are also able to reference an array of documents, for example if each book stored multiple authors you could do the following:
+
+```go
+type Book struct {
+    ID       string  `gorethink:"id,omitempty"`
+    Title    string  `gorethink:"title"`
+    Authors  []Author `gorethink:"author_ids,reference" gorethink_ref:"id"`
+}
+```
+
+```json
+{
+    "author_ids": ["author_1", "author_2"],
+    "id":  "book_1",
+    "title":  "The Hobbit"
+}
+```
+
+The query for reading the data back is slightly more complicated but is very similar:
+
+```go
+r.Table("books").Get("book_1").Merge(func(p r.Term) interface{} {
+    return map[string]interface{}{
+        "author_ids": r.Table("authors").GetAll(r.Args(p.Field("author_ids"))).CoerceTo("array"),
+    }
+})
 ```
 
 ### Custom `Marshaler`s/`Unmarshaler`s
