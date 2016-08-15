@@ -298,7 +298,7 @@ When encoding maps with non-string keys the key values are automatically convert
 
 If you wish to use the `json` tags for GoRethink then you can call `SetTags("gorethink", "json")` when starting your program, this will cause GoRethink to check for `json` tags after checking for `gorethink` tags. By default this feature is disabled. This function will also let you support any other tags, the driver will check for tags in the same order as the parameters.
 
-#### Pseudo-types
+### Pseudo-types
 
 RethinkDB contains some special types which can be used to store special value types, currently supports are binary values, times and geometry data types. GoRethink supports these data types natively however there are some gotchas:
  - Time types: To store times in RethinkDB with GoRethink you must pass a `time.Time` value to your query, due to the way Go works type aliasing or embedding is not support here
@@ -343,6 +343,12 @@ r.Table("books").Get("1").Merge(func(p r.Term) interface{} {
     }
 }).Run(session)
 ```
+
+### Custom `Marshaler`s/`Unmarshaler`s
+
+Sometimes the default behaviour for converting Go types to and from ReQL is not desired, for these situations the driver allows you to implement both the [`Marshaler`](https://godoc.org/github.com/dancannon/gorethink/encoding#Marshaler) and [`Unmarshaler`](https://godoc.org/github.com/dancannon/gorethink/encoding#Unmarshaler) interfaces. These interfaces might look familiar if you are using to using the `encoding/json` package however instead of dealing with `[]byte` the interfaces deal with `interface{}` values (which are later encoded by the `encoding/json` package when communicating with the database).
+
+An good example of how to use these interfaces is in the [`types`](https://github.com/dancannon/gorethink/blob/master/types/geometry.go#L84-L106) package, in this package the `Point` type is encoded as the `GEOMETRY` pseudo-type instead of a normal JSON object.
 
 ## Logging
 
