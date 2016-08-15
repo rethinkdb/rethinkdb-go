@@ -446,6 +446,20 @@ func TestDecodeMapIntKeys(t *testing.T) {
 	}
 }
 
+func TestDecodeCompoundKey(t *testing.T) {
+	input := map[string]interface{}{"id": []string{"1", "2"}, "err_a[]": "3", "err_b[": "4", "err_c]": "5"}
+	want := Compound{"1", "2", "3", "4", "5"}
+
+	out := Compound{}
+	err := Decode(&out, input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
 func jsonEqual(a, b interface{}) bool {
 	// First check using reflect.DeepEqual
 	if reflect.DeepEqual(a, b) {

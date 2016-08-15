@@ -162,6 +162,20 @@ func (se *structEncoder) encode(v reflect.Value) interface{} {
 			encField = getReferenceField(f, v, encField)
 		}
 
+		if f.compound {
+			compoundField, ok := m[f.name].([]interface{})
+			if !ok {
+				compoundField = make([]interface{}, f.compoundIndex+1)
+			} else if len(compoundField) < f.compoundIndex+1 {
+				tmp := make([]interface{}, f.compoundIndex+1)
+				copy(tmp, compoundField)
+				compoundField = tmp
+			}
+
+			compoundField[f.compoundIndex] = encField
+			encField = compoundField
+		}
+
 		m[f.name] = encField
 	}
 

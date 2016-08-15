@@ -290,6 +290,10 @@ Field int `gorethink:"myName,omitempty"`
 // the field is skipped if empty.
 // Note the leading comma.
 Field int `gorethink:",omitempty"`
+// When the tag name includes an index expression
+// a compound field is created
+Field1 int `gorethink:"myName[0]"`
+Field2 int `gorethink:"myName[1]"`
 ```
 
 **NOTE:** It is strongly recommended that struct tags are used to explicitly define the mapping between your Go type and how the data is stored by RethinkDB. This is especially important when using an `Id` field as by default RethinkDB will create a field named `id` as the primary key (note that the RethinkDB field is lowercase but the Go version starts with a capital letter).

@@ -485,34 +485,56 @@ type mapAsStructDecoder struct {
 func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
 	for _, kv := range sv.MapKeys() {
 		var f *field
+		var compoundFields = []*field{}
 		var fieldDec decoderFunc
 		key := []byte(kv.String())
 		for i := range d.fields {
 			ff := &d.fields[i]
 			ffd := d.fieldDecs[i]
+
 			if bytes.Equal(ff.nameBytes, key) {
 				f = ff
 				fieldDec = ffd
-				break
 			}
 			if f == nil && ff.equalFold(ff.nameBytes, key) {
 				f = ff
 				fieldDec = ffd
 			}
+
+			if f != nil && f.compound {
+				compoundFields = append(compoundFields, f)
+			} else if f != nil {
+				break
+			}
 		}
 
-		if f == nil {
-			continue
+		if len(compoundFields) > 0 {
+			for _, compoundField := range compoundFields {
+				dElemVal := fieldByIndex(dv, compoundField.index)
+				sElemVal := sv.MapIndex(kv)
+
+				if sElemVal.Kind() == reflect.Interface {
+					sElemVal = sElemVal.Elem()
+				}
+				sElemVal = sElemVal.Index(compoundField.compoundIndex)
+				fieldDec = typeDecoder(dElemVal.Type(), sElemVal.Type())
+
+				if !sElemVal.IsValid() || !dElemVal.CanSet() {
+					continue
+				}
+
+				fieldDec(dElemVal, sElemVal)
+			}
+		} else if f != nil {
+			dElemVal := fieldByIndex(dv, f.index)
+			sElemVal := sv.MapIndex(kv)
+
+			if !sElemVal.IsValid() || !dElemVal.CanSet() {
+				continue
+			}
+
+			fieldDec(dElemVal, sElemVal)
 		}
-
-		dElemVal := fieldByIndex(dv, f.index)
-		sElemVal := sv.MapIndex(kv)
-
-		if !sElemVal.IsValid() || !dElemVal.CanSet() {
-			continue
-		}
-
-		fieldDec(dElemVal, sElemVal)
 	}
 }
 

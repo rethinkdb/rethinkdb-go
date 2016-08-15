@@ -31,6 +31,18 @@ r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
     Index: "code_name",
 })
 ```
+ 
+ - Added ability to create compound keys from structs, for example:
+
+```
+type User struct {
+  Company string `gorethink:"id[0]"`
+  Name    string `gorethink:"id[1]"`
+  Age     int    `gorethink:"age"`
+}
+// Creates
+{"id": [COMPANY, NAME], "age": AGE}
+```
 
 ### Changed
 
