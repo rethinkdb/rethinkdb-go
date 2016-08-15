@@ -2,6 +2,7 @@ package gorethink
 
 import (
 	"fmt"
+	"reflect"
 	"strconv"
 	"strings"
 
@@ -54,14 +55,71 @@ type termsObj map[string]Term
 // When built the term becomes a JSON array, for more information on the format
 // see http://rethinkdb.com/docs/writing-drivers/.
 type Term struct {
-	name     string
-	rawQuery bool
-	rootTerm bool
-	termType p.Term_TermType
-	data     interface{}
-	args     []Term
-	optArgs  map[string]Term
-	lastErr  error
+	name           string
+	rawQuery       bool
+	rootTerm       bool
+	termType       p.Term_TermType
+	data           interface{}
+	args           []Term
+	optArgs        map[string]Term
+	lastErr        error
+	isMockAnything bool
+}
+
+func (t Term) compare(t2 Term, varMap map[int64]int64) bool {
+	if t.isMockAnything || t2.isMockAnything {
+		return true
+	}
+
+	if t.name != t2.name ||
+		t.rawQuery != t2.rawQuery ||
+		t.rootTerm != t2.rootTerm ||
+		t.termType != t2.termType ||
+		!reflect.DeepEqual(t.data, t2.data) ||
+		len(t.args) != len(t2.args) ||
+		len(t.optArgs) != len(t2.optArgs) {
+		return false
+	}
+
+	for i, v := range t.args {
+		if t.termType == p.Term_FUNC && t2.termType == p.Term_FUNC && i == 0 {
+			// Functions need to be compared differently as each variable
+			// will have a different var ID so first try to create a mapping
+			// between the two sets of IDs
+			argsArr := t.args[0].args
+			argsArr2 := t2.args[0].args
+
+			if len(argsArr) != len(argsArr2) {
+				return false
+			}
+
+			for j := 0; j < len(argsArr); j++ {
+				varMap[argsArr[j].data.(int64)] = argsArr2[j].data.(int64)
+			}
+		} else if t.termType == p.Term_VAR && t2.termType == p.Term_VAR && i == 0 {
+			// When comparing vars use our var map
+			v1 := t.args[i].data.(int64)
+			v2 := t2.args[i].data.(int64)
+
+			if varMap[v1] != v2 {
+				return false
+			}
+		} else if !v.compare(t2.args[i], varMap) {
+			return false
+		}
+	}
+
+	for k, v := range t.optArgs {
+		if _, ok := t2.optArgs[k]; !ok {
+			return false
+		}
+
+		if !v.compare(t2.optArgs[k], varMap) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // build takes the query tree and prepares it to be sent as a JSON
@@ -130,6 +188,10 @@ func (t Term) Build() (interface{}, error) {
 
 // String returns a string representation of the query tree
 func (t Term) String() string {
+	if t.isMockAnything {
+		return "r.MockAnything()"
+	}
+
 	switch t.termType {
 	case p.Term_MAKE_ARRAY:
 		return fmt.Sprintf("[%s]", strings.Join(argsToStringSlice(t.args), ", "))

@@ -31,6 +31,7 @@ r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
     Index: "code_name",
 })
 ```
+ - Added `MockAnything` functions to allow mocking of only part of a query (Thanks to @pzduniak)
 
 ### Changed
 
@@ -45,6 +46,7 @@ r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
  - Fixed bug causing some queries using `r.Row` to fail with the error `Cannot use r.row in nested queries.`
  - Fixed `All` not working correctly when the cursor is created by `Mock`
  - Fixed byte arrays not being correctly converted to the BINARY pseudo-type
+ - Fixed `Mock` not matching queries containing functions
 
 ## v2.1.2 - 2016-07-22
 
