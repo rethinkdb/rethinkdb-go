@@ -44,6 +44,7 @@ r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
  - Fixed broken optional argument `FinalEmit` in `FoldOpts`
  - Fixed bug causing some queries using `r.Row` to fail with the error `Cannot use r.row in nested queries.`
  - Fixed `All` not working correctly when the cursor is created by `Mock`
+ - Fixed byte arrays not being correctly converted to the BINARY pseudo-type
 
 ## v2.1.2 - 2016-07-22
 

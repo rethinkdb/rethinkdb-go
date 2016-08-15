@@ -342,6 +342,18 @@ func (s *RethinkSuite) TestControlBinaryByteArrayAlias(c *test.C) {
 	c.Assert(bytes.Equal(response, []byte("Hello World")), test.Equals, true)
 }
 
+func (s *RethinkSuite) TestControlBinaryByteSlice(c *test.C) {
+	var response [5]byte
+
+	query := Binary([5]byte{'h', 'e', 'l', 'l', 'o'})
+	res, err := query.Run(session)
+	c.Assert(err, test.IsNil)
+
+	err = res.One(&response)
+	c.Assert(err, test.IsNil)
+	c.Assert(response, test.Equals, [5]byte{'h', 'e', 'l', 'l', 'o'})
+}
+
 func (s *RethinkSuite) TestControlBinaryExpr(c *test.C) {
 	var response []byte
 

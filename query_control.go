@@ -251,9 +251,15 @@ func Binary(data interface{}) Term {
 		b = data
 	default:
 		typ := reflect.TypeOf(data)
-		if (typ.Kind() == reflect.Slice || typ.Kind() == reflect.Array) &&
-			typ.Elem().Kind() == reflect.Uint8 {
+		if typ.Kind() == reflect.Slice && typ.Elem().Kind() == reflect.Uint8 {
 			return Binary(reflect.ValueOf(data).Bytes())
+		} else if typ.Kind() == reflect.Array && typ.Elem().Kind() == reflect.Uint8 {
+			v := reflect.ValueOf(data)
+			b = make([]byte, v.Len())
+			for i := 0; i < v.Len(); i++ {
+				b[i] = v.Index(i).Interface().(byte)
+			}
+			return Binary(b)
 		}
 		panic("Unsupported binary type")
 	}

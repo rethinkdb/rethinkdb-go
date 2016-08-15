@@ -347,3 +347,24 @@ func TestReferenceFieldArray(t *testing.T) {
 		t.Errorf("got %q, want %q", out, want)
 	}
 }
+
+func TestEncodeBytes(t *testing.T) {
+	type BytesStruct struct {
+		A []byte
+		B [1]byte
+	}
+
+	input := BytesStruct{[]byte("A"), [1]byte{'B'}}
+	want := map[string]interface{}{
+		"A": map[string]interface{}{"$reql_type$": "BINARY", "data": "QQ=="},
+		"B": map[string]interface{}{"$reql_type$": "BINARY", "data": "Qg=="},
+	}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}

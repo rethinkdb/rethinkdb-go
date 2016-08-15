@@ -371,10 +371,6 @@ func (d *sliceDecoder) decode(dv, sv reflect.Value) {
 }
 
 func newSliceDecoder(dt, st reflect.Type) decoderFunc {
-	// Byte slices get special treatment; arrays don't.
-	// if t.Elem().Kind() == reflect.Uint8 {
-	// 	return decodeByteSlice
-	// }
 	dec := &sliceDecoder{newArrayDecoder(dt, st)}
 	return dec.decode
 }
