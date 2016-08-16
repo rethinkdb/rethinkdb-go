@@ -44,6 +44,8 @@ type User struct {
 {"id": [COMPANY, NAME], "age": AGE}
 ```
 
+ - Added `Merge` function to `encoding` package that decodes data into a value without zeroing it first.
+
 ### Changed
 
  - Renamed `PrimaryTag` to `PrimaryReplicaTag` in `ReconfigureOpts`
