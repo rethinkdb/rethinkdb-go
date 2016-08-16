@@ -309,6 +309,19 @@ RethinkDB contains some special types which can be used to store special value t
  - Binary types: To store binary data pass a byte slice (`[]byte`) to your query
  - Geometry types: As Go does not include any built-in data structures for storing geometry data GoRethink includes its own in the `github.com/dancannon/gorethink/types` package, Any of the types (`Geometry`, `Point`, `Line` and `Lines`) can be passed to a query to create a RethinkDB geometry type.
 
+### Compound Keys
+
+RethinkDB unfortunately does not support compound primary keys using multiple fields however it does support compound keys using an array of values. For example if you wanted to create a compound key for a book where the key contained the author ID and book name then the ID might look like this `["author_id", "book name"]`. Luckily GoRethink allows you to easily manage these keys while keeping the fields separate in your structs. For example:
+
+```go
+type Book struct {
+  AuthorID string `gorethink:"id[0]"`
+  Name     string `gorethink:"id[1]"`
+}
+// Creates the following document in RethinkDB
+{"id": [AUTHORID, NAME]}
+```
+
 ### References
 
 Sometimes you may want to use a Go struct that references a document in another table, instead of creating a new struct which is just used when writing to RethinkDB you can annotate your struct with the reference tag option. This will tell GoRethink that when encoding your data it should "pluck" the ID field from the nested document and use that instead.
