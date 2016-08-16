@@ -45,6 +45,7 @@ type User struct {
 ```
 
  - Added `Merge` function to `encoding` package that decodes data into a value without zeroing it first.
+ - Added `MockAnything` functions to allow mocking of only part of a query (Thanks to @pzduniak)
 
 ### Changed
 
@@ -56,6 +57,7 @@ type User struct {
 ### Fixed
 
  - Fixed `All` not working correctly when the cursor is created by `Mock`
+ - Fixed `Mock` not matching queries containing functions
  - Fixed byte arrays not being correctly converted to the BINARY pseudo-type
 
 ## v2.1.3 - 2016-08-01
