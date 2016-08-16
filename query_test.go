@@ -438,6 +438,7 @@ func (s *RethinkSuite) TestRawQuery_advanced(c *test.C) {
 func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	var n int
 
@@ -483,6 +484,7 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	var n int
 
@@ -519,6 +521,7 @@ func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	var n int
 
@@ -548,6 +551,7 @@ func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 func (s *RethinkSuite) TestTableChangesIncludeInitial(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	// Insert 5 documents to table initially
 	DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
@@ -608,6 +612,8 @@ func (s *RethinkSuite) TestWriteReference(c *test.C) {
 	DB("test").TableDrop("books").Exec(session)
 	DB("test").TableCreate("authors").Exec(session)
 	DB("test").TableCreate("books").Exec(session)
+	DB("test").Table("authors").Wait().Exec(session)
+	DB("test").Table("books").Wait().Exec(session)
 
 	_, err := DB("test").Table("authors").Insert(author).RunWrite(session)
 	c.Assert(err, test.IsNil)
@@ -632,6 +638,10 @@ func (s *RethinkSuite) TestWriteReference(c *test.C) {
 }
 
 func (s *RethinkSuite) TestWriteConflict(c *test.C) {
+	DB("test").TableDrop("test").Exec(session)
+	DB("test").TableCreate("test").Exec(session)
+	DB("test").Table("test").Wait().Exec(session)
+
 	query := DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
 	_, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
@@ -703,6 +713,7 @@ func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 	// Ensure table + database exist
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table1").Exec(session)
+	DB("test").Table("Table1").Wait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table1").Insert(objList).Exec(session)
@@ -723,9 +734,10 @@ func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 
 func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
+	DBCreate("test").Exec(session)
+	DB("test").TableCreate("TestMany").Exec(session)
+	DB("test").Table("TestMany").Wait().Exec(session)
+	DB("test").Table("TestMany").Delete().Exec(session)
 
 	// Insert rows
 	for i := 0; i < 100; i++ {
@@ -738,7 +750,7 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 			})
 		}
 
-		DB("test").Table("TestMany").Insert(data).RunWrite(session)
+		DB("test").Table("TestMany").Insert(data).Exec(session)
 	}
 
 	// Test query
@@ -773,10 +785,12 @@ func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
 
 	// Ensure table + database exist
 	DBCreate("test").RunWrite(sess)
-	DB("test").TableDrop("TestConcurrent").RunWrite(sess)
-	DB("test").TableCreate("TestConcurrent").RunWrite(sess)
-	DB("test").TableDrop("TestConcurrent2").RunWrite(sess)
-	DB("test").TableCreate("TestConcurrent2").RunWrite(sess)
+	DB("test").TableDrop("TestConcurrent").Exec(sess)
+	DB("test").TableCreate("TestConcurrent").Exec(sess)
+	DB("test").TableDrop("TestConcurrent2").Exec(sess)
+	DB("test").TableCreate("TestConcurrent2").Exec(sess)
+	DB("test").Table("TestConcurrent").Wait().Exec(sess)
+	DB("test").Table("TestConcurrent2").Wait().Exec(sess)
 
 	// Insert rows
 	for j := 0; j < 200; j++ {
@@ -868,9 +882,10 @@ func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
 	}
 
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
+	DBCreate("test").Exec(session)
+	DB("test").TableCreate("TestMany").Exec(session)
+	DB("test").Table("TestMany").Wait().Exec(session)
+	DB("test").Table("TestMany").Delete().Exec(session)
 
 	// Insert rows
 	for i := 0; i < 100; i++ {

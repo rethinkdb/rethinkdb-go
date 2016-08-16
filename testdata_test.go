@@ -10,6 +10,10 @@ func setupTestData() {
 		DBCreate("test").Exec(session)
 		DBCreate("examples").Exec(session)
 
+		DB("test").TableCreate("test").Exec(session)
+		DB("test").TableCreate("test2").Exec(session)
+		DB("test").TableCreate("changes").Exec(session)
+
 		DB("examples").TableCreate("posts").Exec(session)
 		DB("examples").TableCreate("heroes").Exec(session)
 		DB("examples").TableCreate("users").Exec(session)
