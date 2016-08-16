@@ -52,11 +52,22 @@ type User struct {
  - Changed logging to be disabled by default, to enable logs change the output writer of the logger. For example: `r.Log.Out = os.Stderr`
 
 ### Fixed
+
+ - Fixed `All` not working correctly when the cursor is created by `Mock`
+ - Fixed byte arrays not being correctly converted to the BINARY pseudo-type
+
+## v2.1.3 - 2016-08-01
+
+### Changed
+
+ - Changed behaviour of function callbacks to allow arguments to be either of type `r.Term` or `interface {}` instead of only `r.Term`
+
+### Fixed
+
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`
  - Fixed broken optional argument `FinalEmit` in `FoldOpts`
  - Fixed bug causing some queries using `r.Row` to fail with the error `Cannot use r.row in nested queries.`
- - Fixed `All` not working correctly when the cursor is created by `Mock`
- - Fixed byte arrays not being correctly converted to the BINARY pseudo-type
+ - Fixed typos in `ConnectOpt` field (and related functions) `InitialCap`.
 
 ## v2.1.2 - 2016-07-22
 

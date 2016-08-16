@@ -220,13 +220,13 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	return nil
 }
 
-// SetInitalPoolCap sets the initial capacity of the connection pool.
-func (s *Session) SetInitalPoolCap(n int) {
+// SetInitialPoolCap sets the initial capacity of the connection pool.
+func (s *Session) SetInitialPoolCap(n int) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
 	s.opts.InitialCap = n
-	s.cluster.SetInitalPoolCap(n)
+	s.cluster.SetInitialPoolCap(n)
 }
 
 // SetMaxIdleConns sets the maximum number of connections in the idle

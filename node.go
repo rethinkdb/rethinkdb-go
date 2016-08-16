@@ -63,9 +63,9 @@ func (n *Node) Close(optArgs ...CloseOpts) error {
 	return nil
 }
 
-// SetInitalPoolCap sets the initial capacity of the connection pool.
-func (n *Node) SetInitalPoolCap(idleConns int) {
-	n.pool.SetInitalPoolCap(idleConns)
+// SetInitialPoolCap sets the initial capacity of the connection pool.
+func (n *Node) SetInitialPoolCap(idleConns int) {
+	n.pool.SetInitialPoolCap(idleConns)
 }
 
 // SetMaxIdleConns sets the maximum number of connections in the idle

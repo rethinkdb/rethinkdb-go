@@ -478,3 +478,32 @@ func jsonEqual(a, b interface{}) bool {
 
 	return bytes.Compare(ba, bb) == 0
 }
+
+func TestMergeStruct(t *testing.T) {
+	var dst struct {
+		Field        string
+		AnotherField string
+	}
+	dst.Field = "change me"
+	dst.AnotherField = "don't blank me"
+	err := Merge(&dst, map[string]interface{}{"Field": "Changed!"})
+	if err != nil {
+		t.Error("Cannot merge:", err)
+	}
+	if dst.AnotherField == "" {
+		t.Error("Field has been wiped")
+	}
+}
+
+func TestMergeMap(t *testing.T) {
+	var dst = make(map[string]string)
+	dst["field"] = "change me"
+	dst["another_field"] = "don't blank me"
+	err := Merge(&dst, map[string]interface{}{"field": "Changed!"})
+	if err != nil {
+		t.Error("Cannot merge:", err)
+	}
+	if dst["another_field"] == "" {
+		t.Error("Field has been wiped")
+	}
+}
