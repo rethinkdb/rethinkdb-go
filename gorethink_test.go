@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"runtime"
-	"sync"
 	"testing"
 	"time"
 
@@ -15,7 +13,6 @@ import (
 )
 
 var session *Session
-var debug = flag.Bool("gorethink.debug", false, "print query trees")
 var testdata = flag.Bool("gorethink.testdata", true, "create test data")
 var url, url1, url2, url3, db, authKey string
 
@@ -122,6 +119,7 @@ var nobj = map[string]interface{}{
 		"2": 4,
 	},
 }
+
 var noDupNumObjList = []interface{}{
 	map[string]interface{}{"id": 1, "g1": 1, "g2": 1, "num": 0},
 	map[string]interface{}{"id": 2, "g1": 2, "g2": 2, "num": 5},
@@ -145,23 +143,6 @@ var objList = []interface{}{
 var nameList = []interface{}{
 	map[string]interface{}{"id": 1, "first_name": "John", "last_name": "Smith", "gender": "M"},
 	map[string]interface{}{"id": 2, "first_name": "Jane", "last_name": "Smith", "gender": "F"},
-}
-var defaultObjList = []interface{}{
-	map[string]interface{}{"a": 1},
-	map[string]interface{}{},
-}
-var joinTable1 = []interface{}{
-	map[string]interface{}{"id": 0, "name": "bob"},
-	map[string]interface{}{"id": 1, "name": "tom"},
-	map[string]interface{}{"id": 2, "name": "joe"},
-}
-var joinTable2 = []interface{}{
-	map[string]interface{}{"id": 0, "title": "goof"},
-	map[string]interface{}{"id": 2, "title": "lmoe"},
-}
-var joinTable3 = []interface{}{
-	map[string]interface{}{"it": 0, "title": "goof"},
-	map[string]interface{}{"it": 2, "title": "lmoe"},
 }
 
 type TStr string
@@ -399,39 +380,6 @@ func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 		c.Assert(err, test.IsNil)
 		c.Assert(response, test.HasLen, 100)
 	}
-}
-
-func doConcurrentTest(c *test.C, ct func()) {
-	maxProcs, numReqs := 1, 150
-	if testing.Short() {
-		maxProcs, numReqs = 4, 50
-	}
-	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(maxProcs))
-
-	var wg sync.WaitGroup
-	wg.Add(numReqs)
-
-	reqs := make(chan bool)
-	defer close(reqs)
-
-	for i := 0; i < maxProcs*2; i++ {
-		go func() {
-			for _ = range reqs {
-				ct()
-				if c.Failed() {
-					wg.Done()
-					continue
-				}
-				wg.Done()
-			}
-		}()
-	}
-
-	for i := 0; i < numReqs; i++ {
-		reqs <- true
-	}
-
-	wg.Wait()
 }
 
 // Test utils

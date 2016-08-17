@@ -6,14 +6,15 @@ import (
 
 // TableCreateOpts contains the optional arguments for the TableCreate term
 type TableCreateOpts struct {
-	PrimaryKey        interface{} `gorethink:"primary_key,omitempty"`
-	Durability        interface{} `gorethink:"durability,omitempty"`
-	Shards            interface{} `gorethink:"shards,omitempty"`
-	Replicas          interface{} `gorethink:"replicas,omitempty"`
-	PrimaryReplicaTag interface{} `gorethink:"primary_replica_tag,omitempty"`
+	PrimaryKey           interface{} `gorethink:"primary_key,omitempty"`
+	Durability           interface{} `gorethink:"durability,omitempty"`
+	Shards               interface{} `gorethink:"shards,omitempty"`
+	Replicas             interface{} `gorethink:"replicas,omitempty"`
+	PrimaryReplicaTag    interface{} `gorethink:"primary_replica_tag,omitempty"`
+	NonVotingReplicaTags interface{} `gorethink:"nonvoting_replica_tags,omitempty"`
 }
 
-func (o *TableCreateOpts) toMap() map[string]interface{} {
+func (o TableCreateOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -67,7 +68,7 @@ type IndexCreateOpts struct {
 	Geo   interface{} `gorethink:"geo,omitempty"`
 }
 
-func (o *IndexCreateOpts) toMap() map[string]interface{} {
+func (o IndexCreateOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -122,7 +123,7 @@ type IndexRenameOpts struct {
 	Overwrite interface{} `gorethink:"overwrite,omitempty"`
 }
 
-func (o *IndexRenameOpts) toMap() map[string]interface{} {
+func (o IndexRenameOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -158,7 +159,7 @@ type ChangesOpts struct {
 }
 
 // ChangesOpts contains the optional arguments for the Changes term
-func (o *ChangesOpts) toMap() map[string]interface{} {
+func (o ChangesOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

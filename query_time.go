@@ -24,7 +24,7 @@ type ISO8601Opts struct {
 	DefaultTimezone interface{} `gorethink:"default_timezone,omitempty"`
 }
 
-func (o *ISO8601Opts) toMap() map[string]interface{} {
+func (o ISO8601Opts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -57,7 +57,7 @@ type DuringOpts struct {
 	RightBound interface{} `gorethink:"right_bound,omitempty"`
 }
 
-func (o *DuringOpts) toMap() map[string]interface{} {
+func (o DuringOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

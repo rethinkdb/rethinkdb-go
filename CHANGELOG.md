@@ -2,6 +2,64 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v2.2.0 - 2016-08-16
+
+### Added
+
+ - Added support for optional arguments to `r.JS()`
+ - Added `NonVotingReplicaTags` optional argument to `TableCreateOpts`
+ - Added root term `TypeOf`, previously only the method term was supported
+ - Added root version of `Group` terms (`Group`, `GroupByIndex`, `MultiGroup`, `MultiGroupByIndex`)
+ - Added root version of `Distinct`
+ - Added root version of `Contains`
+ - Added root version of `Count`
+ - Added root version of `Sum`
+ - Added root version of `Avg`
+ - Added root version of `Min`
+ - Added root version of `MinIndex`
+ - Added root version of `Max`
+ - Added root version of `MaxIndex`
+ - Added `ReadMode` to `RunOpts`
+ - Added the `Interface` function to the `Cursor` which returns a queries result set as an `interface{}`
+ - Added `GroupOpts` type
+ - Added `GetAllOpts` type
+ - Added `MinOpts`/`MaxOpts` types
+ - Added `OptArgs` method to `Term` which allows optional arguments to be specified in an alternative way, for example:
+
+```go
+r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
+    Index: "code_name",
+})
+```
+ 
+ - Added ability to create compound keys from structs, for example:
+
+```
+type User struct {
+  Company string `gorethink:"id[0]"`
+  Name    string `gorethink:"id[1]"`
+  Age     int    `gorethink:"age"`
+}
+// Creates
+{"id": [COMPANY, NAME], "age": AGE}
+```
+
+ - Added `Merge` function to `encoding` package that decodes data into a value without zeroing it first.
+ - Added `MockAnything` functions to allow mocking of only part of a query (Thanks to @pzduniak)
+
+### Changed
+
+ - Renamed `PrimaryTag` to `PrimaryReplicaTag` in `ReconfigureOpts`
+ - Renamed `NotAtomic` to `NonAtomic` in `ReplaceOpts` and `UpdateOpts`
+ - Changed behaviour of function callbacks to allow arguments to be either of type `r.Term` or `interface {}` instead of only `r.Term`
+ - Changed logging to be disabled by default, to enable logs change the output writer of the logger. For example: `r.Log.Out = os.Stderr`
+
+### Fixed
+
+ - Fixed `All` not working correctly when the cursor is created by `Mock`
+ - Fixed `Mock` not matching queries containing functions
+ - Fixed byte arrays not being correctly converted to the BINARY pseudo-type
+
 ## v2.1.3 - 2016-08-01
 
 ### Changed
@@ -9,6 +67,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Changed behaviour of function callbacks to allow arguments to be either of type `r.Term` or `interface {}` instead of only `r.Term`
 
 ### Fixed
+
  - Fixed incorrectly named `Replicas` field in `TableCreateOpts`
  - Fixed broken optional argument `FinalEmit` in `FoldOpts`
  - Fixed bug causing some queries using `r.Row` to fail with the error `Cannot use r.row in nested queries.`

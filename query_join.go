@@ -25,7 +25,7 @@ type EqJoinOpts struct {
 	Ordered interface{} `gorethink:"ordered,omitempty"`
 }
 
-func (o *EqJoinOpts) toMap() map[string]interface{} {
+func (o EqJoinOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

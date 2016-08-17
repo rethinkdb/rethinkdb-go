@@ -8,7 +8,7 @@
 
 ![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v2.1.3 (RethinkDB v2.3)
+Current version: v2.2.0 (RethinkDB v2.3)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -290,6 +290,10 @@ Field int `gorethink:"myName,omitempty"`
 // the field is skipped if empty.
 // Note the leading comma.
 Field int `gorethink:",omitempty"`
+// When the tag name includes an index expression
+// a compound field is created
+Field1 int `gorethink:"myName[0]"`
+Field2 int `gorethink:"myName[1]"`
 ```
 
 **NOTE:** It is strongly recommended that struct tags are used to explicitly define the mapping between your Go type and how the data is stored by RethinkDB. This is especially important when using an `Id` field as by default RethinkDB will create a field named `id` as the primary key (note that the RethinkDB field is lowercase but the Go version starts with a capital letter).
@@ -298,12 +302,25 @@ When encoding maps with non-string keys the key values are automatically convert
 
 If you wish to use the `json` tags for GoRethink then you can call `SetTags("gorethink", "json")` when starting your program, this will cause GoRethink to check for `json` tags after checking for `gorethink` tags. By default this feature is disabled. This function will also let you support any other tags, the driver will check for tags in the same order as the parameters.
 
-#### Pseudo-types
+### Pseudo-types
 
 RethinkDB contains some special types which can be used to store special value types, currently supports are binary values, times and geometry data types. GoRethink supports these data types natively however there are some gotchas:
  - Time types: To store times in RethinkDB with GoRethink you must pass a `time.Time` value to your query, due to the way Go works type aliasing or embedding is not support here
  - Binary types: To store binary data pass a byte slice (`[]byte`) to your query
  - Geometry types: As Go does not include any built-in data structures for storing geometry data GoRethink includes its own in the `github.com/dancannon/gorethink/types` package, Any of the types (`Geometry`, `Point`, `Line` and `Lines`) can be passed to a query to create a RethinkDB geometry type.
+
+### Compound Keys
+
+RethinkDB unfortunately does not support compound primary keys using multiple fields however it does support compound keys using an array of values. For example if you wanted to create a compound key for a book where the key contained the author ID and book name then the ID might look like this `["author_id", "book name"]`. Luckily GoRethink allows you to easily manage these keys while keeping the fields separate in your structs. For example:
+
+```go
+type Book struct {
+  AuthorID string `gorethink:"id[0]"`
+  Name     string `gorethink:"id[1]"`
+}
+// Creates the following document in RethinkDB
+{"id": [AUTHORID, NAME]}
+```
 
 ### References
 
@@ -328,8 +345,8 @@ The resulting data in RethinkDB should look something like this:
 
 ```json
 {
-    "author_id": "c2182a10-6b9d-4ea1-a70c-d6649bb5f8d7",
-    "id":  "eeb006d6-7fec-46c8-9d29-45b83f07ca14",
+    "author_id": "author_1",
+    "id":  "book_1",
     "title":  "The Hobbit"
 }
 ```
@@ -344,13 +361,50 @@ r.Table("books").Get("1").Merge(func(p r.Term) interface{} {
 }).Run(session)
 ```
 
+You are also able to reference an array of documents, for example if each book stored multiple authors you could do the following:
+
+```go
+type Book struct {
+    ID       string  `gorethink:"id,omitempty"`
+    Title    string  `gorethink:"title"`
+    Authors  []Author `gorethink:"author_ids,reference" gorethink_ref:"id"`
+}
+```
+
+```json
+{
+    "author_ids": ["author_1", "author_2"],
+    "id":  "book_1",
+    "title":  "The Hobbit"
+}
+```
+
+The query for reading the data back is slightly more complicated but is very similar:
+
+```go
+r.Table("books").Get("book_1").Merge(func(p r.Term) interface{} {
+    return map[string]interface{}{
+        "author_ids": r.Table("authors").GetAll(r.Args(p.Field("author_ids"))).CoerceTo("array"),
+    }
+})
+```
+
+### Custom `Marshaler`s/`Unmarshaler`s
+
+Sometimes the default behaviour for converting Go types to and from ReQL is not desired, for these situations the driver allows you to implement both the [`Marshaler`](https://godoc.org/github.com/dancannon/gorethink/encoding#Marshaler) and [`Unmarshaler`](https://godoc.org/github.com/dancannon/gorethink/encoding#Unmarshaler) interfaces. These interfaces might look familiar if you are using to using the `encoding/json` package however instead of dealing with `[]byte` the interfaces deal with `interface{}` values (which are later encoded by the `encoding/json` package when communicating with the database).
+
+An good example of how to use these interfaces is in the [`types`](https://github.com/dancannon/gorethink/blob/master/types/geometry.go#L84-L106) package, in this package the `Point` type is encoded as the `GEOMETRY` pseudo-type instead of a normal JSON object.
+
 ## Logging
 
-By default the driver logs errors when it fails to connect to the database. If you would like more verbose error logging you can call `r.SetVerbose(true)`.
+By default the driver logs are disabled however when enabled the driver will log errors when it fails to connect to the database. If you would like more verbose error logging you can call `r.SetVerbose(true)`.
 
 Alternatively if you wish to modify the logging behaviour you can modify the logger provided by `github.com/Sirupsen/logrus`. For example the following code completely disable the logger:
 
 ```go
+// Enabled
+r.Log.Out = os.Stderr
+// Disabled
 r.Log.Out = ioutil.Discard
 ```
 

@@ -87,7 +87,7 @@ func (e rqlServerError) Error() string {
 		return fmt.Sprintf("gorethink: %s", err)
 	}
 
-	return fmt.Sprintf("gorethink: %s in: \n%s", err, e.term.String())
+	return fmt.Sprintf("gorethink: %s in:\n%s", err, e.term.String())
 
 }
 

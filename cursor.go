@@ -58,16 +58,17 @@ type Cursor struct {
 	term       *Term
 	opts       map[string]interface{}
 
-	mu           sync.RWMutex
-	lastErr      error
-	fetching     bool
-	closed       bool
-	finished     bool
-	isAtom       bool
-	pendingSkips int
-	buffer       []interface{}
-	responses    []json.RawMessage
-	profile      interface{}
+	mu            sync.RWMutex
+	lastErr       error
+	fetching      bool
+	closed        bool
+	finished      bool
+	isAtom        bool
+	isSingleValue bool
+	pendingSkips  int
+	buffer        []interface{}
+	responses     []json.RawMessage
+	profile       interface{}
 }
 
 // Profile returns the information returned from the query profiler.
@@ -419,6 +420,41 @@ func (c *Cursor) One(result interface{}) error {
 	return nil
 }
 
+// Interface retrieves all documents from the result set and returns the data
+// as an interface{} and closes the cursor.
+//
+// If the query returns multiple documents then a slice will be returned,
+// otherwise a single value will be returned.
+func (c *Cursor) Interface() (interface{}, error) {
+	if c == nil {
+		return nil, errNilCursor
+	}
+
+	var results []interface{}
+	var result interface{}
+	for c.Next(&result) {
+		results = append(results, result)
+	}
+
+	if err := c.Err(); err != nil {
+		return nil, err
+	}
+
+	c.mu.RLock()
+	isSingleValue := c.isSingleValue
+	c.mu.RUnlock()
+
+	if isSingleValue {
+		if len(results) == 0 {
+			return nil, nil
+		}
+
+		return results[0], nil
+	}
+
+	return results, nil
+}
+
 // Listen listens for rows from the database and sends the result onto the given
 // channel. The type that the row is scanned into is determined by the element
 // type of the channel.
@@ -649,6 +685,12 @@ func (c *Cursor) bufferNextResponse() error {
 		c.buffer = append(c.buffer, nil)
 	} else {
 		c.buffer = append(c.buffer, value)
+
+		// If this is the only value in the response and the response was an
+		// atom then set the single value flag
+		if c.isAtom {
+			c.isSingleValue = true
+		}
 	}
 	return nil
 }

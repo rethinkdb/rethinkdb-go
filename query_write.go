@@ -11,7 +11,7 @@ type InsertOpts struct {
 	Conflict      interface{} `gorethink:"conflict,omitempty"`
 }
 
-func (o *InsertOpts) toMap() map[string]interface{} {
+func (o InsertOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -29,11 +29,11 @@ func (t Term) Insert(arg interface{}, optArgs ...InsertOpts) Term {
 type UpdateOpts struct {
 	Durability    interface{} `gorethink:"durability,omitempty"`
 	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
-	NotAtomic     interface{} `gorethink:"non_atomic,omitempty"`
+	NonAtomic     interface{} `gorethink:"non_atomic,omitempty"`
 	Conflict      interface{} `gorethink:"conflict,omitempty"`
 }
 
-func (o *UpdateOpts) toMap() map[string]interface{} {
+func (o UpdateOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -52,10 +52,10 @@ func (t Term) Update(arg interface{}, optArgs ...UpdateOpts) Term {
 type ReplaceOpts struct {
 	Durability    interface{} `gorethink:"durability,omitempty"`
 	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
-	NotAtomic     interface{} `gorethink:"non_atomic,omitempty"`
+	NonAtomic     interface{} `gorethink:"non_atomic,omitempty"`
 }
 
-func (o *ReplaceOpts) toMap() map[string]interface{} {
+func (o ReplaceOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
@@ -76,7 +76,7 @@ type DeleteOpts struct {
 	ReturnChanges interface{} `gorethink:"return_changes,omitempty"`
 }
 
-func (o *DeleteOpts) toMap() map[string]interface{} {
+func (o DeleteOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 

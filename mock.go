@@ -1,11 +1,13 @@
 package gorethink
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"sync"
 	"time"
+
+	p "gopkg.in/dancannon/gorethink.v2/ql2"
 )
 
 // Mocking is based on the amazing package github.com/stretchr/testify
@@ -15,6 +17,23 @@ type testingT interface {
 	Logf(format string, args ...interface{})
 	Errorf(format string, args ...interface{})
 	FailNow()
+}
+
+// MockAnything can be used in place of any term, this is useful when you want
+// mock similar queries or queries that you don't quite know the exact structure
+// of.
+func MockAnything() Term {
+	t := constructRootTerm("MockAnything", p.Term_DATUM, nil, nil)
+	t.isMockAnything = true
+
+	return t
+}
+
+func (t Term) MockAnything() Term {
+	t = constructMethodTerm(t, "MockAnything", p.Term_DATUM, nil, nil)
+	t.isMockAnything = true
+
+	return t
 }
 
 // MockQuery represents a mocked query and is used for setting expectations,
@@ -233,7 +252,8 @@ func (m *Mock) AssertExpectations(t testingT) bool {
 func (m *Mock) AssertNumberOfExecutions(t testingT, expectedQuery *MockQuery, expectedExecutions int) bool {
 	var actualExecutions int
 	for _, query := range m.queries() {
-		if bytes.Equal(query.BuiltQuery, expectedQuery.BuiltQuery) {
+		if query.Query.Term.compare(*expectedQuery.Query.Term, map[int64]int64{}) && query.Repeatability > -1 {
+			// if bytes.Equal(query.BuiltQuery, expectedQuery.BuiltQuery) {
 			actualExecutions++
 		}
 	}
@@ -309,10 +329,18 @@ func (m *Mock) Query(q Query) (*Cursor, error) {
 
 	// Build cursor and return
 	c := newCursor(nil, "", query.Query.Token, query.Query.Term, query.Query.Opts)
-	c.buffer = append(c.buffer, query.Response)
 	c.finished = true
 	c.fetching = false
 	c.isAtom = true
+
+	responseVal := reflect.ValueOf(query.Response)
+	if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
+		for i := 0; i < responseVal.Len(); i++ {
+			c.buffer = append(c.buffer, responseVal.Index(i).Interface())
+		}
+	} else {
+		c.buffer = append(c.buffer, query.Response)
+	}
 
 	return c, nil
 }
@@ -328,17 +356,12 @@ func (m *Mock) newQuery(t Term, opts map[string]interface{}) (Query, error) {
 }
 
 func (m *Mock) findExpectedQuery(q Query) (int, *MockQuery) {
-	// Build and marshal query
-	builtQuery, err := json.Marshal(q.Build())
-	if err != nil {
-		panic(fmt.Sprintf("Failed to build query: %s", err))
-	}
-
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
 	for i, query := range m.ExpectedQueries {
-		if bytes.Equal(query.BuiltQuery, builtQuery) && query.Repeatability > -1 {
+		// if bytes.Equal(query.BuiltQuery, builtQuery) && query.Repeatability > -1 {
+		if query.Query.Term.compare(*q.Term, map[int64]int64{}) && query.Repeatability > -1 {
 			return i, query
 		}
 	}
@@ -348,7 +371,8 @@ func (m *Mock) findExpectedQuery(q Query) (int, *MockQuery) {
 
 func (m *Mock) queryWasExecuted(expectedQuery *MockQuery) bool {
 	for _, query := range m.queries() {
-		if bytes.Equal(query.BuiltQuery, expectedQuery.BuiltQuery) {
+		if query.Query.Term.compare(*expectedQuery.Query.Term, map[int64]int64{}) {
+			// if bytes.Equal(query.BuiltQuery, expectedQuery.BuiltQuery) {
 			return true
 		}
 	}

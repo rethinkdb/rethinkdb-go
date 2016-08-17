@@ -20,19 +20,23 @@ func (t Term) Rebalance() Term {
 type ReconfigureOpts struct {
 	Shards               interface{} `gorethink:"shards,omitempty"`
 	Replicas             interface{} `gorethink:"replicas,omitempty"`
-	PrimaryTag           interface{} `gorethink:"primary_replica_tag,omitempty"`
 	DryRun               interface{} `gorethink:"dry_run,omitempty"`
 	EmergencyRepair      interface{} `gorethink:"emergency_repair,omitempty"`
 	NonVotingReplicaTags interface{} `gorethink:"nonvoting_replica_tags,omitempty"`
+	PrimaryReplicaTag    interface{} `gorethink:"primary_replica_tag,omitempty"`
 }
 
-func (o *ReconfigureOpts) toMap() map[string]interface{} {
+func (o ReconfigureOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
 // Reconfigure a table's sharding and replication.
-func (t Term) Reconfigure(opts ReconfigureOpts) Term {
-	return constructMethodTerm(t, "Reconfigure", p.Term_RECONFIGURE, []interface{}{}, opts.toMap())
+func (t Term) Reconfigure(optArgs ...ReconfigureOpts) Term {
+	opts := map[string]interface{}{}
+	if len(optArgs) >= 1 {
+		opts = optArgs[0].toMap()
+	}
+	return constructMethodTerm(t, "Reconfigure", p.Term_RECONFIGURE, []interface{}{}, opts)
 }
 
 // Status return the status of a table
@@ -46,7 +50,7 @@ type WaitOpts struct {
 	Timeout interface{} `gorethink:"timeout,omitempty"`
 }
 
-func (o *WaitOpts) toMap() map[string]interface{} {
+func (o WaitOpts) toMap() map[string]interface{} {
 	return optArgsToMap(o)
 }
 
