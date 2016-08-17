@@ -3,8 +3,6 @@ package gorethink
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
-	"math/rand"
 	"sync"
 	"testing"
 	"time"
@@ -438,6 +436,7 @@ func (s *RethinkSuite) TestRawQuery_advanced(c *test.C) {
 func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	var n int
 
@@ -483,6 +482,7 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	var n int
 
@@ -519,6 +519,7 @@ func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	var n int
 
@@ -548,6 +549,7 @@ func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 func (s *RethinkSuite) TestTableChangesIncludeInitial(c *test.C) {
 	DB("test").TableDrop("changes").Exec(session)
 	DB("test").TableCreate("changes").Exec(session)
+	DB("test").Table("changes").Wait().Exec(session)
 
 	// Insert 5 documents to table initially
 	DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
@@ -608,6 +610,8 @@ func (s *RethinkSuite) TestWriteReference(c *test.C) {
 	DB("test").TableDrop("books").Exec(session)
 	DB("test").TableCreate("authors").Exec(session)
 	DB("test").TableCreate("books").Exec(session)
+	DB("test").Table("authors").Wait().Exec(session)
+	DB("test").Table("books").Wait().Exec(session)
 
 	_, err := DB("test").Table("authors").Insert(author).RunWrite(session)
 	c.Assert(err, test.IsNil)
@@ -632,6 +636,10 @@ func (s *RethinkSuite) TestWriteReference(c *test.C) {
 }
 
 func (s *RethinkSuite) TestWriteConflict(c *test.C) {
+	DB("test").TableDrop("test").Exec(session)
+	DB("test").TableCreate("test").Exec(session)
+	DB("test").Table("test").Wait().Exec(session)
+
 	query := DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
 	_, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
@@ -703,6 +711,7 @@ func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 	// Ensure table + database exist
 	DBCreate("test").Exec(session)
 	DB("test").TableCreate("Table1").Exec(session)
+	DB("test").Table("Table1").Wait().Exec(session)
 
 	// Insert rows
 	DB("test").Table("Table1").Insert(objList).Exec(session)
@@ -723,9 +732,10 @@ func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 
 func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
+	DBCreate("test").Exec(session)
+	DB("test").TableCreate("TestMany").Exec(session)
+	DB("test").Table("TestMany").Wait().Exec(session)
+	DB("test").Table("TestMany").Delete().Exec(session)
 
 	// Insert rows
 	for i := 0; i < 100; i++ {
@@ -738,7 +748,7 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 			})
 		}
 
-		DB("test").Table("TestMany").Insert(data).RunWrite(session)
+		DB("test").Table("TestMany").Insert(data).Exec(session)
 	}
 
 	// Test query
@@ -757,162 +767,4 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 	c.Assert(n, test.Equals, 10000)
 
 	res.Close()
-}
-
-func (s *RethinkSuite) TestConcurrentSelectManyWorkers(c *test.C) {
-	if testing.Short() {
-		c.Skip("Skipping long test")
-	}
-
-	rand.Seed(time.Now().UnixNano())
-	sess, _ := Connect(ConnectOpts{
-		Address:    url,
-		MaxOpen:    200,
-		InitialCap: 200,
-	})
-
-	// Ensure table + database exist
-	DBCreate("test").RunWrite(sess)
-	DB("test").TableDrop("TestConcurrent").RunWrite(sess)
-	DB("test").TableCreate("TestConcurrent").RunWrite(sess)
-	DB("test").TableDrop("TestConcurrent2").RunWrite(sess)
-	DB("test").TableCreate("TestConcurrent2").RunWrite(sess)
-
-	// Insert rows
-	for j := 0; j < 200; j++ {
-		DB("test").Table("TestConcurrent").Insert(map[string]interface{}{
-			"id": j,
-			"i":  j,
-		}).Exec(sess)
-		DB("test").Table("TestConcurrent2").Insert(map[string]interface{}{
-			"j": j,
-			"k": j * 2,
-		}).Exec(sess)
-	}
-
-	// Test queries concurrently
-	numQueries := 1000
-	numWorkers := 10
-	queryChan := make(chan int)
-	doneChan := make(chan error)
-
-	// Start workers
-	for i := 0; i < numWorkers; i++ {
-		go func() {
-			for _ = range queryChan {
-				res, err := DB("test").Table("TestConcurrent2").EqJoin("j", DB("test").Table("TestConcurrent")).Zip().Run(sess)
-				if err != nil {
-					doneChan <- err
-					return
-				}
-
-				var response []map[string]interface{}
-				err = res.All(&response)
-				if err != nil {
-					doneChan <- err
-					return
-				}
-				if err := res.Close(); err != nil {
-					doneChan <- err
-					return
-				}
-
-				if len(response) != 200 {
-					doneChan <- fmt.Errorf("expected response length 200, received %d", len(response))
-					return
-				}
-
-				res, err = DB("test").Table("TestConcurrent").Get(response[rand.Intn(len(response))]["id"]).Run(sess)
-				if err != nil {
-					doneChan <- err
-					return
-				}
-
-				err = res.All(&response)
-				if err != nil {
-					doneChan <- err
-					return
-				}
-				if err := res.Close(); err != nil {
-					doneChan <- err
-					return
-				}
-
-				if len(response) != 1 {
-					doneChan <- fmt.Errorf("expected response length 1, received %d", len(response))
-					return
-				}
-
-				doneChan <- nil
-			}
-		}()
-	}
-
-	go func() {
-		for i := 0; i < numQueries; i++ {
-			queryChan <- i
-		}
-	}()
-
-	for i := 0; i < numQueries; i++ {
-		ret := <-doneChan
-		if ret != nil {
-			c.Fatalf("non-nil error returned (%s)", ret)
-		}
-	}
-}
-
-func (s *RethinkSuite) TestConcurrentSelectManyRows(c *test.C) {
-	if testing.Short() {
-		c.Skip("Skipping long test")
-	}
-
-	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
-
-	// Insert rows
-	for i := 0; i < 100; i++ {
-		DB("test").Table("TestMany").Insert(map[string]interface{}{
-			"i": i,
-		}).Exec(session)
-	}
-
-	// Test queries concurrently
-	attempts := 10
-	waitChannel := make(chan error, attempts)
-
-	for i := 0; i < attempts; i++ {
-		go func(i int, ch chan error) {
-			res, err := DB("test").Table("TestMany").Run(session)
-			if err != nil {
-				ch <- err
-				return
-			}
-
-			var response []map[string]interface{}
-			err = res.All(&response)
-			if err != nil {
-				ch <- err
-				return
-			}
-
-			if len(response) != 100 {
-				ch <- fmt.Errorf("expected response length 100, received %d", len(response))
-				return
-			}
-
-			res.Close()
-
-			ch <- nil
-		}(i, waitChannel)
-	}
-
-	for i := 0; i < attempts; i++ {
-		ret := <-waitChannel
-		if ret != nil {
-			c.Fatalf("non-nil error returned (%s)", ret)
-		}
-	}
 }

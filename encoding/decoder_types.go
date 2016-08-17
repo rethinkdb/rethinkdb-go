@@ -482,6 +482,7 @@ func newMapAsMapDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 type mapAsStructDecoder struct {
 	fields    []field
 	fieldDecs []decoderFunc
+	blank     bool
 }
 
 func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
@@ -497,16 +498,16 @@ func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
 			if bytes.Equal(ff.nameBytes, key) {
 				f = ff
 				fieldDec = ffd
+				if ff.compound {
+					compoundFields = append(compoundFields, ff)
+				}
 			}
 			if f == nil && ff.equalFold(ff.nameBytes, key) {
 				f = ff
 				fieldDec = ffd
-			}
-
-			if f != nil && f.compound {
-				compoundFields = append(compoundFields, f)
-			} else if f != nil {
-				break
+				if ff.compound {
+					compoundFields = append(compoundFields, ff)
+				}
 			}
 		}
 
@@ -519,7 +520,7 @@ func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
 					sElemVal = sElemVal.Elem()
 				}
 				sElemVal = sElemVal.Index(compoundField.compoundIndex)
-				fieldDec = typeDecoder(dElemVal.Type(), sElemVal.Type())
+				fieldDec = typeDecoder(dElemVal.Type(), sElemVal.Type(), d.blank)
 
 				if !sElemVal.IsValid() || !dElemVal.CanSet() {
 					continue
@@ -545,6 +546,7 @@ func newMapAsStructDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 	se := &mapAsStructDecoder{
 		fields:    fields,
 		fieldDecs: make([]decoderFunc, len(fields)),
+		blank:     blank,
 	}
 	for i, f := range fields {
 		se.fieldDecs[i] = typeDecoder(typeByIndex(dt, f.index), st.Elem(), blank)

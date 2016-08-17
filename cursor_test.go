@@ -290,6 +290,7 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	DBCreate("test").Exec(session)
 	DB("test").TableDrop("Table3").Exec(session)
 	DB("test").TableCreate("Table3").Exec(session)
+	DB("test").Table("Table3").Wait().Exec(session)
 	DB("test").Table("Table3").IndexCreate("num").Exec(session)
 	DB("test").Table("Table3").IndexWait().Exec(session)
 
