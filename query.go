@@ -288,6 +288,7 @@ type WriteResponse struct {
 // ChangeResponse is a helper type used when dealing with changefeeds. The type
 // contains both the value before the query and the new value.
 type ChangeResponse struct {
+	Error    string      `gorethink:"error"`
 	NewValue interface{} `gorethink:"new_val"`
 	OldValue interface{} `gorethink:"old_val"`
 }
