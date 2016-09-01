@@ -291,6 +291,7 @@ type ChangeResponse struct {
 	NewValue interface{} `gorethink:"new_val,omitempty"`
 	OldValue interface{} `gorethink:"old_val,omitempty"`
 	State    string      `gorethink:"state,omitempty"`
+	Error    string      `gorethink:"error,omitempty"`
 }
 
 // RunOpts contains the optional arguments for the Run function.
