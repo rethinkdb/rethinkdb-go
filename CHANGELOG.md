@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v2.2.1 - 2016-09-18
+
+### Added
+
+ - Added `State` and `Error` to `ChangeResponse`
+
+### Fixed
+
+ - Fixed panic caused by cursor trying to read outstanding responses while closed
+ - Fixed panic when using mock session
+
 ## v2.2.0 - 2016-08-16
 
 ### Added
