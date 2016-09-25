@@ -52,7 +52,7 @@ func SetVerbose(verbose bool) {
 // SetTags allows you to override the tags used when decoding or encoding
 // structs. The driver will check for the tags in the same order that they were
 // passed into this function. If no parameters are passed then the driver will
-// default to checking for the gorethink tag.
+// default to checking for the gorethink tag (the gorethink tag is always included)
 func SetTags(tags ...string) {
-	encoding.Tags = tags
+	encoding.Tags = append(tags, "gorethink")
 }

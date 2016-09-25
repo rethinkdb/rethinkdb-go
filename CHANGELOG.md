@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+
+ - The `gorethink` struct tag is now always checked even after calling `SetTags`
+
 ### Fixed
 
  - Fixed infinite loop in cursor when closed during read
