@@ -535,13 +535,10 @@ func (c *Cursor) IsNil() bool {
 func (c *Cursor) fetchMore() error {
 	var err error
 
-	fetching := c.fetching
-	closed := c.closed
-
-	if !fetching {
+	if !c.fetching {
 		c.fetching = true
 
-		if closed {
+		if c.closed {
 			return errCursorClosed
 		}
 
@@ -609,12 +606,12 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 	for {
 		c.applyPendingSkips(bufferResponse) // if we are buffering the responses, skip can drain from the buffer
 
-		if bufferResponse && len(c.buffer) == 0 && len(c.responses) > 0 && !c.closed {
+		if bufferResponse && len(c.buffer) == 0 && len(c.responses) > 0 {
 			if err := c.bufferNextResponse(); err != nil {
 				return err
 			}
 			continue // go around the loop again to re-apply pending skips
-		} else if len(c.buffer) == 0 && len(c.responses) == 0 && !c.finished && !c.closed {
+		} else if len(c.buffer) == 0 && len(c.responses) == 0 && !c.finished {
 			//  We skipped all of our data, load some more
 			if err := c.fetchMore(); err != nil {
 				return err
@@ -662,6 +659,9 @@ func (c *Cursor) applyPendingSkips(drainFromBuffer bool) (stillPending bool) {
 // if the response is from an atomic response, it will check if the
 // response contains multiple records and store them all into the buffer
 func (c *Cursor) bufferNextResponse() error {
+	if c.closed {
+		return errCursorClosed
+	}
 	// If there are no responses, nothing to do
 	if len(c.responses) == 0 {
 		return nil
