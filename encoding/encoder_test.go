@@ -407,3 +407,16 @@ func TestEncodeCompoundRef(t *testing.T) {
 		t.Errorf("got %q, want %q", out, want)
 	}
 }
+
+func TestEncodeNilSlice(t *testing.T) {
+	input := SliceStruct{}
+	want := map[string]interface{}{"X": []string(nil)}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}

@@ -147,6 +147,10 @@ type Ambig struct {
 	Second int `gorethink:"Hello"`
 }
 
+type SliceStruct struct {
+	X []string
+}
+
 // Decode test helper vars
 var (
 	sampleInt = 2
@@ -451,6 +455,20 @@ func TestDecodeCompoundKey(t *testing.T) {
 	want := Compound{"1", "2", "3", "4", "5"}
 
 	out := Compound{}
+	err := Decode(&out, input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestDecodeNilSlice(t *testing.T) {
+	input := map[string]interface{}{"X": nil}
+	want := SliceStruct{}
+
+	out := SliceStruct{}
 	err := Decode(&out, input)
 	if err != nil {
 		t.Errorf("got error %v, expected nil", err)
