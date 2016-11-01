@@ -89,7 +89,7 @@ var optionalsExpected = map[string]interface{}{
 	"sr":        "",
 	"omitempty": int64(0),
 	"tr":        map[string]interface{}{"$reql_type$": "TIME", "epoch_time": 0, "timezone": "+00:00"},
-	"slr":       []interface{}{},
+	"slr":       []interface{}(nil),
 	"mr":        map[string]interface{}{},
 }
 
