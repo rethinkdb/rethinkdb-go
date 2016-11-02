@@ -148,7 +148,7 @@ func Connect(opts ConnectOpts) (*Session, error) {
 
 	err := s.Reconnect()
 	if err != nil {
-		return nil, err
+		return s, err
 	}
 
 	return s, nil
