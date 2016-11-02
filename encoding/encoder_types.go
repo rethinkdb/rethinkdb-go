@@ -284,7 +284,7 @@ type sliceEncoder struct {
 
 func (se *sliceEncoder) encode(v reflect.Value) interface{} {
 	if v.IsNil() {
-		return []interface{}{}
+		return []interface{}(nil)
 	}
 	return se.arrayEnc(v)
 }

@@ -89,7 +89,7 @@ var optionalsExpected = map[string]interface{}{
 	"sr":        "",
 	"omitempty": int64(0),
 	"tr":        map[string]interface{}{"$reql_type$": "TIME", "epoch_time": 0, "timezone": "+00:00"},
-	"slr":       []interface{}{},
+	"slr":       []interface{}(nil),
 	"mr":        map[string]interface{}{},
 }
 
@@ -398,6 +398,19 @@ type CompoundRef struct {
 func TestEncodeCompoundRef(t *testing.T) {
 	input := CompoundRef{"1", &RefB{"2", "Name"}}
 	want := map[string]interface{}{"id": []string{"1", "2"}}
+
+	out, err := Encode(input)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestEncodeNilSlice(t *testing.T) {
+	input := SliceStruct{}
+	want := map[string]interface{}{"X": []string(nil)}
 
 	out, err := Encode(input)
 	if err != nil {
