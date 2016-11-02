@@ -170,7 +170,7 @@ func (mq *MockQuery) On(t Term) *MockQuery {
 // passing this when running your queries instead of a session. For example:
 //
 //     mock := r.NewMock()
-//     mock.on(r.Table("test")).Return([]interface{}{data}, nil)
+//     mock.On(r.Table("test")).Return([]interface{}{data}, nil)
 //
 //     cursor, err := r.Table("test").Run(mock)
 //
