@@ -148,7 +148,12 @@ func Connect(opts ConnectOpts) (*Session, error) {
 
 	err := s.Reconnect()
 	if err != nil {
-		return s, err
+		// note: s.Reconnect() will initialize cluster information which
+		// will cause the .IsConnected() method to be caught in a loop
+		return &Session{
+			hosts: hosts,
+			opts: &opts,
+		}, err
 	}
 
 	return s, nil
