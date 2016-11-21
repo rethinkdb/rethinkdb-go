@@ -214,6 +214,10 @@ func (c *Cursor) nextLocked(dest interface{}, progressCursor bool) (bool, error)
 			return false, err
 		}
 
+		if c.closed {
+			return false, nil
+		}
+
 		if len(c.buffer) == 0 && c.finished {
 			return false, nil
 		}
@@ -615,6 +619,9 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 			//  We skipped all of our data, load some more
 			if err := c.fetchMore(); err != nil {
 				return err
+			}
+			if c.closed {
+				return nil
 			}
 			continue // go around the loop again to re-apply pending skips
 		}
