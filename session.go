@@ -185,6 +185,7 @@ func (s *Session) Reconnect(optArgs ...CloseOpts) error {
 	s.mu.Lock()
 	s.cluster, err = NewCluster(s.hosts, s.opts)
 	if err != nil {
+		s.mu.Unlock()
 		return err
 	}
 
