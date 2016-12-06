@@ -2,7 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## v3.0.0 - 2016-12-06
+
+Unfortunately this will likely be the last release I plan to work on. This is due to the following reasons:
+
+ - Over the last few years while I have spent a lot of time maintaining this driver I have not used it very much for my own personal projects.
+ - My job has been keeping me very busy lately and I don't have as much time to work on this project as I used to.
+ - The company behind RethinkDB has shut down and while I am sure the community will keep the database going it seems like a good time for me to step away from the project.
+ - The driver itself is in a relatively good condition and many companies are using the existing version in production.
+
+I hope you understand my decision to step back from the project, if you have any questions or would be interested in take over some of the maintenance of the project please let me know. To make this process easier I have also decided to move the repository to the GoRethink organisation. All existing imports _should_ still work.
 
 ### Changed
 
