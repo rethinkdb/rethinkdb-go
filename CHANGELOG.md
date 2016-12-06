@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Changed
+
+- Fixed behaviour when unmarshaling nil slices
+
+### Fixed
+
+ - Fix possible deadlock when calling `Session.Reconnect`
+ - Fixed another bug with panic/infinite loop when closing cursor during reads
+ - Fixed goroutine leak when calling `Session.Close`
+
 ## v2.2.2 - 2016-09-25
 
 ### Changed
