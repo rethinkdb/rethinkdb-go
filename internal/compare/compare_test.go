@@ -103,7 +103,7 @@ func TestCompareMap(t *testing.T) {
 	AssertFalse(t, map[string]interface{}{"a": 1}, map[string]interface{}{})
 
 	Assert(t, map[interface{}]interface{}{1: 1225, 2: 1250, 3: 1275, 0: 1200}, map[string]interface{}{"2": 1250, "3": 1275, "0": 1200, "1": 1225})
-	Assert(t, map[interface{}]interface{}{nil: 33, 0: 22, 20: 22, 30: 23}, map[string]interface{}{"30": 23, "": 33, "0": 22, "20": 22})
+	Assert(t, map[interface{}]interface{}{0: 22, 20: 22, 30: 23}, map[string]interface{}{"30": 23, "0": 22, "20": 22})
 }
 func TestCompareMap_PartialMatch(t *testing.T) {
 
