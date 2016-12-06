@@ -1,15 +1,17 @@
 # GoRethink - RethinkDB Driver for Go
 
-[![GitHub tag](https://img.shields.io/github/tag/dancannon/gorethink.svg?style=flat)](https://github.com/dancannon/gorethink/releases)
-[![GoDoc](https://godoc.org/github.com/dancannon/gorethink?status.png)](https://godoc.org/github.com/dancannon/gorethink)
-[![build status](https://img.shields.io/travis/dancannon/gorethink/master.svg "build status")](https://travis-ci.org/dancannon/gorethink)
+[![GitHub tag](https://img.shields.io/github/tag/gorethink/gorethink.svg?style=flat)](https://github.com/gorethink/gorethink/releases)
+[![GoDoc](https://godoc.org/github.com/gorethink/gorethink?status.png)](https://godoc.org/github.com/gorethink/gorethink)
+[![build status](https://img.shields.io/travis/gorethink/gorethink/master.svg "build status")](https://travis-ci.org/gorethink/gorethink)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/)
 
-![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
+![GoRethink Logo](https://raw.github.com/wiki/gorethink/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v2.2.2 (RethinkDB v2.3)
+Current version: v3.0.0 (RethinkDB v2.3)
+
+This project is no longer maintained, for more information see the [v3.0.0 release](https://github.com/gorethink/gorethink/releases/tag/v3.0.0)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -18,13 +20,13 @@ If you need any help you can find me on the [RethinkDB slack](http://slack.rethi
 ## Installation
 
 ```
-go get gopkg.in/dancannon/gorethink.v2
+go get gopkg.in/gorethink/gorethink.v2
 ```
 
 (Or v1)
 
 ```sh
-go get gopkg.in/dancannon/gorethink.v1
+go get gopkg.in/gorethink/gorethink.v1
 ```
 
 ## Example
@@ -37,7 +39,7 @@ import (
 	"fmt"
 	"log"
 
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v2"
 )
 
 func Example() {
@@ -86,7 +88,7 @@ func ExampleConnect() {
 }
 ```
 
-See the [documentation](http://godoc.org/github.com/dancannon/gorethink#Connect) for a list of supported arguments to Connect().
+See the [documentation](http://godoc.org/github.com/gorethink/gorethink#Connect) for a list of supported arguments to Connect().
 
 ### Connection Pool
 
@@ -165,7 +167,7 @@ Please note that `DiscoverHosts` will not work with user authentication at this 
 
 This library is based on the official drivers so the code on the [API](http://www.rethinkdb.com/api/) page should require very few changes to work.
 
-To view full documentation for the query functions check the [API reference](https://github.com/dancannon/gorethink/wiki/Go-ReQL-command-reference) or [GoDoc](http://godoc.org/github.com/dancannon/gorethink#Term)
+To view full documentation for the query functions check the [API reference](https://github.com/gorethink/gorethink/wiki/Go-ReQL-command-reference) or [GoDoc](http://godoc.org/github.com/gorethink/gorethink#Term)
 
 Slice Expr Example
 ```go
@@ -308,7 +310,7 @@ If you wish to use the `json` tags for GoRethink then you can call `SetTags("gor
 RethinkDB contains some special types which can be used to store special value types, currently supports are binary values, times and geometry data types. GoRethink supports these data types natively however there are some gotchas:
  - Time types: To store times in RethinkDB with GoRethink you must pass a `time.Time` value to your query, due to the way Go works type aliasing or embedding is not support here
  - Binary types: To store binary data pass a byte slice (`[]byte`) to your query
- - Geometry types: As Go does not include any built-in data structures for storing geometry data GoRethink includes its own in the `github.com/dancannon/gorethink/types` package, Any of the types (`Geometry`, `Point`, `Line` and `Lines`) can be passed to a query to create a RethinkDB geometry type.
+ - Geometry types: As Go does not include any built-in data structures for storing geometry data GoRethink includes its own in the `github.com/gorethink/gorethink/types` package, Any of the types (`Geometry`, `Point`, `Line` and `Lines`) can be passed to a query to create a RethinkDB geometry type.
 
 ### Compound Keys
 
@@ -392,9 +394,9 @@ r.Table("books").Get("book_1").Merge(func(p r.Term) interface{} {
 
 ### Custom `Marshaler`s/`Unmarshaler`s
 
-Sometimes the default behaviour for converting Go types to and from ReQL is not desired, for these situations the driver allows you to implement both the [`Marshaler`](https://godoc.org/github.com/dancannon/gorethink/encoding#Marshaler) and [`Unmarshaler`](https://godoc.org/github.com/dancannon/gorethink/encoding#Unmarshaler) interfaces. These interfaces might look familiar if you are using to using the `encoding/json` package however instead of dealing with `[]byte` the interfaces deal with `interface{}` values (which are later encoded by the `encoding/json` package when communicating with the database).
+Sometimes the default behaviour for converting Go types to and from ReQL is not desired, for these situations the driver allows you to implement both the [`Marshaler`](https://godoc.org/github.com/gorethink/gorethink/encoding#Marshaler) and [`Unmarshaler`](https://godoc.org/github.com/gorethink/gorethink/encoding#Unmarshaler) interfaces. These interfaces might look familiar if you are using to using the `encoding/json` package however instead of dealing with `[]byte` the interfaces deal with `interface{}` values (which are later encoded by the `encoding/json` package when communicating with the database).
 
-An good example of how to use these interfaces is in the [`types`](https://github.com/dancannon/gorethink/blob/master/types/geometry.go#L84-L106) package, in this package the `Point` type is encoded as the `GEOMETRY` pseudo-type instead of a normal JSON object.
+An good example of how to use these interfaces is in the [`types`](https://github.com/gorethink/gorethink/blob/master/types/geometry.go#L84-L106) package, in this package the `Point` type is encoded as the `GEOMETRY` pseudo-type instead of a normal JSON object.
 
 ## Logging
 
@@ -478,7 +480,7 @@ BenchmarkSequentialSoftWritesParallel10      10000                           263
 
 ## Examples
 
-Many functions have examples and are viewable in the godoc, alternatively view some more full features examples on the [wiki](https://github.com/dancannon/gorethink/wiki/Examples).
+Many functions have examples and are viewable in the godoc, alternatively view some more full features examples on the [wiki](https://github.com/gorethink/gorethink/wiki/Examples).
 
 Another good place to find examples are the tests, almost every term will have a couple of tests that demonstrate how they can be used.
 

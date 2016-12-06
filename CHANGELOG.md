@@ -13,9 +13,12 @@ Unfortunately this will likely be the last release I plan to work on. This is du
 
 I hope you understand my decision to step back from the project, if you have any questions or would be interested in take over some of the maintenance of the project please let me know. To make this process easier I have also decided to move the repository to the GoRethink organisation. All existing imports _should_ still work.
 
+Thanks to everybody who got involved with this project over the last ~4 years and helped out, I have truly enjoyed the time I have spent building this library and I hope both RethinkDB and this driver manage to keep going.
+
 ### Changed
 
-- Fixed behaviour when unmarshaling nil slices
+ - Moved project to `gorethink` organisation
+ - Fixed behaviour when unmarshaling nil slices
 
 ### Fixed
 
@@ -355,7 +358,7 @@ r.Connect(
 
 1.0.0 is finally here, This is the first stable production ready release of GoRethink!
 
-![GoRethink Logo](https://raw.github.com/wiki/dancannon/gorethink/gopher-and-thinker.png "Golang Gopher and RethinkDB Thinker")
+![GoRethink Logo](https://raw.github.com/wiki/gorethink/gorethink/gopher-and-thinker.png "Golang Gopher and RethinkDB Thinker")
 
 In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes and bug fixes see below.
 
@@ -421,7 +424,7 @@ if err != nil {
 }
 ```
 
-Also added was the ability to read from a cursor using a channel, this is especially useful when using changefeeds. For more information see this [gist](https://gist.github.com/dancannon/2865686d163ed78bbc3c)
+Also added was the ability to read from a cursor using a channel, this is especially useful when using changefeeds. For more information see this [gist](https://gist.github.com/gorethink/2865686d163ed78bbc3c)
 
 ```go
 cursor, err := r.Table("items").Changes()
@@ -429,7 +432,7 @@ ch := make(chan map[string]interface{})
 cursor.Listen(ch)
 ```
 
-For more details checkout the [README](https://github.com/dancannon/gorethink/blob/master/README.md) and [godoc](https://godoc.org/github.com/dancannon/gorethink). As always if you have any further questions send me a message on [Gitter](https://gitter.im/dancannon/gorethink).
+For more details checkout the [README](https://github.com/gorethink/gorethink/blob/master/README.md) and [godoc](https://godoc.org/github.com/gorethink/gorethink). As always if you have any further questions send me a message on [Gitter](https://gitter.im/gorethink/gorethink).
 
 - Added the ability to connect to multiple nodes, queries are then distributed between these nodes. If a node stops responding then queries stop being sent to this node.
 - Added the `DiscoverHosts` optional argument to `ConnectOpts`, when this value is `true` the driver will listen for new nodes added to the cluster.

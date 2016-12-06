@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	r "gopkg.in/dancannon/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v2"
 )
 
 var session *r.Session

@@ -6,7 +6,7 @@ go:
 
 cache: apt
 
-go_import_path: gopkg.in/dancannon/gorethink.v2
+go_import_path: gopkg.in/gorethink/gorethink.v2
 
 before_script:
   - source /etc/lsb-release && echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list

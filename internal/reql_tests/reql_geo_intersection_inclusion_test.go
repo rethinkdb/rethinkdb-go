@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/dancannon/gorethink.v2"
-	"gopkg.in/dancannon/gorethink.v2/internal/compare"
+	r "gopkg.in/gorethink/gorethink.v2"
+	"gopkg.in/gorethink/gorethink.v2/internal/compare"
 )
 
 // Test intersects and includes semantics

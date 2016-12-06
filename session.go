@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	p "gopkg.in/dancannon/gorethink.v2/ql2"
+	p "gopkg.in/gorethink/gorethink.v2/ql2"
 )
 
 // A Session represents a connection to a RethinkDB cluster and should be used
@@ -152,7 +152,7 @@ func Connect(opts ConnectOpts) (*Session, error) {
 		// will cause the .IsConnected() method to be caught in a loop
 		return &Session{
 			hosts: hosts,
-			opts: &opts,
+			opts:  &opts,
 		}, err
 	}
 

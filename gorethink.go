@@ -6,7 +6,7 @@ import (
 
 	"github.com/Sirupsen/logrus"
 
-	"gopkg.in/dancannon/gorethink.v2/encoding"
+	"gopkg.in/gorethink/gorethink.v2/encoding"
 )
 
 var (

@@ -1,6 +1,6 @@
 package gorethink
 
-import p "gopkg.in/dancannon/gorethink.v2/ql2"
+import p "gopkg.in/gorethink/gorethink.v2/ql2"
 
 // Aggregation
 // These commands are used to compute smaller values from large sequences.
