@@ -158,6 +158,7 @@ func (c *Cluster) Close(optArgs ...CloseOpts) error {
 		}
 	}
 
+	c.hp.Close()
 	c.closed = true
 
 	return nil
