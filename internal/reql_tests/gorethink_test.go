@@ -6,7 +6,7 @@ import (
 	"flag"
 	"os"
 
-	r "gopkg.in/gorethink/gorethink.v2"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 var url string

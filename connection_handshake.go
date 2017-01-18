@@ -16,7 +16,7 @@ import (
 
 	"golang.org/x/crypto/pbkdf2"
 
-	p "gopkg.in/gorethink/gorethink.v2/ql2"
+	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
 type HandshakeVersion int
