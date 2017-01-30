@@ -6,7 +6,7 @@ import (
 
 	test "gopkg.in/check.v1"
 
-	"gopkg.in/gorethink/gorethink.v2/types"
+	"gopkg.in/gorethink/gorethink.v3/types"
 )
 
 type jsonChecker struct {

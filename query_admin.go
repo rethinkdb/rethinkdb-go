@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	p "gopkg.in/gorethink/gorethink.v2/ql2"
+	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
 // Config can be used to read and/or update the configurations for individual

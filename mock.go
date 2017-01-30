@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	p "gopkg.in/gorethink/gorethink.v2/ql2"
+	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
 // Mocking is based on the amazing package github.com/stretchr/testify

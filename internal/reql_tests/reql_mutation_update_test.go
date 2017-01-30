@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v2"
-	"gopkg.in/gorethink/gorethink.v2/internal/compare"
+	r "gopkg.in/gorethink/gorethink.v3"
+	"gopkg.in/gorethink/gorethink.v3/internal/compare"
 )
 
 // Tests updates of selections
