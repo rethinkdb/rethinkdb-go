@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v3.0.1 - 2016-01-30
+
+### Fixed
+
+ - Fixed import paths
+ - Updated Go version used by Travis
+
 ## v3.0.0 - 2016-12-06
 
 Unfortunately this will likely be the last release I plan to work on. This is due to the following reasons:
