@@ -1,8 +1,8 @@
 # GoRethink - RethinkDB Driver for Go
 
-[![GitHub tag](https://img.shields.io/github/tag/gorethink/gorethink.svg?style=flat)](https://github.com/gorethink/gorethink/releases)
-[![GoDoc](https://godoc.org/github.com/gorethink/gorethink?status.png)](https://godoc.org/github.com/gorethink/gorethink)
-[![build status](https://img.shields.io/travis/gorethink/gorethink/master.svg "build status")](https://travis-ci.org/gorethink/gorethink)
+[![GitHub tag](https://img.shields.io/github/tag/GoRethink/gorethink.svg?style=flat)](https://github.com/GoRethink/gorethink/releases)
+[![GoDoc](https://godoc.org/github.com/GoRethink/gorethink?status.svg)](https://godoc.org/github.com/GoRethink/gorethink)
+[![Build status](https://travis-ci.org/GoRethink/gorethink.svg?branch=master)](https://travis-ci.org/GoRethink/gorethink)
 [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/)
