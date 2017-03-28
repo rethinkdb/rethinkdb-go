@@ -170,8 +170,8 @@ func (o CloseOpts) toMap() map[string]interface{} {
 
 // IsConnected returns true if session has a valid connection.
 func (s *Session) IsConnected() bool {
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.mu.RLock()
+	defer s.mu.RUnlock()
 
 	if s.cluster == nil || s.closed {
 		return false
