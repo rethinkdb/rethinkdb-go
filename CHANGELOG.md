@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## v3.0.2 - 2017-04-16
 
+### Changed
+
+- Updated Go versions used by CI
+
 ### Fixed
 
 - Fixed performance issue caused by lock contention in `IsConnected` (thanks to @ekle)
