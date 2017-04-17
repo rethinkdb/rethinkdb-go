@@ -417,26 +417,26 @@ Here is an example that shows how to mock a query that returns multiple rows and
 
 ```go
 func TestSomething(t *testing.T) {
-    mock := r.NewMock()
-    mock.on(r.Table("people")).Return([]interface{}{
-        map[string]interface{}{"id": 1, "name": "John Smith"},
-        map[string]interface{}{"id": 2, "name": "Jane Smith"},
-    }, nil)
+	mock := r.NewMock()
+	mock.On(r.Table("people")).Return([]interface{}{
+		map[string]interface{}{"id": 1, "name": "John Smith"},
+		map[string]interface{}{"id": 2, "name": "Jane Smith"},
+	}, nil)
 
-    cursor, err := r.Table("people").Run(mock)
-    if err != nil {
-        t.Errorf(err)
-    }
+	cursor, err := r.Table("people").Run(mock)
+	if err != nil {
+		t.Errorf("err is: %v", err)
+	}
 
-    var rows []interface{}
-    err := res.All(&rows)
-    if err != nil {
-        t.Errorf(err)
-    }
+	var rows []interface{}
+	err = cursor.All(&rows)
+	if err != nil {
+		t.Errorf("err is: %v", err)
+	}
 
-    // Test result of rows
+	// Test result of rows
 
-    mock.AssertExpectations(t)
+	mock.AssertExpectations(t)
 }
 ```
 
