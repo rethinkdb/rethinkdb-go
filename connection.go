@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
+	"fmt"
 	"net"
 	"sync"
 	"sync/atomic"
@@ -189,7 +190,7 @@ func (c *Connection) sendQuery(q Query) error {
 	// Build query
 	b, err := json.Marshal(q.Build())
 	if err != nil {
-		return RQLDriverError{rqlError("Error building query")}
+		return RQLDriverError{rqlError(fmt.Sprintf("Error building query: %s", err.Error()))}
 	}
 
 	// Set timeout
