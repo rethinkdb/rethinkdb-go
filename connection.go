@@ -11,6 +11,7 @@ import (
 	"time"
 
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	"golang.org/x/net/context"
 )
 
 const (
@@ -104,7 +105,11 @@ func (c *Connection) Close() error {
 // Cursor which should be used to view the query's response.
 //
 // This function is used internally by Run which should be used for most queries.
-func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
+func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, error) {
+	if ctx == nil {
+		ctx = c.contextFromConnectionOpts()
+	}
+
 	if c == nil {
 		return nil, nil, ErrConnectionClosed
 	}
@@ -131,30 +136,51 @@ func (c *Connection) Query(q Query) (*Response, *Cursor, error) {
 	}
 	c.mu.Unlock()
 
-	err := c.sendQuery(q)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
-		return nil, nil, nil
-	}
-
-	for {
-		response, err := c.readResponse()
+	var response *Response
+	var cursor *Cursor
+	var errchan chan error = make(chan error, 1)
+	go func() {
+		err := c.sendQuery(q)
 		if err != nil {
-			return nil, nil, err
+			errchan <- err
+			return
 		}
 
-		if response.Token == q.Token {
-			// If this was the requested response process and return
-			return c.processResponse(q, response)
-		} else if _, ok := c.cursors[response.Token]; ok {
-			// If the token is in the cursor cache then process the response
-			c.processResponse(q, response)
-		} else {
-			putResponse(response)
+		if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
+			errchan <- nil
+			return
 		}
+
+		for {
+			response, err := c.readResponse()
+			if err != nil {
+				errchan <- err
+				return
+			}
+
+			if response.Token == q.Token {
+				// If this was the requested response process and return
+				response, cursor, err = c.processResponse(ctx, q, response)
+				errchan <- err
+				return
+			} else if _, ok := c.cursors[response.Token]; ok {
+				// If the token is in the cursor cache then process the response
+				c.processResponse(ctx, q, response)
+			} else {
+				putResponse(response)
+			}
+		}
+	}()
+
+	select {
+	case err := <-errchan:
+		return response, cursor, err
+	case <-ctx.Done():
+		if q.Type != p.Query_STOP {
+			stopQuery := formStopQuery(q.Token)
+			c.Query(c.contextFromConnectionOpts(), stopQuery)
+		}
+		return nil, nil, ErrQueryTimeout
 	}
 }
 
@@ -167,7 +193,7 @@ type ServerResponse struct {
 func (c *Connection) Server() (ServerResponse, error) {
 	var response ServerResponse
 
-	_, cur, err := c.Query(Query{
+	_, cur, err := c.Query(c.contextFromConnectionOpts(), Query{
 		Type: p.Query_SERVER_INFO,
 	})
 	if err != nil {
@@ -255,7 +281,7 @@ func (c *Connection) readResponse() (*Response, error) {
 	return response, nil
 }
 
-func (c *Connection) processResponse(q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
 		return c.processErrorResponse(q, response, RQLClientError{rqlServerError{response, q.Term}})
@@ -264,11 +290,11 @@ func (c *Connection) processResponse(q Query, response *Response) (*Response, *C
 	case p.Response_RUNTIME_ERROR:
 		return c.processErrorResponse(q, response, createRuntimeError(response.ErrorType, response, q.Term))
 	case p.Response_SUCCESS_ATOM, p.Response_SERVER_INFO:
-		return c.processAtomResponse(q, response)
+		return c.processAtomResponse(ctx, q, response)
 	case p.Response_SUCCESS_PARTIAL:
-		return c.processPartialResponse(q, response)
+		return c.processPartialResponse(ctx, q, response)
 	case p.Response_SUCCESS_SEQUENCE:
-		return c.processSequenceResponse(q, response)
+		return c.processSequenceResponse(ctx, q, response)
 	case p.Response_WAIT_COMPLETE:
 		return c.processWaitResponse(q, response)
 	default:
@@ -287,9 +313,9 @@ func (c *Connection) processErrorResponse(q Query, response *Response, err error
 	return response, cursor, err
 }
 
-func (c *Connection) processAtomResponse(q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processAtomResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
 	// Create cursor
-	cursor := newCursor(c, "Cursor", response.Token, q.Term, q.Opts)
+	cursor := newCursor(ctx, c, "Cursor", response.Token, q.Term, q.Opts)
 	cursor.profile = response.Profile
 
 	cursor.extend(response)
@@ -297,7 +323,7 @@ func (c *Connection) processAtomResponse(q Query, response *Response) (*Response
 	return response, cursor, nil
 }
 
-func (c *Connection) processPartialResponse(q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processPartialResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
 	cursorType := "Cursor"
 	if len(response.Notes) > 0 {
 		switch response.Notes[0] {
@@ -318,7 +344,7 @@ func (c *Connection) processPartialResponse(q Query, response *Response) (*Respo
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c, cursorType, response.Token, q.Term, q.Opts)
+		cursor = newCursor(ctx, c, cursorType, response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 
 		c.cursors[response.Token] = cursor
@@ -330,12 +356,12 @@ func (c *Connection) processPartialResponse(q Query, response *Response) (*Respo
 	return response, cursor, nil
 }
 
-func (c *Connection) processSequenceResponse(q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processSequenceResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
 	c.mu.Lock()
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
-		cursor = newCursor(c, "Cursor", response.Token, q.Term, q.Opts)
+		cursor = newCursor(ctx, c, "Cursor", response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 	}
 

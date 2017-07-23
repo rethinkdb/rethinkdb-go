@@ -10,6 +10,7 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/cenkalti/backoff"
 	"github.com/hailocab/go-hostpool"
+	"golang.org/x/net/context"
 )
 
 // A Cluster represents a connection to a RethinkDB cluster, a cluster is created
@@ -57,7 +58,7 @@ func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
 }
 
 // Query executes a ReQL query using the cluster to connect to the database
-func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
+func (c *Cluster) Query(ctx context.Context, q Query) (cursor *Cursor, err error) {
 	for i := 0; i < c.numRetries(); i++ {
 		var node *Node
 		var hpr hostpool.HostPoolResponse
@@ -67,7 +68,7 @@ func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
 			return nil, err
 		}
 
-		cursor, err = node.Query(q)
+		cursor, err = node.Query(ctx, q)
 		hpr.Mark(err)
 
 		if !shouldRetryQuery(q, err) {
@@ -79,7 +80,7 @@ func (c *Cluster) Query(q Query) (cursor *Cursor, err error) {
 }
 
 // Exec executes a ReQL query using the cluster to connect to the database
-func (c *Cluster) Exec(q Query) (err error) {
+func (c *Cluster) Exec(ctx context.Context, q Query) (err error) {
 	for i := 0; i < c.numRetries(); i++ {
 		var node *Node
 		var hpr hostpool.HostPoolResponse
@@ -89,7 +90,7 @@ func (c *Cluster) Exec(q Query) (err error) {
 			return err
 		}
 
-		err = node.Exec(q)
+		err = node.Exec(ctx, q)
 		hpr.Mark(err)
 
 		if !shouldRetryQuery(q, err) {
@@ -204,7 +205,7 @@ func (c *Cluster) listenForNodeChanges() error {
 		return fmt.Errorf("Error building query: %s", err)
 	}
 
-	cursor, err := node.Query(q)
+	cursor, err := node.Query(context.Background(), q) // no need for timeout due to Changes()
 	if err != nil {
 		hpr.Mark(err)
 		return err
@@ -279,7 +280,7 @@ func (c *Cluster) connectNodes(hosts []Host) error {
 				continue
 			}
 
-			_, cursor, err := conn.Query(q)
+			_, cursor, err := conn.Query(nil, q) // nil = connection opts' timeout
 			if err != nil {
 				attemptErr = err
 				Log.Warnf("Error fetching cluster status: %s", err)

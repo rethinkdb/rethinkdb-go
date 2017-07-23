@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	"golang.org/x/net/context"
 )
 
 // Node represents a database server in the cluster
@@ -83,27 +84,27 @@ func (n *Node) SetMaxOpenConns(openConns int) {
 // processed by the server. Note that this guarantee only applies to queries
 // run on the given connection
 func (n *Node) NoReplyWait() error {
-	return n.pool.Exec(Query{
+	return n.pool.Exec(nil, Query{ // nil = connection opts' timeout
 		Type: p.Query_NOREPLY_WAIT,
 	})
 }
 
 // Query executes a ReQL query using this nodes connection pool.
-func (n *Node) Query(q Query) (cursor *Cursor, err error) {
+func (n *Node) Query(ctx context.Context, q Query) (cursor *Cursor, err error) {
 	if n.Closed() {
 		return nil, ErrInvalidNode
 	}
 
-	return n.pool.Query(q)
+	return n.pool.Query(ctx, q)
 }
 
 // Exec executes a ReQL query using this nodes connection pool.
-func (n *Node) Exec(q Query) (err error) {
+func (n *Node) Exec(ctx context.Context, q Query) (err error) {
 	if n.Closed() {
 		return ErrInvalidNode
 	}
 
-	return n.pool.Exec(q)
+	return n.pool.Exec(ctx, q)
 }
 
 // Server returns the server name and server UUID being used by a connection.

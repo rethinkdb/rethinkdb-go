@@ -1,6 +1,9 @@
 package gorethink
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"golang.org/x/net/context"
+)
 
 // Write 'data' to conn
 func (c *Connection) writeData(data []byte) error {
@@ -38,4 +41,13 @@ func (c *Connection) writeQuery(token int64, q []byte) error {
 	pos += copy(data[pos:], q)
 
 	return c.writeData(data)
+}
+
+func (c *Connection) contextFromConnectionOpts() context.Context {
+	sum := c.opts.ReadTimeout + c.opts.WriteTimeout
+	if sum == 0 {
+		return context.Background()
+	}
+	ctx, _ := context.WithTimeout(context.Background(), sum)
+	return ctx
 }
