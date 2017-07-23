@@ -7,8 +7,8 @@ import (
 	"sync"
 	"time"
 
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
 	"golang.org/x/net/context"
+	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
 // Mocking is based on the amazing package github.com/stretchr/testify

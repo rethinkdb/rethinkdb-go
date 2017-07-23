@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
 	"golang.org/x/net/context"
+	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
 const (

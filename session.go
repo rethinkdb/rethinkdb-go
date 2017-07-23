@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
 	"golang.org/x/net/context"
+	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
 // A Session represents a connection to a RethinkDB cluster and should be used

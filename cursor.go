@@ -7,9 +7,9 @@ import (
 	"reflect"
 	"sync"
 
+	"golang.org/x/net/context"
 	"gopkg.in/gorethink/gorethink.v3/encoding"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
-	"golang.org/x/net/context"
 )
 
 var (
@@ -36,7 +36,7 @@ func newCursor(ctx context.Context, conn *Connection, cursorType string, token i
 		opts:       opts,
 		buffer:     make([]interface{}, 0),
 		responses:  make([]json.RawMessage, 0),
-		ctx: ctx,
+		ctx:        ctx,
 	}
 
 	return cursor
@@ -66,7 +66,7 @@ type Cursor struct {
 	cursorType string
 	term       *Term
 	opts       map[string]interface{}
-	ctx context.Context
+	ctx        context.Context
 
 	mu            sync.RWMutex
 	lastErr       error
