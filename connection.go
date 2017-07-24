@@ -177,7 +177,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		return response, cursor, err
 	case <-ctx.Done():
 		if q.Type != p.Query_STOP {
-			stopQuery := formStopQuery(q.Token)
+			stopQuery := newStopQuery(q.Token)
 			c.Query(c.contextFromConnectionOpts(), stopQuery)
 		}
 		return nil, nil, ErrQueryTimeout

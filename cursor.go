@@ -148,7 +148,7 @@ func (c *Cursor) Close() error {
 
 	// Stop any unfinished queries
 	if !c.finished {
-		_, _, err = conn.Query(c.ctx, formStopQuery(c.token))
+		_, _, err = conn.Query(c.ctx, newStopQuery(c.token))
 	}
 
 	if c.releaseConn != nil {

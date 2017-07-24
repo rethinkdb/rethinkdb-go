@@ -338,9 +338,7 @@ func (t Term) Run(s QueryExecutor, optArgs ...RunOpts) (*Cursor, error) {
 	var ctx context.Context = nil // if it's nil connection will form context from connection opts
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
-		if optArgs[0].Context != nil {
-			ctx = optArgs[0].Context
-		}
+		ctx = optArgs[0].Context
 	}
 
 	if s == nil || !s.IsConnected() {
@@ -450,9 +448,7 @@ func (t Term) Exec(s QueryExecutor, optArgs ...ExecOpts) error {
 	var ctx context.Context = nil // if it's nil connection will form context from connection opts
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
-		if optArgs[0].Context != nil {
-			ctx = optArgs[0].Context
-		}
+		ctx = optArgs[0].Context
 	}
 
 	if s == nil || !s.IsConnected() {

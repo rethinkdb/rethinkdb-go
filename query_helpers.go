@@ -4,7 +4,7 @@ import (
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
-func formStopQuery(token int64) Query {
+func newStopQuery(token int64) Query {
 	return Query{
 		Type:  p.Query_STOP,
 		Token: token,
