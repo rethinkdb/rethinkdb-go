@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/net/context"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
@@ -256,8 +257,8 @@ func (t Term) OptArgs(args interface{}) Term {
 
 type QueryExecutor interface {
 	IsConnected() bool
-	Query(Query) (*Cursor, error)
-	Exec(Query) error
+	Query(context.Context, Query) (*Cursor, error)
+	Exec(context.Context, Query) error
 
 	newQuery(t Term, opts map[string]interface{}) (Query, error)
 }
@@ -313,6 +314,8 @@ type RunOpts struct {
 	MaxBatchBytes             interface{} `gorethink:"max_batch_bytes,omitempty"`
 	MaxBatchSeconds           interface{} `gorethink:"max_batch_seconds,omitempty"`
 	FirstBatchScaledownFactor interface{} `gorethink:"first_batch_scaledown_factor,omitempty"`
+
+	Context context.Context `gorethink:"-"`
 }
 
 func (o RunOpts) toMap() map[string]interface{} {
@@ -332,8 +335,10 @@ func (o RunOpts) toMap() map[string]interface{} {
 //	}
 func (t Term) Run(s QueryExecutor, optArgs ...RunOpts) (*Cursor, error) {
 	opts := map[string]interface{}{}
+	var ctx context.Context = nil // if it's nil connection will form context from connection opts
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
+		ctx = optArgs[0].Context
 	}
 
 	if s == nil || !s.IsConnected() {
@@ -345,7 +350,7 @@ func (t Term) Run(s QueryExecutor, optArgs ...RunOpts) (*Cursor, error) {
 		return nil, err
 	}
 
-	return s.Query(q)
+	return s.Query(ctx, q)
 }
 
 // RunWrite runs a query using the given connection but unlike Run automatically
@@ -424,6 +429,8 @@ type ExecOpts struct {
 	FirstBatchScaledownFactor interface{} `gorethink:"first_batch_scaledown_factor,omitempty"`
 
 	NoReply interface{} `gorethink:"noreply,omitempty"`
+
+	Context context.Context `gorethink:"-"`
 }
 
 func (o ExecOpts) toMap() map[string]interface{} {
@@ -438,8 +445,10 @@ func (o ExecOpts) toMap() map[string]interface{} {
 //	})
 func (t Term) Exec(s QueryExecutor, optArgs ...ExecOpts) error {
 	opts := map[string]interface{}{}
+	var ctx context.Context = nil // if it's nil connection will form context from connection opts
 	if len(optArgs) >= 1 {
 		opts = optArgs[0].toMap()
+		ctx = optArgs[0].Context
 	}
 
 	if s == nil || !s.IsConnected() {
@@ -451,5 +460,5 @@ func (t Term) Exec(s QueryExecutor, optArgs ...ExecOpts) error {
 		return err
 	}
 
-	return s.Exec(q)
+	return s.Exec(ctx, q)
 }

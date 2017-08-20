@@ -6,6 +6,7 @@ import (
 	"net"
 	"sync"
 
+	"golang.org/x/net/context"
 	"gopkg.in/fatih/pool.v2"
 )
 
@@ -136,14 +137,14 @@ func (p *Pool) SetMaxOpenConns(n int) {
 // Query execution functions
 
 // Exec executes a query without waiting for any response.
-func (p *Pool) Exec(q Query) error {
+func (p *Pool) Exec(ctx context.Context, q Query) error {
 	c, pc, err := p.conn()
 	if err != nil {
 		return err
 	}
 	defer pc.Close()
 
-	_, _, err = c.Query(q)
+	_, _, err = c.Query(ctx, q)
 
 	if c.isBad() {
 		pc.MarkUnusable()
@@ -153,13 +154,13 @@ func (p *Pool) Exec(q Query) error {
 }
 
 // Query executes a query and waits for the response
-func (p *Pool) Query(q Query) (*Cursor, error) {
+func (p *Pool) Query(ctx context.Context, q Query) (*Cursor, error) {
 	c, pc, err := p.conn()
 	if err != nil {
 		return nil, err
 	}
 
-	_, cursor, err := c.Query(q)
+	_, cursor, err := c.Query(ctx, q)
 
 	if err == nil {
 		cursor.releaseConn = releaseConn(c, pc)

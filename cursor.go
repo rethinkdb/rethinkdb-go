@@ -7,6 +7,7 @@ import (
 	"reflect"
 	"sync"
 
+	"golang.org/x/net/context"
 	"gopkg.in/gorethink/gorethink.v3/encoding"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
@@ -16,7 +17,7 @@ var (
 	errCursorClosed = errors.New("connection closed, cannot read cursor")
 )
 
-func newCursor(conn *Connection, cursorType string, token int64, term *Term, opts map[string]interface{}) *Cursor {
+func newCursor(ctx context.Context, conn *Connection, cursorType string, token int64, term *Term, opts map[string]interface{}) *Cursor {
 	if cursorType == "" {
 		cursorType = "Cursor"
 	}
@@ -35,6 +36,7 @@ func newCursor(conn *Connection, cursorType string, token int64, term *Term, opt
 		opts:       opts,
 		buffer:     make([]interface{}, 0),
 		responses:  make([]json.RawMessage, 0),
+		ctx:        ctx,
 	}
 
 	return cursor
@@ -64,6 +66,7 @@ type Cursor struct {
 	cursorType string
 	term       *Term
 	opts       map[string]interface{}
+	ctx        context.Context
 
 	mu            sync.RWMutex
 	lastErr       error
@@ -145,15 +148,7 @@ func (c *Cursor) Close() error {
 
 	// Stop any unfinished queries
 	if !c.finished {
-		q := Query{
-			Type:  p.Query_STOP,
-			Token: c.token,
-			Opts: map[string]interface{}{
-				"noreply": true,
-			},
-		}
-
-		_, _, err = conn.Query(q)
+		_, _, err = conn.Query(c.ctx, newStopQuery(c.token))
 	}
 
 	if c.releaseConn != nil {
@@ -552,7 +547,7 @@ func (c *Cursor) fetchMore() error {
 		}
 
 		c.mu.Unlock()
-		_, _, err = c.conn.Query(q)
+		_, _, err = c.conn.Query(c.ctx, q)
 		c.mu.Lock()
 	}
 

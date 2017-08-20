@@ -211,6 +211,12 @@ r.Table("test").Insert(doc, r.InsertOpts{
 
 As shown above in the Between example optional arguments are passed to the function as a struct. Each function that has optional arguments as a related struct. This structs are named in the format FunctionNameOpts, for example BetweenOpts is the related struct for Between.
 
+#### Cancelling queries
+
+For query cancellation use `Context` argument at `RunOpts`. If `Context` is `nil` and `ReadTimeout` or `WriteTimeout` is not 0 from `ConnectionOpts`, `Context` will be formed by summation of these timeouts.
+
+For unlimited timeouts for `Changes()` pass `context.Background()`.
+
 ## Results
 
 Different result types are returned depending on what function is used to execute the query.

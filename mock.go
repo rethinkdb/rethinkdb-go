@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/net/context"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
@@ -290,7 +291,7 @@ func (m *Mock) IsConnected() bool {
 	return true
 }
 
-func (m *Mock) Query(q Query) (*Cursor, error) {
+func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 	found, query := m.findExpectedQuery(q)
 
 	if found < 0 {
@@ -328,7 +329,7 @@ func (m *Mock) Query(q Query) (*Cursor, error) {
 	}
 
 	// Build cursor and return
-	c := newCursor(nil, "", query.Query.Token, query.Query.Term, query.Query.Opts)
+	c := newCursor(ctx, nil, "", query.Query.Token, query.Query.Term, query.Query.Opts)
 	c.finished = true
 	c.fetching = false
 	c.isAtom = true
@@ -345,8 +346,8 @@ func (m *Mock) Query(q Query) (*Cursor, error) {
 	return c, nil
 }
 
-func (m *Mock) Exec(q Query) error {
-	_, err := m.Query(q)
+func (m *Mock) Exec(ctx context.Context, q Query) error {
+	_, err := m.Query(ctx, q)
 
 	return err
 }

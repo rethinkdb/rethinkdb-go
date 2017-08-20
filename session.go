@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"golang.org/x/net/context"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
 )
 
@@ -265,7 +266,7 @@ func (s *Session) NoReplyWait() error {
 		return ErrConnectionClosed
 	}
 
-	return s.cluster.Exec(Query{
+	return s.cluster.Exec(nil, Query{ // nil = connection opts' defaults
 		Type: p.Query_NOREPLY_WAIT,
 	})
 }
@@ -287,7 +288,7 @@ func (s *Session) Database() string {
 }
 
 // Query executes a ReQL query using the session to connect to the database
-func (s *Session) Query(q Query) (*Cursor, error) {
+func (s *Session) Query(ctx context.Context, q Query) (*Cursor, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -295,11 +296,11 @@ func (s *Session) Query(q Query) (*Cursor, error) {
 		return nil, ErrConnectionClosed
 	}
 
-	return s.cluster.Query(q)
+	return s.cluster.Query(ctx, q)
 }
 
 // Exec executes a ReQL query using the session to connect to the database
-func (s *Session) Exec(q Query) error {
+func (s *Session) Exec(ctx context.Context, q Query) error {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -307,7 +308,7 @@ func (s *Session) Exec(q Query) error {
 		return ErrConnectionClosed
 	}
 
-	return s.cluster.Exec(q)
+	return s.cluster.Exec(ctx, q)
 }
 
 // Server returns the server name and server UUID being used by a connection.
