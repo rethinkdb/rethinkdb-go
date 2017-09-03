@@ -70,7 +70,7 @@ func Example() {
 
 Setting up a basic connection with RethinkDB is simple:
 
-[embedmd]:# (example_connect_test.go go /func ExampleConnect\(\) {/ /(?m)^}/)
+[embedmd]:# (example_connect_test.go go /func ExampleConnect\(\) {/ /^}/)
 ```go
 func ExampleConnect() {
 	var err error
@@ -92,7 +92,7 @@ The driver uses a connection pool at all times, by default it creates and frees 
 
 To configure the connection pool `InitialCap`, `MaxOpen` and `Timeout` can be specified during connection. If you wish to change the value of `InitialCap` or `MaxOpen` during runtime then the functions `SetInitialPoolCap` and `SetMaxOpenConns` can be used.
 
-[embedmd]:# (example_connect_test.go go /func ExampleConnect_connectionPool\(\) {/ /(?m)^}/)
+[embedmd]:# (example_connect_test.go go /func ExampleConnect_connectionPool\(\) {/ /^}/)
 ```go
 func ExampleConnect_connectionPool() {
 	var err error
@@ -112,7 +112,7 @@ func ExampleConnect_connectionPool() {
 
 To connect to a RethinkDB cluster which has multiple nodes you can use the following syntax. When connecting to a cluster with multiple nodes queries will be distributed between these nodes.
 
-[embedmd]:# (example_connect_test.go go /func ExampleConnect_cluster\(\) {/ /(?m)^}/)
+[embedmd]:# (example_connect_test.go go /func ExampleConnect_cluster\(\) {/ /^}/)
 ```go
 func ExampleConnect_cluster() {
 	var err error
