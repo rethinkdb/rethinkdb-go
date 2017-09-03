@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v3.0.3 - 2071-09-03
+
+- Added support to cancellation queries and timeouts with `context.Context` passed through `RunOpts`
+- Fixed import path for `sirupsen/logrus` due to repo was renamed
+
 ## v3.0.2 - 2017-04-16
 
 ### Changed
