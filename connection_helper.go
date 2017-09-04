@@ -45,7 +45,7 @@ func (c *Connection) writeQuery(token int64, q []byte) error {
 
 func (c *Connection) contextFromConnectionOpts() context.Context {
 	sum := c.opts.ReadTimeout + c.opts.WriteTimeout
-	if sum == 0 {
+	if c.opts.ReadTimeout == 0 || c.opts.WriteTimeout == 0 {
 		return context.Background()
 	}
 	ctx, _ := context.WithTimeout(context.Background(), sum)
