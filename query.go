@@ -259,6 +259,7 @@ type QueryExecutor interface {
 	IsConnected() bool
 	Query(context.Context, Query) (*Cursor, error)
 	Exec(context.Context, Query) error
+	Close(optArgs ...CloseOpts) error
 
 	newQuery(t Term, opts map[string]interface{}) (Query, error)
 }
