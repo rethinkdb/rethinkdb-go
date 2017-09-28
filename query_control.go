@@ -183,7 +183,7 @@ type HTTPOpts struct {
 	Reattempts   interface{} `gorethink:"reattempts,omitempty"`
 	Redirects    interface{} `gorethink:"redirect,omitempty"`
 	Verify       interface{} `gorethink:"verify,omitempty"`
-	ResultFormat interface{} `gorethink:"resul_format,omitempty"`
+	ResultFormat interface{} `gorethink:"result_format,omitempty"`
 
 	// Request Options
 	Method interface{} `gorethink:"method,omitempty"`

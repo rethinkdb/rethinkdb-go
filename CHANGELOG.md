@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v3.0.5 - 2017-09-28
+
+- Fixed typo at http opts
+
 ## v3.0.4 - 2017-09-04
 
 - Fixed default context timeout if one of config's timeout os omitted
