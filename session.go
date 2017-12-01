@@ -219,7 +219,7 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	}
 
 	if s.cluster != nil {
-		s.cluster.Close()
+		return s.cluster.Close()
 	}
 	s.cluster = nil
 	s.closed = true

@@ -3,6 +3,7 @@ package gorethink
 import (
 	"encoding/binary"
 	"golang.org/x/net/context"
+	"io"
 )
 
 // Write 'data' to conn
@@ -12,16 +13,8 @@ func (c *Connection) writeData(data []byte) error {
 	return err
 }
 
-func (c *Connection) read(buf []byte, length int) (total int, err error) {
-	var n int
-	for total < length {
-		if n, err = c.Conn.Read(buf[total:length]); err != nil {
-			break
-		}
-		total += n
-	}
-
-	return total, err
+func (c *Connection) read(buf []byte) (total int, err error) {
+	return io.ReadFull(c.Conn, buf)
 }
 
 func (c *Connection) writeQuery(token int64, q []byte) error {

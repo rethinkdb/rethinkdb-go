@@ -138,6 +138,14 @@ type RQLConnectionError struct {
 	rqlError
 }
 
+func createClientError(response *Response, term *Term) error {
+	return RQLClientError{rqlServerError{response, term}}
+}
+
+func createCompileError(response *Response, term *Term) error {
+	return RQLCompileError{rqlServerError{response, term}}
+}
+
 func createRuntimeError(errorType p.Response_ErrorType, response *Response, term *Term) error {
 	serverErr := rqlServerError{response, term}
 

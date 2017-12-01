@@ -583,8 +583,6 @@ func (c *Cursor) extendLocked(response *Response) {
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL
 	c.fetching = false
 	c.isAtom = response.Type == p.Response_SUCCESS_ATOM
-
-	putResponse(response)
 }
 
 // seekCursor takes care of loading more data if needed and applying pending skips
