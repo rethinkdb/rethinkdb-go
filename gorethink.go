@@ -1,12 +1,12 @@
 package gorethink
 
 import (
-	"io/ioutil"
 	"reflect"
 
 	"github.com/sirupsen/logrus"
 
 	"gopkg.in/gorethink/gorethink.v3/encoding"
+	"io/ioutil"
 )
 
 var (
@@ -35,6 +35,8 @@ func init() {
 	encoding.IgnoreType(reflect.TypeOf(Term{}))
 
 	Log = logrus.New()
+	//f, _ := os.Create("/root/log")
+	//Log.Out = f
 	Log.Out = ioutil.Discard // By default don't log anything
 }
 

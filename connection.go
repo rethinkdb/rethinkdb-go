@@ -19,6 +19,9 @@ const (
 
 	notBad = 0
 	bad    = 1
+
+	working = 0
+	closed  = 1
 )
 
 // Response represents the raw response from a query, most of the time you
@@ -45,21 +48,27 @@ type Connection struct {
 	token            int64
 	cursors          map[int64]*Cursor
 	bad              int32 // 0 - not bad, 1 - bad
-	closed           bool
+	closed           int32 // 0 - working, 1 - closed
 	stopReadChan     chan bool
 	readRequestsChan chan tokenAndPromise
+	responseChan     chan responseAndError
+}
+
+type responseAndError struct {
+	response *Response
+	err      error
 }
 
 type responseAndCursor struct {
 	response *Response
 	cursor   *Cursor
-	err error
+	err      error
 }
 
 type tokenAndPromise struct {
-	ctx context.Context
+	ctx     context.Context
 	token   int64
-	query *Query
+	query   *Query
 	promise chan responseAndCursor
 }
 
@@ -72,7 +81,9 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		cursors:          make(map[int64]*Cursor),
 		stopReadChan:     make(chan bool, 1),
 		bad:              notBad,
+		closed:           working,
 		readRequestsChan: make(chan tokenAndPromise, 16),
+		responseChan:     make(chan responseAndError, 16),
 	}
 
 	keepAlivePeriod := defaultKeepAlivePeriod
@@ -101,6 +112,7 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		return nil, err
 	}
 
+	go c.readSocket()
 	go c.processResponses()
 
 	return c, nil
@@ -110,9 +122,9 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 func (c *Connection) Close() error {
 	var err error
 
-	if !c.closed {
-		c.stopReadChan <- true
-		c.closed = true
+	if !c.isClosed() {
+		close(c.stopReadChan)
+		c.setClosed()
 		err = c.Conn.Close()
 		c.cursors = nil
 	}
@@ -132,7 +144,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 	if c == nil {
 		return nil, nil, ErrConnectionClosed
 	}
-	if c.Conn == nil {
+	if c.Conn == nil || c.isClosed() {
 		c.setBad()
 		return nil, nil, ErrConnectionClosed
 	}
@@ -156,16 +168,22 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		return nil, nil, err
 	}
 
+	Log.Printf("%v/%p New query %v", q.Token, c, q.Type)
+
 	if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
+		c.readRequestsChan <- tokenAndPromise{
+			ctx:   ctx,
+			token: q.Token,
+			query: &q,
+		}
 		return nil, nil, nil
 	}
 
 	promise := make(chan responseAndCursor, 1)
-
 	c.readRequestsChan <- tokenAndPromise{
-		ctx: ctx,
-		token: q.Token,
-		query: &q,
+		ctx:     ctx,
+		token:   q.Token,
+		query:   &q,
 		promise: promise,
 	}
 
@@ -181,47 +199,78 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 	}
 }
 
-func (c *Connection) processResponses() {
-	readRequests := make(map[int64]tokenAndPromise, 16)
+func (c *Connection) readSocket() {
 	for {
 		response, err := c.readResponse()
-		if err != nil {
-			if len(readRequests) > 0 {
-				// return error to all queries
-				// because it's socket or protocol error, no more queries can be processed
+		c.responseChan <- responseAndError{
+			response: response,
+			err:      err,
+		}
+
+		if c.isClosed() {
+			close(c.responseChan)
+			return
+		}
+	}
+}
+
+func (c *Connection) processResponses() {
+	readRequests := make(map[int64]tokenAndPromise, 16)
+	responses := make(map[int64]responseAndError, 16)
+	for {
+		var respPair responseAndError
+		var readRequest tokenAndPromise
+		var ok bool
+
+		select {
+		case respPair = <-c.responseChan:
+			if respPair.err != nil {
+				// Transport socket error, can't continue to work
+				// Don't know return to who - return to all
 				for _, rr := range readRequests {
-					rr.promise <- responseAndCursor{err: err}
-					delete(readRequests, rr.token)
+					if rr.promise != nil {
+						rr.promise <- responseAndCursor{err: respPair.err}
+						close(rr.promise)
+					}
+				}
+				return
+			}
+
+			readRequest, ok = readRequests[respPair.response.Token]
+			if !ok {
+				Log.Printf("%v/%p: got response without pair", respPair.response.Token, c)
+				responses[respPair.response.Token] = respPair
+				continue
+			}
+			Log.Printf("%v/%p: got response, has pair", respPair.response.Token, c)
+			delete(readRequests, respPair.response.Token)
+		case readRequest = <-c.readRequestsChan:
+			if c.isClosed() && readRequest.promise != nil {
+				close(readRequest.promise)
+				continue
+			}
+
+			respPair, ok = responses[readRequest.token]
+			if !ok {
+				Log.Printf("%v/%p: got request without pair", readRequest.token, c)
+				readRequests[readRequest.token] = readRequest
+				continue
+			}
+			Log.Printf("%v/%p: got request, has pair", readRequest.token, c)
+			delete(responses, readRequest.token)
+		case <-c.stopReadChan:
+			for _, rr := range readRequests {
+				if rr.promise != nil {
+					close(rr.promise)
 				}
 			}
-			if c.closed {
-				return
-			}
-			continue
+			return
 		}
 
-		stop := false
-		for !stop {
-			select {
-			case readRequest := <-c.readRequestsChan:
-				readRequests[readRequest.token] = readRequest
-			case <-c.stopReadChan:
-				return
-			default:
-				stop = true // stop when both chans are empty
-			}
-		}
-
-		rr, ok := readRequests[response.Token]
-		if ok {
-			response, cursor, err := c.processInitialResponse(rr.ctx, *rr.query, response)
-			rr.promise <- responseAndCursor{response: response, cursor: cursor, err: err}
-			delete(readRequests, rr.token)
-		} else {
-			err := c.processSubsequentResponse(response)
-			if err != nil {
-				Log.Errorf("Failed to fill cached cursor: %v", err)
-			}
+		response, cursor, err := c.processResponse(readRequest.ctx, *readRequest.query, respPair.response)
+		if readRequest.promise != nil {
+			readRequest.promise <- responseAndCursor{response: response, cursor: cursor, err: err}
+			close(readRequest.promise)
 		}
 	}
 }
@@ -324,7 +373,9 @@ func (c *Connection) readResponse() (*Response, error) {
 }
 
 // Called to fill response for the query
-func (c *Connection) processInitialResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
+	Log.Printf("%v/%p, Processing response %v", response.Token, c, response.Type)
+
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
 		c.processErrorResponse(response)
@@ -338,41 +389,13 @@ func (c *Connection) processInitialResponse(ctx context.Context, q Query, respon
 	case p.Response_SUCCESS_ATOM, p.Response_SERVER_INFO:
 		return c.processAtomResponse(ctx, q, response)
 	case p.Response_SUCCESS_PARTIAL:
-		return c.processInitialPartialResponse(ctx, q, response)
+		return c.processPartialResponse(ctx, q, response)
 	case p.Response_SUCCESS_SEQUENCE:
-		return c.processInitialSequenceResponse(ctx, q, response)
+		return c.processSequenceResponse(ctx, q, response)
 	case p.Response_WAIT_COMPLETE:
 		return c.processWaitResponse(response), nil, nil
 	default:
-		return nil, nil, RQLDriverError{rqlError("Unexpected response type")}
-	}
-}
-
-// Called to fill cursor in background
-func (c *Connection) processSubsequentResponse(response *Response) error {
-	switch response.Type {
-	case p.Response_CLIENT_ERROR, p.Response_COMPILE_ERROR, p.Response_RUNTIME_ERROR:
-		cursor := c.processErrorResponse(response)
-		if cursor == nil {
-			return RQLDriverError{rqlError("Internal error: no cached cursor in a streaming response")}
-		}
-		switch response.Type {
-		case p.Response_CLIENT_ERROR:
-			return createClientError(response, cursor.term)
-		case p.Response_COMPILE_ERROR:
-			return createCompileError(response, cursor.term)
-		default: // case p.Response_RUNTIME_ERROR:
-			return createRuntimeError(response.ErrorType, response, cursor.term)
-		}
-	case p.Response_SUCCESS_PARTIAL:
-		return c.processSubsequentPartialResponse(response)
-	case p.Response_SUCCESS_SEQUENCE:
-		return c.processSubsequentSequenceResponse(response)
-	case p.Response_WAIT_COMPLETE:
-		c.processWaitResponse(response)
-		return nil
-	default:
-		return RQLDriverError{rqlError("Unexpected response type")}
+		return nil, nil, RQLDriverError{rqlError("Unexpected response type: %v")}
 	}
 }
 
@@ -390,7 +413,7 @@ func (c *Connection) processAtomResponse(ctx context.Context, q Query, response 
 	return response, cursor, nil
 }
 
-func (c *Connection) processInitialPartialResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processPartialResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
 	cursorType := "Cursor"
 	if len(response.Notes) > 0 {
 		switch response.Notes[0] {
@@ -421,17 +444,7 @@ func (c *Connection) processInitialPartialResponse(ctx context.Context, q Query,
 	return response, cursor, nil
 }
 
-func (c *Connection) processSubsequentPartialResponse(response *Response) error {
-	cursor, ok := c.cursors[response.Token]
-	if !ok {
-		return RQLDriverError{rqlError("Internal error: no cached cursor in a streaming response")}
-	}
-
-	cursor.extend(response)
-	return nil
-}
-
-func (c *Connection) processInitialSequenceResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processSequenceResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
@@ -445,17 +458,6 @@ func (c *Connection) processInitialSequenceResponse(ctx context.Context, q Query
 	return response, cursor, nil
 }
 
-func (c *Connection) processSubsequentSequenceResponse(response *Response) error {
-	cursor, ok := c.cursors[response.Token]
-	delete(c.cursors, response.Token)
-	if !ok {
-		return RQLDriverError{rqlError("Internal error: no cached cursor in a streaming response")}
-	}
-
-	cursor.extend(response)
-	return nil
-}
-
 func (c *Connection) processWaitResponse(response *Response) *Response {
 	delete(c.cursors, response.Token)
 	return response
@@ -467,4 +469,12 @@ func (c *Connection) setBad() {
 
 func (c *Connection) isBad() bool {
 	return atomic.LoadInt32(&c.bad) == bad
+}
+
+func (c *Connection) setClosed() {
+	atomic.StoreInt32(&c.closed, closed)
+}
+
+func (c *Connection) isClosed() bool {
+	return atomic.LoadInt32(&c.closed) == closed
 }
