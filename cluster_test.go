@@ -31,13 +31,13 @@ func (s *RethinkSuite) TestClusterMultipleQueries(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	for i := 0; i < 1000; i++ {
-		row, err := Expr(fmt.Sprintf("Hello World", i)).Run(session)
+		row, err := Expr(fmt.Sprintf("Hello World %v", i)).Run(session)
 		c.Assert(err, test.IsNil)
 
 		var response string
 		err = row.One(&response)
 		c.Assert(err, test.IsNil)
-		c.Assert(response, test.Equals, fmt.Sprintf("Hello World", i))
+		c.Assert(response, test.Equals, fmt.Sprintf("Hello World %v", i))
 	}
 }
 
