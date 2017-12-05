@@ -126,7 +126,6 @@ func (c *Connection) Close() error {
 		close(c.stopReadChan)
 		c.setClosed()
 		err = c.Conn.Close()
-		c.cursors = nil
 	}
 
 	return err
@@ -167,8 +166,6 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 	if err != nil {
 		return nil, nil, err
 	}
-
-	Log.Printf("%v/%p New query %v", q.Token, c, q.Type)
 
 	if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
 		c.readRequestsChan <- tokenAndPromise{
@@ -215,59 +212,59 @@ func (c *Connection) readSocket() {
 }
 
 func (c *Connection) processResponses() {
-	readRequests := make(map[int64]tokenAndPromise, 16)
-	responses := make(map[int64]responseAndError, 16)
+	readRequests := make([]tokenAndPromise, 0, 16)
+	responses := make([]*Response, 0, 16)
 	for {
-		var respPair responseAndError
+		var response *Response
 		var readRequest tokenAndPromise
 		var ok bool
 
 		select {
-		case respPair = <-c.responseChan:
+		case respPair := <-c.responseChan:
 			if respPair.err != nil {
 				// Transport socket error, can't continue to work
 				// Don't know return to who - return to all
 				for _, rr := range readRequests {
-					if rr.promise != nil {
-						rr.promise <- responseAndCursor{err: respPair.err}
-						close(rr.promise)
-					}
+						if rr.promise != nil {
+							rr.promise <- responseAndCursor{err: respPair.err}
+							close(rr.promise)
+						}
 				}
+				c.cursors = nil
 				return
 			}
+			response = respPair.response
 
-			readRequest, ok = readRequests[respPair.response.Token]
+			token := respPair.response.Token
+			readRequest, ok = getReadRequest(readRequests, token)
 			if !ok {
-				Log.Printf("%v/%p: got response without pair", respPair.response.Token, c)
-				responses[respPair.response.Token] = respPair
+				responses = append(responses, respPair.response)
 				continue
 			}
-			Log.Printf("%v/%p: got response, has pair", respPair.response.Token, c)
-			delete(readRequests, respPair.response.Token)
+			readRequests = removeReadRequest(readRequests, respPair.response.Token)
 		case readRequest = <-c.readRequestsChan:
 			if c.isClosed() && readRequest.promise != nil {
 				close(readRequest.promise)
 				continue
 			}
 
-			respPair, ok = responses[readRequest.token]
+			response, ok = getResponse(responses, readRequest.token)
 			if !ok {
-				Log.Printf("%v/%p: got request without pair", readRequest.token, c)
-				readRequests[readRequest.token] = readRequest
+				readRequests = append(readRequests, readRequest)
 				continue
 			}
-			Log.Printf("%v/%p: got request, has pair", readRequest.token, c)
-			delete(responses, readRequest.token)
+			responses = removeResponse(responses, readRequest.token)
 		case <-c.stopReadChan:
 			for _, rr := range readRequests {
 				if rr.promise != nil {
 					close(rr.promise)
 				}
 			}
+			c.cursors = nil
 			return
 		}
 
-		response, cursor, err := c.processResponse(readRequest.ctx, *readRequest.query, respPair.response)
+		response, cursor, err := c.processResponse(readRequest.ctx, *readRequest.query, response)
 		if readRequest.promise != nil {
 			readRequest.promise <- responseAndCursor{response: response, cursor: cursor, err: err}
 			close(readRequest.promise)
@@ -374,18 +371,15 @@ func (c *Connection) readResponse() (*Response, error) {
 
 // Called to fill response for the query
 func (c *Connection) processResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
-	Log.Printf("%v/%p, Processing response %v", response.Token, c, response.Type)
-
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
-		c.processErrorResponse(response)
-		return response, nil, createClientError(response, q.Term)
+		return response, c.processErrorResponse(response), createClientError(response, q.Term)
 	case p.Response_COMPILE_ERROR:
 		c.processErrorResponse(response)
-		return response, nil, createCompileError(response, q.Term)
+		return response, c.processErrorResponse(response), createCompileError(response, q.Term)
 	case p.Response_RUNTIME_ERROR:
 		c.processErrorResponse(response)
-		return response, nil, createRuntimeError(response.ErrorType, response, q.Term)
+		return response, c.processErrorResponse(response), createRuntimeError(response.ErrorType, response, q.Term)
 	case p.Response_SUCCESS_ATOM, p.Response_SERVER_INFO:
 		return c.processAtomResponse(ctx, q, response)
 	case p.Response_SUCCESS_PARTIAL:
@@ -393,7 +387,7 @@ func (c *Connection) processResponse(ctx context.Context, q Query, response *Res
 	case p.Response_SUCCESS_SEQUENCE:
 		return c.processSequenceResponse(ctx, q, response)
 	case p.Response_WAIT_COMPLETE:
-		return c.processWaitResponse(response), nil, nil
+		return c.processWaitResponse(response)
 	default:
 		return nil, nil, RQLDriverError{rqlError("Unexpected response type: %v")}
 	}
@@ -458,9 +452,9 @@ func (c *Connection) processSequenceResponse(ctx context.Context, q Query, respo
 	return response, cursor, nil
 }
 
-func (c *Connection) processWaitResponse(response *Response) *Response {
+func (c *Connection) processWaitResponse(response *Response) (*Response, *Cursor, error) {
 	delete(c.cursors, response.Token)
-	return response
+	return response, nil, nil
 }
 
 func (c *Connection) setBad() {
@@ -477,4 +471,40 @@ func (c *Connection) setClosed() {
 
 func (c *Connection) isClosed() bool {
 	return atomic.LoadInt32(&c.closed) == closed
+}
+
+func getReadRequest(list []tokenAndPromise, token int64) (tokenAndPromise, bool) {
+	for _, e := range list {
+		if e.token == token {
+			return e, true
+		}
+	}
+	return tokenAndPromise{}, false
+}
+
+func getResponse(list []*Response, token int64) (*Response, bool) {
+	for _, e := range list {
+		if e.Token == token {
+			return e, true
+		}
+	}
+	return nil, false
+}
+
+func removeReadRequest(list []tokenAndPromise, token int64) []tokenAndPromise {
+	for i := range list {
+		if list[i].token == token {
+			return append(list[:i], list[i+1:]...)
+		}
+	}
+	return list
+}
+
+func removeResponse(list []*Response, token int64) []*Response {
+	for i := range list {
+		if list[i].Token == token {
+			return append(list[:i], list[i+1:]...)
+		}
+	}
+	return list
 }
