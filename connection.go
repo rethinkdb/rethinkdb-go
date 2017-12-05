@@ -11,6 +11,7 @@ import (
 
 	"golang.org/x/net/context"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	"sync"
 )
 
 const (
@@ -52,6 +53,7 @@ type Connection struct {
 	stopReadChan     chan bool
 	readRequestsChan chan tokenAndPromise
 	responseChan     chan responseAndError
+	mu               sync.Mutex
 }
 
 type responseAndError struct {
@@ -122,9 +124,12 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 func (c *Connection) Close() error {
 	var err error
 
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
 	if !c.isClosed() {
-		close(c.stopReadChan)
 		c.setClosed()
+		close(c.stopReadChan)
 		err = c.Conn.Close()
 	}
 
@@ -199,12 +204,15 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 func (c *Connection) readSocket() {
 	for {
 		response, err := c.readResponse()
-		c.responseChan <- responseAndError{
+
+		respPair := responseAndError{
 			response: response,
 			err:      err,
 		}
 
-		if c.isClosed() {
+		select {
+		case c.responseChan <- respPair:
+		case <-c.stopReadChan:
 			close(c.responseChan)
 			return
 		}
@@ -225,35 +233,35 @@ func (c *Connection) processResponses() {
 				// Transport socket error, can't continue to work
 				// Don't know return to who - return to all
 				for _, rr := range readRequests {
-						if rr.promise != nil {
-							rr.promise <- responseAndCursor{err: respPair.err}
-							close(rr.promise)
-						}
+					if rr.promise != nil {
+						rr.promise <- responseAndCursor{err: respPair.err}
+						close(rr.promise)
+					}
 				}
-				c.cursors = nil
-				return
+				c.Close()
+				continue
 			}
+			if respPair.response == nil && respPair.err == nil { // responseChan is closed
+				continue
+			}
+
 			response = respPair.response
 
-			token := respPair.response.Token
-			readRequest, ok = getReadRequest(readRequests, token)
+			readRequest, ok = getReadRequest(readRequests, respPair.response.Token)
 			if !ok {
 				responses = append(responses, respPair.response)
 				continue
 			}
 			readRequests = removeReadRequest(readRequests, respPair.response.Token)
-		case readRequest = <-c.readRequestsChan:
-			if c.isClosed() && readRequest.promise != nil {
-				close(readRequest.promise)
-				continue
-			}
 
+		case readRequest = <-c.readRequestsChan:
 			response, ok = getResponse(responses, readRequest.token)
 			if !ok {
 				readRequests = append(readRequests, readRequest)
 				continue
 			}
 			responses = removeResponse(responses, readRequest.token)
+
 		case <-c.stopReadChan:
 			for _, rr := range readRequests {
 				if rr.promise != nil {
@@ -308,9 +316,7 @@ func (c *Connection) sendQuery(q Query) error {
 	}
 
 	// Set timeout
-	if c.opts.WriteTimeout == 0 {
-		c.Conn.SetWriteDeadline(time.Time{})
-	} else {
+	if c.opts.WriteTimeout != 0 {
 		c.Conn.SetWriteDeadline(time.Now().Add(c.opts.WriteTimeout))
 	}
 
@@ -334,9 +340,7 @@ func (c *Connection) nextToken() int64 {
 // could be read then an error is returned.
 func (c *Connection) readResponse() (*Response, error) {
 	// Set timeout
-	if c.opts.ReadTimeout == 0 {
-		c.Conn.SetReadDeadline(time.Time{})
-	} else {
+	if c.opts.ReadTimeout != 0 {
 		c.Conn.SetReadDeadline(time.Now().Add(c.opts.ReadTimeout))
 	}
 
