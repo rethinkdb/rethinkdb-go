@@ -10,6 +10,7 @@ import (
 	"golang.org/x/net/context"
 	"gopkg.in/gorethink/gorethink.v3/encoding"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	"github.com/opentracing/opentracing-go"
 )
 
 var (
@@ -155,6 +156,10 @@ func (c *Cursor) Close() error {
 		if err := c.releaseConn(); err != nil {
 			return err
 		}
+	}
+
+	if span := opentracing.SpanFromContext(c.ctx); span != nil {
+		span.Finish()
 	}
 
 	c.closed = true

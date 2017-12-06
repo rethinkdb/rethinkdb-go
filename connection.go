@@ -12,6 +12,9 @@ import (
 	"golang.org/x/net/context"
 	p "gopkg.in/gorethink/gorethink.v3/ql2"
 	"sync"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
+	"github.com/opentracing/opentracing-go/log"
 )
 
 const (
@@ -69,9 +72,9 @@ type responseAndCursor struct {
 
 type tokenAndPromise struct {
 	ctx     context.Context
-	token   int64
 	query   *Query
 	promise chan responseAndCursor
+	span opentracing.Span
 }
 
 // NewConnection creates a new connection to the database server
@@ -141,16 +144,15 @@ func (c *Connection) Close() error {
 //
 // This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, error) {
-	if ctx == nil {
-		ctx = c.contextFromConnectionOpts()
-	}
-
 	if c == nil {
 		return nil, nil, ErrConnectionClosed
 	}
 	if c.Conn == nil || c.isClosed() {
 		c.setBad()
 		return nil, nil, ErrConnectionClosed
+	}
+	if ctx == nil {
+		ctx = c.contextFromConnectionOpts()
 	}
 
 	// Add token if query is a START/NOREPLY_WAIT
@@ -167,38 +169,76 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		}
 	}
 
+	var fetchingSpan opentracing.Span
+	if c.opts.UseOpentracing {
+		parentSpan := opentracing.SpanFromContext(ctx)
+		if parentSpan != nil {
+			if q.Type == p.Query_START {
+				querySpan := c.startTracingSpan(parentSpan, &q) // will be Finished when cursor closed
+				parentSpan = querySpan
+				ctx = opentracing.ContextWithSpan(ctx, querySpan)
+			}
+
+			fetchingSpan = c.startTracingSpan(parentSpan, &q) // will be Finished when response arrived
+		}
+	}
+
 	err := c.sendQuery(q)
 	if err != nil {
+		if fetchingSpan != nil {
+			ext.Error.Set(fetchingSpan, true)
+			fetchingSpan.LogFields(log.Error(err))
+			fetchingSpan.Finish()
+		}
 		return nil, nil, err
 	}
 
 	if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
-		c.readRequestsChan <- tokenAndPromise{
-			ctx:   ctx,
-			token: q.Token,
-			query: &q,
+		select {
+		case c.readRequestsChan <- tokenAndPromise{ctx: ctx, query: &q, span: fetchingSpan}:
+			return nil, nil, nil
+		case <-ctx.Done():
+			return c.stopQuery(&q)
 		}
-		return nil, nil, nil
 	}
 
 	promise := make(chan responseAndCursor, 1)
-	c.readRequestsChan <- tokenAndPromise{
-		ctx:     ctx,
-		token:   q.Token,
-		query:   &q,
-		promise: promise,
+	select {
+	case c.readRequestsChan <- tokenAndPromise{ctx: ctx, query: &q, span: fetchingSpan, promise: promise}:
+	case <-ctx.Done():
+		return c.stopQuery(&q)
 	}
 
 	select {
 	case future := <-promise:
 		return future.response, future.cursor, future.err
 	case <-ctx.Done():
-		if q.Type != p.Query_STOP {
-			stopQuery := newStopQuery(q.Token)
-			c.Query(c.contextFromConnectionOpts(), stopQuery)
-		}
-		return nil, nil, ErrQueryTimeout
+		return c.stopQuery(&q)
 	}
+}
+
+func (c *Connection) stopQuery(q *Query) (*Response, *Cursor, error) {
+	if q.Type != p.Query_STOP {
+		stopQuery := newStopQuery(q.Token)
+		c.Query(c.contextFromConnectionOpts(), stopQuery)
+	}
+	return nil, nil, ErrQueryTimeout
+}
+
+func (c* Connection) startTracingSpan(parentSpan opentracing.Span, q *Query) opentracing.Span {
+	span := parentSpan.Tracer().StartSpan(
+		"Query_"+q.Type.String(),
+		opentracing.ChildOf(parentSpan.Context()),
+		ext.SpanKindRPCClient)
+
+	ext.PeerAddress.Set(span, c.address)
+	ext.Component.Set(span, "gorethink")
+
+	if q.Type == p.Query_START {
+		span.LogFields(log.String("query", q.Term.String()))
+	}
+
+	return span
 }
 
 func (c *Connection) readSocket() {
@@ -255,12 +295,12 @@ func (c *Connection) processResponses() {
 			readRequests = removeReadRequest(readRequests, respPair.response.Token)
 
 		case readRequest = <-c.readRequestsChan:
-			response, ok = getResponse(responses, readRequest.token)
+			response, ok = getResponse(responses, readRequest.query.Token)
 			if !ok {
 				readRequests = append(readRequests, readRequest)
 				continue
 			}
-			responses = removeResponse(responses, readRequest.token)
+			responses = removeResponse(responses, readRequest.query.Token)
 
 		case <-c.stopReadChan:
 			for _, rr := range readRequests {
@@ -272,7 +312,7 @@ func (c *Connection) processResponses() {
 			return
 		}
 
-		response, cursor, err := c.processResponse(readRequest.ctx, *readRequest.query, response)
+		response, cursor, err := c.processResponse(readRequest.ctx, *readRequest.query, response, readRequest.span)
 		if readRequest.promise != nil {
 			readRequest.promise <- responseAndCursor{response: response, cursor: cursor, err: err}
 			close(readRequest.promise)
@@ -374,7 +414,17 @@ func (c *Connection) readResponse() (*Response, error) {
 }
 
 // Called to fill response for the query
-func (c *Connection) processResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
+func (c *Connection) processResponse(ctx context.Context, q Query, response *Response, span opentracing.Span) (r *Response, cur *Cursor, err error) {
+	if span != nil {
+		defer func(){
+			if err != nil {
+				ext.Error.Set(span, true)
+				span.LogFields(log.Error(err))
+			}
+			span.Finish()
+		}()
+	}
+
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
 		return response, c.processErrorResponse(response), createClientError(response, q.Term)
@@ -479,7 +529,7 @@ func (c *Connection) isClosed() bool {
 
 func getReadRequest(list []tokenAndPromise, token int64) (tokenAndPromise, bool) {
 	for _, e := range list {
-		if e.token == token {
+		if e.query.Token == token {
 			return e, true
 		}
 	}
@@ -497,7 +547,7 @@ func getResponse(list []*Response, token int64) (*Response, bool) {
 
 func removeReadRequest(list []tokenAndPromise, token int64) []tokenAndPromise {
 	for i := range list {
-		if list[i].token == token {
+		if list[i].query.Token == token {
 			return append(list[:i], list[i+1:]...)
 		}
 	}

@@ -93,6 +93,11 @@ type ConnectOpts struct {
 	// score when selecting a host. By default a value of 5 minutes is used.
 	HostDecayDuration time.Duration
 
+	// UseOpentracing is used to enable creating opentracing-go spans for queries.
+	// Each span is created as child of span from the context in `RunOpts`.
+	// This span lasts from point the query created to the point when cursor closed.
+	UseOpentracing bool
+
 	// Deprecated: This function is no longer used due to changes in the
 	// way hosts are selected.
 	NodeRefreshInterval time.Duration `gorethink:"node_refresh_interval,omitempty"`

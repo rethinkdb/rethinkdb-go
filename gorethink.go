@@ -35,8 +35,6 @@ func init() {
 	encoding.IgnoreType(reflect.TypeOf(Term{}))
 
 	Log = logrus.New()
-	//f, _ := os.Create("/root/log")
-	//Log.Out = f
 	Log.Out = ioutil.Discard // By default don't log anything
 }
 
