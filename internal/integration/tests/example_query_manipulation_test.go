@@ -1,12 +1,13 @@
-package gorethink
+package tests
 
 import (
 	"fmt"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 // Get john's age
 func ExampleTerm_Field() {
-	cur, err := DB("examples").Table("users").Get("john").Field("age").Run(session)
+	cur, err := r.DB("examples").Table("users").Get("john").Field("age").Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return

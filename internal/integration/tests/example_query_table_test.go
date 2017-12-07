@@ -1,17 +1,18 @@
-package gorethink
+package tests
 
 import (
 	"fmt"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 // Create a table named "table" with the default settings.
 func ExampleTerm_TableCreate() {
 	// Setup database
-	DB("examples").TableDrop("table").Run(session)
+	r.DB("examples").TableDrop("table").Run(session)
 
-	response, err := DB("examples").TableCreate("table").RunWrite(session)
+	response, err := r.DB("examples").TableCreate("table").RunWrite(session)
 	if err != nil {
-		Log.Fatalf("Error creating table: %s", err)
+		r.Log.Fatalf("Error creating table: %s", err)
 	}
 
 	fmt.Printf("%d table created", response.TablesCreated)
@@ -23,12 +24,12 @@ func ExampleTerm_TableCreate() {
 // Create a simple index based on the field name.
 func ExampleTerm_IndexCreate() {
 	// Setup database
-	DB("examples").TableDrop("table").Run(session)
-	DB("examples").TableCreate("table").Run(session)
+	r.DB("examples").TableDrop("table").Run(session)
+	r.DB("examples").TableCreate("table").Run(session)
 
-	response, err := DB("examples").Table("table").IndexCreate("name").RunWrite(session)
+	response, err := r.DB("examples").Table("table").IndexCreate("name").RunWrite(session)
 	if err != nil {
-		Log.Fatalf("Error creating index: %s", err)
+		r.Log.Fatalf("Error creating index: %s", err)
 	}
 
 	fmt.Printf("%d index created", response.Created)
@@ -40,14 +41,14 @@ func ExampleTerm_IndexCreate() {
 // Create a compound index based on the fields first_name and last_name.
 func ExampleTerm_IndexCreate_compound() {
 	// Setup database
-	DB("examples").TableDrop("table").Run(session)
-	DB("examples").TableCreate("table").Run(session)
+	r.DB("examples").TableDrop("table").Run(session)
+	r.DB("examples").TableCreate("table").Run(session)
 
-	response, err := DB("examples").Table("table").IndexCreateFunc("full_name", func(row Term) interface{} {
+	response, err := r.DB("examples").Table("table").IndexCreateFunc("full_name", func(row r.Term) interface{} {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(session)
 	if err != nil {
-		Log.Fatalf("Error creating index: %s", err)
+		r.Log.Fatalf("Error creating index: %s", err)
 	}
 
 	fmt.Printf("%d index created", response.Created)

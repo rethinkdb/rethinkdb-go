@@ -1,4 +1,4 @@
-package gorethink_test
+package tests
 
 import (
 	"fmt"

@@ -1,13 +1,14 @@
-package gorethink
+package tests
 
 import (
 	"fmt"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 // Find a document by ID.
 func ExampleTerm_Get() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("heroes").Get(2).Run(session)
+	res, err := r.DB("examples").Table("heroes").Get(2).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -33,7 +34,7 @@ func ExampleTerm_Get() {
 // Find a document by ID.
 func ExampleTerm_GetAll() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("heroes").GetAll(2).Run(session)
+	res, err := r.DB("examples").Table("heroes").GetAll(2).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -59,7 +60,7 @@ func ExampleTerm_GetAll() {
 // Find a document by ID.
 func ExampleTerm_GetAll_multiple() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("heroes").GetAll(1, 2).Run(session)
+	res, err := r.DB("examples").Table("heroes").GetAll(1, 2).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -80,7 +81,7 @@ func ExampleTerm_GetAll_multiple() {
 // Find all document with an indexed value.
 func ExampleTerm_GetAll_optArgs() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(GetAllOpts{
+	res, err := r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
 		Index: "code_name",
 	}).Run(session)
 	if err != nil {
@@ -108,7 +109,7 @@ func ExampleTerm_GetAll_optArgs() {
 // Find all document with an indexed value.
 func ExampleTerm_GetAllByIndex() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("heroes").GetAllByIndex("code_name", "man_of_steel").Run(session)
+	res, err := r.DB("examples").Table("heroes").GetAllByIndex("code_name", "man_of_steel").Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -134,7 +135,7 @@ func ExampleTerm_GetAllByIndex() {
 // Find a document and merge another document with it.
 func ExampleTerm_Get_merge() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("heroes").Get(4).Merge(map[string]interface{}{
+	res, err := r.DB("examples").Table("heroes").Get(4).Merge(map[string]interface{}{
 		"powers": []string{"speed"},
 	}).Run(session)
 	if err != nil {
@@ -162,7 +163,7 @@ func ExampleTerm_Get_merge() {
 // Get all users who are 30 years old.
 func ExampleTerm_Filter() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("users").Filter(map[string]interface{}{
+	res, err := r.DB("examples").Table("users").Filter(map[string]interface{}{
 		"age": 30,
 	}).Run(session)
 	if err != nil {
@@ -186,7 +187,7 @@ func ExampleTerm_Filter() {
 // Get all users who are more than 25 years old.
 func ExampleTerm_Filter_row() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("users").Filter(Row.Field("age").Gt(25)).Run(session)
+	res, err := r.DB("examples").Table("users").Filter(r.Row.Field("age").Gt(25)).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -208,7 +209,7 @@ func ExampleTerm_Filter_row() {
 // Retrieve all users who have a gmail account (whose field email ends with @gmail.com).
 func ExampleTerm_Filter_function() {
 	// Fetch the row from the database
-	res, err := DB("examples").Table("users").Filter(func(user Term) Term {
+	res, err := r.DB("examples").Table("users").Filter(func(user r.Term) r.Term {
 		return user.Field("email").Match("@gmail.com$")
 	}).Run(session)
 	if err != nil {

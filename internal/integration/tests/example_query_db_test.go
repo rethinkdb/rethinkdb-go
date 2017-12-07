@@ -1,12 +1,13 @@
-package gorethink
+package tests
 
 import (
 	"fmt"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 // Create a database named ’superheroes’.
 func ExampleDBCreate() {
-	resp, err := DBCreate("superheroes").RunWrite(session)
+	resp, err := r.DBCreate("superheroes").RunWrite(session)
 	if err != nil {
 		fmt.Print(err)
 	}
@@ -19,11 +20,11 @@ func ExampleDBCreate() {
 // Drop a database named ‘superheroes’.
 func ExampleDBDrop() {
 	// Setup database + tables
-	DBCreate("superheroes").Exec(session)
-	DB("superheroes").TableCreate("superheroes").Exec(session)
-	DB("superheroes").TableCreate("battles").Exec(session)
+	r.DBCreate("superheroes").Exec(session)
+	r.DB("superheroes").TableCreate("superheroes").Exec(session)
+	r.DB("superheroes").TableCreate("battles").Exec(session)
 
-	resp, err := DBDrop("superheroes").RunWrite(session)
+	resp, err := r.DBDrop("superheroes").RunWrite(session)
 	if err != nil {
 		fmt.Print(err)
 	}

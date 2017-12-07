@@ -1,4 +1,4 @@
-package gorethink_test
+package tests
 
 import (
 	"log"
@@ -7,22 +7,22 @@ import (
 	r "gopkg.in/gorethink/gorethink.v3"
 )
 
-var session *r.Session
-var url string
+var sessionEx *r.Session
+var urlEx string
 
 func init() {
 	// If the test is being run by wercker look for the rethink url
-	url = os.Getenv("RETHINKDB_URL")
-	if url == "" {
-		url = "localhost:28015"
+	urlEx = os.Getenv("RETHINKDB_URL")
+	if urlEx == "" {
+		urlEx = "localhost:28015"
 	}
 }
 
 func ExampleConnect() {
 	var err error
 
-	session, err = r.Connect(r.ConnectOpts{
-		Address: url,
+	sessionEx, err = r.Connect(r.ConnectOpts{
+		Address: urlEx,
 	})
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -32,8 +32,8 @@ func ExampleConnect() {
 func ExampleConnect_connectionPool() {
 	var err error
 
-	session, err = r.Connect(r.ConnectOpts{
-		Address:    url,
+	sessionEx, err = r.Connect(r.ConnectOpts{
+		Address:    urlEx,
 		InitialCap: 10,
 		MaxOpen:    10,
 	})
@@ -45,8 +45,8 @@ func ExampleConnect_connectionPool() {
 func ExampleConnect_cluster() {
 	var err error
 
-	session, err = r.Connect(r.ConnectOpts{
-		Addresses: []string{url},
+	sessionEx, err = r.Connect(r.ConnectOpts{
+		Addresses: []string{urlEx},
 		//  Addresses: []string{url1, url2, url3, ...},
 	})
 	if err != nil {

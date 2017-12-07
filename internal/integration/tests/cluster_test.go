@@ -1,6 +1,6 @@
 // +build cluster
 
-package gorethink
+package tests
 
 import (
 	"fmt"

@@ -1,12 +1,13 @@
-package gorethink
+package tests
 
 import (
 	"fmt"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 // Group games by player.
 func ExampleTerm_Group() {
-	cur, err := DB("examples").Table("games").Group("player").Run(session)
+	cur, err := r.DB("examples").Table("games").Group("player").Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -24,7 +25,7 @@ func ExampleTerm_Group() {
 
 // Group games by the index type.
 func ExampleTerm_GroupByIndex() {
-	cur, err := DB("examples").Table("games").GroupByIndex("type").Run(session)
+	cur, err := r.DB("examples").Table("games").GroupByIndex("type").Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -49,7 +50,7 @@ func ExampleTerm_GroupByIndex() {
 //   ]
 // Using MultiGroup we can group data by match A, B or C.
 func ExampleTerm_MultiGroup() {
-	cur, err := DB("examples").Table("games2").MultiGroup(Row.Field("matches").Keys()).Run(session)
+	cur, err := r.DB("examples").Table("games2").MultiGroup(r.Row.Field("matches").Keys()).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -67,7 +68,7 @@ func ExampleTerm_MultiGroup() {
 
 // Ungrouping grouped data.
 func ExampleTerm_Ungroup() {
-	cur, err := DB("examples").Table("games").
+	cur, err := r.DB("examples").Table("games").
 		Group("player").
 		Max("points").Field("points").
 		Ungroup().
@@ -89,11 +90,11 @@ func ExampleTerm_Ungroup() {
 
 // Return the number of documents in the table posts.
 func ExampleTerm_Reduce() {
-	cur, err := DB("examples").Table("posts").
-		Map(func(doc Term) interface{} {
+	cur, err := r.DB("examples").Table("posts").
+		Map(func(doc r.Term) interface{} {
 			return 1
 		}).
-		Reduce(func(left, right Term) interface{} {
+		Reduce(func(left, right r.Term) interface{} {
 			return left.Add(right)
 		}).
 		Run(session)
@@ -114,8 +115,8 @@ func ExampleTerm_Reduce() {
 
 // Concatenate words from a list.
 func ExampleTerm_Fold() {
-	cur, err := Expr([]string{"a", "b", "c"}).Fold("", func(acc, word Term) Term {
-		return acc.Add(Branch(acc.Eq(""), "", ", ")).Add(word)
+	cur, err := r.Expr([]string{"a", "b", "c"}).Fold("", func(acc, word r.Term) r.Term {
+		return acc.Add(r.Branch(acc.Eq(""), "", ", ")).Add(word)
 	}).Run(session)
 	if err != nil {
 		fmt.Print(err)

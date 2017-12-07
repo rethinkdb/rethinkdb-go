@@ -1,19 +1,20 @@
-package gorethink
+package tests
 
 import (
 	"os"
 	"time"
 
 	test "gopkg.in/check.v1"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 func (s *RethinkSuite) TestSessionConnect(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	c.Assert(err, test.IsNil)
 
-	row, err := Expr("Hello World").Run(session)
+	row, err := r.Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 
 	var response string
@@ -23,13 +24,13 @@ func (s *RethinkSuite) TestSessionConnect(c *test.C) {
 }
 
 func (s *RethinkSuite) TestSessionConnectHandshakeV1_0(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address:          url,
-		HandshakeVersion: HandshakeV1_0,
+		HandshakeVersion: r.HandshakeV1_0,
 	})
 	c.Assert(err, test.IsNil)
 
-	row, err := Expr("Hello World").Run(session)
+	row, err := r.Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 
 	var response string
@@ -39,13 +40,13 @@ func (s *RethinkSuite) TestSessionConnectHandshakeV1_0(c *test.C) {
 }
 
 func (s *RethinkSuite) TestSessionConnectHandshakeV0_4(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address:          url,
-		HandshakeVersion: HandshakeV0_4,
+		HandshakeVersion: r.HandshakeV0_4,
 	})
 	c.Assert(err, test.IsNil)
 
-	row, err := Expr("Hello World").Run(session)
+	row, err := r.Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 
 	var response string
@@ -55,12 +56,12 @@ func (s *RethinkSuite) TestSessionConnectHandshakeV0_4(c *test.C) {
 }
 
 func (s *RethinkSuite) TestSessionReconnect(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	c.Assert(err, test.IsNil)
 
-	row, err := Expr("Hello World").Run(session)
+	row, err := r.Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 
 	var response string
@@ -71,7 +72,7 @@ func (s *RethinkSuite) TestSessionReconnect(c *test.C) {
 	err = session.Reconnect()
 	c.Assert(err, test.IsNil)
 
-	row, err = Expr("Hello World 2").Run(session)
+	row, err = r.Expr("Hello World 2").Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = row.One(&response)
@@ -81,33 +82,33 @@ func (s *RethinkSuite) TestSessionReconnect(c *test.C) {
 
 func (s *RethinkSuite) TestSessionConnectError(c *test.C) {
 	var err error
-	_, err = Connect(ConnectOpts{
+	_, err = r.Connect(r.ConnectOpts{
 		Address: "nonexistanturl",
 		Timeout: time.Second,
 	})
 
 	c.Assert(err, test.NotNil)
-	c.Assert(err, test.FitsTypeOf, RQLConnectionError{})
+	c.Assert(err, test.FitsTypeOf, r.RQLConnectionError{})
 }
 
 func (s *RethinkSuite) TestSessionClose(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	c.Assert(err, test.IsNil)
 
-	_, err = Expr("Hello World").Run(session)
+	_, err = r.Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 
 	err = session.Close()
 	c.Assert(err, test.IsNil)
 
-	_, err = Expr("Hello World").Run(session)
+	_, err = r.Expr("Hello World").Run(session)
 	c.Assert(err, test.NotNil)
 }
 
 func (s *RethinkSuite) TestSessionServer(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	c.Assert(err, test.IsNil)
@@ -120,7 +121,7 @@ func (s *RethinkSuite) TestSessionServer(c *test.C) {
 }
 
 func (s *RethinkSuite) TestSessionConnectDatabase(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address:  url,
 		AuthKey:  os.Getenv("RETHINKDB_AUTHKEY"),
 		Database: "test2",
@@ -128,7 +129,7 @@ func (s *RethinkSuite) TestSessionConnectDatabase(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(session.Database(), test.Equals, "test2")
 
-	_, err = Table("test2").Run(session)
+	_, err = r.Table("test2").Run(session)
 	c.Assert(err, test.NotNil)
 	c.Assert(err.Error(), test.Equals, "gorethink: Database `test2` does not exist. in:\nr.Table(\"test2\")")
 
@@ -137,23 +138,23 @@ func (s *RethinkSuite) TestSessionConnectDatabase(c *test.C) {
 }
 
 func (s *RethinkSuite) TestSessionConnectUsername(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	c.Assert(err, test.IsNil)
 
-	DB("rethinkdb").Table("users").Insert(map[string]string{
+	r.DB("rethinkdb").Table("users").Insert(map[string]string{
 		"id":       "gorethink_test",
 		"password": "password",
 	}).Exec(session)
 
-	session, err = Connect(ConnectOpts{
+	session, err = r.Connect(r.ConnectOpts{
 		Address:  url,
 		Username: "gorethink_test",
 		Password: "password",
 	})
 	c.Assert(err, test.IsNil)
 
-	_, err = Expr("Hello World").Run(session)
+	_, err = r.Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 }

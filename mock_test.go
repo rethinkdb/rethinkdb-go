@@ -4,9 +4,18 @@ import (
 	"fmt"
 
 	test "gopkg.in/check.v1"
+	"testing"
+	"gopkg.in/gorethink/gorethink.v3/internal/integration/tests"
 )
 
-func (s *RethinkSuite) TestMockExecSuccess(c *test.C) {
+// Hook up gocheck into the gotest runner.
+func Test(t *testing.T) { test.TestingT(t) }
+
+type MockSuite struct{}
+
+var _ = test.Suite(&MockSuite{})
+
+func (s *MockSuite) TestMockExecSuccess(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test").Insert(map[string]string{
 		"id": "mocked",
@@ -19,7 +28,7 @@ func (s *RethinkSuite) TestMockExecSuccess(c *test.C) {
 	mock.AssertExpectations(c)
 }
 
-func (s *RethinkSuite) TestMockExecFail(c *test.C) {
+func (s *MockSuite) TestMockExecFail(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test").Insert(map[string]string{
 		"id": "mocked",
@@ -32,7 +41,7 @@ func (s *RethinkSuite) TestMockExecFail(c *test.C) {
 	mock.AssertExpectations(c)
 }
 
-func (s *RethinkSuite) TestMockRunSuccessSingleResult(c *test.C) {
+func (s *MockSuite) TestMockRunSuccessSingleResult(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test").Get("mocked")).Return(map[string]interface{}{
 		"id": "mocked",
@@ -45,13 +54,13 @@ func (s *RethinkSuite) TestMockRunSuccessSingleResult(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, map[string]interface{}{"id": "mocked"})
+	c.Assert(response, tests.JsonEquals, map[string]interface{}{"id": "mocked"})
 	mock.AssertExpectations(c)
 
 	res.Close()
 }
 
-func (s *RethinkSuite) TestMockRunSuccessMultipleResults(c *test.C) {
+func (s *MockSuite) TestMockRunSuccessMultipleResults(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test")).Return([]interface{}{
 		map[string]interface{}{"id": "mocked"},
@@ -64,13 +73,13 @@ func (s *RethinkSuite) TestMockRunSuccessMultipleResults(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, []interface{}{map[string]interface{}{"id": "mocked"}})
+	c.Assert(response, tests.JsonEquals, []interface{}{map[string]interface{}{"id": "mocked"}})
 	mock.AssertExpectations(c)
 
 	res.Close()
 }
 
-func (s *RethinkSuite) TestMockRunSuccessMultipleResults_type(c *test.C) {
+func (s *MockSuite) TestMockRunSuccessMultipleResults_type(c *test.C) {
 	type document struct {
 		Id string
 	}
@@ -87,13 +96,13 @@ func (s *RethinkSuite) TestMockRunSuccessMultipleResults_type(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, []document{document{"mocked"}})
+	c.Assert(response, tests.JsonEquals, []document{document{"mocked"}})
 	mock.AssertExpectations(c)
 
 	res.Close()
 }
 
-func (s *RethinkSuite) TestMockRunMissingMock(c *test.C) {
+func (s *MockSuite) TestMockRunMissingMock(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test")).Return([]interface{}{
 		map[string]interface{}{"id": "mocked"},
@@ -107,7 +116,7 @@ func (s *RethinkSuite) TestMockRunMissingMock(c *test.C) {
 	mock.AssertExpectations(c)
 }
 
-func (s *RethinkSuite) TestMockRunMissingQuery(c *test.C) {
+func (s *MockSuite) TestMockRunMissingQuery(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test")).Return([]interface{}{
 		map[string]interface{}{"id": "mocked"},
@@ -121,7 +130,7 @@ func (s *RethinkSuite) TestMockRunMissingQuery(c *test.C) {
 	c.Assert(t.Failed(), test.Equals, true)
 }
 
-func (s *RethinkSuite) TestMockRunMissingQuerySingle(c *test.C) {
+func (s *MockSuite) TestMockRunMissingQuerySingle(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test")).Return([]interface{}{
 		map[string]interface{}{"id": "mocked"},
@@ -133,7 +142,7 @@ func (s *RethinkSuite) TestMockRunMissingQuerySingle(c *test.C) {
 	c.Assert(t.Failed(), test.Equals, true)
 }
 
-func (s *RethinkSuite) TestMockRunMissingQueryMultiple(c *test.C) {
+func (s *MockSuite) TestMockRunMissingQueryMultiple(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test")).Return([]interface{}{
 		map[string]interface{}{"id": "mocked"},
@@ -147,7 +156,7 @@ func (s *RethinkSuite) TestMockRunMissingQueryMultiple(c *test.C) {
 	c.Assert(t.Failed(), test.Equals, true)
 }
 
-func (s *RethinkSuite) TestMockRunMutlipleQueries(c *test.C) {
+func (s *MockSuite) TestMockRunMutlipleQueries(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test").Get("mocked1")).Return(map[string]interface{}{
 		"id": "mocked1",
@@ -165,7 +174,7 @@ func (s *RethinkSuite) TestMockRunMutlipleQueries(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, map[string]interface{}{"id": "mocked1"})
+	c.Assert(response, tests.JsonEquals, map[string]interface{}{"id": "mocked1"})
 
 	// Query 2
 	res, err = DB("test").Table("test").Get("mocked1").Run(mock)
@@ -174,7 +183,7 @@ func (s *RethinkSuite) TestMockRunMutlipleQueries(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, map[string]interface{}{"id": "mocked1"})
+	c.Assert(response, tests.JsonEquals, map[string]interface{}{"id": "mocked1"})
 
 	// Query 3
 	res, err = DB("test").Table("test").Get("mocked2").Run(mock)
@@ -183,12 +192,12 @@ func (s *RethinkSuite) TestMockRunMutlipleQueries(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, map[string]interface{}{"id": "mocked2"})
+	c.Assert(response, tests.JsonEquals, map[string]interface{}{"id": "mocked2"})
 
 	mock.AssertExpectations(c)
 }
 
-func (s *RethinkSuite) TestMockQueriesWithFuncs(c *test.C) {
+func (s *MockSuite) TestMockQueriesWithFuncs(c *test.C) {
 	mock := NewMock()
 	mock.On(Expr([]int{2}).Map(func(row Term) interface{} {
 		return row.Add(1)
@@ -211,7 +220,7 @@ func (s *RethinkSuite) TestMockQueriesWithFuncs(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, []int{3})
+	c.Assert(response, tests.JsonEquals, []int{3})
 
 	// Query 2
 	res, err = Expr([]int{2}).Map(func(row Term) interface{} {
@@ -222,7 +231,7 @@ func (s *RethinkSuite) TestMockQueriesWithFuncs(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, []int{3})
+	c.Assert(response, tests.JsonEquals, []int{3})
 
 	// Query 3
 	res, err = Expr([]int{4}).Map(func(row1, row2 Term) interface{} {
@@ -233,7 +242,7 @@ func (s *RethinkSuite) TestMockQueriesWithFuncs(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, []int{5})
+	c.Assert(response, tests.JsonEquals, []int{5})
 
 	// Query 5
 	res, err = Expr([]int{9}).Map(func(row1, row2 Term) interface{} {
@@ -244,12 +253,12 @@ func (s *RethinkSuite) TestMockQueriesWithFuncs(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, []int{10})
+	c.Assert(response, tests.JsonEquals, []int{10})
 
 	mock.AssertExpectations(c)
 }
 
-func (s *RethinkSuite) TestMockAnything(c *test.C) {
+func (s *MockSuite) TestMockAnything(c *test.C) {
 	mock := NewMock()
 	mock.On(MockAnything()).Return("okay", nil).Times(1)
 	mock.On(Table("test").MockAnything()).Return("okay2", nil).Times(1)
@@ -267,7 +276,7 @@ func (s *RethinkSuite) TestMockAnything(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, "okay")
+	c.Assert(response, tests.JsonEquals, "okay")
 
 	// Query 2
 	res, err = Table("test").Get("mocked1").Run(mock)
@@ -276,7 +285,7 @@ func (s *RethinkSuite) TestMockAnything(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, "okay2")
+	c.Assert(response, tests.JsonEquals, "okay2")
 
 	// Query 3
 	res, err = Table("test").Insert(map[string]interface{}{
@@ -287,7 +296,7 @@ func (s *RethinkSuite) TestMockAnything(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, "okay3")
+	c.Assert(response, tests.JsonEquals, "okay3")
 
 	// Query 3
 	res, err = Expr([]interface{}{1, 2, 3}).Run(mock)
@@ -296,7 +305,7 @@ func (s *RethinkSuite) TestMockAnything(c *test.C) {
 	err = res.One(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, jsonEquals, "okay4")
+	c.Assert(response, tests.JsonEquals, "okay4")
 
 	mock.AssertExpectations(c)
 }

@@ -1,12 +1,13 @@
-package gorethink
+package tests
 
 import (
 	"fmt"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 // Return the first five squares.
 func ExampleTerm_Map() {
-	cur, err := Expr([]int{1, 2, 3, 4, 5}).Map(func(val Term) Term {
+	cur, err := r.Expr([]int{1, 2, 3, 4, 5}).Map(func(val r.Term) r.Term {
 		return val.Mul(val)
 	}).Run(session)
 	if err != nil {
@@ -33,7 +34,7 @@ func ExampleMap_multipleSequences() {
 	var sequence2 = []int{10, 20, 30, 40}
 	var sequence3 = []int{1, 2, 3, 4}
 
-	cur, err := Map(sequence1, sequence2, sequence3, func(val1, val2, val3 Term) Term {
+	cur, err := r.Map(sequence1, sequence2, sequence3, func(val1, val2, val3 r.Term) r.Term {
 		return val1.Add(val2).Add(val3)
 	}).Run(session)
 	if err != nil {
@@ -56,7 +57,7 @@ func ExampleMap_multipleSequences() {
 
 // Order all the posts using the index date.
 func ExampleTerm_OrderBy_index() {
-	cur, err := DB("examples").Table("posts").OrderBy(OrderByOpts{
+	cur, err := r.DB("examples").Table("posts").OrderBy(r.OrderByOpts{
 		Index: "date",
 	}).Run(session)
 	if err != nil {
@@ -76,8 +77,8 @@ func ExampleTerm_OrderBy_index() {
 
 // Order all the posts using the index date in descending order.
 func ExampleTerm_OrderBy_indexDesc() {
-	cur, err := DB("examples").Table("posts").OrderBy(OrderByOpts{
-		Index: Desc("date"),
+	cur, err := r.DB("examples").Table("posts").OrderBy(r.OrderByOpts{
+		Index: r.Desc("date"),
 	}).Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -97,8 +98,8 @@ func ExampleTerm_OrderBy_indexDesc() {
 // You can efficiently order using multiple fields by using a compound index.
 // For example order by date and title.
 func ExampleTerm_OrderBy_compound() {
-	cur, err := DB("examples").Table("posts").OrderBy(OrderByOpts{
-		Index: Desc("dateAndTitle"),
+	cur, err := r.DB("examples").Table("posts").OrderBy(r.OrderByOpts{
+		Index: r.Desc("dateAndTitle"),
 	}).Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -118,9 +119,9 @@ func ExampleTerm_OrderBy_compound() {
 // If you have a sequence with fewer documents than the arrayLimit, you can order
 // it by multiple fields without an index.
 func ExampleTerm_OrderBy_multiple() {
-	cur, err := DB("examples").Table("posts").OrderBy(
+	cur, err := r.DB("examples").Table("posts").OrderBy(
 		"title",
-		OrderByOpts{Index: Desc("date")},
+		r.OrderByOpts{Index: r.Desc("date")},
 	).Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -141,9 +142,9 @@ func ExampleTerm_OrderBy_multiple() {
 // query orders posts by date, and if multiple posts were published on the same
 // date, they will be ordered by title.
 func ExampleTerm_OrderBy_multipleWithIndex() {
-	cur, err := DB("examples").Table("posts").OrderBy(
+	cur, err := r.DB("examples").Table("posts").OrderBy(
 		"title",
-		OrderByOpts{Index: Desc("date")},
+		r.OrderByOpts{Index: r.Desc("date")},
 	).Run(session)
 	if err != nil {
 		fmt.Print(err)

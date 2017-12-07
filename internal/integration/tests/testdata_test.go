@@ -1,41 +1,43 @@
-package gorethink
+package tests
+
+import (r "gopkg.in/gorethink/gorethink.v3")
 
 func setupTestData() {
 	if *testdata {
 		// Delete any preexisting databases
-		DBDrop("test").Exec(session)
-		DBDrop("examples").Exec(session)
-		DBDrop("superheroes").Exec(session)
+		r.DBDrop("test").Exec(session)
+		r.DBDrop("examples").Exec(session)
+		r.DBDrop("superheroes").Exec(session)
 
-		DBCreate("test").Exec(session)
-		DBCreate("examples").Exec(session)
+		r.DBCreate("test").Exec(session)
+		r.DBCreate("examples").Exec(session)
 
-		DB("test").TableCreate("test").Exec(session)
-		DB("test").TableCreate("test2").Exec(session)
-		DB("test").TableCreate("changes").Exec(session)
+		r.DB("test").TableCreate("test").Exec(session)
+		r.DB("test").TableCreate("test2").Exec(session)
+		r.DB("test").TableCreate("changes").Exec(session)
 
-		DB("examples").TableCreate("posts").Exec(session)
-		DB("examples").TableCreate("heroes").Exec(session)
-		DB("examples").TableCreate("users").Exec(session)
-		DB("examples").TableCreate("games").Exec(session)
-		DB("examples").TableCreate("games2").Exec(session)
-		DB("examples").TableCreate("marvel").Exec(session)
+		r.DB("examples").TableCreate("posts").Exec(session)
+		r.DB("examples").TableCreate("heroes").Exec(session)
+		r.DB("examples").TableCreate("users").Exec(session)
+		r.DB("examples").TableCreate("games").Exec(session)
+		r.DB("examples").TableCreate("games2").Exec(session)
+		r.DB("examples").TableCreate("marvel").Exec(session)
 
-		DB("examples").Table("posts").IndexCreate("date").Exec(session)
-		DB("examples").Table("posts").IndexWait().Exec(session)
-		DB("examples").Table("posts").IndexCreateFunc(
+		r.DB("examples").Table("posts").IndexCreate("date").Exec(session)
+		r.DB("examples").Table("posts").IndexWait().Exec(session)
+		r.DB("examples").Table("posts").IndexCreateFunc(
 			"dateAndTitle",
-			[]interface{}{Row.Field("date"), Row.Field("title")},
+			[]interface{}{r.Row.Field("date"), r.Row.Field("title")},
 		).Exec(session)
 
-		DB("examples").Table("heroes").IndexCreate("code_name").Exec(session)
-		DB("examples").Table("heroes").IndexWait().Exec(session)
+		r.DB("examples").Table("heroes").IndexCreate("code_name").Exec(session)
+		r.DB("examples").Table("heroes").IndexWait().Exec(session)
 
-		DB("examples").Table("games").IndexCreate("type").Exec(session)
-		DB("examples").Table("games").IndexWait().Exec(session)
+		r.DB("examples").Table("games").IndexCreate("type").Exec(session)
+		r.DB("examples").Table("games").IndexWait().Exec(session)
 
 		// Create heroes table
-		DB("examples").Table("heroes").Insert([]interface{}{
+		r.DB("examples").Table("heroes").Insert([]interface{}{
 			map[string]interface{}{
 				"id":        1,
 				"code_name": "batman",
@@ -59,7 +61,7 @@ func setupTestData() {
 		}).Exec(session)
 
 		// Create users table
-		DB("examples").Table("users").Insert([]interface{}{
+		r.DB("examples").Table("users").Insert([]interface{}{
 			map[string]interface{}{
 				"id":    "william",
 				"email": "william@rethinkdb.com",
@@ -93,7 +95,7 @@ func setupTestData() {
 		}).Exec(session)
 
 		// Create games table
-		DB("examples").Table("games").Insert([]interface{}{
+		r.DB("examples").Table("games").Insert([]interface{}{
 			map[string]interface{}{"id": 2, "player": "Bob", "points": 15, "type": "ranked"},
 			map[string]interface{}{"id": 5, "player": "Alice", "points": 7, "type": "free"},
 			map[string]interface{}{"id": 11, "player": "Bob", "points": 10, "type": "free"},
@@ -101,14 +103,14 @@ func setupTestData() {
 		}).Exec(session)
 
 		// Create games2 table
-		DB("examples").Table("games2").Insert([]interface{}{
+		r.DB("examples").Table("games2").Insert([]interface{}{
 			map[string]interface{}{"id": 1, "matches": map[string]interface{}{"a": []int{1, 2, 3}, "b": []int{4, 5, 6}}},
 			map[string]interface{}{"id": 2, "matches": map[string]interface{}{"b": []int{100}, "c": []int{7, 8, 9}}},
 			map[string]interface{}{"id": 3, "matches": map[string]interface{}{"a": []int{10, 20}, "c": []int{70, 80}}},
 		}).Exec(session)
 
 		// Create marvel table
-		DB("examples").Table("marvel").Insert([]interface{}{
+		r.DB("examples").Table("marvel").Insert([]interface{}{
 			map[string]interface{}{"name": "Iron Man", "victories": 214},
 			map[string]interface{}{"name": "Jubilee", "victories": 9},
 		}).Exec(session)

@@ -1,4 +1,4 @@
-package gorethink
+package tests
 
 import (
 	"encoding/json"
@@ -25,10 +25,10 @@ func (j jsonChecker) Check(params []interface{}, names []string) (result bool, e
 	return test.DeepEquals.Check(jsonParams, names)
 }
 
-// jsonEquals compares two interface{} objects by converting them to JSON and
+// JsonEquals compares two interface{} objects by converting them to JSON and
 // seeing if the strings match
-var jsonEquals = &jsonChecker{
-	&test.CheckerInfo{Name: "jsonEquals", Params: []string{"obtained", "expected"}},
+var JsonEquals = &jsonChecker{
+	&test.CheckerInfo{Name: "JsonEquals", Params: []string{"obtained", "expected"}},
 }
 
 type geometryChecker struct {

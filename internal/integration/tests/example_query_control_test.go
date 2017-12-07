@@ -1,15 +1,16 @@
-package gorethink
+package tests
 
 import (
 	"fmt"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
 // Return heroes and superheroes.
 func ExampleBranch() {
-	cur, err := DB("examples").Table("marvel").OrderBy("name").Map(Branch(
-		Row.Field("victories").Gt(100),
-		Row.Field("name").Add(" is a superhero"),
-		Row.Field("name").Add(" is a hero"),
+	cur, err := r.DB("examples").Table("marvel").OrderBy("name").Map(r.Branch(
+		r.Row.Field("victories").Gt(100),
+		r.Row.Field("name").Add(" is a superhero"),
+		r.Row.Field("name").Add(" is a hero"),
 	)).Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -34,7 +35,7 @@ func ExampleBranch() {
 
 // Return an error
 func ExampleError() {
-	err := Error("this is a runtime error").Exec(session)
+	err := r.Error("this is a runtime error").Exec(session)
 	fmt.Println(err)
 }
 
@@ -42,9 +43,9 @@ func ExampleError() {
 // case where the author field is missing or null, we want to retrieve the
 // string "Anonymous".
 func ExampleTerm_Default() {
-	cur, err := DB("examples").Table("posts").Map(map[string]interface{}{
-		"title":  Row.Field("title"),
-		"author": Row.Field("author").Default("Anonymous"),
+	cur, err := r.DB("examples").Table("posts").Map(map[string]interface{}{
+		"title":  r.Row.Field("title"),
+		"author": r.Row.Field("author").Default("Anonymous"),
 	}).Run(session)
 	if err != nil {
 		fmt.Print(err)
@@ -63,7 +64,7 @@ func ExampleTerm_Default() {
 
 // Convert a Go integer to a ReQL object
 func ExampleExpr_int() {
-	cur, err := Expr(1).Run(session)
+	cur, err := r.Expr(1).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -83,7 +84,7 @@ func ExampleExpr_int() {
 
 // Convert a Go slice to a ReQL object
 func ExampleExpr_slice() {
-	cur, err := Expr([]int{1, 2, 3}).Run(session)
+	cur, err := r.Expr([]int{1, 2, 3}).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return
@@ -108,7 +109,7 @@ func ExampleExpr_slice() {
 
 // Convert a Go slice to a ReQL object
 func ExampleExpr_map() {
-	cur, err := Expr(map[string]interface{}{
+	cur, err := r.Expr(map[string]interface{}{
 		"a": 1,
 		"b": "b",
 	}).Run(session)
@@ -151,7 +152,7 @@ func ExampleExpr_struct() {
 		Nested ExampleTypeNested
 	}
 
-	cur, err := Expr(ExampleTypeA{
+	cur, err := r.Expr(ExampleTypeA{
 		A: 1,
 		B: "b",
 		ExampleTypeEmbed: ExampleTypeEmbed{
@@ -194,7 +195,7 @@ func ExampleExpr_structTags() {
 		B string `gorethink:"field_b"`
 	}
 
-	cur, err := Expr(ExampleType{
+	cur, err := r.Expr(ExampleType{
 		A: 1,
 		B: "b",
 	}).Run(session)
@@ -221,7 +222,7 @@ func ExampleExpr_structTags() {
 
 // Execute a raw JSON query
 func ExampleRawQuery() {
-	cur, err := RawQuery([]byte(`"hello world"`)).Run(session)
+	cur, err := r.RawQuery([]byte(`"hello world"`)).Run(session)
 	if err != nil {
 		fmt.Print(err)
 		return

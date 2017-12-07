@@ -1,7 +1,7 @@
 // +build cluster
 // +build integration
 
-package gorethink
+package tests
 
 import (
 	"time"

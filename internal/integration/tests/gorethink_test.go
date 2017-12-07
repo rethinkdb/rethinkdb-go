@@ -1,4 +1,4 @@
-package gorethink
+package tests
 
 import (
 	"encoding/json"
@@ -10,15 +10,16 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
+	r "gopkg.in/gorethink/gorethink.v3"
 )
 
-var session *Session
+var session *r.Session
 var testdata = flag.Bool("gorethink.testdata", true, "create test data")
 var url, url1, url2, url3, db, authKey string
 
 func init() {
 	flag.Parse()
-	SetVerbose(true)
+	r.SetVerbose(true)
 
 	// If the test is being run by wercker look for the rethink url
 	url = os.Getenv("RETHINKDB_URL")
@@ -52,11 +53,11 @@ func init() {
 //
 func testSetup(m *testing.M) {
 	var err error
-	session, err = Connect(ConnectOpts{
+	session, err = r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	if err != nil {
-		Log.Fatalln(err.Error())
+		r.Log.Fatalln(err.Error())
 	}
 
 	setupTestData()
@@ -66,15 +67,15 @@ func testTeardown(m *testing.M) {
 }
 
 func testBenchmarkSetup() {
-	DBDrop("benchmarks").Exec(session)
-	DBCreate("benchmarks").Exec(session)
+	r.DBDrop("benchmarks").Exec(session)
+	r.DBCreate("benchmarks").Exec(session)
 
-	DB("benchmarks").TableDrop("benchmarks").Run(session)
-	DB("benchmarks").TableCreate("benchmarks").Run(session)
+	r.DB("benchmarks").TableDrop("benchmarks").Run(session)
+	r.DB("benchmarks").TableCreate("benchmarks").Run(session)
 }
 
 func testBenchmarkTeardown() {
-	DBDrop("benchmarks").Run(session)
+	r.DBDrop("benchmarks").Run(session)
 }
 
 func TestMain(m *testing.M) {
@@ -240,7 +241,7 @@ type TagsTest struct {
 func (s *RethinkSuite) BenchmarkExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query
-		query := Expr(true)
+		query := r.Expr(true)
 		err := query.Exec(session)
 		c.Assert(err, test.IsNil)
 	}
@@ -249,17 +250,17 @@ func (s *RethinkSuite) BenchmarkExpr(c *test.C) {
 func (s *RethinkSuite) BenchmarkNoReplyExpr(c *test.C) {
 	for i := 0; i < c.N; i++ {
 		// Test query
-		query := Expr(true)
-		err := query.Exec(session, ExecOpts{NoReply: true})
+		query := r.Expr(true)
+		err := query.Exec(session, r.ExecOpts{NoReply: true})
 		c.Assert(err, test.IsNil)
 	}
 }
 
 func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
+	r.DBCreate("test").RunWrite(session)
+	r.DB("test").TableCreate("TestMany").RunWrite(session)
+	r.DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -268,29 +269,29 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 			"id": i,
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(session)
+	r.DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
 
 		// Test query
 		var response interface{}
-		query := DB("test").Table("TestMany").Get(n)
+		query := r.DB("test").Table("TestMany").Get(n)
 		res, err := query.Run(session)
 		c.Assert(err, test.IsNil)
 
 		err = res.One(&response)
 
 		c.Assert(err, test.IsNil)
-		c.Assert(response, jsonEquals, map[string]interface{}{"id": n})
+		c.Assert(response, JsonEquals, map[string]interface{}{"id": n})
 	}
 }
 
 func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
+	r.DBCreate("test").RunWrite(session)
+	r.DB("test").TableCreate("TestMany").RunWrite(session)
+	r.DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -304,14 +305,14 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 			}},
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(session)
+	r.DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
 
 		// Test query
 		var resObj object
-		query := DB("test").Table("TestMany").Get(n)
+		query := r.DB("test").Table("TestMany").Get(n)
 		res, err := query.Run(session)
 		c.Assert(err, test.IsNil)
 
@@ -323,9 +324,9 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
+	r.DBCreate("test").RunWrite(session)
+	r.DB("test").TableCreate("TestMany").RunWrite(session)
+	r.DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -334,11 +335,11 @@ func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 			"id": i,
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(session)
+	r.DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		// Test query
-		res, err := DB("test").Table("TestMany").Run(session)
+		res, err := r.DB("test").Table("TestMany").Run(session)
 		c.Assert(err, test.IsNil)
 
 		var response []map[string]interface{}
@@ -351,9 +352,9 @@ func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 
 func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 	// Ensure table + database exist
-	DBCreate("test").RunWrite(session)
-	DB("test").TableCreate("TestMany").RunWrite(session)
-	DB("test").Table("TestMany").Delete().RunWrite(session)
+	r.DBCreate("test").RunWrite(session)
+	r.DB("test").TableCreate("TestMany").RunWrite(session)
+	r.DB("test").Table("TestMany").Delete().RunWrite(session)
 
 	// Insert rows
 	data := []interface{}{}
@@ -367,11 +368,11 @@ func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 			}},
 		})
 	}
-	DB("test").Table("TestMany").Insert(data).Run(session)
+	r.DB("test").Table("TestMany").Insert(data).Run(session)
 
 	for i := 0; i < c.N; i++ {
 		// Test query
-		res, err := DB("test").Table("TestMany").Run(session)
+		res, err := r.DB("test").Table("TestMany").Run(session)
 		c.Assert(err, test.IsNil)
 
 		var response []object

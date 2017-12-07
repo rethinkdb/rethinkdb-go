@@ -15,6 +15,7 @@ import (
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
+	"bytes"
 )
 
 const (
@@ -79,33 +80,25 @@ type tokenAndPromise struct {
 
 // NewConnection creates a new connection to the database server
 func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
-	var err error
-	c := &Connection{
-		address:          address,
-		opts:             opts,
-		cursors:          make(map[int64]*Cursor),
-		stopReadChan:     make(chan bool, 1),
-		bad:              notBad,
-		closed:           working,
-		readRequestsChan: make(chan tokenAndPromise, 16),
-		responseChan:     make(chan responseAndError, 16),
-	}
-
 	keepAlivePeriod := defaultKeepAlivePeriod
 	if opts.KeepAlivePeriod > 0 {
 		keepAlivePeriod = opts.KeepAlivePeriod
 	}
 
 	// Connect to Server
-	nd := net.Dialer{Timeout: c.opts.Timeout, KeepAlive: keepAlivePeriod}
-	if c.opts.TLSConfig == nil {
-		c.Conn, err = nd.Dial("tcp", address)
+	var err error
+	var conn net.Conn
+	nd := net.Dialer{Timeout: opts.Timeout, KeepAlive: keepAlivePeriod}
+	if opts.TLSConfig == nil {
+		conn, err = nd.Dial("tcp", address)
 	} else {
-		c.Conn, err = tls.DialWithDialer(&nd, "tcp", address, c.opts.TLSConfig)
+		conn, err = tls.DialWithDialer(&nd, "tcp", address, opts.TLSConfig)
 	}
 	if err != nil {
 		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
+
+	c := newConnection(conn, address, opts)
 
 	// Send handshake
 	handshake, err := c.handshake(opts.HandshakeVersion)
@@ -117,10 +110,26 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		return nil, err
 	}
 
+	return c, nil
+}
+
+func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection {
+	c := &Connection{
+		Conn: conn,
+		address:          address,
+		opts:             opts,
+		cursors:          make(map[int64]*Cursor),
+		stopReadChan:     make(chan bool, 1),
+		bad:              notBad,
+		closed:           working,
+		readRequestsChan: make(chan tokenAndPromise, 16),
+		responseChan:     make(chan responseAndError, 16),
+	}
+
 	go c.readSocket()
 	go c.processResponses()
 
-	return c, nil
+	return c
 }
 
 // Close closes the underlying net.Conn
@@ -349,11 +358,22 @@ func (c *Connection) Server() (ServerResponse, error) {
 
 // sendQuery marshals the Query and sends the JSON to the server.
 func (c *Connection) sendQuery(q Query) error {
+	buf := &bytes.Buffer{}
+	buf.Grow(respHeaderLen)
+	buf.Write(buf.Bytes()[:respHeaderLen]) // reserve for header
+	enc := json.NewEncoder(buf)
+
 	// Build query
-	b, err := json.Marshal(q.Build())
+	err := enc.Encode(q.Build())
 	if err != nil {
 		return RQLDriverError{rqlError(fmt.Sprintf("Error building query: %s", err.Error()))}
 	}
+
+	b := buf.Bytes()
+
+	// Write header
+	binary.LittleEndian.PutUint64(b, uint64(q.Token))
+	binary.LittleEndian.PutUint32(b[8:], uint32(len(b)-respHeaderLen))
 
 	// Set timeout
 	if c.opts.WriteTimeout != 0 {
@@ -361,7 +381,7 @@ func (c *Connection) sendQuery(q Query) error {
 	}
 
 	// Send the JSON encoding of the query itself.
-	if err = c.writeQuery(q.Token, b); err != nil {
+	if err = c.writeData(b); err != nil {
 		c.setBad()
 		return RQLConnectionError{rqlError(err.Error())}
 	}
