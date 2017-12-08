@@ -7,10 +7,17 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
+	r "gopkg.in/gorethink/gorethink.v3"
+	"strings"
+	"strconv"
 )
 
 func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	h1, p1 := splitAddress(url)
+	h2, p2 := splitAddress(url2)
+	hosts := []r.Host{r.NewHost(h1, p1), r.NewHost(h2, p2)}
+
+	cluster, err := r.NewCluster(hosts, &r.ConnectOpts{
 		Addresses:           []string{url, url2},
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
@@ -25,7 +32,7 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 			c.Fatal("No node was added to the cluster")
 		default:
 			// Pass if another node was added
-			if len(session.cluster.GetNodes()) >= 3 {
+			if len(cluster.GetNodes()) >= 3 {
 				return
 			}
 		}
@@ -33,7 +40,11 @@ func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {
 }
 
 func (s *RethinkSuite) TestClusterRecoverAfterNoNodes(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	h1, p1 := splitAddress(url)
+	h2, p2 := splitAddress(url2)
+	hosts := []r.Host{r.NewHost(h1, p1), r.NewHost(h2, p2)}
+
+	cluster, err := r.NewCluster(hosts, &r.ConnectOpts{
 		Addresses:           []string{url, url2},
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
@@ -49,12 +60,12 @@ func (s *RethinkSuite) TestClusterRecoverAfterNoNodes(c *test.C) {
 			c.Fatal("No node was added to the cluster")
 		default:
 			// Check if there are no nodes
-			if len(session.cluster.GetNodes()) == 0 {
+			if len(cluster.GetNodes()) == 0 {
 				hasHadZeroNodes = true
 			}
 
 			// Pass if another node was added
-			if len(session.cluster.GetNodes()) >= 1 && hasHadZeroNodes {
+			if len(cluster.GetNodes()) >= 1 && hasHadZeroNodes {
 				return
 			}
 		}
@@ -62,7 +73,7 @@ func (s *RethinkSuite) TestClusterRecoverAfterNoNodes(c *test.C) {
 }
 
 func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
-	session, err := Connect(ConnectOpts{
+	session, err := r.Connect(r.ConnectOpts{
 		Addresses:           []string{url1, url2, url3},
 		DiscoverHosts:       true,
 		NodeRefreshInterval: time.Second,
@@ -90,10 +101,26 @@ func (s *RethinkSuite) TestClusterNodeHealth(c *test.C) {
 			return
 		default:
 			attempts++
-			if err := Expr(1).Exec(session); err != nil {
+			if err := r.Expr(1).Exec(session); err != nil {
 				c.Logf("Query failed, %s", err)
 				failed++
 			}
 		}
 	}
+}
+
+func splitAddress(address string) (hostname string, port int) {
+	hostname = "localhost"
+	port = 28015
+
+	addrParts := strings.Split(address, ":")
+
+	if len(addrParts) >= 1 {
+		hostname = addrParts[0]
+	}
+	if len(addrParts) >= 2 {
+		port, _ = strconv.Atoi(addrParts[1])
+	}
+
+	return
 }

@@ -6,7 +6,6 @@ import (
 	"golang.org/x/net/context"
 	"encoding/binary"
 	"encoding/json"
-	"gopkg.in/gorethink/gorethink.v3/internal/integration/tests"
 )
 
 type ConnectionSuite struct{}
@@ -27,13 +26,14 @@ func (s *ConnectionSuite) TestConnection_Query_Ok(c *test.C) {
 	conn.On("Read", len(respData)).Return(respData, len(respData), nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
+	connection.runConnection()
 	response, cursor, err := connection.Query(ctx, q)
 
 	c.Assert(response, test.NotNil)
 	c.Assert(response.Token, test.Equals, token)
 	c.Assert(response.Type, test.Equals, p.Response_SUCCESS_ATOM)
 	c.Assert(response.Responses, test.HasLen, 1)
-	c.Assert(response.Responses[0], tests.JsonEquals, "response")
+	c.Assert(response.Responses[0], test.DeepEquals, json.RawMessage([]byte(`"response"`)))
 	c.Assert(cursor, test.NotNil)
 	c.Assert(cursor.token, test.Equals, token)
 	c.Assert(cursor.conn, test.Equals, connection)

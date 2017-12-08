@@ -457,11 +457,10 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 			n++
 		}
 
+		defer wg.Done()
 		if res.Err() != nil {
 			c.Fatal(res.Err())
 		}
-
-		wg.Done()
 	}()
 
 	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
@@ -577,11 +576,10 @@ func (s *RethinkSuite) TestTableChangesIncludeInitial(c *test.C) {
 			n++
 		}
 
+		defer wg.Done()
 		if res.Err() != nil {
 			c.Fatal(res.Err())
 		}
-
-		wg.Done()
 	}()
 
 	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 6}).Exec(session)

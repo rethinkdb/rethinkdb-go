@@ -75,7 +75,7 @@ type tokenAndPromise struct {
 	ctx     context.Context
 	query   *Query
 	promise chan responseAndCursor
-	span opentracing.Span
+	span    opentracing.Span
 }
 
 // NewConnection creates a new connection to the database server
@@ -110,12 +110,14 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		return nil, err
 	}
 
+	c.runConnection()
+
 	return c, nil
 }
 
 func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection {
 	c := &Connection{
-		Conn: conn,
+		Conn:             conn,
 		address:          address,
 		opts:             opts,
 		cursors:          make(map[int64]*Cursor),
@@ -125,11 +127,12 @@ func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection
 		readRequestsChan: make(chan tokenAndPromise, 16),
 		responseChan:     make(chan responseAndError, 16),
 	}
+	return c
+}
 
+func (c *Connection) runConnection() {
 	go c.readSocket()
 	go c.processResponses()
-
-	return c
 }
 
 // Close closes the underlying net.Conn
@@ -234,7 +237,7 @@ func (c *Connection) stopQuery(q *Query) (*Response, *Cursor, error) {
 	return nil, nil, ErrQueryTimeout
 }
 
-func (c* Connection) startTracingSpan(parentSpan opentracing.Span, q *Query) opentracing.Span {
+func (c *Connection) startTracingSpan(parentSpan opentracing.Span, q *Query) opentracing.Span {
 	span := parentSpan.Tracer().StartSpan(
 		"Query_"+q.Type.String(),
 		opentracing.ChildOf(parentSpan.Context()),
@@ -436,7 +439,7 @@ func (c *Connection) readResponse() (*Response, error) {
 // Called to fill response for the query
 func (c *Connection) processResponse(ctx context.Context, q Query, response *Response, span opentracing.Span) (r *Response, cur *Cursor, err error) {
 	if span != nil {
-		defer func(){
+		defer func() {
 			if err != nil {
 				ext.Error.Set(span, true)
 				span.LogFields(log.Error(err))
