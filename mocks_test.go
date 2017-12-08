@@ -40,16 +40,16 @@ func (m* connMock) RemoteAddr() net.Addr {
 }
 
 func (m* connMock) SetDeadline(t time.Time) error {
-	args := m.Called(t)
+	args := m.Called()
 	return args.Error(0)
 }
 
 func (m* connMock) SetReadDeadline(t time.Time) error {
-	args := m.Called(t)
+	args := m.Called()
 	return args.Error(0)
 }
 
 func (m* connMock) SetWriteDeadline(t time.Time) error {
-	args := m.Called(t)
+	args := m.Called()
 	return args.Error(0)
 }

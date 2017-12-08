@@ -25,3 +25,5 @@ _testmain.go
 
 *.exe
 .wercker
+
+cover.html

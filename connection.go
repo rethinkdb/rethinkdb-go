@@ -201,6 +201,9 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 			ext.Error.Set(fetchingSpan, true)
 			fetchingSpan.LogFields(log.Error(err))
 			fetchingSpan.Finish()
+			if q.Type == p.Query_START {
+				opentracing.SpanFromContext(ctx).Finish()
+			}
 		}
 		return nil, nil, err
 	}
@@ -290,6 +293,7 @@ func (c *Connection) processResponses() {
 						close(rr.promise)
 					}
 				}
+				readRequests = []tokenAndPromise{}
 				c.Close()
 				continue
 			}
@@ -317,6 +321,7 @@ func (c *Connection) processResponses() {
 		case <-c.stopReadChan:
 			for _, rr := range readRequests {
 				if rr.promise != nil {
+					rr.promise <- responseAndCursor{err: ErrConnectionClosed}
 					close(rr.promise)
 				}
 			}
