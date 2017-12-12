@@ -457,10 +457,8 @@ func (c *Connection) processResponse(ctx context.Context, q Query, response *Res
 	case p.Response_CLIENT_ERROR:
 		return response, c.processErrorResponse(response), createClientError(response, q.Term)
 	case p.Response_COMPILE_ERROR:
-		c.processErrorResponse(response)
 		return response, c.processErrorResponse(response), createCompileError(response, q.Term)
 	case p.Response_RUNTIME_ERROR:
-		c.processErrorResponse(response)
 		return response, c.processErrorResponse(response), createRuntimeError(response.ErrorType, response, q.Term)
 	case p.Response_SUCCESS_ATOM, p.Response_SERVER_INFO:
 		return c.processAtomResponse(ctx, q, response)

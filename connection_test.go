@@ -326,6 +326,225 @@ func (s *ConnectionSuite) TestConnection_processResponses_ResponseFirst(c *test.
 	conn.AssertExpectations(c)
 }
 
+func (s *ConnectionSuite) TestConnection_readResponse_TimeoutHeader(c *test.C) {
+	timeout := time.Second
+
+	conn := &connMock{}
+	conn.On("SetReadDeadline").Return(nil)
+	conn.On("Read", respHeaderLen).Return(nil, 0, io.EOF)
+
+	connection := newConnection(conn, "addr", &ConnectOpts{ReadTimeout: timeout})
+
+	response, err := connection.readResponse()
+
+	c.Assert(response, test.IsNil)
+	c.Assert(err, test.FitsTypeOf, RQLConnectionError{})
+	c.Assert(connection.isBad(), test.Equals, true)
+	conn.AssertExpectations(c)
+}
+
+func (s *ConnectionSuite) TestConnection_readResponse_BodySocketErr(c *test.C) {
+	token := int64(5)
+	respData := serializeAtomResponse()
+	header := respHeader(token, respData)
+
+	conn := &connMock{}
+	conn.On("Read", respHeaderLen).Return(header, len(header), nil)
+	conn.On("Read", len(respData)).Return(nil, 0, io.EOF)
+
+	connection := newConnection(conn, "addr", &ConnectOpts{})
+
+	response, err := connection.readResponse()
+
+	c.Assert(response, test.IsNil)
+	c.Assert(err, test.FitsTypeOf, RQLConnectionError{})
+	c.Assert(connection.isBad(), test.Equals, true)
+	conn.AssertExpectations(c)
+}
+
+func (s *ConnectionSuite) TestConnection_readResponse_BodyUnmarshalErr(c *test.C) {
+	token := int64(5)
+	respData := serializeAtomResponse()
+	header := respHeader(token, respData)
+
+	conn := &connMock{}
+	conn.On("Read", respHeaderLen).Return(header, len(header), nil)
+	conn.On("Read", len(respData)).Return(make([]byte, len(respData)), len(respData), nil)
+
+	connection := newConnection(conn, "addr", &ConnectOpts{})
+
+	response, err := connection.readResponse()
+
+	c.Assert(response, test.IsNil)
+	c.Assert(err, test.FitsTypeOf, RQLDriverError{})
+	c.Assert(connection.isBad(), test.Equals, true)
+	conn.AssertExpectations(c)
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_ClientErrOk(c *test.C) {
+	ctx := context.Background()
+	token := int64(3)
+	q := Query{Token: token}
+	response := &Response{Token: token, Type: p.Response_CLIENT_ERROR}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, nil)
+
+	c.Assert(resp, test.Equals, response)
+	c.Assert(cursor, test.IsNil)
+	c.Assert(err, test.FitsTypeOf, RQLClientError{})
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_CompileErrOk(c *test.C) {
+	ctx := context.Background()
+	token := int64(3)
+	q := Query{Token: token}
+	response := &Response{Token: token, Type: p.Response_COMPILE_ERROR}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, nil)
+
+	c.Assert(resp, test.Equals, response)
+	c.Assert(cursor, test.IsNil)
+	c.Assert(err, test.FitsTypeOf, RQLCompileError{})
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_RuntimeErrOk(c *test.C) {
+	tracer := mocktracer.New()
+	rootSpan := tracer.StartSpan("root")
+	ctx := opentracing.ContextWithSpan(context.Background(), rootSpan)
+	qSpan := rootSpan.Tracer().StartSpan("q", opentracing.ChildOf(rootSpan.Context()))
+
+	token := int64(3)
+	term := Table("test")
+	q := Query{Token: token, Term: &term}
+	response := &Response{Token: token, Type: p.Response_RUNTIME_ERROR, Responses: []json.RawMessage{{'e', 'r', 'r'}}}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, qSpan)
+
+	c.Assert(resp, test.Equals, response)
+	c.Assert(cursor, test.IsNil)
+	c.Assert(err, test.FitsTypeOf, RQLRuntimeError{})
+	c.Assert(tracer.FinishedSpans(), test.HasLen, 1)
+	c.Assert(tracer.FinishedSpans()[0].Tags()["error"], test.Equals, true)
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_FirstPartialOk(c *test.C) {
+	ctx := context.Background()
+	token := int64(3)
+	q := Query{Token: token}
+	rawResponse1 := json.RawMessage{1,2,3}
+	rawResponse2 := json.RawMessage{3,4,5}
+	response := &Response{Token: token, Type: p.Response_SUCCESS_PARTIAL, Responses: []json.RawMessage{rawResponse1, rawResponse2}}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, nil)
+
+	c.Assert(resp, test.Equals, response)
+	c.Assert(cursor, test.NotNil)
+	c.Assert(cursor.token, test.Equals, token)
+	c.Assert(cursor.ctx, test.Equals, ctx)
+	c.Assert(cursor.responses, test.HasLen, 2)
+	c.Assert(cursor.responses[0], test.DeepEquals, rawResponse1)
+	c.Assert(cursor.responses[1], test.DeepEquals, rawResponse2)
+	c.Assert(cursor.conn, test.Equals, connection)
+	c.Assert(err, test.IsNil)
+	c.Assert(connection.cursors, test.HasLen, 1)
+	c.Assert(connection.cursors[token], test.Equals, cursor)
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_PartialOk(c *test.C) {
+	ctx := context.Background()
+	token := int64(3)
+	term := Table("test")
+	q := Query{Token: token}
+	rawResponse1 := json.RawMessage{1,2,3}
+	rawResponse2 := json.RawMessage{3,4,5}
+	response := &Response{Token: token, Type: p.Response_SUCCESS_PARTIAL, Responses: []json.RawMessage{rawResponse1, rawResponse2}}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+	oldCursor := newCursor(ctx, connection, "Cursor", token, &term, q.Opts)
+	connection.cursors[token] = oldCursor
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, nil)
+
+	c.Assert(resp, test.Equals, response)
+	c.Assert(cursor, test.Equals, oldCursor)
+	c.Assert(cursor.responses, test.HasLen, 2)
+	c.Assert(cursor.responses[0], test.DeepEquals, rawResponse1)
+	c.Assert(cursor.responses[1], test.DeepEquals, rawResponse2)
+	c.Assert(err, test.IsNil)
+	c.Assert(connection.cursors, test.HasLen, 1)
+	c.Assert(connection.cursors[token], test.Equals, cursor)
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_SequenceOk(c *test.C) {
+	tracer := mocktracer.New()
+	rootSpan := tracer.StartSpan("root")
+	ctx := opentracing.ContextWithSpan(context.Background(), rootSpan)
+	qSpan := rootSpan.Tracer().StartSpan("q", opentracing.ChildOf(rootSpan.Context()))
+
+	token := int64(3)
+	q := Query{Token: token}
+	rawResponse1 := json.RawMessage{1,2,3}
+	rawResponse2 := json.RawMessage{3,4,5}
+	response := &Response{Token: token, Type: p.Response_SUCCESS_SEQUENCE, Responses: []json.RawMessage{rawResponse1, rawResponse2}}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, qSpan)
+
+	c.Assert(resp, test.Equals, response)
+	c.Assert(cursor, test.NotNil)
+	c.Assert(cursor.token, test.Equals, token)
+	c.Assert(cursor.ctx, test.Equals, ctx)
+	c.Assert(cursor.responses, test.HasLen, 2)
+	c.Assert(cursor.responses[0], test.DeepEquals, rawResponse1)
+	c.Assert(cursor.responses[1], test.DeepEquals, rawResponse2)
+	c.Assert(cursor.conn, test.Equals, connection)
+	c.Assert(err, test.IsNil)
+	c.Assert(connection.cursors, test.HasLen, 0)
+	c.Assert(tracer.FinishedSpans(), test.HasLen, 1)
+	c.Assert(tracer.FinishedSpans()[0].Tags(), test.HasLen, 0)
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_WaitOk(c *test.C) {
+	ctx := context.Background()
+	token := int64(3)
+	q := Query{Token: token}
+	response := &Response{Token: token, Type: p.Response_WAIT_COMPLETE}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+	connection.cursors[token] = &Cursor{}
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, nil)
+
+	c.Assert(resp, test.Equals, response)
+	c.Assert(cursor, test.IsNil)
+	c.Assert(err, test.IsNil)
+	c.Assert(connection.cursors, test.HasLen, 0)
+}
+
+func (s *ConnectionSuite) TestConnection_processResponse_UnexpectedOk(c *test.C) {
+	ctx := context.Background()
+	token := int64(3)
+	q := Query{Token: token}
+	response := &Response{Token: token, Type: 99}
+
+	connection := newConnection(nil, "addr", &ConnectOpts{})
+
+	resp, cursor, err := connection.processResponse(ctx, q, response, nil)
+
+	c.Assert(resp, test.IsNil)
+	c.Assert(cursor, test.IsNil)
+	c.Assert(err, test.FitsTypeOf, RQLDriverError{})
+}
+
 func testQuery(t Term) Query {
 	q, _ := newQuery(
 		t,
