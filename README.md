@@ -20,7 +20,7 @@ If you need any help you can find me on the [RethinkDB slack](http://slack.rethi
 ## Installation
 
 ```
-go get gopkg.in/gorethink/gorethink.v3
+go get gopkg.in/gorethink/gorethink.v4
 ```
 
 Replace `v3` with `v2` or `v1` to use previous versions.
@@ -35,7 +35,7 @@ import (
 	"fmt"
 	"log"
 
-	r "gopkg.in/gorethink/gorethink.v3"
+	r "gopkg.in/gorethink/gorethink.v4"
 )
 
 func Example() {

@@ -1,17 +1,18 @@
 language: go
 
 go:
-  - 1.7.5
-  - 1.8.1
-  - 1.9.2
+  - 1.7.x
+  - 1.8.x
+  - 1.9.x
   - tip
 
 cache: apt
 
-go_import_path: gopkg.in/gorethink/gorethink.v3
+go_import_path: gopkg.in/gorethink/gorethink.v4
+
+install: go get -t ./...
 
 before_script:
-  - go get -t ./...
   - source /etc/lsb-release && echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
   - wget -qO- http://download.rethinkdb.com/apt/pubkey.gpg | sudo apt-key add -
   - sudo apt-get update

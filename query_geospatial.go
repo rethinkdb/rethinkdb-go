@@ -1,7 +1,7 @@
 package gorethink
 
 import (
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 )
 
 // CircleOpts contains the optional arguments for the Circle term.

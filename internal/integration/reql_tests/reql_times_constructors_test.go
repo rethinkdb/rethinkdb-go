@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v3"
-	"gopkg.in/gorethink/gorethink.v3/internal/compare"
+	r "gopkg.in/gorethink/gorethink.v4"
+	"gopkg.in/gorethink/gorethink.v4/internal/compare"
 )
 
 // Test basic time arithmetic

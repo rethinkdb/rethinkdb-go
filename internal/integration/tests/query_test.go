@@ -8,7 +8,7 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/gorethink/gorethink.v3"
+	r "gopkg.in/gorethink/gorethink.v4"
 )
 
 func (s *RethinkSuite) TestQueryRun(c *test.C) {

@@ -6,7 +6,7 @@ import (
 
 	"reflect"
 
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 )
 
 // Expr converts any value to an expression and is also used by many other terms

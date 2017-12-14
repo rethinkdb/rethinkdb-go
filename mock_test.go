@@ -5,7 +5,7 @@ import (
 
 	test "gopkg.in/check.v1"
 	"testing"
-	"gopkg.in/gorethink/gorethink.v3/internal/integration/tests"
+	"gopkg.in/gorethink/gorethink.v4/internal/integration/tests"
 )
 
 // Hook up gocheck into the gotest runner.

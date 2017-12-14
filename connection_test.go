@@ -2,7 +2,7 @@ package gorethink
 
 import (
 	test "gopkg.in/check.v1"
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 	"golang.org/x/net/context"
 	"encoding/binary"
 	"encoding/json"

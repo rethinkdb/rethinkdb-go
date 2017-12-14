@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 )
 
 // A Query represents a query ready to be sent to the database, A Query differs

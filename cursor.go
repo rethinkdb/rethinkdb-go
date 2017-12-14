@@ -8,8 +8,8 @@ import (
 	"sync"
 
 	"golang.org/x/net/context"
-	"gopkg.in/gorethink/gorethink.v3/encoding"
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	"gopkg.in/gorethink/gorethink.v4/encoding"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 	"github.com/opentracing/opentracing-go"
 )
 

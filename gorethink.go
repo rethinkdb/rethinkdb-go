@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"gopkg.in/gorethink/gorethink.v3/encoding"
+	"gopkg.in/gorethink/gorethink.v4/encoding"
 	"io/ioutil"
 )
 

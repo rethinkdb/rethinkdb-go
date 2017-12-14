@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	r "gopkg.in/gorethink/gorethink.v3"
+	r "gopkg.in/gorethink/gorethink.v4"
 )
 
 // Return heroes and superheroes.
