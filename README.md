@@ -9,7 +9,7 @@
 
 ![GoRethink Logo](https://raw.github.com/wiki/gorethink/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v3.0.5 (RethinkDB v2.3)
+Current version: v4.0.0 (RethinkDB v2.3)
 
 <!-- This project is no longer maintained, for more information see the [v3.0.0 release](https://github.com/gorethink/gorethink/releases/tag/v3.0.0)-->
 
@@ -23,7 +23,7 @@ If you need any help you can find me on the [RethinkDB slack](http://slack.rethi
 go get gopkg.in/gorethink/gorethink.v4
 ```
 
-Replace `v3` with `v2` or `v1` to use previous versions.
+Replace `v4` with `v3` or `v2` to use previous versions.
 
 ## Example
 
@@ -412,6 +412,15 @@ r.Log.Out = os.Stderr
 // Disabled
 r.Log.Out = ioutil.Discard
 ```
+
+## Tracing
+
+The driver supports [opentracing-go](https://github.com/opentracing/opentracing-go/). You can enable this feature by setting `UseOpentracing` to true in the `ConnectOpts`. Then driver will expect `opentracing.Span` in the `RunOpts.Context` and will start new child spans for queries.
+Also you need to configure tracer in your program by yourself.
+
+The driver starts span for the whole query, from the first byte is sent to the cursor closed, and second-level span for each query for fetching data.
+
+So you can trace how much time you program spends for RethinkDB queries.  
 
 ## Mocking
 
