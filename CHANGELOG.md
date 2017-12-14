@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v4.0.0 - 2017-12-14
+
+### Fixed
+
+ - `Connection` work with sockets, now only a single goroutine reads from socket.
+ - Optimized threadsafe operations in `Connection` with channels and atomics instead of mutex.
+ - All tests with real db moved to integration folder
+
+### Added
+
+ - Added support for tracing with `opentracing-go`
+ - Added a brand-new unit tests for `Connection` 
+
 ## v3.0.5 - 2017-09-28
 
 - Fixed typo at http opts

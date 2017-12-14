@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 )
 
 var (
@@ -136,6 +136,14 @@ type RQLDriverError struct {
 // server.
 type RQLConnectionError struct {
 	rqlError
+}
+
+func createClientError(response *Response, term *Term) error {
+	return RQLClientError{rqlServerError{response, term}}
+}
+
+func createCompileError(response *Response, term *Term) error {
+	return RQLCompileError{rqlServerError{response, term}}
 }
 
 func createRuntimeError(errorType p.Response_ErrorType, response *Response, term *Term) error {

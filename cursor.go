@@ -8,8 +8,9 @@ import (
 	"sync"
 
 	"golang.org/x/net/context"
-	"gopkg.in/gorethink/gorethink.v3/encoding"
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	"gopkg.in/gorethink/gorethink.v4/encoding"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	"github.com/opentracing/opentracing-go"
 )
 
 var (
@@ -155,6 +156,10 @@ func (c *Cursor) Close() error {
 		if err := c.releaseConn(); err != nil {
 			return err
 		}
+	}
+
+	if span := opentracing.SpanFromContext(c.ctx); span != nil {
+		span.Finish()
 	}
 
 	c.closed = true
@@ -583,8 +588,6 @@ func (c *Cursor) extendLocked(response *Response) {
 	c.finished = response.Type != p.Response_SUCCESS_PARTIAL
 	c.fetching = false
 	c.isAtom = response.Type == p.Response_SUCCESS_ATOM
-
-	putResponse(response)
 }
 
 // seekCursor takes care of loading more data if needed and applying pending skips

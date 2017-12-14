@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"gopkg.in/gorethink/gorethink.v3/types"
+	"gopkg.in/gorethink/gorethink.v4/types"
 
 	"fmt"
 )

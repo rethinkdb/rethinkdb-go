@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 )
 
 // A Session represents a connection to a RethinkDB cluster and should be used
@@ -92,6 +92,11 @@ type ConnectOpts struct {
 	// HostDecayDuration is used by the go-hostpool package to calculate a weighted
 	// score when selecting a host. By default a value of 5 minutes is used.
 	HostDecayDuration time.Duration
+
+	// UseOpentracing is used to enable creating opentracing-go spans for queries.
+	// Each span is created as child of span from the context in `RunOpts`.
+	// This span lasts from point the query created to the point when cursor closed.
+	UseOpentracing bool
 
 	// Deprecated: This function is no longer used due to changes in the
 	// way hosts are selected.
@@ -219,7 +224,7 @@ func (s *Session) Close(optArgs ...CloseOpts) error {
 	}
 
 	if s.cluster != nil {
-		s.cluster.Close()
+		return s.cluster.Close()
 	}
 	s.cluster = nil
 	s.closed = true

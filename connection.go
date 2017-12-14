@@ -6,17 +6,27 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"sync"
 	"sync/atomic"
 	"time"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v3/ql2"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	"sync"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/ext"
+	"github.com/opentracing/opentracing-go/log"
+	"bytes"
 )
 
 const (
 	respHeaderLen          = 12
 	defaultKeepAlivePeriod = time.Second * 30
+
+	notBad = 0
+	bad    = 1
+
+	working = 0
+	closed  = 1
 )
 
 // Response represents the raw response from a query, most of the time you
@@ -39,38 +49,56 @@ type Connection struct {
 	address string
 	opts    *ConnectOpts
 
-	_       [4]byte
-	mu      sync.Mutex
-	token   int64
-	cursors map[int64]*Cursor
-	bad     bool
-	closed  bool
+	_                [4]byte
+	token            int64
+	cursors          map[int64]*Cursor
+	bad              int32 // 0 - not bad, 1 - bad
+	closed           int32 // 0 - working, 1 - closed
+	stopReadChan     chan bool
+	readRequestsChan chan tokenAndPromise
+	responseChan     chan responseAndError
+	mu               sync.Mutex
+}
+
+type responseAndError struct {
+	response *Response
+	err      error
+}
+
+type responseAndCursor struct {
+	response *Response
+	cursor   *Cursor
+	err      error
+}
+
+type tokenAndPromise struct {
+	ctx     context.Context
+	query   *Query
+	promise chan responseAndCursor
+	span    opentracing.Span
 }
 
 // NewConnection creates a new connection to the database server
 func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
-	var err error
-	c := &Connection{
-		address: address,
-		opts:    opts,
-		cursors: make(map[int64]*Cursor),
-	}
-
 	keepAlivePeriod := defaultKeepAlivePeriod
 	if opts.KeepAlivePeriod > 0 {
 		keepAlivePeriod = opts.KeepAlivePeriod
 	}
 
 	// Connect to Server
-	nd := net.Dialer{Timeout: c.opts.Timeout, KeepAlive: keepAlivePeriod}
-	if c.opts.TLSConfig == nil {
-		c.Conn, err = nd.Dial("tcp", address)
+	var err error
+	var conn net.Conn
+	nd := net.Dialer{Timeout: opts.Timeout, KeepAlive: keepAlivePeriod}
+	if opts.TLSConfig == nil {
+		conn, err = nd.Dial("tcp", address)
 	} else {
-		c.Conn, err = tls.DialWithDialer(&nd, "tcp", address, c.opts.TLSConfig)
+		conn, err = tls.DialWithDialer(&nd, "tcp", address, opts.TLSConfig)
 	}
 	if err != nil {
 		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
+
+	c := newConnection(conn, address, opts)
 
 	// Send handshake
 	handshake, err := c.handshake(opts.HandshakeVersion)
@@ -82,20 +110,42 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		return nil, err
 	}
 
+	c.runConnection()
+
 	return c, nil
+}
+
+func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection {
+	c := &Connection{
+		Conn:             conn,
+		address:          address,
+		opts:             opts,
+		cursors:          make(map[int64]*Cursor),
+		stopReadChan:     make(chan bool, 1),
+		bad:              notBad,
+		closed:           working,
+		readRequestsChan: make(chan tokenAndPromise, 16),
+		responseChan:     make(chan responseAndError, 16),
+	}
+	return c
+}
+
+func (c *Connection) runConnection() {
+	go c.readSocket()
+	go c.processResponses()
 }
 
 // Close closes the underlying net.Conn
 func (c *Connection) Close() error {
+	var err error
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	var err error
-
-	if !c.closed {
+	if !c.isClosed() {
+		c.setClosed()
+		close(c.stopReadChan)
 		err = c.Conn.Close()
-		c.closed = true
-		c.cursors = make(map[int64]*Cursor)
 	}
 
 	return err
@@ -106,18 +156,15 @@ func (c *Connection) Close() error {
 //
 // This function is used internally by Run which should be used for most queries.
 func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, error) {
-	if ctx == nil {
-		ctx = c.contextFromConnectionOpts()
-	}
-
 	if c == nil {
 		return nil, nil, ErrConnectionClosed
 	}
-	c.mu.Lock()
-	if c.Conn == nil {
-		c.bad = true
-		c.mu.Unlock()
+	if c.Conn == nil || c.isClosed() {
+		c.setBad()
 		return nil, nil, ErrConnectionClosed
+	}
+	if ctx == nil {
+		ctx = c.contextFromConnectionOpts()
 	}
 
 	// Add token if query is a START/NOREPLY_WAIT
@@ -129,58 +176,164 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 			var err error
 			q.Opts["db"], err = DB(c.opts.Database).Build()
 			if err != nil {
-				c.mu.Unlock()
 				return nil, nil, RQLDriverError{rqlError(err.Error())}
 			}
 		}
 	}
-	c.mu.Unlock()
 
-	var response *Response
-	var cursor *Cursor
-	var errchan chan error = make(chan error, 1)
-	go func() {
-		err := c.sendQuery(q)
-		if err != nil {
-			errchan <- err
-			return
-		}
-
-		if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
-			errchan <- nil
-			return
-		}
-
-		for {
-			response, err := c.readResponse()
-			if err != nil {
-				errchan <- err
-				return
+	var fetchingSpan opentracing.Span
+	if c.opts.UseOpentracing {
+		parentSpan := opentracing.SpanFromContext(ctx)
+		if parentSpan != nil {
+			if q.Type == p.Query_START {
+				querySpan := c.startTracingSpan(parentSpan, &q) // will be Finished when cursor closed
+				parentSpan = querySpan
+				ctx = opentracing.ContextWithSpan(ctx, querySpan)
 			}
 
-			if response.Token == q.Token {
-				// If this was the requested response process and return
-				response, cursor, err = c.processResponse(ctx, q, response)
-				errchan <- err
-				return
-			} else if _, ok := c.cursors[response.Token]; ok {
-				// If the token is in the cursor cache then process the response
-				c.processResponse(ctx, q, response)
-			} else {
-				putResponse(response)
+			fetchingSpan = c.startTracingSpan(parentSpan, &q) // will be Finished when response arrived
+		}
+	}
+
+	err := c.sendQuery(q)
+	if err != nil {
+		if fetchingSpan != nil {
+			ext.Error.Set(fetchingSpan, true)
+			fetchingSpan.LogFields(log.Error(err))
+			fetchingSpan.Finish()
+			if q.Type == p.Query_START {
+				opentracing.SpanFromContext(ctx).Finish()
 			}
 		}
-	}()
+		return nil, nil, err
+	}
+
+	if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
+		select {
+		case c.readRequestsChan <- tokenAndPromise{ctx: ctx, query: &q, span: fetchingSpan}:
+			return nil, nil, nil
+		case <-ctx.Done():
+			return c.stopQuery(&q)
+		}
+	}
+
+	promise := make(chan responseAndCursor, 1)
+	select {
+	case c.readRequestsChan <- tokenAndPromise{ctx: ctx, query: &q, span: fetchingSpan, promise: promise}:
+	case <-ctx.Done():
+		return c.stopQuery(&q)
+	}
 
 	select {
-	case err := <-errchan:
-		return response, cursor, err
+	case future := <-promise:
+		return future.response, future.cursor, future.err
 	case <-ctx.Done():
-		if q.Type != p.Query_STOP {
-			stopQuery := newStopQuery(q.Token)
-			c.Query(c.contextFromConnectionOpts(), stopQuery)
+		return c.stopQuery(&q)
+	}
+}
+
+func (c *Connection) stopQuery(q *Query) (*Response, *Cursor, error) {
+	if q.Type != p.Query_STOP {
+		stopQuery := newStopQuery(q.Token)
+		c.Query(c.contextFromConnectionOpts(), stopQuery)
+	}
+	return nil, nil, ErrQueryTimeout
+}
+
+func (c *Connection) startTracingSpan(parentSpan opentracing.Span, q *Query) opentracing.Span {
+	span := parentSpan.Tracer().StartSpan(
+		"Query_"+q.Type.String(),
+		opentracing.ChildOf(parentSpan.Context()),
+		ext.SpanKindRPCClient)
+
+	ext.PeerAddress.Set(span, c.address)
+	ext.Component.Set(span, "gorethink")
+
+	if q.Type == p.Query_START {
+		span.LogFields(log.String("query", q.Term.String()))
+	}
+
+	return span
+}
+
+func (c *Connection) readSocket() {
+	for {
+		response, err := c.readResponse()
+
+		respPair := responseAndError{
+			response: response,
+			err:      err,
 		}
-		return nil, nil, ErrQueryTimeout
+
+		select {
+		case c.responseChan <- respPair:
+		case <-c.stopReadChan:
+			close(c.responseChan)
+			return
+		}
+	}
+}
+
+func (c *Connection) processResponses() {
+	readRequests := make([]tokenAndPromise, 0, 16)
+	responses := make([]*Response, 0, 16)
+	for {
+		var response *Response
+		var readRequest tokenAndPromise
+		var ok bool
+
+		select {
+		case respPair := <-c.responseChan:
+			if respPair.err != nil {
+				// Transport socket error, can't continue to work
+				// Don't know return to who - return to all
+				for _, rr := range readRequests {
+					if rr.promise != nil {
+						rr.promise <- responseAndCursor{err: respPair.err}
+						close(rr.promise)
+					}
+				}
+				readRequests = []tokenAndPromise{}
+				c.Close()
+				continue
+			}
+			if respPair.response == nil && respPair.err == nil { // responseChan is closed
+				continue
+			}
+
+			response = respPair.response
+
+			readRequest, ok = getReadRequest(readRequests, respPair.response.Token)
+			if !ok {
+				responses = append(responses, respPair.response)
+				continue
+			}
+			readRequests = removeReadRequest(readRequests, respPair.response.Token)
+
+		case readRequest = <-c.readRequestsChan:
+			response, ok = getResponse(responses, readRequest.query.Token)
+			if !ok {
+				readRequests = append(readRequests, readRequest)
+				continue
+			}
+			responses = removeResponse(responses, readRequest.query.Token)
+
+		case <-c.stopReadChan:
+			for _, rr := range readRequests {
+				if rr.promise != nil {
+					rr.promise <- responseAndCursor{err: ErrConnectionClosed}
+					close(rr.promise)
+				}
+			}
+			c.cursors = nil
+			return
+		}
+
+		response, cursor, err := c.processResponse(readRequest.ctx, *readRequest.query, response, readRequest.span)
+		if readRequest.promise != nil {
+			readRequest.promise <- responseAndCursor{response: response, cursor: cursor, err: err}
+			close(readRequest.promise)
+		}
 	}
 }
 
@@ -213,22 +366,31 @@ func (c *Connection) Server() (ServerResponse, error) {
 
 // sendQuery marshals the Query and sends the JSON to the server.
 func (c *Connection) sendQuery(q Query) error {
+	buf := &bytes.Buffer{}
+	buf.Grow(respHeaderLen)
+	buf.Write(buf.Bytes()[:respHeaderLen]) // reserve for header
+	enc := json.NewEncoder(buf)
+
 	// Build query
-	b, err := json.Marshal(q.Build())
+	err := enc.Encode(q.Build())
 	if err != nil {
 		return RQLDriverError{rqlError(fmt.Sprintf("Error building query: %s", err.Error()))}
 	}
 
+	b := buf.Bytes()
+
+	// Write header
+	binary.LittleEndian.PutUint64(b, uint64(q.Token))
+	binary.LittleEndian.PutUint32(b[8:], uint32(len(b)-respHeaderLen))
+
 	// Set timeout
-	if c.opts.WriteTimeout == 0 {
-		c.Conn.SetWriteDeadline(time.Time{})
-	} else {
+	if c.opts.WriteTimeout != 0 {
 		c.Conn.SetWriteDeadline(time.Now().Add(c.opts.WriteTimeout))
 	}
 
 	// Send the JSON encoding of the query itself.
-	if err = c.writeQuery(q.Token, b); err != nil {
-		c.bad = true
+	if err = c.writeData(b); err != nil {
+		c.setBad()
 		return RQLConnectionError{rqlError(err.Error())}
 	}
 
@@ -246,16 +408,14 @@ func (c *Connection) nextToken() int64 {
 // could be read then an error is returned.
 func (c *Connection) readResponse() (*Response, error) {
 	// Set timeout
-	if c.opts.ReadTimeout == 0 {
-		c.Conn.SetReadDeadline(time.Time{})
-	} else {
+	if c.opts.ReadTimeout != 0 {
 		c.Conn.SetReadDeadline(time.Now().Add(c.opts.ReadTimeout))
 	}
 
 	// Read response header (token+length)
 	headerBuf := [respHeaderLen]byte{}
-	if _, err := c.read(headerBuf[:], respHeaderLen); err != nil {
-		c.bad = true
+	if _, err := c.read(headerBuf[:]); err != nil {
+		c.setBad()
 		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
@@ -265,15 +425,15 @@ func (c *Connection) readResponse() (*Response, error) {
 	// Read the JSON encoding of the Response itself.
 	b := make([]byte, int(messageLength))
 
-	if _, err := c.read(b, int(messageLength)); err != nil {
-		c.bad = true
+	if _, err := c.read(b); err != nil {
+		c.setBad()
 		return nil, RQLConnectionError{rqlError(err.Error())}
 	}
 
 	// Decode the response
-	var response = newCachedResponse()
+	var response = new(Response)
 	if err := json.Unmarshal(b, response); err != nil {
-		c.bad = true
+		c.setBad()
 		return nil, RQLDriverError{rqlError(err.Error())}
 	}
 	response.Token = responseToken
@@ -281,14 +441,25 @@ func (c *Connection) readResponse() (*Response, error) {
 	return response, nil
 }
 
-func (c *Connection) processResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
+// Called to fill response for the query
+func (c *Connection) processResponse(ctx context.Context, q Query, response *Response, span opentracing.Span) (r *Response, cur *Cursor, err error) {
+	if span != nil {
+		defer func() {
+			if err != nil {
+				ext.Error.Set(span, true)
+				span.LogFields(log.Error(err))
+			}
+			span.Finish()
+		}()
+	}
+
 	switch response.Type {
 	case p.Response_CLIENT_ERROR:
-		return c.processErrorResponse(q, response, RQLClientError{rqlServerError{response, q.Term}})
+		return response, c.processErrorResponse(response), createClientError(response, q.Term)
 	case p.Response_COMPILE_ERROR:
-		return c.processErrorResponse(q, response, RQLCompileError{rqlServerError{response, q.Term}})
+		return response, c.processErrorResponse(response), createCompileError(response, q.Term)
 	case p.Response_RUNTIME_ERROR:
-		return c.processErrorResponse(q, response, createRuntimeError(response.ErrorType, response, q.Term))
+		return response, c.processErrorResponse(response), createRuntimeError(response.ErrorType, response, q.Term)
 	case p.Response_SUCCESS_ATOM, p.Response_SERVER_INFO:
 		return c.processAtomResponse(ctx, q, response)
 	case p.Response_SUCCESS_PARTIAL:
@@ -296,28 +467,21 @@ func (c *Connection) processResponse(ctx context.Context, q Query, response *Res
 	case p.Response_SUCCESS_SEQUENCE:
 		return c.processSequenceResponse(ctx, q, response)
 	case p.Response_WAIT_COMPLETE:
-		return c.processWaitResponse(q, response)
+		return c.processWaitResponse(response)
 	default:
-		putResponse(response)
-		return nil, nil, RQLDriverError{rqlError("Unexpected response type")}
+		return nil, nil, RQLDriverError{rqlError("Unexpected response type: %v")}
 	}
 }
 
-func (c *Connection) processErrorResponse(q Query, response *Response, err error) (*Response, *Cursor, error) {
-	c.mu.Lock()
+func (c *Connection) processErrorResponse(response *Response) *Cursor {
 	cursor := c.cursors[response.Token]
-
 	delete(c.cursors, response.Token)
-	c.mu.Unlock()
-
-	return response, cursor, err
+	return cursor
 }
 
 func (c *Connection) processAtomResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
-	// Create cursor
 	cursor := newCursor(ctx, c, "Cursor", response.Token, q.Term, q.Opts)
 	cursor.profile = response.Profile
-
 	cursor.extend(response)
 
 	return response, cursor, nil
@@ -340,7 +504,6 @@ func (c *Connection) processPartialResponse(ctx context.Context, q Query, respon
 		}
 	}
 
-	c.mu.Lock()
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
@@ -349,7 +512,6 @@ func (c *Connection) processPartialResponse(ctx context.Context, q Query, respon
 
 		c.cursors[response.Token] = cursor
 	}
-	c.mu.Unlock()
 
 	cursor.extend(response)
 
@@ -357,52 +519,72 @@ func (c *Connection) processPartialResponse(ctx context.Context, q Query, respon
 }
 
 func (c *Connection) processSequenceResponse(ctx context.Context, q Query, response *Response) (*Response, *Cursor, error) {
-	c.mu.Lock()
 	cursor, ok := c.cursors[response.Token]
 	if !ok {
 		// Create a new cursor if needed
 		cursor = newCursor(ctx, c, "Cursor", response.Token, q.Term, q.Opts)
 		cursor.profile = response.Profile
 	}
-
 	delete(c.cursors, response.Token)
-	c.mu.Unlock()
 
 	cursor.extend(response)
 
 	return response, cursor, nil
 }
 
-func (c *Connection) processWaitResponse(q Query, response *Response) (*Response, *Cursor, error) {
-	c.mu.Lock()
+func (c *Connection) processWaitResponse(response *Response) (*Response, *Cursor, error) {
 	delete(c.cursors, response.Token)
-	c.mu.Unlock()
-
 	return response, nil, nil
 }
 
+func (c *Connection) setBad() {
+	atomic.StoreInt32(&c.bad, bad)
+}
+
 func (c *Connection) isBad() bool {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
-	return c.bad
+	return atomic.LoadInt32(&c.bad) == bad
 }
 
-var responseCache = make(chan *Response, 16)
-
-func newCachedResponse() *Response {
-	select {
-	case r := <-responseCache:
-		return r
-	default:
-		return new(Response)
-	}
+func (c *Connection) setClosed() {
+	atomic.StoreInt32(&c.closed, closed)
 }
 
-func putResponse(r *Response) {
-	*r = Response{} // zero it
-	select {
-	case responseCache <- r:
-	default:
+func (c *Connection) isClosed() bool {
+	return atomic.LoadInt32(&c.closed) == closed
+}
+
+func getReadRequest(list []tokenAndPromise, token int64) (tokenAndPromise, bool) {
+	for _, e := range list {
+		if e.query.Token == token {
+			return e, true
+		}
 	}
+	return tokenAndPromise{}, false
+}
+
+func getResponse(list []*Response, token int64) (*Response, bool) {
+	for _, e := range list {
+		if e.Token == token {
+			return e, true
+		}
+	}
+	return nil, false
+}
+
+func removeReadRequest(list []tokenAndPromise, token int64) []tokenAndPromise {
+	for i := range list {
+		if list[i].query.Token == token {
+			return append(list[:i], list[i+1:]...)
+		}
+	}
+	return list
+}
+
+func removeResponse(list []*Response, token int64) []*Response {
+	for i := range list {
+		if list[i].Token == token {
+			return append(list[:i], list[i+1:]...)
+		}
+	}
+	return list
 }
