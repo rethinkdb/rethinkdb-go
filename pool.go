@@ -164,8 +164,11 @@ func (p *Pool) Query(ctx context.Context, q Query) (*Cursor, error) {
 
 	if err == nil {
 		cursor.releaseConn = releaseConn(c, pc)
-	} else if c.isBad() {
-		pc.MarkUnusable()
+	} else {
+		if c.isBad() {
+			pc.MarkUnusable()
+		}
+		pc.Close()
 	}
 
 	return cursor, err
