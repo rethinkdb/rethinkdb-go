@@ -39,6 +39,8 @@
 //   token to get more results from the original query.
 ////////////////////////////////////////////////////////////////////////////////
 
+syntax = "proto2";
+
 message VersionDummy { // We need to wrap it like this for some
                        // non-conforming protobuf libraries
     // This enum contains the magic numbers for your version.  See **THE HIGH-LEVEL
@@ -576,6 +578,14 @@ message Term {
         // Renames the given index to a new name
         INDEX_RENAME = 156; // Table, STRING, STRING, {overwrite:BOOL} -> OBJECT
 
+        // * Write hook Function OPs
+        // Creates a new write hook function with a particular definition
+        SET_WRITE_HOOK = 189; // Table, Function(2)
+        // Gets an existing write hook function on a table
+        GET_WRITE_HOOK = 190; // Table
+
+
+
         // * Control Operators
         // Calls a function on data
         FUNCALL  = 64; // Function(*), DATUM... -> DATUM
@@ -665,11 +675,6 @@ message Term {
         // Parses its first argument as a json string and returns it as a
         // datum.
         JSON = 98; // STRING -> DATUM
-        // Returns the datum as a JSON string.
-        // N.B.: we would really prefer this be named TO_JSON and that exists as
-        // an alias in Python and JavaScript drivers; however it conflicts with the
-        // standard `to_json` method defined by Ruby's standard json library.
-        TO_JSON_STRING = 172; // DATUM -> STRING
 
         // Parses its first arguments as an ISO 8601 time and returns it as a
         // datum.
@@ -776,9 +781,23 @@ message Term {
         GET_NEAREST = 168;       // TABLE, PSEUDOTYPE(GEOMETRY) {index:!STRING, max_results:NUM, max_dist:NUM, geo_system:STRING, unit:STRING} -> ARRAY
         POLYGON_SUB = 171;       // PSEUDOTYPE(GEOMETRY), PSEUDOTYPE(GEOMETRY) -> PSEUDOTYPE(GEOMETRY)
 
+        // Returns the datum as a JSON string.
+        // N.B.: we would really prefer this be named TO_JSON and that exists as
+        // an alias in Python and JavaScript drivers; however it conflicts with the
+        // standard `to_json` method defined by Ruby's standard json library.
+        TO_JSON_STRING = 172; // DATUM -> STRING
+
         // Constants for specifying key ranges
         MINVAL = 180;
         MAXVAL = 181;
+
+        // Bitwise operations
+        BIT_AND = 191;
+        BIT_OR = 192;
+        BIT_XOR = 193;
+        BIT_NOT = 194;
+        BIT_SAL = 195;
+        BIT_SAR = 196;
     }
     optional TermType type = 1;
 
