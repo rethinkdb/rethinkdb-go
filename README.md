@@ -9,7 +9,7 @@
 
 ![GoRethink Logo](https://raw.github.com/wiki/gorethink/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v4.0.0 (RethinkDB v2.3)
+Current version: v4.1.0 (RethinkDB v2.3)
 
 <!-- This project is no longer maintained, for more information see the [v3.0.0 release](https://github.com/gorethink/gorethink/releases/tag/v3.0.0)-->
 
@@ -40,7 +40,7 @@ import (
 
 func Example() {
 	session, err := r.Connect(r.ConnectOpts{
-		Address: url,
+		Address: url, // endpoint without http
 	})
 	if err != nil {
 		log.Fatalln(err)
@@ -399,6 +399,8 @@ r.Table("books").Get("book_1").Merge(func(p r.Term) interface{} {
 Sometimes the default behaviour for converting Go types to and from ReQL is not desired, for these situations the driver allows you to implement both the [`Marshaler`](https://godoc.org/github.com/gorethink/gorethink/encoding#Marshaler) and [`Unmarshaler`](https://godoc.org/github.com/gorethink/gorethink/encoding#Unmarshaler) interfaces. These interfaces might look familiar if you are using to using the `encoding/json` package however instead of dealing with `[]byte` the interfaces deal with `interface{}` values (which are later encoded by the `encoding/json` package when communicating with the database).
 
 An good example of how to use these interfaces is in the [`types`](https://github.com/gorethink/gorethink/blob/master/types/geometry.go#L84-L106) package, in this package the `Point` type is encoded as the `GEOMETRY` pseudo-type instead of a normal JSON object.
+
+On the other side, you can implement external encode/decode functions with [`SetTypeEncoding`](https://godoc.org/github.com/gorethink/gorethink/encoding#SetTypeEncoding) function.
 
 ## Logging
 

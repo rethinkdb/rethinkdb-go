@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v4.1.0 - 2018-08-29
+
+### Fixed
+
+ - Rare `Connection` leaks if socket errors occurred
+ - Updated `ql2.proto` file from rethinkdb repo
+ 
+### Added
+
+ - Support for independent custom type marshalers 
+
 ## v4.0.0 - 2017-12-14
 
 ### Fixed
