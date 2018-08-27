@@ -8,8 +8,8 @@ import (
 
 	test "gopkg.in/check.v1"
 	r "gopkg.in/gorethink/gorethink.v4"
-	"strings"
 	"strconv"
+	"strings"
 )
 
 func (s *RethinkSuite) TestClusterDetectNewNode(c *test.C) {

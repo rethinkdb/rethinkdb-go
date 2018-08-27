@@ -4,8 +4,8 @@ import (
 	"fmt"
 
 	test "gopkg.in/check.v1"
-	"testing"
 	"gopkg.in/gorethink/gorethink.v4/internal/integration/tests"
+	"testing"
 )
 
 // Hook up gocheck into the gotest runner.

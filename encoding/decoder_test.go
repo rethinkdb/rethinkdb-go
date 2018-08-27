@@ -3,6 +3,7 @@ package encoding
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"image"
 	"reflect"
 	"testing"
@@ -523,5 +524,148 @@ func TestMergeMap(t *testing.T) {
 	}
 	if dst["another_field"] == "" {
 		t.Error("Field has been wiped")
+	}
+}
+
+func TestDecodeCustomTypeEncodingValue(t *testing.T) {
+	type innerType struct {
+		Val int
+	}
+	type outerType struct {
+		Inner innerType `gorethink:"inner"`
+	}
+
+	want := outerType{Inner: innerType{Val: 5}}
+	in := map[string]interface{}{
+		"inner": map[string]interface{}{
+			"someval": 5,
+		},
+	}
+
+	SetTypeEncoding(reflect.TypeOf(innerType{}),
+		nil, func(enc interface{}, val reflect.Value) error {
+			m := enc.(map[string]interface{})
+			val.Set(reflect.ValueOf(innerType{Val: m["someval"].(int)}))
+			return nil
+		})
+
+	var out outerType
+	err := Decode(&out, in)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestDecodeCustomTypeEncodingPointer(t *testing.T) {
+	type innerType struct {
+		Val int
+	}
+	type outerType struct {
+		Inner *innerType `gorethink:"inner"`
+	}
+
+	want := outerType{Inner: &innerType{Val: 5}}
+	in := map[string]interface{}{
+		"inner": map[string]interface{}{
+			"someval": 5,
+		},
+	}
+
+	SetTypeEncoding(reflect.TypeOf((*innerType)(nil)),
+		nil, func(enc interface{}, val reflect.Value) error {
+			m := enc.(map[string]interface{})
+			val.Set(reflect.ValueOf(&innerType{Val: m["someval"].(int)}))
+			return nil
+		})
+
+	var out outerType
+	err := Decode(&out, in)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestDecodeCustomRootTypeEncodingValue(t *testing.T) {
+	type cType struct {
+		Val int
+	}
+
+	want := cType{Val: 5}
+	in := map[string]interface{}{
+		"someval": 5,
+	}
+
+	SetTypeEncoding(reflect.TypeOf(cType{}),
+		nil, func(enc interface{}, val reflect.Value) error {
+			m := enc.(map[string]interface{})
+			val.Set(reflect.ValueOf(cType{Val: m["someval"].(int)}))
+			return nil
+		})
+
+	var out cType
+	err := Decode(&out, in)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestDecodeCustomRootTypeEncodingPointer(t *testing.T) {
+	type cType struct {
+		Val int
+	}
+
+	want := cType{Val: 5}
+	in := map[string]interface{}{
+		"someval": 5,
+	}
+
+	SetTypeEncoding(reflect.TypeOf((*cType)(nil)),
+		nil, func(enc interface{}, val reflect.Value) error {
+			m := enc.(map[string]interface{})
+			val.Set(reflect.ValueOf(&cType{Val: m["someval"].(int)}))
+			return nil
+		})
+
+	var out *cType
+	err := Decode(&out, in)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestDecodeCustomTypeEncodingError(t *testing.T) {
+	type cType struct {
+		Val int
+	}
+
+	in := map[string]interface{}{
+		"val": 5,
+	}
+
+	cerr := errors.New("decode error")
+	SetTypeEncoding(reflect.TypeOf(cType{}),
+		nil, func(enc interface{}, val reflect.Value) error {
+			return cerr
+		})
+
+	var out cType
+	err := Decode(&out, in)
+	if err == nil {
+		t.Errorf("got no error, expected %v", cerr)
+	}
+	if err != cerr {
+		t.Errorf("got %v, want %v", err, cerr)
 	}
 }

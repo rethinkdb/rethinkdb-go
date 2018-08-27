@@ -1,6 +1,8 @@
 package tests
 
-import (r "gopkg.in/gorethink/gorethink.v4")
+import (
+	r "gopkg.in/gorethink/gorethink.v4"
+)
 
 func setupTestData() {
 	if *testdata {

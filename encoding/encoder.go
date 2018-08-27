@@ -80,10 +80,3 @@ func typeEncoder(t reflect.Type) encoderFunc {
 	encoderCache.Unlock()
 	return f
 }
-
-// IgnoreType causes the encoder to ignore a type when encoding
-func IgnoreType(t reflect.Type) {
-	encoderCache.Lock()
-	encoderCache.m[t] = doNothingEncoder
-	encoderCache.Unlock()
-}
