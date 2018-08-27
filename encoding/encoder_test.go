@@ -436,7 +436,7 @@ func TestEncodeCustomTypeEncodingValue(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf(innerType{}),
-		func (v interface{}) interface{}{
+		func(v interface{}) interface{} {
 			return map[string]interface{}{"someval": v.(innerType).Val}
 		}, nil)
 
@@ -464,7 +464,7 @@ func TestEncodeCustomTypeEncodingPointer(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf((*innerType)(nil)),
-		func (v interface{}) interface{}{
+		func(v interface{}) interface{} {
 			return map[string]interface{}{"someval": v.(*innerType).Val}
 		}, nil)
 
@@ -488,7 +488,7 @@ func TestEncodeCustomRootTypeEncodingValue(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf(cType{}),
-		func (v interface{}) interface{}{
+		func(v interface{}) interface{} {
 			return map[string]interface{}{"someval": v.(cType).Val}
 		}, nil)
 
@@ -512,7 +512,7 @@ func TestEncodeCustomRootTypeEncodingPointer(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf((*cType)(nil)),
-		func (v interface{}) interface{}{
+		func(v interface{}) interface{} {
 			return map[string]interface{}{"someval": v.(*cType).Val}
 		}, nil)
 

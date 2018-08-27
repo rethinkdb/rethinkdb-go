@@ -14,7 +14,7 @@ var (
 	unmarshalerType = reflect.TypeOf(new(Unmarshaler)).Elem()
 
 	emptyInterfaceType = reflect.TypeOf((*interface{})(nil)).Elem()
-	mapInterfaceType = reflect.TypeOf((map[string]interface{})(nil))
+	mapInterfaceType   = reflect.TypeOf((map[string]interface{})(nil))
 )
 
 // Marshaler is the interface implemented by objects that
