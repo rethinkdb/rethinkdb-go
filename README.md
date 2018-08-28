@@ -40,7 +40,7 @@ import (
 
 func Example() {
 	session, err := r.Connect(r.ConnectOpts{
-		Address: url,
+		Address: "localhost:28013",
 	})
 	if err != nil {
 		log.Fatalln(err)
