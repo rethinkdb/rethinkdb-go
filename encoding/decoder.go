@@ -9,7 +9,7 @@ import (
 
 var byteSliceType = reflect.TypeOf([]byte(nil))
 
-type decoderFunc func(dv reflect.Value, sv reflect.Value)
+type decoderFunc func(dv reflect.Value, sv reflect.Value) error
 
 // Decode decodes map[string]interface{} into a struct. The first parameter
 // must be a pointer.
@@ -54,18 +54,16 @@ func decode(dst interface{}, src interface{}, blank bool) (err error) {
 		}
 	}
 
-	decodeValue(dv, sv, blank)
-	return nil
+	return decodeValue(dv, sv, blank)
 }
 
 // decodeValue decodes the source value into the destination value
-func decodeValue(dv, sv reflect.Value, blank bool) {
-	valueDecoder(dv, sv, blank)(dv, sv)
+func decodeValue(dv, sv reflect.Value, blank bool) error {
+	return valueDecoder(dv, sv, blank)(dv, sv)
 }
 
 type decoderCacheKey struct {
 	dt, st reflect.Type
-	blank  bool
 }
 
 var decoderCache struct {
@@ -90,7 +88,7 @@ func valueDecoder(dv, sv reflect.Value, blank bool) decoderFunc {
 
 func typeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 	decoderCache.RLock()
-	f := decoderCache.m[decoderCacheKey{dt, st, blank}]
+	f := decoderCache.m[decoderCacheKey{dt, st}]
 	decoderCache.RUnlock()
 	if f != nil {
 		return f
@@ -103,9 +101,9 @@ func typeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 	decoderCache.Lock()
 	var wg sync.WaitGroup
 	wg.Add(1)
-	decoderCache.m[decoderCacheKey{dt, st, blank}] = func(dv, sv reflect.Value) {
+	decoderCache.m[decoderCacheKey{dt, st}] = func(dv, sv reflect.Value) error {
 		wg.Wait()
-		f(dv, sv)
+		return f(dv, sv)
 	}
 	decoderCache.Unlock()
 
@@ -114,7 +112,7 @@ func typeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 	f = newTypeDecoder(dt, st, blank)
 	wg.Done()
 	decoderCache.Lock()
-	decoderCache.m[decoderCacheKey{dt, st, blank}] = f
+	decoderCache.m[decoderCacheKey{dt, st}] = f
 	decoderCache.Unlock()
 	return f
 }

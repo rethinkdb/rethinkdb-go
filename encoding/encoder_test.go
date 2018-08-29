@@ -1,6 +1,7 @@
 package encoding
 
 import (
+	"errors"
 	"image"
 	"reflect"
 	"testing"
@@ -418,5 +419,131 @@ func TestEncodeNilSlice(t *testing.T) {
 	}
 	if !jsonEqual(out, want) {
 		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestEncodeCustomTypeEncodingValue(t *testing.T) {
+	type innerType struct {
+		Val int
+	}
+
+	outer := struct {
+		Inner innerType `gorethink:"inner"`
+	}{Inner: innerType{Val: 5}}
+	want := map[string]interface{}{
+		"inner": map[string]interface{}{
+			"someval": 5,
+		},
+	}
+
+	SetTypeEncoding(reflect.TypeOf(innerType{}),
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(innerType).Val}, nil
+		}, nil)
+
+	out, err := Encode(outer)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestEncodeCustomTypeEncodingPointer(t *testing.T) {
+	type innerType struct {
+		Val int
+	}
+
+	outer := struct {
+		Inner *innerType `gorethink:"inner"`
+	}{Inner: &innerType{Val: 5}}
+	want := map[string]interface{}{
+		"inner": map[string]interface{}{
+			"someval": 5,
+		},
+	}
+
+	SetTypeEncoding(reflect.TypeOf((*innerType)(nil)),
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(*innerType).Val}, nil
+		}, nil)
+
+	out, err := Encode(outer)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestEncodeCustomRootTypeEncodingValue(t *testing.T) {
+	type cType struct {
+		Val int
+	}
+	in := cType{Val: 5}
+
+	want := map[string]interface{}{
+		"someval": 5,
+	}
+
+	SetTypeEncoding(reflect.TypeOf(cType{}),
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(cType).Val}, nil
+		}, nil)
+
+	out, err := Encode(in)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestEncodeCustomRootTypeEncodingPointer(t *testing.T) {
+	type cType struct {
+		Val int
+	}
+	in := cType{Val: 5}
+
+	want := map[string]interface{}{
+		"someval": 5,
+	}
+
+	SetTypeEncoding(reflect.TypeOf((*cType)(nil)),
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(*cType).Val}, nil
+		}, nil)
+
+	out, err := Encode(&in)
+	if err != nil {
+		t.Errorf("got error %v, expected nil", err)
+	}
+	if !jsonEqual(out, want) {
+		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestEncodeCustomRootTypeEncodingError(t *testing.T) {
+	type cType struct {
+		Val int
+	}
+	in := cType{Val: 5}
+
+	cerr := errors.New("encode error")
+
+	SetTypeEncoding(reflect.TypeOf((*cType)(nil)),
+		func(v interface{}) (interface{}, error) {
+			return nil, cerr
+		}, nil)
+
+	_, err := Encode(&in)
+	if err == nil {
+		t.Errorf("got nil error, expected %v", cerr)
+	}
+	if err != cerr  {
+		t.Errorf("got %q, want %q", err, cerr)
 	}
 }

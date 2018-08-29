@@ -155,44 +155,47 @@ func newTypeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 	}
 }
 
-func invalidValueDecoder(dv, sv reflect.Value) {
+func invalidValueDecoder(dv, sv reflect.Value) error {
 	dv.Set(reflect.Zero(dv.Type()))
+	return nil
 }
 
-func unsupportedTypeDecoder(dv, sv reflect.Value) {
-	panic(&UnsupportedTypeError{dv.Type()})
+func unsupportedTypeDecoder(dv, sv reflect.Value) error {
+	return &UnsupportedTypeError{dv.Type()}
 }
 
-func decodeTypeError(dv, sv reflect.Value) {
-	panic(&DecodeTypeError{
+func decodeTypeError(dv, sv reflect.Value) error {
+	return &DecodeTypeError{
 		DestType: dv.Type(),
 		SrcType:  sv.Type(),
-	})
-}
-
-func newDecodeTypeError(err error) decoderFunc {
-	return func(dv, sv reflect.Value) {
-		panic(&DecodeTypeError{
-			DestType: dv.Type(),
-			SrcType:  sv.Type(),
-			Reason:   err.Error(),
-		})
 	}
 }
 
-func interfaceDecoder(dv, sv reflect.Value) {
+func newDecodeTypeError(err error) decoderFunc {
+	return func(dv, sv reflect.Value) error {
+		return &DecodeTypeError{
+			DestType: dv.Type(),
+			SrcType:  sv.Type(),
+			Reason:   err.Error(),
+		}
+	}
+}
+
+func interfaceDecoder(dv, sv reflect.Value) error {
 	dv.Set(sv)
+	return nil
 }
 
 func newInterfaceAsTypeDecoder(blank bool) decoderFunc {
-	return func(dv, sv reflect.Value) {
+	return func(dv, sv reflect.Value) error {
 		if !sv.IsNil() {
 			dv = indirect(dv, false)
 			if blank {
 				dv.Set(reflect.Zero(dv.Type()))
 			}
-			decodeValue(dv, sv.Elem(), blank)
+			return decodeValue(dv, sv.Elem(), blank)
 		}
+		return nil
 	}
 }
 
@@ -200,10 +203,11 @@ type ptrDecoder struct {
 	elemDec decoderFunc
 }
 
-func (d *ptrDecoder) decode(dv, sv reflect.Value) {
+func (d *ptrDecoder) decode(dv, sv reflect.Value) error {
 	v := reflect.New(dv.Type().Elem())
-	d.elemDec(v, sv)
+	err := d.elemDec(v, sv)
 	dv.Set(v)
+	return err
 }
 
 func newPtrDecoder(dt, st reflect.Type, blank bool) decoderFunc {
@@ -212,7 +216,7 @@ func newPtrDecoder(dt, st reflect.Type, blank bool) decoderFunc {
 	return dec.decode
 }
 
-func unmarshalerDecoder(dv, sv reflect.Value) {
+func unmarshalerDecoder(dv, sv reflect.Value) error {
 	// modeled off of https://golang.org/src/encoding/json/decode.go?#L325
 	if dv.Kind() != reflect.Ptr && dv.Type().Name() != "" && dv.CanAddr() {
 		dv = dv.Addr()
@@ -225,136 +229,162 @@ func unmarshalerDecoder(dv, sv reflect.Value) {
 	u := dv.Interface().(Unmarshaler)
 	err := u.UnmarshalRQL(sv.Interface())
 	if err != nil {
-		panic(&DecodeTypeError{dv.Type(), sv.Type(), err.Error()})
+		return &DecodeTypeError{dv.Type(), sv.Type(), err.Error()}
 	}
+	return nil
 }
 
 // Boolean decoders
 
-func boolAsBoolDecoder(dv, sv reflect.Value) {
+func boolAsBoolDecoder(dv, sv reflect.Value) error {
 	dv.SetBool(sv.Bool())
+	return nil
 }
-func boolAsIntDecoder(dv, sv reflect.Value) {
+func boolAsIntDecoder(dv, sv reflect.Value) error {
 	if sv.Bool() {
 		dv.SetInt(1)
 	} else {
 		dv.SetInt(0)
 	}
+	return nil
 }
-func boolAsUintDecoder(dv, sv reflect.Value) {
+func boolAsUintDecoder(dv, sv reflect.Value) error {
 	if sv.Bool() {
 		dv.SetUint(1)
 	} else {
 		dv.SetUint(0)
 	}
+	return nil
 }
-func boolAsFloatDecoder(dv, sv reflect.Value) {
+func boolAsFloatDecoder(dv, sv reflect.Value) error {
 	if sv.Bool() {
 		dv.SetFloat(1)
 	} else {
 		dv.SetFloat(0)
 	}
+	return nil
 }
-func boolAsStringDecoder(dv, sv reflect.Value) {
+func boolAsStringDecoder(dv, sv reflect.Value) error {
 	if sv.Bool() {
 		dv.SetString("1")
 	} else {
 		dv.SetString("0")
 	}
+	return nil
 }
 
 // Int decoders
 
-func intAsBoolDecoder(dv, sv reflect.Value) {
+func intAsBoolDecoder(dv, sv reflect.Value) error {
 	dv.SetBool(sv.Int() != 0)
+	return nil
 }
-func intAsIntDecoder(dv, sv reflect.Value) {
+func intAsIntDecoder(dv, sv reflect.Value) error {
 	dv.SetInt(sv.Int())
+	return nil
 }
-func intAsUintDecoder(dv, sv reflect.Value) {
+func intAsUintDecoder(dv, sv reflect.Value) error {
 	dv.SetUint(uint64(sv.Int()))
+	return nil
 }
-func intAsFloatDecoder(dv, sv reflect.Value) {
+func intAsFloatDecoder(dv, sv reflect.Value) error {
 	dv.SetFloat(float64(sv.Int()))
+	return nil
 }
-func intAsStringDecoder(dv, sv reflect.Value) {
+func intAsStringDecoder(dv, sv reflect.Value) error {
 	dv.SetString(strconv.FormatInt(sv.Int(), 10))
+	return nil
 }
 
 // Uint decoders
 
-func uintAsBoolDecoder(dv, sv reflect.Value) {
+func uintAsBoolDecoder(dv, sv reflect.Value) error {
 	dv.SetBool(sv.Uint() != 0)
+	return nil
 }
-func uintAsIntDecoder(dv, sv reflect.Value) {
+func uintAsIntDecoder(dv, sv reflect.Value) error {
 	dv.SetInt(int64(sv.Uint()))
+	return nil
 }
-func uintAsUintDecoder(dv, sv reflect.Value) {
+func uintAsUintDecoder(dv, sv reflect.Value) error {
 	dv.SetUint(sv.Uint())
+	return nil
 }
-func uintAsFloatDecoder(dv, sv reflect.Value) {
+func uintAsFloatDecoder(dv, sv reflect.Value) error {
 	dv.SetFloat(float64(sv.Uint()))
+	return nil
 }
-func uintAsStringDecoder(dv, sv reflect.Value) {
+func uintAsStringDecoder(dv, sv reflect.Value) error {
 	dv.SetString(strconv.FormatUint(sv.Uint(), 10))
+	return nil
 }
 
 // Float decoders
 
-func floatAsBoolDecoder(dv, sv reflect.Value) {
+func floatAsBoolDecoder(dv, sv reflect.Value) error {
 	dv.SetBool(sv.Float() != 0)
+	return nil
 }
-func floatAsIntDecoder(dv, sv reflect.Value) {
+func floatAsIntDecoder(dv, sv reflect.Value) error {
 	dv.SetInt(int64(sv.Float()))
+	return nil
 }
-func floatAsUintDecoder(dv, sv reflect.Value) {
+func floatAsUintDecoder(dv, sv reflect.Value) error {
 	dv.SetUint(uint64(sv.Float()))
+	return nil
 }
-func floatAsFloatDecoder(dv, sv reflect.Value) {
+func floatAsFloatDecoder(dv, sv reflect.Value) error {
 	dv.SetFloat(float64(sv.Float()))
+	return nil
 }
-func floatAsStringDecoder(dv, sv reflect.Value) {
+func floatAsStringDecoder(dv, sv reflect.Value) error {
 	dv.SetString(strconv.FormatFloat(sv.Float(), 'f', -1, 64))
+	return nil
 }
 
 // String decoders
 
-func stringAsBoolDecoder(dv, sv reflect.Value) {
+func stringAsBoolDecoder(dv, sv reflect.Value) error {
 	b, err := strconv.ParseBool(sv.String())
 	if err == nil {
 		dv.SetBool(b)
 	} else if sv.String() == "" {
 		dv.SetBool(false)
 	} else {
-		panic(&DecodeTypeError{dv.Type(), sv.Type(), err.Error()})
+		return &DecodeTypeError{dv.Type(), sv.Type(), err.Error()}
 	}
+	return nil
 }
-func stringAsIntDecoder(dv, sv reflect.Value) {
+func stringAsIntDecoder(dv, sv reflect.Value) error {
 	i, err := strconv.ParseInt(sv.String(), 0, dv.Type().Bits())
 	if err == nil {
 		dv.SetInt(i)
 	} else {
-		panic(&DecodeTypeError{dv.Type(), sv.Type(), err.Error()})
+		return &DecodeTypeError{dv.Type(), sv.Type(), err.Error()}
 	}
+	return nil
 }
-func stringAsUintDecoder(dv, sv reflect.Value) {
+func stringAsUintDecoder(dv, sv reflect.Value) error {
 	i, err := strconv.ParseUint(sv.String(), 0, dv.Type().Bits())
 	if err == nil {
 		dv.SetUint(i)
 	} else {
-		panic(&DecodeTypeError{dv.Type(), sv.Type(), err.Error()})
+		return &DecodeTypeError{dv.Type(), sv.Type(), err.Error()}
 	}
+	return nil
 }
-func stringAsFloatDecoder(dv, sv reflect.Value) {
+func stringAsFloatDecoder(dv, sv reflect.Value) error {
 	f, err := strconv.ParseFloat(sv.String(), dv.Type().Bits())
 	if err == nil {
 		dv.SetFloat(f)
 	} else {
-		panic(&DecodeTypeError{dv.Type(), sv.Type(), err.Error()})
+		return &DecodeTypeError{dv.Type(), sv.Type(), err.Error()}
 	}
+	return nil
 }
-func stringAsStringDecoder(dv, sv reflect.Value) {
+func stringAsStringDecoder(dv, sv reflect.Value) error {
 	dv.SetString(sv.String())
+	return nil
 }
 
 // Slice/Array decoder
@@ -363,14 +393,18 @@ type sliceDecoder struct {
 	arrayDec decoderFunc
 }
 
-func (d *sliceDecoder) decode(dv, sv reflect.Value) {
+func (d *sliceDecoder) decode(dv, sv reflect.Value) error {
 	if dv.Kind() == reflect.Slice {
 		dv.Set(reflect.MakeSlice(dv.Type(), dv.Len(), dv.Cap()))
 	}
 
 	if !sv.IsNil() {
-		d.arrayDec(dv, sv)
+		err := d.arrayDec(dv, sv)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }
 
 func newSliceDecoder(dt, st reflect.Type) decoderFunc {
@@ -382,7 +416,7 @@ type arrayDecoder struct {
 	elemDec decoderFunc
 }
 
-func (d *arrayDecoder) decode(dv, sv reflect.Value) {
+func (d *arrayDecoder) decode(dv, sv reflect.Value) error {
 	// Iterate through the slice/array and decode each element before adding it
 	// to the dest slice/array
 	i := 0
@@ -405,7 +439,10 @@ func (d *arrayDecoder) decode(dv, sv reflect.Value) {
 
 		if i < dv.Len() {
 			// Decode into element.
-			d.elemDec(dv.Index(i), sv.Index(i))
+			err := d.elemDec(dv.Index(i), sv.Index(i))
+			if err != nil {
+				return err
+			}
 		}
 
 		i++
@@ -423,6 +460,7 @@ func (d *arrayDecoder) decode(dv, sv reflect.Value) {
 			dv.SetLen(i)
 		}
 	}
+	return nil
 }
 
 func newArrayDecoder(dt, st reflect.Type) decoderFunc {
@@ -437,7 +475,7 @@ type mapAsMapDecoder struct {
 	blank           bool
 }
 
-func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) {
+func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) error {
 	dt := dv.Type()
 	if d.blank {
 		dv.Set(reflect.MakeMap(reflect.MapOf(dt.Key(), dt.Elem())))
@@ -467,11 +505,18 @@ func (d *mapAsMapDecoder) decode(dv, sv reflect.Value) {
 		}
 		dElemVal = mapElem
 
-		d.keyDec(dElemKey, sElemKey)
-		d.elemDec(dElemVal, sv.MapIndex(sElemKey))
+		err := d.keyDec(dElemKey, sElemKey)
+		if err != nil {
+			return err
+		}
+		err = d.elemDec(dElemVal, sv.MapIndex(sElemKey))
+		if err != nil {
+			return err
+		}
 
 		dv.SetMapIndex(dElemKey, dElemVal)
 	}
+	return nil
 }
 
 func newMapAsMapDecoder(dt, st reflect.Type, blank bool) decoderFunc {
@@ -485,7 +530,7 @@ type mapAsStructDecoder struct {
 	blank     bool
 }
 
-func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
+func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) error {
 	for _, kv := range sv.MapKeys() {
 		var f *field
 		var compoundFields = []*field{}
@@ -526,7 +571,10 @@ func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
 					continue
 				}
 
-				fieldDec(dElemVal, sElemVal)
+				err := fieldDec(dElemVal, sElemVal)
+				if err != nil {
+					return err
+				}
 			}
 		} else if f != nil {
 			dElemVal := fieldByIndex(dv, f.index)
@@ -536,9 +584,13 @@ func (d *mapAsStructDecoder) decode(dv, sv reflect.Value) {
 				continue
 			}
 
-			fieldDec(dElemVal, sElemVal)
+			err := fieldDec(dElemVal, sElemVal)
+			if err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
 
 func newMapAsStructDecoder(dt, st reflect.Type, blank bool) decoderFunc {

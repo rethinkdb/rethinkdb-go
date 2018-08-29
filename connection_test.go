@@ -1,15 +1,15 @@
 package gorethink
 
 import (
-	test "gopkg.in/check.v1"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
-	"golang.org/x/net/context"
 	"encoding/binary"
 	"encoding/json"
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/mocktracer"
+	"golang.org/x/net/context"
+	test "gopkg.in/check.v1"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
 	"io"
 	"time"
-	"github.com/opentracing/opentracing-go/mocktracer"
-	"github.com/opentracing/opentracing-go"
 )
 
 type ConnectionSuite struct{}
@@ -52,7 +52,7 @@ func (s *ConnectionSuite) TestConnection_Query_Ok(c *test.C) {
 func (s *ConnectionSuite) TestConnection_Query_DefaultDBOk(c *test.C) {
 	ctx := context.Background()
 	token := int64(1)
-	q := testQuery(Table("table").Get("id"),)
+	q := testQuery(Table("table").Get("id"))
 	q2 := q
 	q2.Opts["db"], _ = DB("db").Build()
 	writeData := serializeQuery(token, q2)
@@ -134,7 +134,7 @@ func (s *ConnectionSuite) TestConnection_Query_NoReplyOk(c *test.C) {
 	connection := newConnection(conn, "addr", &ConnectOpts{})
 	connection.runConnection()
 	response, cursor, err := connection.Query(nil, q)
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	connection.Close()
 
 	c.Assert(response, test.IsNil)
@@ -247,9 +247,9 @@ func (s *ConnectionSuite) TestConnection_processResponses_SocketErr(c *test.C) {
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 1}, promise: promise1}
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 2}, promise: promise2}
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 2}, promise: promise3}
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	connection.responseChan <- responseAndError{err: io.EOF}
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 
 	select {
 	case f := <-promise1:
@@ -284,9 +284,9 @@ func (s *ConnectionSuite) TestConnection_processResponses_StopOk(c *test.C) {
 
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 1}, promise: promise1}
 	close(connection.responseChan)
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	close(connection.stopReadChan)
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 
 	select {
 	case f := <-promise1:
@@ -299,7 +299,7 @@ func (s *ConnectionSuite) TestConnection_processResponses_StopOk(c *test.C) {
 
 func (s *ConnectionSuite) TestConnection_processResponses_ResponseFirst(c *test.C) {
 	promise1 := make(chan responseAndCursor, 1)
-	response1 := &Response{Token:1, Type: p.Response_RUNTIME_ERROR, ErrorType: p.Response_INTERNAL}
+	response1 := &Response{Token: 1, Type: p.Response_RUNTIME_ERROR, ErrorType: p.Response_INTERNAL}
 
 	conn := &connMock{}
 	conn.On("Close").Return(nil)
@@ -309,11 +309,11 @@ func (s *ConnectionSuite) TestConnection_processResponses_ResponseFirst(c *test.
 	go connection.processResponses()
 
 	connection.responseChan <- responseAndError{response: response1}
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 1}, promise: promise1}
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 	connection.Close()
-	time.Sleep(5*time.Millisecond)
+	time.Sleep(5 * time.Millisecond)
 
 	select {
 	case f := <-promise1:
@@ -437,8 +437,8 @@ func (s *ConnectionSuite) TestConnection_processResponse_FirstPartialOk(c *test.
 	ctx := context.Background()
 	token := int64(3)
 	q := Query{Token: token}
-	rawResponse1 := json.RawMessage{1,2,3}
-	rawResponse2 := json.RawMessage{3,4,5}
+	rawResponse1 := json.RawMessage{1, 2, 3}
+	rawResponse2 := json.RawMessage{3, 4, 5}
 	response := &Response{Token: token, Type: p.Response_SUCCESS_PARTIAL, Responses: []json.RawMessage{rawResponse1, rawResponse2}}
 
 	connection := newConnection(nil, "addr", &ConnectOpts{})
@@ -463,8 +463,8 @@ func (s *ConnectionSuite) TestConnection_processResponse_PartialOk(c *test.C) {
 	token := int64(3)
 	term := Table("test")
 	q := Query{Token: token}
-	rawResponse1 := json.RawMessage{1,2,3}
-	rawResponse2 := json.RawMessage{3,4,5}
+	rawResponse1 := json.RawMessage{1, 2, 3}
+	rawResponse2 := json.RawMessage{3, 4, 5}
 	response := &Response{Token: token, Type: p.Response_SUCCESS_PARTIAL, Responses: []json.RawMessage{rawResponse1, rawResponse2}}
 
 	connection := newConnection(nil, "addr", &ConnectOpts{})
@@ -491,8 +491,8 @@ func (s *ConnectionSuite) TestConnection_processResponse_SequenceOk(c *test.C) {
 
 	token := int64(3)
 	q := Query{Token: token}
-	rawResponse1 := json.RawMessage{1,2,3}
-	rawResponse2 := json.RawMessage{3,4,5}
+	rawResponse1 := json.RawMessage{1, 2, 3}
+	rawResponse2 := json.RawMessage{3, 4, 5}
 	response := &Response{Token: token, Type: p.Response_SUCCESS_SEQUENCE, Responses: []json.RawMessage{rawResponse1, rawResponse2}}
 
 	connection := newConnection(nil, "addr", &ConnectOpts{})

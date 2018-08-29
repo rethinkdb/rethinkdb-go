@@ -1,12 +1,12 @@
 package tests
 
 import (
+	r "gopkg.in/gorethink/gorethink.v4"
 	"math/rand"
 	"strconv"
 	"sync"
 	"testing"
 	"time"
-	r "gopkg.in/gorethink/gorethink.v4"
 )
 
 func BenchmarkBatch200RandomWrites(b *testing.B) {

@@ -42,7 +42,6 @@ func (e *DecodeTypeError) Error() string {
 		return "gorethink: could not decode type " + e.SrcType.String() + " into Go value of type " + e.DestType.String() + ": " + e.Reason
 	} else {
 		return "gorethink: could not decode type " + e.SrcType.String() + " into Go value of type " + e.DestType.String()
-
 	}
 }
 

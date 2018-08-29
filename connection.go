@@ -9,13 +9,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
-	"sync"
+	"bytes"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
-	"bytes"
+	"golang.org/x/net/context"
+	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	"sync"
 )
 
 const (
