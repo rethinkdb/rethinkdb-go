@@ -9,7 +9,7 @@ import (
 	"sync"
 )
 
-type encoderFunc func(v reflect.Value) interface{}
+type encoderFunc func(v reflect.Value) (interface{}, error)
 
 // Encode returns the encoded value of v.
 //
@@ -30,10 +30,10 @@ func Encode(v interface{}) (ev interface{}, err error) {
 		}
 	}()
 
-	return encode(reflect.ValueOf(v)), nil
+	return encode(reflect.ValueOf(v))
 }
 
-func encode(v reflect.Value) interface{} {
+func encode(v reflect.Value) (interface{}, error) {
 	return valueEncoder(v)(v)
 }
 
@@ -65,7 +65,7 @@ func typeEncoder(t reflect.Type) encoderFunc {
 	encoderCache.Lock()
 	var wg sync.WaitGroup
 	wg.Add(1)
-	encoderCache.m[t] = func(v reflect.Value) interface{} {
+	encoderCache.m[t] = func(v reflect.Value) (interface{}, error) {
 		wg.Wait()
 		return f(v)
 	}

@@ -43,11 +43,11 @@ func IgnoreType(t reflect.Type) {
 
 func SetTypeEncoding(
 	t reflect.Type,
-	encode func(value interface{}) interface{},
+	encode func(value interface{}) (interface{}, error),
 	decode func(encoded interface{}, value reflect.Value) error,
 ) {
 	encoderCache.Lock()
-	encoderCache.m[t] = func(v reflect.Value) interface{} {
+	encoderCache.m[t] = func(v reflect.Value) (interface{}, error) {
 		return encode(v.Interface())
 	}
 	encoderCache.Unlock()

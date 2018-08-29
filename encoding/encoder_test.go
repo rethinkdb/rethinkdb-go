@@ -1,6 +1,7 @@
 package encoding
 
 import (
+	"errors"
 	"image"
 	"reflect"
 	"testing"
@@ -436,8 +437,8 @@ func TestEncodeCustomTypeEncodingValue(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf(innerType{}),
-		func(v interface{}) interface{} {
-			return map[string]interface{}{"someval": v.(innerType).Val}
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(innerType).Val}, nil
 		}, nil)
 
 	out, err := Encode(outer)
@@ -464,8 +465,8 @@ func TestEncodeCustomTypeEncodingPointer(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf((*innerType)(nil)),
-		func(v interface{}) interface{} {
-			return map[string]interface{}{"someval": v.(*innerType).Val}
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(*innerType).Val}, nil
 		}, nil)
 
 	out, err := Encode(outer)
@@ -488,8 +489,8 @@ func TestEncodeCustomRootTypeEncodingValue(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf(cType{}),
-		func(v interface{}) interface{} {
-			return map[string]interface{}{"someval": v.(cType).Val}
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(cType).Val}, nil
 		}, nil)
 
 	out, err := Encode(in)
@@ -512,8 +513,8 @@ func TestEncodeCustomRootTypeEncodingPointer(t *testing.T) {
 	}
 
 	SetTypeEncoding(reflect.TypeOf((*cType)(nil)),
-		func(v interface{}) interface{} {
-			return map[string]interface{}{"someval": v.(*cType).Val}
+		func(v interface{}) (interface{}, error) {
+			return map[string]interface{}{"someval": v.(*cType).Val}, nil
 		}, nil)
 
 	out, err := Encode(&in)
@@ -522,5 +523,27 @@ func TestEncodeCustomRootTypeEncodingPointer(t *testing.T) {
 	}
 	if !jsonEqual(out, want) {
 		t.Errorf("got %q, want %q", out, want)
+	}
+}
+
+func TestEncodeCustomRootTypeEncodingError(t *testing.T) {
+	type cType struct {
+		Val int
+	}
+	in := cType{Val: 5}
+
+	cerr := errors.New("encode error")
+
+	SetTypeEncoding(reflect.TypeOf((*cType)(nil)),
+		func(v interface{}) (interface{}, error) {
+			return nil, cerr
+		}, nil)
+
+	_, err := Encode(&in)
+	if err == nil {
+		t.Errorf("got nil error, expected %v", cerr)
+	}
+	if err != cerr  {
+		t.Errorf("got %q, want %q", err, cerr)
 	}
 }
