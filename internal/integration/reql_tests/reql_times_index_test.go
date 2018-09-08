@@ -36,16 +36,16 @@ func (suite *TimesIndexSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_times_idx").Exec(suite.session)
+	err = r.DBCreate("db_times_idx").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_times_idx").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("test").TableDrop("tbl").Exec(suite.session)
-	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
+	r.DB("db_times_idx").TableDrop("table_test_times_index").Exec(suite.session)
+	err = r.DB("db_times_idx").TableCreate("table_test_times_index").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
+	err = r.DB("db_times_idx").Table("table_test_times_index").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *TimesIndexSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("test").TableDrop("tbl").Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DB("db_times_idx").TableDrop("table_test_times_index").Exec(suite.session)
+		r.DBDrop("db_times_idx").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,8 +64,8 @@ func (suite *TimesIndexSuite) TearDownSuite() {
 func (suite *TimesIndexSuite) TestCases() {
 	suite.T().Log("Running TimesIndexSuite: secondary indexes on times")
 
-	tbl := r.DB("test").Table("tbl")
-	_ = tbl // Prevent any noused variable errors
+	table_test_times_index := r.DB("db_times_idx").Table("table_test_times_index")
+	_ = table_test_times_index // Prevent any noused variable errors
 
 	// times/index.yaml line #7
 	// ts={"timezone":"-07:00","epoch_time":1375445162.0872,"$reql_type$":"TIME"}
@@ -127,11 +127,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #37
 		/* 5 */
 		var expected_ int = 5
-		/* tbl.insert(trows)['inserted'] */
+		/* table_test_times_index.insert(trows)['inserted'] */
 
-		suite.T().Log("About to run line #37: tbl.Insert(trows).AtIndex('inserted')")
+		suite.T().Log("About to run line #37: table_test_times_index.Insert(trows).AtIndex('inserted')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(trows).AtIndex("inserted"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Insert(trows).AtIndex("inserted"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -149,11 +149,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #42
 		/* ("Duplicate primary key `id`:\n{\n\t\"id\":\t{\n\t\t\"$reql_type$\":\t\"TIME\",\n\t\t\"epoch_time\":\t1375445163.087,\n\t\t\"timezone\":\t\"-07:00\"\n\t}\n}\n{\n\t\"id\":\t{\n\t\t\"$reql_type$\":\t\"TIME\",\n\t\t\"epoch_time\":\t1375445163.087,\n\t\t\"timezone\":\t\"+00:00\"\n\t}\n}") */
 		var expected_ string = "Duplicate primary key `id`:\n{\n\t\"id\":\t{\n\t\t\"$reql_type$\":\t\"TIME\",\n\t\t\"epoch_time\":\t1375445163.087,\n\t\t\"timezone\":\t\"-07:00\"\n\t}\n}\n{\n\t\"id\":\t{\n\t\t\"$reql_type$\":\t\"TIME\",\n\t\t\"epoch_time\":\t1375445163.087,\n\t\t\"timezone\":\t\"+00:00\"\n\t}\n}"
-		/* tbl.insert(bad_insert)['first_error'] */
+		/* table_test_times_index.insert(bad_insert)['first_error'] */
 
-		suite.T().Log("About to run line #42: tbl.Insert(bad_insert).AtIndex('first_error')")
+		suite.T().Log("About to run line #42: table_test_times_index.Insert(bad_insert).AtIndex('first_error')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(bad_insert).AtIndex("first_error"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Insert(bad_insert).AtIndex("first_error"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -164,11 +164,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #46
 		/* 5 */
 		var expected_ int = 5
-		/* tbl.between(ts, te).count() */
+		/* table_test_times_index.between(ts, te).count() */
 
-		suite.T().Log("About to run line #46: tbl.Between(ts, te).Count()")
+		suite.T().Log("About to run line #46: table_test_times_index.Between(ts, te).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(ts, te).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(ts, te).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -179,11 +179,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #48
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(t1, t4).count() */
+		/* table_test_times_index.between(t1, t4).count() */
 
-		suite.T().Log("About to run line #48: tbl.Between(t1, t4).Count()")
+		suite.T().Log("About to run line #48: table_test_times_index.Between(t1, t4).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, t4).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, t4).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -194,11 +194,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #51
 		/* 4 */
 		var expected_ int = 4
-		/* tbl.between(t1, t4, right_bound='closed').count() */
+		/* table_test_times_index.between(t1, t4, right_bound='closed').count() */
 
-		suite.T().Log("About to run line #51: tbl.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
+		suite.T().Log("About to run line #51: table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -209,11 +209,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #54
 		/* 5 */
 		var expected_ int = 5
-		/* tbl.between(r.expr(ts).in_timezone("+06:00"), te).count() */
+		/* table_test_times_index.between(r.expr(ts).in_timezone("+06:00"), te).count() */
 
-		suite.T().Log("About to run line #54: tbl.Between(r.Expr(ts).InTimezone('+06:00'), te).Count()")
+		suite.T().Log("About to run line #54: table_test_times_index.Between(r.Expr(ts).InTimezone('+06:00'), te).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.Expr(ts).InTimezone("+06:00"), te).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(r.Expr(ts).InTimezone("+06:00"), te).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -224,11 +224,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #56
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(t1, r.expr(t4).in_timezone("+08:00")).count() */
+		/* table_test_times_index.between(t1, r.expr(t4).in_timezone("+08:00")).count() */
 
-		suite.T().Log("About to run line #56: tbl.Between(t1, r.Expr(t4).InTimezone('+08:00')).Count()")
+		suite.T().Log("About to run line #56: table_test_times_index.Between(t1, r.Expr(t4).InTimezone('+08:00')).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, r.Expr(t4).InTimezone("+08:00")).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, r.Expr(t4).InTimezone("+08:00")).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -239,11 +239,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #59
 		/* 4 */
 		var expected_ int = 4
-		/* tbl.between(r.expr(t1).in_timezone("Z"), t4, right_bound='closed').count() */
+		/* table_test_times_index.between(r.expr(t1).in_timezone("Z"), t4, right_bound='closed').count() */
 
-		suite.T().Log("About to run line #59: tbl.Between(r.Expr(t1).InTimezone('Z'), t4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
+		suite.T().Log("About to run line #59: table_test_times_index.Between(r.Expr(t1).InTimezone('Z'), t4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.Expr(t1).InTimezone("Z"), t4).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(r.Expr(t1).InTimezone("Z"), t4).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -254,11 +254,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #64
 		/* 5 */
 		var expected_ int = 5
-		/* tbl.update(lambda row:{'a':row['id']})['replaced'] */
+		/* table_test_times_index.update(lambda row:{'a':row['id']})['replaced'] */
 
-		suite.T().Log("About to run line #64: tbl.Update(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': row.AtIndex('id'), }}).AtIndex('replaced')")
+		suite.T().Log("About to run line #64: table_test_times_index.Update(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': row.AtIndex('id'), }}).AtIndex('replaced')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Update(func(row r.Term) interface{} { return map[interface{}]interface{}{"a": row.AtIndex("id")} }).AtIndex("replaced"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Update(func(row r.Term) interface{} { return map[interface{}]interface{}{"a": row.AtIndex("id")} }).AtIndex("replaced"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -269,11 +269,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #67
 		/* ({'created':1}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
-		/* tbl.index_create('a') */
+		/* table_test_times_index.index_create('a') */
 
-		suite.T().Log("About to run line #67: tbl.IndexCreate('a')")
+		suite.T().Log("About to run line #67: table_test_times_index.IndexCreate('a')")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("a"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.IndexCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -284,11 +284,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #69
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.index_wait('a').count() */
+		/* table_test_times_index.index_wait('a').count() */
 
-		suite.T().Log("About to run line #69: tbl.IndexWait('a').Count()")
+		suite.T().Log("About to run line #69: table_test_times_index.IndexWait('a').Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexWait("a").Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.IndexWait("a").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -299,11 +299,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #73
 		/* 5 */
 		var expected_ int = 5
-		/* tbl.between(ts, te, index='a').count() */
+		/* table_test_times_index.between(ts, te, index='a').count() */
 
-		suite.T().Log("About to run line #73: tbl.Between(ts, te).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
+		suite.T().Log("About to run line #73: table_test_times_index.Between(ts, te).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(ts, te).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(ts, te).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -314,11 +314,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #77
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(t1, t4, index='a').count() */
+		/* table_test_times_index.between(t1, t4, index='a').count() */
 
-		suite.T().Log("About to run line #77: tbl.Between(t1, t4).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
+		suite.T().Log("About to run line #77: table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, t4).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -329,11 +329,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #81
 		/* 4 */
 		var expected_ int = 4
-		/* tbl.between(t1, t4, right_bound='closed', index='a').count() */
+		/* table_test_times_index.between(t1, t4, right_bound='closed', index='a').count() */
 
-		suite.T().Log("About to run line #81: tbl.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'a', }).Count()")
+		suite.T().Log("About to run line #81: table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'a', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "a"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "a"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -344,11 +344,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #85
 		/* 5 */
 		var expected_ int = 5
-		/* tbl.between(r.expr(ts).in_timezone("+06:00"), te, index='a').count() */
+		/* table_test_times_index.between(r.expr(ts).in_timezone("+06:00"), te, index='a').count() */
 
-		suite.T().Log("About to run line #85: tbl.Between(r.Expr(ts).InTimezone('+06:00'), te).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
+		suite.T().Log("About to run line #85: table_test_times_index.Between(r.Expr(ts).InTimezone('+06:00'), te).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.Expr(ts).InTimezone("+06:00"), te).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(r.Expr(ts).InTimezone("+06:00"), te).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -359,11 +359,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #89
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(t1, r.expr(t4).in_timezone("+08:00"), index='a').count() */
+		/* table_test_times_index.between(t1, r.expr(t4).in_timezone("+08:00"), index='a').count() */
 
-		suite.T().Log("About to run line #89: tbl.Between(t1, r.Expr(t4).InTimezone('+08:00')).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
+		suite.T().Log("About to run line #89: table_test_times_index.Between(t1, r.Expr(t4).InTimezone('+08:00')).OptArgs(r.BetweenOpts{Index: 'a', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, r.Expr(t4).InTimezone("+08:00")).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, r.Expr(t4).InTimezone("+08:00")).OptArgs(r.BetweenOpts{Index: "a"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -374,11 +374,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #93
 		/* 4 */
 		var expected_ int = 4
-		/* tbl.between(r.expr(t1).in_timezone("Z"), t4, right_bound='closed', index='a').count() */
+		/* table_test_times_index.between(r.expr(t1).in_timezone("Z"), t4, right_bound='closed', index='a').count() */
 
-		suite.T().Log("About to run line #93: tbl.Between(r.Expr(t1).InTimezone('Z'), t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'a', }).Count()")
+		suite.T().Log("About to run line #93: table_test_times_index.Between(r.Expr(t1).InTimezone('Z'), t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'a', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.Expr(t1).InTimezone("Z"), t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "a"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(r.Expr(t1).InTimezone("Z"), t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "a"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -389,11 +389,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #98
 		/* ({'created':1}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
-		/* tbl.index_create('b', lambda row:r.branch(row['id'] < t4, row['a'], null)) */
+		/* table_test_times_index.index_create('b', lambda row:r.branch(row['id'] < t4, row['a'], null)) */
 
-		suite.T().Log("About to run line #98: tbl.IndexCreateFunc('b', func(row r.Term) interface{} { return r.Branch(row.AtIndex('id').Lt(t4), row.AtIndex('a'), nil)})")
+		suite.T().Log("About to run line #98: table_test_times_index.IndexCreateFunc('b', func(row r.Term) interface{} { return r.Branch(row.AtIndex('id').Lt(t4), row.AtIndex('a'), nil)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("b", func(row r.Term) interface{} { return r.Branch(row.AtIndex("id").Lt(t4), row.AtIndex("a"), nil) }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.IndexCreateFunc("b", func(row r.Term) interface{} { return r.Branch(row.AtIndex("id").Lt(t4), row.AtIndex("a"), nil) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -404,11 +404,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #101
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.index_wait('b').count() */
+		/* table_test_times_index.index_wait('b').count() */
 
-		suite.T().Log("About to run line #101: tbl.IndexWait('b').Count()")
+		suite.T().Log("About to run line #101: table_test_times_index.IndexWait('b').Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexWait("b").Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.IndexWait("b").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -419,11 +419,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #105
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.index_wait('b').count() */
+		/* table_test_times_index.index_wait('b').count() */
 
-		suite.T().Log("About to run line #105: tbl.IndexWait('b').Count()")
+		suite.T().Log("About to run line #105: table_test_times_index.IndexWait('b').Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexWait("b").Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.IndexWait("b").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -434,11 +434,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #109
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(ts, te, index='b').count() */
+		/* table_test_times_index.between(ts, te, index='b').count() */
 
-		suite.T().Log("About to run line #109: tbl.Between(ts, te).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
+		suite.T().Log("About to run line #109: table_test_times_index.Between(ts, te).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(ts, te).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(ts, te).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -449,11 +449,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #113
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(t1, t4, index='b').count() */
+		/* table_test_times_index.between(t1, t4, index='b').count() */
 
-		suite.T().Log("About to run line #113: tbl.Between(t1, t4).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
+		suite.T().Log("About to run line #113: table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, t4).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -464,11 +464,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #117
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(t1, t4, right_bound='closed', index='b').count() */
+		/* table_test_times_index.between(t1, t4, right_bound='closed', index='b').count() */
 
-		suite.T().Log("About to run line #117: tbl.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'b', }).Count()")
+		suite.T().Log("About to run line #117: table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'b', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "b"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "b"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -479,11 +479,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #121
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(r.expr(ts).in_timezone("+06:00"), te, index='b').count() */
+		/* table_test_times_index.between(r.expr(ts).in_timezone("+06:00"), te, index='b').count() */
 
-		suite.T().Log("About to run line #121: tbl.Between(r.Expr(ts).InTimezone('+06:00'), te).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
+		suite.T().Log("About to run line #121: table_test_times_index.Between(r.Expr(ts).InTimezone('+06:00'), te).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.Expr(ts).InTimezone("+06:00"), te).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(r.Expr(ts).InTimezone("+06:00"), te).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -494,11 +494,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #125
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(t1, r.expr(t4).in_timezone("+08:00"), index='b').count() */
+		/* table_test_times_index.between(t1, r.expr(t4).in_timezone("+08:00"), index='b').count() */
 
-		suite.T().Log("About to run line #125: tbl.Between(t1, r.Expr(t4).InTimezone('+08:00')).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
+		suite.T().Log("About to run line #125: table_test_times_index.Between(t1, r.Expr(t4).InTimezone('+08:00')).OptArgs(r.BetweenOpts{Index: 'b', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(t1, r.Expr(t4).InTimezone("+08:00")).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(t1, r.Expr(t4).InTimezone("+08:00")).OptArgs(r.BetweenOpts{Index: "b"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -509,11 +509,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #129
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.between(r.expr(t1).in_timezone("Z"), t4, right_bound='closed', index='b').count() */
+		/* table_test_times_index.between(r.expr(t1).in_timezone("Z"), t4, right_bound='closed', index='b').count() */
 
-		suite.T().Log("About to run line #129: tbl.Between(r.Expr(t1).InTimezone('Z'), t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'b', }).Count()")
+		suite.T().Log("About to run line #129: table_test_times_index.Between(r.Expr(t1).InTimezone('Z'), t4).OptArgs(r.BetweenOpts{RightBound: 'closed', Index: 'b', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(r.Expr(t1).InTimezone("Z"), t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "b"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Between(r.Expr(t1).InTimezone("Z"), t4).OptArgs(r.BetweenOpts{RightBound: "closed", Index: "b"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -538,11 +538,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #142
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.insert([{'id':oldtime}])['inserted'] */
+		/* table_test_times_index.insert([{'id':oldtime}])['inserted'] */
 
-		suite.T().Log("About to run line #142: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': oldtime, }}).AtIndex('inserted')")
+		suite.T().Log("About to run line #142: table_test_times_index.Insert([]interface{}{map[interface{}]interface{}{'id': oldtime, }}).AtIndex('inserted')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": oldtime}}).AtIndex("inserted"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Insert([]interface{}{map[interface{}]interface{}{"id": oldtime}}).AtIndex("inserted"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -553,11 +553,11 @@ func (suite *TimesIndexSuite) TestCases() {
 		// times/index.yaml line #148
 		/* ("PTYPE<TIME>") */
 		var expected_ string = "PTYPE<TIME>"
-		/* tbl.get(oldtime)['id'].type_of() */
+		/* table_test_times_index.get(oldtime)['id'].type_of() */
 
-		suite.T().Log("About to run line #148: tbl.Get(oldtime).AtIndex('id').TypeOf()")
+		suite.T().Log("About to run line #148: table_test_times_index.Get(oldtime).AtIndex('id').TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get(oldtime).AtIndex("id").TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_times_index.Get(oldtime).AtIndex("id").TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

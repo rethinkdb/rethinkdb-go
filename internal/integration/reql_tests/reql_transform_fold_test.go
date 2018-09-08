@@ -36,16 +36,16 @@ func (suite *TransformFoldSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_tfm_fold").Exec(suite.session)
+	err = r.DBCreate("db_tfm_fold").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_fold").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("test").TableDrop("tbl").Exec(suite.session)
-	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
+	r.DB("db_tfm_fold").TableDrop("table_test_transform_fold").Exec(suite.session)
+	err = r.DB("db_tfm_fold").TableCreate("table_test_transform_fold").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_fold").Table("table_test_transform_fold").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *TransformFoldSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("test").TableDrop("tbl").Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DB("db_tfm_fold").TableDrop("table_test_transform_fold").Exec(suite.session)
+		r.DBDrop("db_tfm_fold").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,18 +64,18 @@ func (suite *TransformFoldSuite) TearDownSuite() {
 func (suite *TransformFoldSuite) TestCases() {
 	suite.T().Log("Running TransformFoldSuite: Tests for the fold term")
 
-	tbl := r.DB("test").Table("tbl")
-	_ = tbl // Prevent any noused variable errors
+	table_test_transform_fold := r.DB("db_tfm_fold").Table("table_test_transform_fold")
+	_ = table_test_transform_fold // Prevent any noused variable errors
 
 	{
 		// transform/fold.yaml line #6
 		/* {'deleted':0,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':100} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 100}
-		/* tbl.insert(r.range(100).map(lambda i: {'id':i, 'a':i%4}).coerce_to("array")) */
+		/* table_test_transform_fold.insert(r.range(100).map(lambda i: {'id':i, 'a':i%4}).coerce_to("array")) */
 
-		suite.T().Log("About to run line #6: tbl.Insert(r.Range(100).Map(func(i r.Term) interface{} { return map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), }}).CoerceTo('array'))")
+		suite.T().Log("About to run line #6: table_test_transform_fold.Insert(r.Range(100).Map(func(i r.Term) interface{} { return map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), }}).CoerceTo('array'))")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(r.Range(100).Map(func(i r.Term) interface{} { return map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4)} }).CoerceTo("array")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_transform_fold.Insert(r.Range(100).Map(func(i r.Term) interface{} { return map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4)} }).CoerceTo("array")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -180,11 +180,11 @@ func (suite *TransformFoldSuite) TestCases() {
 		// transform/fold.yaml line #39
 		/* [{'a': 0, 'id': 20}, {'a': 3, 'id': 15}, {'a': 2, 'id': 46}, {'a': 2, 'id': 78}, {'a': 2, 'id': 90}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 0, "id": 20}, map[interface{}]interface{}{"a": 3, "id": 15}, map[interface{}]interface{}{"a": 2, "id": 46}, map[interface{}]interface{}{"a": 2, "id": 78}, map[interface{}]interface{}{"a": 2, "id": 90}}
-		/* tbl.filter("id").fold(0, lambda acc, row: acc.add(1), emit=lambda old,row,acc: r.branch(old.mod(20).eq(0),[row],[])).coerce_to("array") */
+		/* table_test_transform_fold.filter("id").fold(0, lambda acc, row: acc.add(1), emit=lambda old,row,acc: r.branch(old.mod(20).eq(0),[row],[])).coerce_to("array") */
 
-		suite.T().Log("About to run line #39: tbl.Filter('id').Fold(0, func(acc r.Term, row r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return r.Branch(old.Mod(20).Eq(0), []interface{}{row}, []interface{}{})}, }).CoerceTo('array')")
+		suite.T().Log("About to run line #39: table_test_transform_fold.Filter('id').Fold(0, func(acc r.Term, row r.Term) interface{} { return acc.Add(1)}).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} { return r.Branch(old.Mod(20).Eq(0), []interface{}{row}, []interface{}{})}, }).CoerceTo('array')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Filter("id").Fold(0, func(acc r.Term, row r.Term) interface{} { return acc.Add(1) }).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} {
+		runAndAssert(suite.Suite, expected_, table_test_transform_fold.Filter("id").Fold(0, func(acc r.Term, row r.Term) interface{} { return acc.Add(1) }).OptArgs(r.FoldOpts{Emit: func(old r.Term, row r.Term, acc r.Term) interface{} {
 			return r.Branch(old.Mod(20).Eq(0), []interface{}{row}, []interface{}{})
 		}}).CoerceTo("array"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
