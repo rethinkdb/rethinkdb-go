@@ -27,12 +27,12 @@ type connCounting struct {
 }
 
 // Socket leak debug net.Conn wrapper
-func NewCountingConn(conn net.Conn) net.Conn{
+func NewCountingConn(conn net.Conn) net.Conn {
 	c := &connCounting{
-		Conn: conn,
+		Conn:   conn,
 		closed: false,
 	}
-	runtime.SetFinalizer(c, func(cc *connCounting){
+	runtime.SetFinalizer(c, func(cc *connCounting) {
 		if !cc.closed {
 			atomic.AddInt64(&connsCount, -1)
 			cc.closed = true
@@ -40,7 +40,7 @@ func NewCountingConn(conn net.Conn) net.Conn{
 	})
 
 	atomic.AddInt64(&connsCount, 1)
-	printer.Do(func(){
+	printer.Do(func() {
 		go func() {
 			t := time.NewTicker(time.Second)
 			f, err := os.Create("sockets.ticker")

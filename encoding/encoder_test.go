@@ -543,7 +543,7 @@ func TestEncodeCustomRootTypeEncodingError(t *testing.T) {
 	if err == nil {
 		t.Errorf("got nil error, expected %v", cerr)
 	}
-	if err != cerr  {
+	if err != cerr {
 		t.Errorf("got %q, want %q", err, cerr)
 	}
 }
