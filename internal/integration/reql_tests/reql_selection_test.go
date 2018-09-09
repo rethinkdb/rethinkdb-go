@@ -91,14 +91,14 @@ func (suite *SelectionSuite) TestCases() {
 
 		suite.T().Log("About to run line #6: table_test_selection.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), })\n    }\n    return res\n}()))")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Insert((func() []interface{} {
+		runAndAssert(suite.Suite, expected_, table_test_selection.Insert(func() []interface{} {
 			res := []interface{}{}
 			for iterator_ := 0; iterator_ < 100; iterator_++ {
 				i := iterator_
 				res = append(res, map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4)})
 			}
 			return res
-		}())), suite.session, r.RunOpts{
+		}()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -160,7 +160,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #39
 		/* err("ReqlOpFailedError", 'Table `test.missing` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.missing` does not exist.")
+		var expected_ Err = err("ReqlOpFailedError", "Table `db_sele.missing` does not exist.")
 		/* r.db('test').table('missing') */
 
 		suite.T().Log("About to run line #39: r.DB('test').Table('missing')")

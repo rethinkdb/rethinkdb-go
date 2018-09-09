@@ -550,7 +550,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #135
 		/* err('ReqlOpFailedError', 'Table `test.foo` already exists.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.foo` already exists.")
+		var expected_ Err = err("ReqlOpFailedError", "Table `db_mtable.foo` already exists.")
 		/* db.table_create('foo') */
 
 		suite.T().Log("About to run line #135: db.TableCreate('foo')")
@@ -580,7 +580,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #141
 		/* err('ReqlOpFailedError', 'Table `test.foo` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.foo` does not exist.")
+		var expected_ Err = err("ReqlOpFailedError", "Table `db_mtable.foo` does not exist.")
 		/* db.table_drop('foo') */
 
 		suite.T().Log("About to run line #141: db.TableDrop('foo')")
