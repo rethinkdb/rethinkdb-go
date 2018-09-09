@@ -4,6 +4,8 @@ import (
 	p "gopkg.in/gorethink/gorethink.v4/ql2"
 )
 
+// Rethinkdb proposal: https://github.com/rethinkdb/rethinkdb/pull/6534
+
 // Or performs a bitwise And.
 func (t Term) BitAnd(args ...interface{}) Term {
 	return constructMethodTerm(t, "BitAnd", p.Term_BIT_AND, args, map[string]interface{}{})

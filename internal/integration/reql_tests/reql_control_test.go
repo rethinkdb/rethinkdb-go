@@ -833,7 +833,9 @@ func (suite *ControlSuite) TestCases() {
 
 		suite.T().Log("About to run line #219: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return table_test_control.Update(map[interface{}]interface{}{'foo': row, })})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return table_test_control.Update(map[interface{}]interface{}{"foo": row}) }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} {
+			return table_test_control.Update(map[interface{}]interface{}{"foo": row})
+		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

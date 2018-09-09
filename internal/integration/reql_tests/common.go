@@ -215,7 +215,7 @@ func (expected Err) assert(suite suite.Suite, obtainerCursor *r.Cursor, obtained
 		obtainedErr = obtainerCursor.All(&res)
 	}
 
-	if suite.Error(obtainedErr) {
+	if !suite.Error(obtainedErr) {
 		return
 	}
 
