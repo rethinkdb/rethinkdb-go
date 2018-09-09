@@ -46,11 +46,12 @@ func (s *RethinkSuite) TestQueryExec(c *test.C) {
 }
 
 func (s *RethinkSuite) TestQueryRunWrite(c *test.C) {
+	r.DBDrop("test_runwrite").Exec(session)
 	err := r.DBCreate("test_runwrite").Exec(session)
 	c.Assert(err, test.IsNil)
 	err = r.DB("test_runwrite").TableCreate("test_runwrite").Exec(session)
 	c.Assert(err, test.IsNil)
-	err = r.DB("test_runwrite").TableCreate("test_runwrite").Wait().Exec(session)
+	err = r.DB("test_runwrite").Table("test_runwrite").Wait().Exec(session)
 	c.Assert(err, test.IsNil)
 
 	query := r.DB("test_runwrite").Table("test_runwrite").Insert([]interface{}{
