@@ -45,11 +45,3 @@ func PartialMatch(v interface{}) Expected {
 		Val:     v,
 	}
 }
-
-//func ContainsMatch(containsAllThis interface{}) Expected {
-//	return Expected{
-//		Ordered: false,
-//		Partial: false,
-//		Val: v,
-//	}
-//}
