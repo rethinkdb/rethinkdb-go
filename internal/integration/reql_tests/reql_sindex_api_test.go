@@ -1087,7 +1087,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #286
 		/* err('ReqlQueryLogicError', 'Indexed order_by can only be performed on a TABLE or TABLE_SLICE.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE.")
+		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE. Make sure order_by comes before any transformations (such as map) or filters.")
 		/* table_test_sindex_api.get_all(1, index='bi').order_by(index='id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #286: table_test_sindex_api.GetAll(1).OptArgs(r.GetAllOpts{Index: 'bi', }).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
