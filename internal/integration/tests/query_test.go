@@ -46,7 +46,15 @@ func (s *RethinkSuite) TestQueryExec(c *test.C) {
 }
 
 func (s *RethinkSuite) TestQueryRunWrite(c *test.C) {
-	query := r.DB("test").Table("test").Insert([]interface{}{
+	r.DBDrop("test_runwrite").Exec(session)
+	err := r.DBCreate("test_runwrite").Exec(session)
+	c.Assert(err, test.IsNil)
+	err = r.DB("test_runwrite").TableCreate("test_runwrite").Exec(session)
+	c.Assert(err, test.IsNil)
+	err = r.DB("test_runwrite").Table("test_runwrite").Wait().Exec(session)
+	c.Assert(err, test.IsNil)
+
+	query := r.DB("test_runwrite").Table("test_runwrite").Insert([]interface{}{
 		map[string]interface{}{"num": 1},
 		map[string]interface{}{"num": 2},
 	}, r.InsertOpts{ReturnChanges: true})
@@ -435,13 +443,13 @@ func (s *RethinkSuite) TestRawQuery_advanced(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableChanges(c *test.C) {
-	r.DB("test").TableDrop("changes").Exec(session)
-	r.DB("test").TableCreate("changes").Exec(session)
-	r.DB("test").Table("changes").Wait().Exec(session)
+	r.DB("test").TableDrop("changes1").Exec(session)
+	r.DB("test").TableCreate("changes1").Exec(session)
+	r.DB("test").Table("changes1").Wait().Exec(session)
 
 	var n int
 
-	res, err := r.DB("test").Table("changes").Changes().Run(session)
+	res, err := r.DB("test").Table("changes1").Changes().Run(session)
 	if err != nil {
 		c.Fatal(err.Error())
 	}
@@ -463,16 +471,16 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 		}
 	}()
 
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 6}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 7}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 8}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 9}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 10}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 1}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 2}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 3}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 4}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 5}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 6}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 7}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 8}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 9}).Exec(session)
+	r.DB("test").Table("changes1").Insert(map[string]interface{}{"n": 10}).Exec(session)
 
 	wg.Wait()
 
@@ -480,13 +488,13 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
-	r.DB("test").TableDrop("changes").Exec(session)
-	r.DB("test").TableCreate("changes").Exec(session)
-	r.DB("test").Table("changes").Wait().Exec(session)
+	r.DB("test").TableDrop("changes2").Exec(session)
+	r.DB("test").TableCreate("changes2").Exec(session)
+	r.DB("test").Table("changes2").Wait().Exec(session)
 
 	var n int
 
-	res, err := r.DB("test").Table("changes").Changes().Run(session)
+	res, err := r.DB("test").Table("changes2").Changes().Run(session)
 	if err != nil {
 		c.Fatal(err.Error())
 	}
@@ -501,11 +509,11 @@ func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 	}()
 
 	// Insert 5 docs
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(session)
+	r.DB("test").Table("changes2").Insert(map[string]interface{}{"n": 1}).Exec(session)
+	r.DB("test").Table("changes2").Insert(map[string]interface{}{"n": 2}).Exec(session)
+	r.DB("test").Table("changes2").Insert(map[string]interface{}{"n": 3}).Exec(session)
+	r.DB("test").Table("changes2").Insert(map[string]interface{}{"n": 4}).Exec(session)
+	r.DB("test").Table("changes2").Insert(map[string]interface{}{"n": 5}).Exec(session)
 
 	// Listen for changes
 	res.Listen(change)
@@ -517,13 +525,13 @@ func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
-	r.DB("test").TableDrop("changes").Exec(session)
-	r.DB("test").TableCreate("changes").Exec(session)
-	r.DB("test").Table("changes").Wait().Exec(session)
+	r.DB("test").TableDrop("changes3").Exec(session)
+	r.DB("test").TableCreate("changes3").Exec(session)
+	r.DB("test").Table("changes3").Wait().Exec(session)
 
 	var n int
 
-	res, err := r.DB("test").Table("changes").Changes().Run(session)
+	res, err := r.DB("test").Table("changes3").Changes().Run(session)
 	if err != nil {
 		c.Fatal(err.Error())
 	}
@@ -547,20 +555,20 @@ func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 }
 
 func (s *RethinkSuite) TestTableChangesIncludeInitial(c *test.C) {
-	r.DB("test").TableDrop("changes").Exec(session)
-	r.DB("test").TableCreate("changes").Exec(session)
-	r.DB("test").Table("changes").Wait().Exec(session)
+	r.DB("test").TableDrop("changes4").Exec(session)
+	r.DB("test").TableCreate("changes4").Exec(session)
+	r.DB("test").Table("changes4").Wait().Exec(session)
 
 	// Insert 5 documents to table initially
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 1}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 2}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 3}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 4}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 5}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 1}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 2}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 3}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 4}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 5}).Exec(session)
 
 	var n int
 
-	res, err := r.DB("test").Table("changes").Changes(r.ChangesOpts{IncludeInitial: true}).Run(session)
+	res, err := r.DB("test").Table("changes4").Changes(r.ChangesOpts{IncludeInitial: true}).Run(session)
 	if err != nil {
 		c.Fatal(err.Error())
 	}
@@ -582,11 +590,11 @@ func (s *RethinkSuite) TestTableChangesIncludeInitial(c *test.C) {
 		}
 	}()
 
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 6}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 7}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 8}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 9}).Exec(session)
-	r.DB("test").Table("changes").Insert(map[string]interface{}{"n": 10}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 6}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 7}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 8}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 9}).Exec(session)
+	r.DB("test").Table("changes4").Insert(map[string]interface{}{"n": 10}).Exec(session)
 
 	wg.Wait()
 
@@ -635,15 +643,15 @@ func (s *RethinkSuite) TestWriteReference(c *test.C) {
 }
 
 func (s *RethinkSuite) TestWriteConflict(c *test.C) {
-	r.DB("test").TableDrop("test").Exec(session)
-	r.DB("test").TableCreate("test").Exec(session)
-	r.DB("test").Table("test").Wait().Exec(session)
+	r.DB("test").TableDrop("test_write_conf").Exec(session)
+	r.DB("test").TableCreate("test_write_conf").Exec(session)
+	r.DB("test").Table("test_write_conf").Wait().Exec(session)
 
-	query := r.DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
+	query := r.DB("test").Table("test_write_conf").Insert(map[string]interface{}{"id": "a"})
 	_, err := query.RunWrite(session)
 	c.Assert(err, test.IsNil)
 
-	query = r.DB("test").Table("test").Insert(map[string]interface{}{"id": "a"})
+	query = r.DB("test").Table("test_write_conf").Insert(map[string]interface{}{"id": "a"})
 	_, err = query.RunWrite(session)
 	c.Assert(r.IsConflictErr(err), test.Equals, true)
 }
@@ -708,16 +716,16 @@ func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 	c.Assert(err, test.IsNil)
 	defer session.Close()
 	// Ensure table + database exist
-	r.DBCreate("test").Exec(session)
-	r.DB("test").TableCreate("Table1").Exec(session)
-	r.DB("test").Table("Table1").Wait().Exec(session)
+	r.DBCreate("test_jnum").Exec(session)
+	r.DB("test_jnum").TableCreate("table_test_query_jsonnum").Exec(session)
+	r.DB("test_jnum").Table("table_test_query_jsonnum").Wait().Exec(session)
 
 	// Insert rows
-	r.DB("test").Table("Table1").Insert(objList).Exec(session)
+	r.DB("test_jnum").Table("table_test_query_jsonnum").Insert(objList).Exec(session)
 
 	// Test query
 	var response interface{}
-	query := r.DB("test").Table("Table1").Get(6)
+	query := r.DB("test_jnum").Table("table_test_query_jsonnum").Get(6)
 	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
@@ -731,10 +739,10 @@ func (s *RethinkSuite) TestSelectJSONNumbers(c *test.C) {
 
 func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 	// Ensure table + database exist
-	r.DBCreate("test").Exec(session)
-	r.DB("test").TableCreate("TestMany").Exec(session)
-	r.DB("test").Table("TestMany").Wait().Exec(session)
-	r.DB("test").Table("TestMany").Delete().Exec(session)
+	r.DBCreate("test_sm").Exec(session)
+	r.DB("test_sm").TableCreate("table_test_query_many").Exec(session)
+	r.DB("test_sm").Table("table_test_query_many").Wait().Exec(session)
+	r.DB("test_sm").Table("table_test_query_many").Delete().Exec(session)
 
 	// Insert rows
 	for i := 0; i < 100; i++ {
@@ -747,11 +755,11 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 			})
 		}
 
-		r.DB("test").Table("TestMany").Insert(data).Exec(session)
+		r.DB("test_sm").Table("table_test_query_many").Insert(data).Exec(session)
 	}
 
 	// Test query
-	res, err := r.DB("test").Table("TestMany").Run(session, r.RunOpts{
+	res, err := r.DB("test_sm").Table("table_test_query_many").Run(session, r.RunOpts{
 		MaxBatchRows: 1,
 	})
 	c.Assert(err, test.IsNil)

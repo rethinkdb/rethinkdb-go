@@ -36,26 +36,26 @@ func (suite *TransformUnorderedMapSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_tfm_umap").Exec(suite.session)
+	err = r.DBCreate("db_tfm_umap").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_umap").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("test").TableDrop("even").Exec(suite.session)
-	err = r.DB("test").TableCreate("even").Exec(suite.session)
+	r.DB("db_tfm_umap").TableDrop("even").Exec(suite.session)
+	err = r.DB("db_tfm_umap").TableCreate("even").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("even").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_umap").Table("even").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
-	r.DB("test").TableDrop("odd").Exec(suite.session)
-	err = r.DB("test").TableCreate("odd").Exec(suite.session)
+	r.DB("db_tfm_umap").TableDrop("odd").Exec(suite.session)
+	err = r.DB("db_tfm_umap").TableCreate("odd").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("odd").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_umap").Table("odd").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
-	r.DB("test").TableDrop("odd2").Exec(suite.session)
-	err = r.DB("test").TableCreate("odd2").Exec(suite.session)
+	r.DB("db_tfm_umap").TableDrop("odd2").Exec(suite.session)
+	err = r.DB("db_tfm_umap").TableCreate("odd2").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("odd2").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_umap").Table("odd2").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -64,10 +64,10 @@ func (suite *TransformUnorderedMapSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("test").TableDrop("even").Exec(suite.session)
-		r.DB("test").TableDrop("odd").Exec(suite.session)
-		r.DB("test").TableDrop("odd2").Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DB("db_tfm_umap").TableDrop("even").Exec(suite.session)
+		r.DB("db_tfm_umap").TableDrop("odd").Exec(suite.session)
+		r.DB("db_tfm_umap").TableDrop("odd2").Exec(suite.session)
+		r.DBDrop("db_tfm_umap").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -76,11 +76,11 @@ func (suite *TransformUnorderedMapSuite) TearDownSuite() {
 func (suite *TransformUnorderedMapSuite) TestCases() {
 	suite.T().Log("Running TransformUnorderedMapSuite: Tests for ordered_union")
 
-	even := r.DB("test").Table("even")
+	even := r.DB("db_tfm_umap").Table("even")
 	_ = even // Prevent any noused variable errors
-	odd := r.DB("test").Table("odd")
+	odd := r.DB("db_tfm_umap").Table("odd")
 	_ = odd // Prevent any noused variable errors
-	odd2 := r.DB("test").Table("odd2")
+	odd2 := r.DB("db_tfm_umap").Table("odd2")
 	_ = odd2 // Prevent any noused variable errors
 
 	{

@@ -57,13 +57,13 @@ func runAndAssert(suite suite.Suite, expected, v interface{}, session *r.Session
 
 func fetchAndAssert(suite suite.Suite, expected, result interface{}, count int) {
 	switch v := expected.(type) {
-	case Expected:
+	case compare.Expected:
 		v.Fetch = true
 		v.FetchCount = count
 
 		expected = v
 	default:
-		expected = Expected(compare.Expected{
+		expected = compare.Expected(compare.Expected{
 			Val:        v,
 			Fetch:      true,
 			FetchCount: count,
@@ -105,17 +105,15 @@ func assertExpected(suite suite.Suite, expected interface{}, obtainedCursor *r.C
 	switch expected := expected.(type) {
 	case Err:
 		expected.assert(suite, obtainedCursor, obtainedErr)
-	case Expected:
-		expected.assert(suite, obtainedCursor, obtainedErr)
+	case compare.Expected:
+		assert(suite, expected, obtainedCursor, obtainedErr)
 	default:
-		Expected(compare.Expected{Val: expected}).assert(suite, obtainedCursor, obtainedErr)
+		assert(suite, compare.Expected{Val: expected}, obtainedCursor, obtainedErr)
 	}
 }
 
-type Expected compare.Expected
-
-func (expected Expected) assert(suite suite.Suite, obtainedCursor *r.Cursor, obtainedErr error) {
-	if suite.NoError(obtainedErr, "Query returned unexpected error") {
+func assert(suite suite.Suite, expected compare.Expected, obtainedCursor *r.Cursor, obtainedErr error) {
+	if !suite.NoError(obtainedErr, "Query returned unexpected error") {
 		return
 	}
 
@@ -217,7 +215,7 @@ func (expected Err) assert(suite suite.Suite, obtainerCursor *r.Cursor, obtained
 		obtainedErr = obtainerCursor.All(&res)
 	}
 
-	if suite.Error(obtainedErr) {
+	if !suite.Error(obtainedErr) {
 		return
 	}
 
