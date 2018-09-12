@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"bytes"
@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 var (
@@ -21,12 +21,12 @@ var (
 	ErrInvalidNode = errors.New("invalid node")
 	// ErrNoConnections is returned when there are no active connections in the
 	// clusters connection pool.
-	ErrNoConnections = errors.New("gorethink: no connections were available")
+	ErrNoConnections = errors.New("rethinkdb: no connections were available")
 	// ErrConnectionClosed is returned when trying to send a query with a closed
 	// connection.
-	ErrConnectionClosed = errors.New("gorethink: the connection is closed")
+	ErrConnectionClosed = errors.New("rethinkdb: the connection is closed")
 	// ErrQueryTimeout is returned when query context deadline exceeded.
-	ErrQueryTimeout = errors.New("gorethink: query timeout")
+	ErrQueryTimeout = errors.New("rethinkdb: query timeout")
 )
 
 func printCarrots(t Term, frames []*p.Frame) string {
@@ -86,10 +86,10 @@ func (e rqlServerError) Error() string {
 	}
 
 	if e.term == nil {
-		return fmt.Sprintf("gorethink: %s", err)
+		return fmt.Sprintf("rethinkdb: %s", err)
 	}
 
-	return fmt.Sprintf("gorethink: %s in:\n%s", err, e.term.String())
+	return fmt.Sprintf("rethinkdb: %s in:\n%s", err, e.term.String())
 
 }
 
@@ -100,7 +100,7 @@ func (e rqlServerError) String() string {
 type rqlError string
 
 func (e rqlError) Error() string {
-	return fmt.Sprintf("gorethink: %s", string(e))
+	return fmt.Sprintf("rethinkdb: %s", string(e))
 }
 
 func (e rqlError) String() string {

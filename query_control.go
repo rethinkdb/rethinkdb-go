@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"encoding/base64"
@@ -6,7 +6,7 @@ import (
 
 	"reflect"
 
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // Expr converts any value to an expression and is also used by many other terms
@@ -20,21 +20,21 @@ import (
 //  - the field is empty and its tag specifies the "omitempty" option.
 //
 // Each fields default name in the map is the field name but can be specified
-// in the struct field's tag value. The "gorethink" key in the struct field's
+// in the struct field's tag value. The "rethinkdb" key in the struct field's
 // tag value is the key name, followed by an optional comma and options. Examples:
 //
 //   // Field is ignored by this package.
-//   Field int `gorethink:"-"`
+//   Field int `rethinkdb:"-"`
 //   // Field appears as key "myName".
-//   Field int `gorethink:"myName"`
+//   Field int `rethinkdb:"myName"`
 //   // Field appears as key "myName" and
 //   // the field is omitted from the object if its value is empty,
 //   // as defined above.
-//   Field int `gorethink:"myName,omitempty"`
+//   Field int `rethinkdb:"myName,omitempty"`
 //   // Field appears as key "Field" (the default), but
 //   // the field is skipped if empty.
 //   // Note the leading comma.
-//   Field int `gorethink:",omitempty"`
+//   Field int `rethinkdb:",omitempty"`
 func Expr(val interface{}) Term {
 	if val == nil {
 		return Term{
@@ -159,7 +159,7 @@ func Expr(val interface{}) Term {
 
 // JSOpts contains the optional arguments for the JS term
 type JSOpts struct {
-	Timeout interface{} `gorethink:"timeout,omitempty"`
+	Timeout interface{} `rethinkdb:"timeout,omitempty"`
 }
 
 func (o JSOpts) toMap() map[string]interface{} {
@@ -179,22 +179,22 @@ func JS(jssrc interface{}, optArgs ...JSOpts) Term {
 // HTTPOpts contains the optional arguments for the HTTP term
 type HTTPOpts struct {
 	// General Options
-	Timeout      interface{} `gorethink:"timeout,omitempty"`
-	Reattempts   interface{} `gorethink:"reattempts,omitempty"`
-	Redirects    interface{} `gorethink:"redirect,omitempty"`
-	Verify       interface{} `gorethink:"verify,omitempty"`
-	ResultFormat interface{} `gorethink:"result_format,omitempty"`
+	Timeout      interface{} `rethinkdb:"timeout,omitempty"`
+	Reattempts   interface{} `rethinkdb:"reattempts,omitempty"`
+	Redirects    interface{} `rethinkdb:"redirect,omitempty"`
+	Verify       interface{} `rethinkdb:"verify,omitempty"`
+	ResultFormat interface{} `rethinkdb:"result_format,omitempty"`
 
 	// Request Options
-	Method interface{} `gorethink:"method,omitempty"`
-	Auth   interface{} `gorethink:"auth,omitempty"`
-	Params interface{} `gorethink:"params,omitempty"`
-	Header interface{} `gorethink:"header,omitempty"`
-	Data   interface{} `gorethink:"data,omitempty"`
+	Method interface{} `rethinkdb:"method,omitempty"`
+	Auth   interface{} `rethinkdb:"auth,omitempty"`
+	Params interface{} `rethinkdb:"params,omitempty"`
+	Header interface{} `rethinkdb:"header,omitempty"`
+	Data   interface{} `rethinkdb:"data,omitempty"`
 
 	// Pagination
-	Page      interface{} `gorethink:"page,omitempty"`
-	PageLimit interface{} `gorethink:"page_limit,omitempty"`
+	Page      interface{} `rethinkdb:"page,omitempty"`
+	PageLimit interface{} `rethinkdb:"page_limit,omitempty"`
 }
 
 func (o HTTPOpts) toMap() map[string]interface{} {
@@ -374,7 +374,7 @@ func UUID(args ...interface{}) Term {
 }
 
 // RawQuery creates a new query from a JSON string, this bypasses any encoding
-// done by GoRethink. The query should not contain the query type or any options
+// done by RethinkDB-go. The query should not contain the query type or any options
 // as this should be handled using the normal driver API.
 //
 // THis query will only work if this is the only term in the query.

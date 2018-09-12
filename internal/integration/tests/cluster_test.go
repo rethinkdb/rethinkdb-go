@@ -7,7 +7,7 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 func (s *RethinkSuite) TestClusterConnect(c *test.C) {
@@ -60,5 +60,5 @@ func (s *RethinkSuite) TestClusterConnectDatabase(c *test.C) {
 
 	_, err = r.Table("test2").Run(session)
 	c.Assert(err, test.NotNil)
-	c.Assert(err.Error(), test.Equals, "gorethink: Database `test2` does not exist. in:\nr.Table(\"test2\")")
+	c.Assert(err.Error(), test.Equals, "rethinkdb: Database `test2` does not exist. in:\nr.Table(\"test2\")")
 }

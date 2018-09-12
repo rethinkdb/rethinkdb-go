@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Tests that manipulation data in tables
@@ -1400,14 +1400,15 @@ func (suite *AggregationSuite) TestCases() {
 	{
 		// aggregation.yaml line #482
 		/* {null:33, 0:22, 20:22, 30:23} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{nil: 33, 0: 22, 20: 22, 30: 23}
+		//var expected_ map[interface{}]interface{} = map[interface{}]interface{}{nil: 33, 0: 22, 20: 22, 30: 23}
+		var expected_ = compare.UnorderedMatch([]map[string]interface{}{{"group": nil, "reduction": 33}, {"group": 0, "reduction": 22}, {"group": 20, "reduction": 22}, {"group": 30, "reduction": 23}})
 		/* table_test_agg.group('b').count() */
 
 		suite.T().Log("About to run line #482: table_test_agg.Group('b').Count()")
 
 		runAndAssert(suite.Suite, expected_, table_test_agg.Group("b").Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
-			GroupFormat:    "map",
+			GroupFormat:    "native",
 		})
 		suite.T().Log("Finished running line #482")
 	}

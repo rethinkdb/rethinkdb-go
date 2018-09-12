@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"fmt"
@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // A Query represents a query ready to be sent to the database, A Query differs
@@ -30,7 +30,7 @@ func (q *Query) Build() []interface{} {
 	}
 
 	if len(q.Opts) > 0 {
-		// Clone opts and remove custom gorethink options
+		// Clone opts and remove custom rethinkdb options
 		opts := map[string]interface{}{}
 		for k, v := range q.Opts {
 			switch k {
@@ -266,56 +266,56 @@ type QueryExecutor interface {
 // WriteResponse is a helper type used when dealing with the response of a
 // write query. It is also returned by the RunWrite function.
 type WriteResponse struct {
-	Errors        int              `gorethink:"errors"`
-	Inserted      int              `gorethink:"inserted"`
-	Updated       int              `gorethink:"updated"`
-	Unchanged     int              `gorethink:"unchanged"`
-	Replaced      int              `gorethink:"replaced"`
-	Renamed       int              `gorethink:"renamed"`
-	Skipped       int              `gorethink:"skipped"`
-	Deleted       int              `gorethink:"deleted"`
-	Created       int              `gorethink:"created"`
-	DBsCreated    int              `gorethink:"dbs_created"`
-	TablesCreated int              `gorethink:"tables_created"`
-	Dropped       int              `gorethink:"dropped"`
-	DBsDropped    int              `gorethink:"dbs_dropped"`
-	TablesDropped int              `gorethink:"tables_dropped"`
-	GeneratedKeys []string         `gorethink:"generated_keys"`
-	FirstError    string           `gorethink:"first_error"` // populated if Errors > 0
-	ConfigChanges []ChangeResponse `gorethink:"config_changes"`
+	Errors        int              `rethinkdb:"errors"`
+	Inserted      int              `rethinkdb:"inserted"`
+	Updated       int              `rethinkdb:"updated"`
+	Unchanged     int              `rethinkdb:"unchanged"`
+	Replaced      int              `rethinkdb:"replaced"`
+	Renamed       int              `rethinkdb:"renamed"`
+	Skipped       int              `rethinkdb:"skipped"`
+	Deleted       int              `rethinkdb:"deleted"`
+	Created       int              `rethinkdb:"created"`
+	DBsCreated    int              `rethinkdb:"dbs_created"`
+	TablesCreated int              `rethinkdb:"tables_created"`
+	Dropped       int              `rethinkdb:"dropped"`
+	DBsDropped    int              `rethinkdb:"dbs_dropped"`
+	TablesDropped int              `rethinkdb:"tables_dropped"`
+	GeneratedKeys []string         `rethinkdb:"generated_keys"`
+	FirstError    string           `rethinkdb:"first_error"` // populated if Errors > 0
+	ConfigChanges []ChangeResponse `rethinkdb:"config_changes"`
 	Changes       []ChangeResponse
 }
 
 // ChangeResponse is a helper type used when dealing with changefeeds. The type
 // contains both the value before the query and the new value.
 type ChangeResponse struct {
-	NewValue interface{} `gorethink:"new_val,omitempty"`
-	OldValue interface{} `gorethink:"old_val,omitempty"`
-	State    string      `gorethink:"state,omitempty"`
-	Error    string      `gorethink:"error,omitempty"`
+	NewValue interface{} `rethinkdb:"new_val,omitempty"`
+	OldValue interface{} `rethinkdb:"old_val,omitempty"`
+	State    string      `rethinkdb:"state,omitempty"`
+	Error    string      `rethinkdb:"error,omitempty"`
 }
 
 // RunOpts contains the optional arguments for the Run function.
 type RunOpts struct {
-	DB             interface{} `gorethink:"db,omitempty"`
-	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
-	Profile        interface{} `gorethink:"profile,omitempty"`
-	Durability     interface{} `gorethink:"durability,omitempty"`
-	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
-	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
-	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
-	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
-	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
-	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
-	ReadMode       interface{} `gorethink:"read_mode,omitempty"`
+	DB             interface{} `rethinkdb:"db,omitempty"`
+	Db             interface{} `rethinkdb:"db,omitempty"` // Deprecated
+	Profile        interface{} `rethinkdb:"profile,omitempty"`
+	Durability     interface{} `rethinkdb:"durability,omitempty"`
+	UseOutdated    interface{} `rethinkdb:"use_outdated,omitempty"` // Deprecated
+	ArrayLimit     interface{} `rethinkdb:"array_limit,omitempty"`
+	TimeFormat     interface{} `rethinkdb:"time_format,omitempty"`
+	GroupFormat    interface{} `rethinkdb:"group_format,omitempty"`
+	BinaryFormat   interface{} `rethinkdb:"binary_format,omitempty"`
+	GeometryFormat interface{} `rethinkdb:"geometry_format,omitempty"`
+	ReadMode       interface{} `rethinkdb:"read_mode,omitempty"`
 
-	MinBatchRows              interface{} `gorethink:"min_batch_rows,omitempty"`
-	MaxBatchRows              interface{} `gorethink:"max_batch_rows,omitempty"`
-	MaxBatchBytes             interface{} `gorethink:"max_batch_bytes,omitempty"`
-	MaxBatchSeconds           interface{} `gorethink:"max_batch_seconds,omitempty"`
-	FirstBatchScaledownFactor interface{} `gorethink:"first_batch_scaledown_factor,omitempty"`
+	MinBatchRows              interface{} `rethinkdb:"min_batch_rows,omitempty"`
+	MaxBatchRows              interface{} `rethinkdb:"max_batch_rows,omitempty"`
+	MaxBatchBytes             interface{} `rethinkdb:"max_batch_bytes,omitempty"`
+	MaxBatchSeconds           interface{} `rethinkdb:"max_batch_seconds,omitempty"`
+	FirstBatchScaledownFactor interface{} `rethinkdb:"first_batch_scaledown_factor,omitempty"`
 
-	Context context.Context `gorethink:"-"`
+	Context context.Context `rethinkdb:"-"`
 }
 
 func (o RunOpts) toMap() map[string]interface{} {
@@ -411,26 +411,26 @@ func (t Term) ReadAll(dest interface{}, s QueryExecutor, optArgs ...RunOpts) err
 // When NoReply is true it causes the driver not to wait to receive the result
 // and return immediately.
 type ExecOpts struct {
-	DB             interface{} `gorethink:"db,omitempty"`
-	Db             interface{} `gorethink:"db,omitempty"` // Deprecated
-	Profile        interface{} `gorethink:"profile,omitempty"`
-	Durability     interface{} `gorethink:"durability,omitempty"`
-	UseOutdated    interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
-	ArrayLimit     interface{} `gorethink:"array_limit,omitempty"`
-	TimeFormat     interface{} `gorethink:"time_format,omitempty"`
-	GroupFormat    interface{} `gorethink:"group_format,omitempty"`
-	BinaryFormat   interface{} `gorethink:"binary_format,omitempty"`
-	GeometryFormat interface{} `gorethink:"geometry_format,omitempty"`
+	DB             interface{} `rethinkdb:"db,omitempty"`
+	Db             interface{} `rethinkdb:"db,omitempty"` // Deprecated
+	Profile        interface{} `rethinkdb:"profile,omitempty"`
+	Durability     interface{} `rethinkdb:"durability,omitempty"`
+	UseOutdated    interface{} `rethinkdb:"use_outdated,omitempty"` // Deprecated
+	ArrayLimit     interface{} `rethinkdb:"array_limit,omitempty"`
+	TimeFormat     interface{} `rethinkdb:"time_format,omitempty"`
+	GroupFormat    interface{} `rethinkdb:"group_format,omitempty"`
+	BinaryFormat   interface{} `rethinkdb:"binary_format,omitempty"`
+	GeometryFormat interface{} `rethinkdb:"geometry_format,omitempty"`
 
-	MinBatchRows              interface{} `gorethink:"min_batch_rows,omitempty"`
-	MaxBatchRows              interface{} `gorethink:"max_batch_rows,omitempty"`
-	MaxBatchBytes             interface{} `gorethink:"max_batch_bytes,omitempty"`
-	MaxBatchSeconds           interface{} `gorethink:"max_batch_seconds,omitempty"`
-	FirstBatchScaledownFactor interface{} `gorethink:"first_batch_scaledown_factor,omitempty"`
+	MinBatchRows              interface{} `rethinkdb:"min_batch_rows,omitempty"`
+	MaxBatchRows              interface{} `rethinkdb:"max_batch_rows,omitempty"`
+	MaxBatchBytes             interface{} `rethinkdb:"max_batch_bytes,omitempty"`
+	MaxBatchSeconds           interface{} `rethinkdb:"max_batch_seconds,omitempty"`
+	FirstBatchScaledownFactor interface{} `rethinkdb:"first_batch_scaledown_factor,omitempty"`
 
-	NoReply interface{} `gorethink:"noreply,omitempty"`
+	NoReply interface{} `rethinkdb:"noreply,omitempty"`
 
-	Context context.Context `gorethink:"-"`
+	Context context.Context `rethinkdb:"-"`
 }
 
 func (o ExecOpts) toMap() map[string]interface{} {

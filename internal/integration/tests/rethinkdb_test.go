@@ -10,11 +10,11 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 var session *r.Session
-var testdata = flag.Bool("gorethink.testdata", true, "create test data")
+var testdata = flag.Bool("rethinkdb.testdata", true, "create test data")
 var url, url1, url2, url3, db, authKey string
 
 func init() {
@@ -150,9 +150,9 @@ type TStr string
 type TMap map[string]interface{}
 
 type T struct {
-	A string `gorethink:"id, omitempty"`
+	A string `rethinkdb:"id, omitempty"`
 	B int
-	C int `gorethink:"-"`
+	C int `rethinkdb:"-"`
 	D map[string]interface{}
 	E []interface{}
 	F X
@@ -222,20 +222,20 @@ var str = T{
 }
 
 type Author struct {
-	ID   string `gorethink:"id,omitempty"`
-	Name string `gorethink:"name"`
+	ID   string `rethinkdb:"id,omitempty"`
+	Name string `rethinkdb:"name"`
 }
 
 type Book struct {
-	ID     string `gorethink:"id,omitempty"`
-	Title  string `gorethink:"title"`
-	Author Author `gorethink:"author_id,reference" gorethink_ref:"id"`
+	ID     string `rethinkdb:"id,omitempty"`
+	Title  string `rethinkdb:"title"`
+	Author Author `rethinkdb:"author_id,reference" rethinkdb_ref:"id"`
 }
 
 type TagsTest struct {
-	A string `gorethink:"a"`
+	A string `rethinkdb:"a"`
 	B string `json:"b"`
-	C string `gorethink:"c1" json:"c2"`
+	C string `rethinkdb:"c1" json:"c2"`
 }
 
 func (s *RethinkSuite) BenchmarkExpr(c *test.C) {

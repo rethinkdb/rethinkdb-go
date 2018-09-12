@@ -8,7 +8,7 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 func (s *RethinkSuite) TestQueryRun(c *test.C) {
@@ -206,7 +206,7 @@ func (s *RethinkSuite) TestControlStruct(c *test.C) {
 }
 
 func (s *RethinkSuite) TestControlStructTags(c *test.C) {
-	r.SetTags("gorethink", "json")
+	r.SetTags("rethinkdb", "json")
 	defer r.SetTags()
 
 	var response map[string]interface{}
@@ -297,7 +297,7 @@ func (s *RethinkSuite) TestControlError(c *test.C) {
 	c.Assert(err, test.NotNil)
 	c.Assert(err, test.FitsTypeOf, r.RQLUserError{})
 
-	c.Assert(err.Error(), test.Equals, "gorethink: An error occurred in:\nr.Error(\"An error occurred\")")
+	c.Assert(err.Error(), test.Equals, "rethinkdb: An error occurred in:\nr.Error(\"An error occurred\")")
 }
 
 func (s *RethinkSuite) TestControlDoNothing(c *test.C) {

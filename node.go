@@ -1,10 +1,10 @@
-package gorethink
+package rethinkdb
 
 import (
 	"sync"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // Node represents a database server in the cluster
@@ -119,16 +119,16 @@ func (n *Node) Server() (ServerResponse, error) {
 }
 
 type nodeStatus struct {
-	ID      string `gorethink:"id"`
-	Name    string `gorethink:"name"`
-	Status  string `gorethink:"status"`
+	ID      string `rethinkdb:"id"`
+	Name    string `rethinkdb:"name"`
+	Status  string `rethinkdb:"status"`
 	Network struct {
-		Hostname           string `gorethink:"hostname"`
-		ClusterPort        int64  `gorethink:"cluster_port"`
-		ReqlPort           int64  `gorethink:"reql_port"`
+		Hostname           string `rethinkdb:"hostname"`
+		ClusterPort        int64  `rethinkdb:"cluster_port"`
+		ReqlPort           int64  `rethinkdb:"reql_port"`
 		CanonicalAddresses []struct {
-			Host string `gorethink:"host"`
-			Port int64  `gorethink:"port"`
-		} `gorethink:"canonical_addresses"`
-	} `gorethink:"network"`
+			Host string `rethinkdb:"host"`
+			Port int64  `rethinkdb:"port"`
+		} `rethinkdb:"canonical_addresses"`
+	} `rethinkdb:"network"`
 }

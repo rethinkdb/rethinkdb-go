@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 func maybeRun(query interface{}, session *r.Session, opts r.RunOpts) interface{} {
@@ -220,7 +220,7 @@ func (expected Err) assert(suite suite.Suite, obtainerCursor *r.Cursor, obtained
 	}
 
 	obtainedType := reflect.TypeOf(obtainedErr).String()
-	obtainedMessage := strings.TrimPrefix(obtainedErr.Error(), "gorethink: ")
+	obtainedMessage := strings.TrimPrefix(obtainedErr.Error(), "rethinkdb: ")
 	obtainedMessage = exceptionRegex.ReplaceAllString(obtainedMessage, "${message}")
 
 	suite.Equal(expected.Type, obtainedType)
@@ -234,14 +234,14 @@ func (expected Err) assert(suite suite.Suite, obtainerCursor *r.Cursor, obtained
 
 func err(errType, message string) Err {
 	return Err{
-		Type:    "gorethink.RQL" + errType[4:],
+		Type:    "rethinkdb.RQL" + errType[4:],
 		Message: message,
 	}
 }
 
 func err_regex(errType, expr string) Err {
 	return Err{
-		Type:  "gorethink.RQL" + errType[4:],
+		Type:  "rethinkdb.RQL" + errType[4:],
 		Regex: expr,
 	}
 }

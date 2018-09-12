@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"errors"
@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	errPoolClosed = errors.New("gorethink: pool is closed")
+	errPoolClosed = errors.New("rethinkdb: pool is closed")
 )
 
 // A Pool is used to store a pool of connections to a single RethinkDB server

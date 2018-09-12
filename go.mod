@@ -1,4 +1,4 @@
-module gopkg.in/gorethink/gorethink.v4
+module gopkg.in/rethinkdb/rethinkdb-go.v5
 
 require (
 	github.com/cenkalti/backoff v2.0.0+incompatible

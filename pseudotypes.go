@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"encoding/base64"
@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"gopkg.in/gorethink/gorethink.v4/types"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/types"
 
 	"fmt"
 )
