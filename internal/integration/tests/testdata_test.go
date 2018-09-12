@@ -1,7 +1,7 @@
 package tests
 
 import (
-	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 func setupTestData() {

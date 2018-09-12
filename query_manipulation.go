@@ -1,7 +1,7 @@
 package rethinkdb
 
 import (
-	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // Row returns the currently visited document. Note that Row does not work within

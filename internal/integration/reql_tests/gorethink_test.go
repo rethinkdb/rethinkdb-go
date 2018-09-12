@@ -6,7 +6,7 @@ import (
 	"flag"
 	"os"
 
-	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 var url string

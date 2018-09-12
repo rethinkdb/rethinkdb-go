@@ -1,7 +1,7 @@
 package rethinkdb
 
 import (
-	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // InsertOpts contains the optional arguments for the Insert term

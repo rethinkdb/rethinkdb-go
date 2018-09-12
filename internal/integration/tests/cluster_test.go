@@ -7,7 +7,7 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 func (s *RethinkSuite) TestClusterConnect(c *test.C) {

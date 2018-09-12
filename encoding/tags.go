@@ -14,11 +14,11 @@ var (
 )
 
 const (
-	TagName     = "rethinkdb"
-	OldTagName     = "gorethink"
-	JSONTagName = "json"
-	RefTagName  = "rethinkdb_ref"
-	OldRefTagName  = "gorethink_ref"
+	TagName       = "rethinkdb"
+	OldTagName    = "gorethink"
+	JSONTagName   = "json"
+	RefTagName    = "rethinkdb_ref"
+	OldRefTagName = "gorethink_ref"
 )
 
 // tagOptions is the string following a comma in a struct field's

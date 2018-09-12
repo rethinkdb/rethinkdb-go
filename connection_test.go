@@ -7,7 +7,7 @@ import (
 	"github.com/opentracing/opentracing-go/mocktracer"
 	"golang.org/x/net/context"
 	test "gopkg.in/check.v1"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 	"io"
 	"time"
 )

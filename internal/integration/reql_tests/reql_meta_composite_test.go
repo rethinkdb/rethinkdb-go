@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
-	"gopkg.in/rethinkdb/rethinkdb-go.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Tests meta operations in composite queries
@@ -84,7 +84,7 @@ func (suite *MetaCompositeSuite) TestCases() {
 		suite.T().Log("About to run line #8: r.DBList().SetDifference([]interface{}{'rethinkdb', 'test'}).ForEach(func(db_name r.Term) interface{} { return r.Expr([]interface{}{1, 2, 3}).ForEach(func(i r.Term) interface{} { return r.DB(db_name).TableCreate(r.Add('tbl_', i.CoerceTo('string')))})})")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(
-			func (i r.Term) interface{}{
+			func(i r.Term) interface{} {
 				return r.Expr([]interface{}{1, 2, 3}).ForEach(func(j r.Term) interface{} {
 					return r.DB(r.Add("db_", i.CoerceTo("string"))).TableCreate(r.Add("tbl_", j.CoerceTo("string")))
 				})

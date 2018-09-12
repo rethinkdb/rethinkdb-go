@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 // Group games by player.

@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"gopkg.in/rethinkdb/rethinkdb-go.v4/types"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/types"
 
 	"fmt"
 )

@@ -6,7 +6,7 @@ import (
 
 	"reflect"
 
-	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // Expr converts any value to an expression and is also used by many other terms

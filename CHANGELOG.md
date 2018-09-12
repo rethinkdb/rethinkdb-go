@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## v4.2.0 - 2018-09-12
+## v5.0.0 - 2018-09-12
 
 - Moved to rethinkdb organization
 - Renamed to rethinkdb-go repo
