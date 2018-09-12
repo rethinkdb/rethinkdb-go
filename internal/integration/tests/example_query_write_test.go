@@ -2,15 +2,15 @@ package tests
 
 import (
 	"fmt"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
 )
 
 // Insert a document into the table posts using a struct.
 func ExampleTerm_Insert_struct() {
 	type Post struct {
-		ID      int    `gorethink:"id"`
-		Title   string `gorethink:"title"`
-		Content string `gorethink:"content"`
+		ID      int    `rethinkdb:"id"`
+		Title   string `rethinkdb:"title"`
+		Content string `rethinkdb:"content"`
 	}
 
 	resp, err := r.DB("examples").Table("posts").Insert(Post{
@@ -33,8 +33,8 @@ func ExampleTerm_Insert_struct() {
 // the primary key is id.
 func ExampleTerm_Insert_generatedKey() {
 	type Post struct {
-		Title   string `gorethink:"title"`
-		Content string `gorethink:"content"`
+		Title   string `rethinkdb:"title"`
+		Content string `rethinkdb:"content"`
 	}
 
 	resp, err := r.DB("examples").Table("posts").Insert(map[string]interface{}{

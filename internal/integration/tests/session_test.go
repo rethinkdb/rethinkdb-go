@@ -5,7 +5,7 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
 )
 
 func (s *RethinkSuite) TestSessionConnect(c *test.C) {
@@ -131,7 +131,7 @@ func (s *RethinkSuite) TestSessionConnectDatabase(c *test.C) {
 
 	_, err = r.Table("test2").Run(session)
 	c.Assert(err, test.NotNil)
-	c.Assert(err.Error(), test.Equals, "gorethink: Database `test2` does not exist. in:\nr.Table(\"test2\")")
+	c.Assert(err.Error(), test.Equals, "rethinkdb: Database `test2` does not exist. in:\nr.Table(\"test2\")")
 
 	session.Use("test3")
 	c.Assert(session.Database(), test.Equals, "test3")
@@ -144,13 +144,13 @@ func (s *RethinkSuite) TestSessionConnectUsername(c *test.C) {
 	c.Assert(err, test.IsNil)
 
 	r.DB("rethinkdb").Table("users").Insert(map[string]string{
-		"id":       "gorethink_test",
+		"id":       "rethinkdb_test",
 		"password": "password",
 	}).Exec(session)
 
 	session, err = r.Connect(r.ConnectOpts{
 		Address:  url,
-		Username: "gorethink_test",
+		Username: "rethinkdb_test",
 		Password: "password",
 	})
 	c.Assert(err, test.IsNil)

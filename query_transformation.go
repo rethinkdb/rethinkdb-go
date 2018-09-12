@@ -1,6 +1,6 @@
-package gorethink
+package rethinkdb
 
-import p "gopkg.in/gorethink/gorethink.v4/ql2"
+import p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 
 // Map transform each element of the sequence by applying the given mapping
 // function. It takes two arguments, a sequence and a function of type
@@ -53,7 +53,7 @@ func (t Term) ConcatMap(args ...interface{}) Term {
 
 // OrderByOpts contains the optional arguments for the OrderBy term
 type OrderByOpts struct {
-	Index interface{} `gorethink:"index,omitempty"`
+	Index interface{} `rethinkdb:"index,omitempty"`
 }
 
 func (o OrderByOpts) toMap() map[string]interface{} {
@@ -111,8 +111,8 @@ func (t Term) Limit(args ...interface{}) Term {
 
 // SliceOpts contains the optional arguments for the Slice term
 type SliceOpts struct {
-	LeftBound  interface{} `gorethink:"left_bound,omitempty"`
-	RightBound interface{} `gorethink:"right_bound,omitempty"`
+	LeftBound  interface{} `rethinkdb:"left_bound,omitempty"`
+	RightBound interface{} `rethinkdb:"right_bound,omitempty"`
 }
 
 func (o SliceOpts) toMap() map[string]interface{} {
@@ -157,7 +157,7 @@ func (t Term) IsEmpty(args ...interface{}) Term {
 
 // UnionOpts contains the optional arguments for the Slice term
 type UnionOpts struct {
-	Interleave interface{} `gorethink:"interleave,omitempty"`
+	Interleave interface{} `rethinkdb:"interleave,omitempty"`
 }
 
 func (o UnionOpts) toMap() map[string]interface{} {

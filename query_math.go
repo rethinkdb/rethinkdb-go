@@ -1,7 +1,7 @@
-package gorethink
+package rethinkdb
 
 import (
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 )
 
 var (
@@ -153,7 +153,7 @@ func Not(args ...interface{}) Term {
 
 // RandomOpts contains the optional arguments for the Random term.
 type RandomOpts struct {
-	Float interface{} `gorethink:"float,omitempty"`
+	Float interface{} `rethinkdb:"float,omitempty"`
 }
 
 func (o RandomOpts) toMap() map[string]interface{} {

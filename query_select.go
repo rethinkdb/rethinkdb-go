@@ -1,7 +1,7 @@
-package gorethink
+package rethinkdb
 
 import (
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 )
 
 // DB references a database.
@@ -11,9 +11,9 @@ func DB(args ...interface{}) Term {
 
 // TableOpts contains the optional arguments for the Table term
 type TableOpts struct {
-	ReadMode         interface{} `gorethink:"read_mode,omitempty"`
-	UseOutdated      interface{} `gorethink:"use_outdated,omitempty"` // Deprecated
-	IdentifierFormat interface{} `gorethink:"identifier_format,omitempty"`
+	ReadMode         interface{} `rethinkdb:"read_mode,omitempty"`
+	UseOutdated      interface{} `rethinkdb:"use_outdated,omitempty"` // Deprecated
+	IdentifierFormat interface{} `rethinkdb:"identifier_format,omitempty"`
 }
 
 func (o TableOpts) toMap() map[string]interface{} {
@@ -63,7 +63,7 @@ func (t Term) Get(args ...interface{}) Term {
 
 // GetAllOpts contains the optional arguments for the GetAll term
 type GetAllOpts struct {
-	Index interface{} `gorethink:"index,omitempty"`
+	Index interface{} `rethinkdb:"index,omitempty"`
 }
 
 func (o GetAllOpts) toMap() map[string]interface{} {
@@ -86,9 +86,9 @@ func (t Term) GetAllByIndex(index interface{}, keys ...interface{}) Term {
 
 // BetweenOpts contains the optional arguments for the Between term
 type BetweenOpts struct {
-	Index      interface{} `gorethink:"index,omitempty"`
-	LeftBound  interface{} `gorethink:"left_bound,omitempty"`
-	RightBound interface{} `gorethink:"right_bound,omitempty"`
+	Index      interface{} `rethinkdb:"index,omitempty"`
+	LeftBound  interface{} `rethinkdb:"left_bound,omitempty"`
+	RightBound interface{} `rethinkdb:"right_bound,omitempty"`
 }
 
 func (o BetweenOpts) toMap() map[string]interface{} {
@@ -117,7 +117,7 @@ func (t Term) Between(lowerKey, upperKey interface{}, optArgs ...BetweenOpts) Te
 
 // FilterOpts contains the optional arguments for the Filter term
 type FilterOpts struct {
-	Default interface{} `gorethink:"default,omitempty"`
+	Default interface{} `rethinkdb:"default,omitempty"`
 }
 
 func (o FilterOpts) toMap() map[string]interface{} {

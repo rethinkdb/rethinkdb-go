@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"reflect"
@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"gopkg.in/gorethink/gorethink.v4/encoding"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	"gopkg.in/rethinkdb/rethinkdb-go.v4/encoding"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 )
 
 // Helper functions for constructing terms
@@ -103,7 +103,7 @@ func makeFunc(f interface{}) Term {
 
 		// make sure all input arguments are of type Term
 		argValueTypeName := valueType.In(i).String()
-		if argValueTypeName != "gorethink.Term" && argValueTypeName != "interface {}" {
+		if argValueTypeName != "rethinkdb.Term" && argValueTypeName != "interface {}" {
 			panic("Function argument is not of type Term or interface {}")
 		}
 	}

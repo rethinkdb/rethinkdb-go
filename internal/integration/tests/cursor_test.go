@@ -5,12 +5,12 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
 )
 
 type object struct {
-	ID    int64  `gorethink:"id,omitempty"`
-	Name  string `gorethink:"name"`
+	ID    int64  `rethinkdb:"id,omitempty"`
+	Name  string `rethinkdb:"name"`
 	Attrs []attr
 }
 

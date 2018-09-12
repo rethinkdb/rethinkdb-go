@@ -14,9 +14,11 @@ var (
 )
 
 const (
-	TagName     = "gorethink"
+	TagName     = "rethinkdb"
+	OldTagName     = "gorethink"
 	JSONTagName = "json"
-	RefTagName  = "gorethink_ref"
+	RefTagName  = "rethinkdb_ref"
+	OldRefTagName  = "gorethink_ref"
 )
 
 // tagOptions is the string following a comma in a struct field's
@@ -25,7 +27,11 @@ type tagOptions string
 
 func getTag(sf reflect.StructField) string {
 	if Tags == nil {
-		return sf.Tag.Get(TagName)
+		value := sf.Tag.Get(TagName)
+		if value == "" {
+			return sf.Tag.Get(OldTagName)
+		}
+		return value
 	}
 
 	for _, tagName := range Tags {
@@ -38,7 +44,11 @@ func getTag(sf reflect.StructField) string {
 }
 
 func getRefTag(sf reflect.StructField) string {
-	return sf.Tag.Get(RefTagName)
+	value := sf.Tag.Get(RefTagName)
+	if value == "" {
+		return sf.Tag.Get(OldRefTagName)
+	}
+	return value
 }
 
 // parseTag splits a struct field's tag into its name and

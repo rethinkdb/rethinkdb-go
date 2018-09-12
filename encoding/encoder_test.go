@@ -69,21 +69,21 @@ func TestEncode(t *testing.T) {
 }
 
 type Optionals struct {
-	Sr string `gorethink:"sr"`
-	So string `gorethink:"so,omitempty"`
-	Sw string `gorethink:"-"`
+	Sr string `rethinkdb:"sr"`
+	So string `rethinkdb:"so,omitempty"`
+	Sw string `rethinkdb:"-"`
 
-	Ir int `gorethink:"omitempty"` // actually named omitempty, not an option
-	Io int `gorethink:"io,omitempty"`
+	Ir int `rethinkdb:"omitempty"` // actually named omitempty, not an option
+	Io int `rethinkdb:"io,omitempty"`
 
-	Tr time.Time `gorethink:"tr"`
-	To time.Time `gorethink:"to,omitempty"`
+	Tr time.Time `rethinkdb:"tr"`
+	To time.Time `rethinkdb:"to,omitempty"`
 
-	Slr []string `gorethink:"slr"`
-	Slo []string `gorethink:"slo,omitempty"`
+	Slr []string `rethinkdb:"slr"`
+	Slo []string `rethinkdb:"slo,omitempty"`
 
-	Mr map[string]interface{} `gorethink:"mr"`
-	Mo map[string]interface{} `gorethink:",omitempty"`
+	Mr map[string]interface{} `rethinkdb:"mr"`
+	Mo map[string]interface{} `rethinkdb:",omitempty"`
 }
 
 var optionalsExpected = map[string]interface{}{
@@ -211,7 +211,7 @@ func TestEmbeddedBug(t *testing.T) {
 }
 
 type BugD struct { // Same as BugA after tagging.
-	XXX string `gorethink:"S"`
+	XXX string `rethinkdb:"S"`
 }
 
 // BugD's tagged S field should dominate BugA's.
@@ -276,13 +276,13 @@ func TestEncodeMapIntKeys(t *testing.T) {
 }
 
 type RefA struct {
-	ID string `gorethink:"id,omitempty"`
-	B  *RefB  `gorethink:"b_id,reference" gorethink_ref:"id"`
+	ID string `rethinkdb:"id,omitempty"`
+	B  *RefB  `rethinkdb:"b_id,reference" rethinkdb_ref:"id"`
 }
 
 type RefB struct {
-	ID   string `gorethink:"id,omitempty"`
-	Name string `gorethink:"name"`
+	ID   string `rethinkdb:"id,omitempty"`
+	Name string `rethinkdb:"name"`
 }
 
 func TestReferenceField(t *testing.T) {
@@ -299,8 +299,8 @@ func TestReferenceField(t *testing.T) {
 }
 
 type RefC struct {
-	ID string `gorethink:"id,omitempty"`
-	B  *RefB  `gorethink:"b_id,reference" gorethink_ref:"b_id"`
+	ID string `rethinkdb:"id,omitempty"`
+	B  *RefB  `rethinkdb:"b_id,reference" rethinkdb_ref:"b_id"`
 }
 
 func TestReferenceFieldMissing(t *testing.T) {
@@ -313,8 +313,8 @@ func TestReferenceFieldMissing(t *testing.T) {
 }
 
 type RefD struct {
-	ID string `gorethink:"id,omitempty"`
-	B  string `gorethink:"b_id,reference" gorethink_ref:"b_id"`
+	ID string `rethinkdb:"id,omitempty"`
+	B  string `rethinkdb:"b_id,reference" rethinkdb_ref:"b_id"`
 }
 
 func TestReferenceFieldInvalid(t *testing.T) {
@@ -327,13 +327,13 @@ func TestReferenceFieldInvalid(t *testing.T) {
 }
 
 type RefE struct {
-	ID   string  `gorethink:"id,omitempty"`
-	FIDs *[]RefF `gorethink:"f_ids,reference" gorethink_ref:"id"`
+	ID   string  `rethinkdb:"id,omitempty"`
+	FIDs *[]RefF `rethinkdb:"f_ids,reference" rethinkdb_ref:"id"`
 }
 
 type RefF struct {
-	ID   string `gorethink:"id,omitempty"`
-	Name string `gorethink:"name"`
+	ID   string `rethinkdb:"id,omitempty"`
+	Name string `rethinkdb:"name"`
 }
 
 func TestReferenceFieldArray(t *testing.T) {
@@ -371,11 +371,11 @@ func TestEncodeBytes(t *testing.T) {
 }
 
 type Compound struct {
-	PartA string `gorethink:"id[0]"`
-	PartB string `gorethink:"id[1]"`
-	ErrA  string `gorethink:"err_a[]"`
-	ErrB  string `gorethink:"err_b["`
-	ErrC  string `gorethink:"err_c]"`
+	PartA string `rethinkdb:"id[0]"`
+	PartB string `rethinkdb:"id[1]"`
+	ErrA  string `rethinkdb:"err_a[]"`
+	ErrB  string `rethinkdb:"err_b["`
+	ErrC  string `rethinkdb:"err_c]"`
 }
 
 func TestEncodeCompound(t *testing.T) {
@@ -392,8 +392,8 @@ func TestEncodeCompound(t *testing.T) {
 }
 
 type CompoundRef struct {
-	PartA string `gorethink:"id[0]"`
-	PartB *RefB  `gorethink:"id[1],reference" gorethink_ref:"id"`
+	PartA string `rethinkdb:"id[0]"`
+	PartB *RefB  `rethinkdb:"id[1],reference" rethinkdb_ref:"id"`
 }
 
 func TestEncodeCompoundRef(t *testing.T) {
@@ -428,7 +428,7 @@ func TestEncodeCustomTypeEncodingValue(t *testing.T) {
 	}
 
 	outer := struct {
-		Inner innerType `gorethink:"inner"`
+		Inner innerType `rethinkdb:"inner"`
 	}{Inner: innerType{Val: 5}}
 	want := map[string]interface{}{
 		"inner": map[string]interface{}{
@@ -456,7 +456,7 @@ func TestEncodeCustomTypeEncodingPointer(t *testing.T) {
 	}
 
 	outer := struct {
-		Inner *innerType `gorethink:"inner"`
+		Inner *innerType `rethinkdb:"inner"`
 	}{Inner: &innerType{Val: 5}}
 	want := map[string]interface{}{
 		"inner": map[string]interface{}{

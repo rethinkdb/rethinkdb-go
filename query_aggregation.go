@@ -1,6 +1,6 @@
-package gorethink
+package rethinkdb
 
-import p "gopkg.in/gorethink/gorethink.v4/ql2"
+import p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 
 // Aggregation
 // These commands are used to compute smaller values from large sequences.
@@ -20,7 +20,7 @@ func (t Term) Reduce(args ...interface{}) Term {
 
 // DistinctOpts contains the optional arguments for the Distinct term
 type DistinctOpts struct {
-	Index interface{} `gorethink:"index,omitempty"`
+	Index interface{} `rethinkdb:"index,omitempty"`
 }
 
 func (o DistinctOpts) toMap() map[string]interface{} {
@@ -47,8 +47,8 @@ func (t Term) Distinct(optArgs ...DistinctOpts) Term {
 
 // GroupOpts contains the optional arguments for the Group term
 type GroupOpts struct {
-	Index interface{} `gorethink:"index,omitempty"`
-	Multi interface{} `gorethink:"multi,omitempty"`
+	Index interface{} `rethinkdb:"index,omitempty"`
+	Multi interface{} `rethinkdb:"multi,omitempty"`
 }
 
 func (o GroupOpts) toMap() map[string]interface{} {
@@ -225,7 +225,7 @@ func (t Term) Avg(args ...interface{}) Term {
 
 // MinOpts contains the optional arguments for the Min term
 type MinOpts struct {
-	Index interface{} `gorethink:"index,omitempty"`
+	Index interface{} `rethinkdb:"index,omitempty"`
 }
 
 func (o MinOpts) toMap() map[string]interface{} {
@@ -274,7 +274,7 @@ func (t Term) MinIndex(index interface{}, args ...interface{}) Term {
 
 // MaxOpts contains the optional arguments for the Max term
 type MaxOpts struct {
-	Index interface{} `gorethink:"index,omitempty"`
+	Index interface{} `rethinkdb:"index,omitempty"`
 }
 
 func (o MaxOpts) toMap() map[string]interface{} {
@@ -323,8 +323,8 @@ func (t Term) MaxIndex(index interface{}, args ...interface{}) Term {
 
 // FoldOpts contains the optional arguments for the Fold term
 type FoldOpts struct {
-	Emit      interface{} `gorethink:"emit,omitempty"`
-	FinalEmit interface{} `gorethink:"final_emit,omitempty"`
+	Emit      interface{} `rethinkdb:"emit,omitempty"`
+	FinalEmit interface{} `rethinkdb:"final_emit,omitempty"`
 }
 
 func (o FoldOpts) toMap() map[string]interface{} {

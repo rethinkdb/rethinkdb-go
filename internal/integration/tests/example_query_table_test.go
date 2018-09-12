@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
 )
 
 // Create a table named "table" with the default settings.

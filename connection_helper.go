@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"golang.org/x/net/context"

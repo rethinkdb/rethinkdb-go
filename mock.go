@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 )
 
 // Mocking is based on the amazing package github.com/stretchr/testify
@@ -295,7 +295,7 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 	found, query := m.findExpectedQuery(q)
 
 	if found < 0 {
-		panic(fmt.Sprintf("gorethink: mock: This query was unexpected:\n\t\t%s", q.Term.String()))
+		panic(fmt.Sprintf("rethinkdb: mock: This query was unexpected:\n\t\t%s", q.Term.String()))
 	} else {
 		m.mu.Lock()
 		switch {

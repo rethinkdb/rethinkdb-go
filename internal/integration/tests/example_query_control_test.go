@@ -2,7 +2,7 @@ package tests
 
 import (
 	"fmt"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
 )
 
 // Return heroes and superheroes.
@@ -187,12 +187,12 @@ func ExampleExpr_struct() {
 	// }
 }
 
-// Convert a Go struct (with gorethink tags) to a ReQL object. The tags allow
+// Convert a Go struct (with rethinkdb tags) to a ReQL object. The tags allow
 // the field names to be changed.
 func ExampleExpr_structTags() {
 	type ExampleType struct {
-		A int    `gorethink:"field_a"`
-		B string `gorethink:"field_b"`
+		A int    `rethinkdb:"field_a"`
+		B string `rethinkdb:"field_b"`
 	}
 
 	cur, err := r.Expr(ExampleType{

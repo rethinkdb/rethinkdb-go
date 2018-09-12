@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v4.2.0 - 2018-09-12
+
+- Moved to rethinkdb organization
+- Renamed to rethinkdb-go repo
+- Renamed to rethinkdb package
+
 ## v4.1.0 - 2018-08-29
 
 ### Fixed
@@ -65,7 +71,7 @@ Unfortunately this will likely be the last release I plan to work on. This is du
  - The company behind RethinkDB has shut down and while I am sure the community will keep the database going it seems like a good time for me to step away from the project.
  - The driver itself is in a relatively good condition and many companies are using the existing version in production.
 
-I hope you understand my decision to step back from the project, if you have any questions or would be interested in take over some of the maintenance of the project please let me know. To make this process easier I have also decided to move the repository to the GoRethink organisation. All existing imports _should_ still work.
+I hope you understand my decision to step back from the project, if you have any questions or would be interested in take over some of the maintenance of the project please let me know. To make this process easier I have also decided to move the repository to the RethinkDB-go organisation. All existing imports _should_ still work.
 
 Thanks to everybody who got involved with this project over the last ~4 years and helped out, I have truly enjoyed the time I have spent building this library and I hope both RethinkDB and this driver manage to keep going.
 
@@ -135,9 +141,9 @@ r.DB("examples").Table("heroes").GetAll("man_of_steel").OptArgs(r.GetAllOpts{
 
 ```
 type User struct {
-  Company string `gorethink:"id[0]"`
-  Name    string `gorethink:"id[1]"`
-  Age     int    `gorethink:"age"`
+  Company string `rethinkdb:"id[0]"`
+  Name    string `rethinkdb:"id[1]"`
+  Age     int    `rethinkdb:"age"`
 }
 // Creates
 {"id": [COMPANY, NAME], "age": AGE}
@@ -254,7 +260,7 @@ type User struct {
 
 ### Changed
 
- - GoRethink now uses the v1.0 RethinkDB protocol which supports RethinkDB v2.3 and above. If you are using RethinkDB 2.2 or older please set `HandshakeVersion` when creating a session. For example:
+ - RethinkDB-go now uses the v1.0 RethinkDB protocol which supports RethinkDB v2.3 and above. If you are using RethinkDB 2.2 or older please set `HandshakeVersion` when creating a session. For example:
 ```go
 r.Connect(
     ...
@@ -294,7 +300,7 @@ r.Connect(
 
 ### Added
 - Added the ability to reference subdocuments when inserting new documents, for more information see the documentation in the readme.
-- Added the `SetTags` function which allows GoRethink to override which tags are used when working with structs. For example to support the `json` add the following call `SetTags("gorethink", "json")`.
+- Added the `SetTags` function which allows RethinkDB-go to override which tags are used when working with structs. For example to support the `json` add the following call `SetTags("gorethink", "json")`.
 - Added helper functions for checking the error type of a write query, this is useful when calling `RunWrite`.
     + Added `IsConflictErr` which returns true when RethinkDB returns a duplicate key error.
     + Added `IsTypeErr` which returns true when RethinkDB returns an unexpected type error.
@@ -319,7 +325,7 @@ r.Connect(
 
 ### Fixed
 - Fixed `RunWrite` not defering its call to `Cursor.Close()`. This could cause issues if an error occurred when decoding the result.
-- Fixed panic when calling `Error()` on a GoRethink `rqlError`.
+- Fixed panic when calling `Error()` on a RethinkDB-go `rqlError`.
 
 ## v1.3.0 - 2016-01-11
 
@@ -410,9 +416,9 @@ r.Connect(
 
 ## v1.0.0 - 2015-06-27
 
-1.0.0 is finally here, This is the first stable production ready release of GoRethink!
+1.0.0 is finally here, This is the first stable production ready release of RethinkDB-go!
 
-![GoRethink Logo](https://raw.github.com/wiki/gorethink/gorethink/gopher-and-thinker.png "Golang Gopher and RethinkDB Thinker")
+![RethinkDB-go Logo](https://raw.github.com/wiki/gorethink/gorethink/gopher-and-thinker.png "Golang Gopher and RethinkDB Thinker")
 
 In an attempt to make this library more "idiomatic" some functions have been renamed, for the full list of changes and bug fixes see below.
 

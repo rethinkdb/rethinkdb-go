@@ -1,7 +1,7 @@
 package tests
 
 import (
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v4"
 	"math/rand"
 	"strconv"
 	"sync"

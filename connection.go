@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"crypto/tls"
@@ -14,7 +14,7 @@ import (
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
 	"golang.org/x/net/context"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 	"sync"
 )
 
@@ -247,7 +247,7 @@ func (c *Connection) startTracingSpan(parentSpan opentracing.Span, q *Query) ope
 		ext.SpanKindRPCClient)
 
 	ext.PeerAddress.Set(span, c.address)
-	ext.Component.Set(span, "gorethink")
+	ext.Component.Set(span, "rethinkdb-go")
 
 	if q.Type == p.Query_START {
 		span.LogFields(log.String("query", q.Term.String()))
@@ -338,8 +338,8 @@ func (c *Connection) processResponses() {
 }
 
 type ServerResponse struct {
-	ID   string `gorethink:"id"`
-	Name string `gorethink:"name"`
+	ID   string `rethinkdb:"id"`
+	Name string `rethinkdb:"name"`
 }
 
 // Server returns the server name and server UUID being used by a connection.

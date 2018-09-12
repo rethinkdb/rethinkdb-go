@@ -1,10 +1,10 @@
-package gorethink
+package rethinkdb
 
 import (
 	"fmt"
 
 	test "gopkg.in/check.v1"
-	"gopkg.in/gorethink/gorethink.v4/internal/integration/tests"
+	"gopkg.in/rethinkdb/rethinkdb-go.v4/internal/integration/tests"
 	"testing"
 )
 
@@ -112,7 +112,7 @@ func (s *MockSuite) TestMockRunMissingMock(c *test.C) {
 		c.Assert(DB("test").Table("test").Exec(mock), test.IsNil)
 		c.Assert(DB("test").Table("test").Exec(mock), test.IsNil)
 	}, test.PanicMatches, ""+
-		"gorethink: mock: This query was unexpected:(?s:.*)")
+		"rethinkdb: mock: This query was unexpected:(?s:.*)")
 	mock.AssertExpectations(c)
 }
 

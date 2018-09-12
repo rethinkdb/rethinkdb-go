@@ -1,7 +1,7 @@
-package gorethink
+package rethinkdb
 
 import (
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 )
 
 // Config can be used to read and/or update the configurations for individual
@@ -18,12 +18,12 @@ func (t Term) Rebalance() Term {
 
 // ReconfigureOpts contains the optional arguments for the Reconfigure term.
 type ReconfigureOpts struct {
-	Shards               interface{} `gorethink:"shards,omitempty"`
-	Replicas             interface{} `gorethink:"replicas,omitempty"`
-	DryRun               interface{} `gorethink:"dry_run,omitempty"`
-	EmergencyRepair      interface{} `gorethink:"emergency_repair,omitempty"`
-	NonVotingReplicaTags interface{} `gorethink:"nonvoting_replica_tags,omitempty"`
-	PrimaryReplicaTag    interface{} `gorethink:"primary_replica_tag,omitempty"`
+	Shards               interface{} `rethinkdb:"shards,omitempty"`
+	Replicas             interface{} `rethinkdb:"replicas,omitempty"`
+	DryRun               interface{} `rethinkdb:"dry_run,omitempty"`
+	EmergencyRepair      interface{} `rethinkdb:"emergency_repair,omitempty"`
+	NonVotingReplicaTags interface{} `rethinkdb:"nonvoting_replica_tags,omitempty"`
+	PrimaryReplicaTag    interface{} `rethinkdb:"primary_replica_tag,omitempty"`
 }
 
 func (o ReconfigureOpts) toMap() map[string]interface{} {
@@ -46,8 +46,8 @@ func (t Term) Status() Term {
 
 // WaitOpts contains the optional arguments for the Wait term.
 type WaitOpts struct {
-	WaitFor interface{} `gorethink:"wait_for,omitempty"`
-	Timeout interface{} `gorethink:"timeout,omitempty"`
+	WaitFor interface{} `rethinkdb:"wait_for,omitempty"`
+	Timeout interface{} `rethinkdb:"timeout,omitempty"`
 }
 
 func (o WaitOpts) toMap() map[string]interface{} {

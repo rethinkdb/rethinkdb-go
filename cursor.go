@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"bytes"
@@ -9,8 +9,8 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"golang.org/x/net/context"
-	"gopkg.in/gorethink/gorethink.v4/encoding"
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	"gopkg.in/rethinkdb/rethinkdb-go.v4/encoding"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v4/ql2"
 )
 
 var (
