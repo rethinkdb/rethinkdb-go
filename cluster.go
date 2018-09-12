@@ -1,4 +1,4 @@
-package gorethink
+package rethinkdb
 
 import (
 	"fmt"
@@ -213,8 +213,8 @@ func (c *Cluster) listenForNodeChanges() error {
 
 	// Keep reading node status updates from changefeed
 	var result struct {
-		NewVal nodeStatus `gorethink:"new_val"`
-		OldVal nodeStatus `gorethink:"old_val"`
+		NewVal nodeStatus `rethinkdb:"new_val"`
+		OldVal nodeStatus `rethinkdb:"old_val"`
 	}
 	for cursor.Next(&result) {
 		addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Tests meta queries for creating and deleting tables
@@ -36,10 +36,10 @@ func (suite *MetaTableSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_mtable").Exec(suite.session)
+	err = r.DBCreate("db_mtable").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_mtable").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
 }
@@ -49,7 +49,7 @@ func (suite *MetaTableSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DBDrop("db_mtable").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -62,7 +62,7 @@ func (suite *MetaTableSuite) TestCases() {
 	// db = r.db('test')
 	suite.T().Log("Possibly executing: var db r.Term = r.DB('test')")
 
-	db := r.DB("test")
+	db := r.DB("db_mtable")
 	_ = db // Prevent any noused variable errors
 
 	{
@@ -550,7 +550,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #135
 		/* err('ReqlOpFailedError', 'Table `test.foo` already exists.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.foo` already exists.")
+		var expected_ Err = err("ReqlOpFailedError", "Table `db_mtable.foo` already exists.")
 		/* db.table_create('foo') */
 
 		suite.T().Log("About to run line #135: db.TableCreate('foo')")
@@ -580,7 +580,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #141
 		/* err('ReqlOpFailedError', 'Table `test.foo` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.foo` does not exist.")
+		var expected_ Err = err("ReqlOpFailedError", "Table `db_mtable.foo` does not exist.")
 		/* db.table_drop('foo') */
 
 		suite.T().Log("About to run line #141: db.TableDrop('foo')")
@@ -1157,12 +1157,12 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #324
 		/* {'db':'test','name':'testA'} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"db": "test", "name": "testA"}
+		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"db": "db_mtable", "name": "testA"}
 		/* r.table('testA').config().pluck('db','name') */
 
 		suite.T().Log("About to run line #324: r.Table('testA').Config().Pluck('db', 'name')")
 
-		runAndAssert(suite.Suite, expected_, r.Table("testA").Config().Pluck("db", "name"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("testA").Config().Pluck("db", "name"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -1207,7 +1207,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #333: r.DB('rethinkdb').Table('table_config').Filter(map[interface{}]interface{}{'name': 'testA', }).Nth(0).Eq(r.Table('testA').Config())")
 
-		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_config").Filter(map[interface{}]interface{}{"name": "testA"}).Nth(0).Eq(r.Table("testA").Config()), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_config").Filter(map[interface{}]interface{}{"name": "testA"}).Nth(0).Eq(db.Table("testA").Config()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -1222,7 +1222,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #336: r.DB('rethinkdb').Table('table_status').Filter(map[interface{}]interface{}{'name': 'testA', }).Nth(0).Eq(r.Table('testA').Status())")
 
-		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_status").Filter(map[interface{}]interface{}{"name": "testA"}).Nth(0).Eq(r.Table("testA").Status()), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("rethinkdb").Table("table_status").Filter(map[interface{}]interface{}{"name": "testA"}).Nth(0).Eq(db.Table("testA").Status()), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -1252,7 +1252,7 @@ func (suite *MetaTableSuite) TestCases() {
 
 		suite.T().Log("About to run line #344: r.Table('testA').OptArgs(r.TableOpts{IdentifierFormat: 'uuid', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, r.Table("testA").OptArgs(r.TableOpts{IdentifierFormat: "uuid"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, db.Table("testA").OptArgs(r.TableOpts{IdentifierFormat: "uuid"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

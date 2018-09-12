@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Tests manipulation operations on tables
@@ -36,16 +36,16 @@ func (suite *TransformTableSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_tfm_table").Exec(suite.session)
+	err = r.DBCreate("db_tfm_table").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_table").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("test").TableDrop("tbl").Exec(suite.session)
-	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
+	r.DB("db_tfm_table").TableDrop("table_test_transform_table").Exec(suite.session)
+	err = r.DB("db_tfm_table").TableCreate("table_test_transform_table").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
+	err = r.DB("db_tfm_table").Table("table_test_transform_table").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *TransformTableSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("test").TableDrop("tbl").Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DB("db_tfm_table").TableDrop("table_test_transform_table").Exec(suite.session)
+		r.DBDrop("db_tfm_table").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,18 +64,18 @@ func (suite *TransformTableSuite) TearDownSuite() {
 func (suite *TransformTableSuite) TestCases() {
 	suite.T().Log("Running TransformTableSuite: Tests manipulation operations on tables")
 
-	tbl := r.DB("test").Table("tbl")
-	_ = tbl // Prevent any noused variable errors
+	table_test_transform_table := r.DB("db_tfm_table").Table("table_test_transform_table")
+	_ = table_test_transform_table // Prevent any noused variable errors
 
 	{
 		// transform/table.yaml line #5
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* tbl.insert([{"a":["k1","v1"]},{"a":["k2","v2"]}]) */
+		/* table_test_transform_table.insert([{"a":["k1","v1"]},{"a":["k2","v2"]}]) */
 
-		suite.T().Log("About to run line #5: tbl.Insert([]interface{}{map[interface{}]interface{}{'a': []interface{}{'k1', 'v1'}, }, map[interface{}]interface{}{'a': []interface{}{'k2', 'v2'}, }})")
+		suite.T().Log("About to run line #5: table_test_transform_table.Insert([]interface{}{map[interface{}]interface{}{'a': []interface{}{'k1', 'v1'}, }, map[interface{}]interface{}{'a': []interface{}{'k2', 'v2'}, }})")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"a": []interface{}{"k1", "v1"}}, map[interface{}]interface{}{"a": []interface{}{"k2", "v2"}}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_transform_table.Insert([]interface{}{map[interface{}]interface{}{"a": []interface{}{"k1", "v1"}}, map[interface{}]interface{}{"a": []interface{}{"k2", "v2"}}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -86,11 +86,11 @@ func (suite *TransformTableSuite) TestCases() {
 		// transform/table.yaml line #10
 		/* {"k1":"v1","k2":"v2"} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"k1": "v1", "k2": "v2"}
-		/* tbl.map(r.row["a"]).coerce_to("object") */
+		/* table_test_transform_table.map(r.row["a"]).coerce_to("object") */
 
-		suite.T().Log("About to run line #10: tbl.Map(r.Row.AtIndex('a')).CoerceTo('object')")
+		suite.T().Log("About to run line #10: table_test_transform_table.Map(r.Row.AtIndex('a')).CoerceTo('object')")
 
-		runAndAssert(suite.Suite, expected_, tbl.Map(r.Row.AtIndex("a")).CoerceTo("object"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_transform_table.Map(r.Row.AtIndex("a")).CoerceTo("object"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -101,11 +101,11 @@ func (suite *TransformTableSuite) TestCases() {
 		// transform/table.yaml line #14
 		/* "SELECTION<STREAM>" */
 		var expected_ string = "SELECTION<STREAM>"
-		/* tbl.limit(1).type_of() */
+		/* table_test_transform_table.limit(1).type_of() */
 
-		suite.T().Log("About to run line #14: tbl.Limit(1).TypeOf()")
+		suite.T().Log("About to run line #14: table_test_transform_table.Limit(1).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Limit(1).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_transform_table.Limit(1).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -116,11 +116,11 @@ func (suite *TransformTableSuite) TestCases() {
 		// transform/table.yaml line #17
 		/* "ARRAY" */
 		var expected_ string = "ARRAY"
-		/* tbl.limit(1).coerce_to('array').type_of() */
+		/* table_test_transform_table.limit(1).coerce_to('array').type_of() */
 
-		suite.T().Log("About to run line #17: tbl.Limit(1).CoerceTo('array').TypeOf()")
+		suite.T().Log("About to run line #17: table_test_transform_table.Limit(1).CoerceTo('array').TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Limit(1).CoerceTo("array").TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_transform_table.Limit(1).CoerceTo("array").TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

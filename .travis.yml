@@ -4,11 +4,13 @@ go:
   - 1.7.x
   - 1.8.x
   - 1.9.x
-  - tip
+  - 1.10.x
+  - 1.11.x
+  - master
 
 cache: apt
 
-go_import_path: gopkg.in/gorethink/gorethink.v4
+go_import_path: gopkg.in/rethinkdb/rethinkdb-go.v5
 
 install: go get -t ./...
 
@@ -18,8 +20,10 @@ before_script:
   - sudo apt-get update
   - sudo apt-get install rethinkdb
   - rethinkdb > /dev/null 2>&1 &
-  - rethinkdb --port-offset 1 --directory rethinkdb_data1 --join localhost:29016 > /dev/null 2>&1 &
+  - rethinkdb --port-offset 1 --directory rethinkdb_data1                        > /dev/null 2>&1 &
   - rethinkdb --port-offset 2 --directory rethinkdb_data2 --join localhost:29016 > /dev/null 2>&1 &
   - rethinkdb --port-offset 3 --directory rethinkdb_data3 --join localhost:29016 > /dev/null 2>&1 &
 
-script: go test -tags='cluster' -short -race -v ./...
+script:
+  - go test -race .
+  - go test -tags='cluster' -short -race -v ./...

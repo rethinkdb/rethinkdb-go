@@ -1,17 +1,14 @@
-# GoRethink - RethinkDB Driver for Go
+# RethinkDB-go - RethinkDB Driver for Go
 
-[![GitHub tag](https://img.shields.io/github/tag/GoRethink/gorethink.svg?style=flat)](https://github.com/GoRethink/gorethink/releases)
-[![GoDoc](https://godoc.org/github.com/GoRethink/gorethink?status.svg)](https://godoc.org/github.com/GoRethink/gorethink)
-[![Build status](https://travis-ci.org/GoRethink/gorethink.svg?branch=master)](https://travis-ci.org/GoRethink/gorethink)
-<!-- [![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) -->
+[![GitHub tag](https://img.shields.io/github/tag/rethinkdb/rethinkdb-go.svg?style=flat)](https://github.com/rethinkdb/rethinkdb-go/releases)
+[![GoDoc](https://godoc.org/github.com/rethinkdb/rethinkdb-go?status.svg)](https://godoc.org/github.com/rethinkdb/rethinkdb-go)
+[![Build status](https://travis-ci.org/rethinkdb/rethinkdb-go.svg?branch=master)](https://travis-ci.org/rethinkdb/rethinkdb-go)
 
 [Go](http://golang.org/) driver for [RethinkDB](http://www.rethinkdb.com/)
 
-![GoRethink Logo](https://raw.github.com/wiki/gorethink/gorethink/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
+![RethinkDB-go Logo](https://raw.github.com/wiki/rethinkdb/rethinkdb-go/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v4.1.0 (RethinkDB v2.3)
-
-<!-- This project is no longer maintained, for more information see the [v3.0.0 release](https://github.com/gorethink/gorethink/releases/tag/v3.0.0)-->
+Current version: v5.0.0 (RethinkDB v2.3)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -20,22 +17,22 @@ If you need any help you can find me on the [RethinkDB slack](http://slack.rethi
 ## Installation
 
 ```
-go get gopkg.in/gorethink/gorethink.v4
+go get gopkg.in/rethinkdb/rethinkdb-go.v5
 ```
 
-Replace `v4` with `v3` or `v2` to use previous versions.
+Replace `v5` with `v4` or `v3` to use previous versions.
 
 ## Example
 
 [embedmd]:# (example_test.go go)
 ```go
-package gorethink_test
+package rethinkdb_test
 
 import (
 	"fmt"
 	"log"
 
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 func Example() {
@@ -84,7 +81,7 @@ func ExampleConnect() {
 }
 ```
 
-See the [documentation](http://godoc.org/github.com/gorethink/gorethink#Connect) for a list of supported arguments to Connect().
+See the [documentation](http://godoc.org/github.com/rethinkdb/rethinkdb-go#Connect) for a list of supported arguments to Connect().
 
 ### Connection Pool
 
@@ -127,7 +124,7 @@ func ExampleConnect_cluster() {
 }
 ```
 
-When `DiscoverHosts` is true any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by GoRethink. Unfortunately the canonical address of each server in the cluster **MUST** be set as otherwise clients will try to connect to the database nodes locally. For more information about how to set a RethinkDB servers canonical address set this page http://www.rethinkdb.com/docs/config-file/.
+When `DiscoverHosts` is true any nodes are added to the cluster after the initial connection then the new node will be added to the pool of available nodes used by RethinkDB-go. Unfortunately the canonical address of each server in the cluster **MUST** be set as otherwise clients will try to connect to the database nodes locally. For more information about how to set a RethinkDB servers canonical address set this page http://www.rethinkdb.com/docs/config-file/.
 
 ## User Authentication
 
@@ -163,7 +160,7 @@ Please note that `DiscoverHosts` will not work with user authentication at this 
 
 This library is based on the official drivers so the code on the [API](http://www.rethinkdb.com/api/) page should require very few changes to work.
 
-To view full documentation for the query functions check the [API reference](https://github.com/gorethink/gorethink/wiki/Go-ReQL-command-reference) or [GoDoc](http://godoc.org/github.com/gorethink/gorethink#Term)
+To view full documentation for the query functions check the [API reference](https://github.com/rethinkdb/rethinkdb-go/wiki/Go-ReQL-command-reference) or [GoDoc](http://godoc.org/github.com/rethinkdb/rethinkdb-go#Term)
 
 Slice Expr Example
 ```go
@@ -195,7 +192,7 @@ r.DB("database").Table("table").Between(1, 10, r.BetweenOpts{
 }).Run(session)
 ```
 
-For any queries which use callbacks the function signature is important as your function needs to be a valid GoRethink callback, you can see an example of this in the map example above. The simplified explanation is that all arguments must be of type `r.Term`, this is because of how the query is sent to the database (your callback is not actually executed in your Go application but encoded as JSON and executed by RethinkDB). The return argument can be anything you want it to be (as long as it is a valid return value for the current query) so it usually makes sense to return `interface{}`. Here is an example of a callback for the conflict callback of an insert operation:
+For any queries which use callbacks the function signature is important as your function needs to be a valid RethinkDB-go callback, you can see an example of this in the map example above. The simplified explanation is that all arguments must be of type `r.Term`, this is because of how the query is sent to the database (your callback is not actually executed in your Go application but encoded as JSON and executed by RethinkDB). The return argument can be anything you want it to be (as long as it is a valid return value for the current query) so it usually makes sense to return `interface{}`. Here is an example of a callback for the conflict callback of an insert operation:
 
 ```go
 r.Table("test").Insert(doc, r.InsertOpts{
@@ -278,50 +275,52 @@ When passing structs to Expr(And functions that use Expr such as Insert, Update)
   - the field's tag is "-", or
   - the field is empty and its tag specifies the "omitempty" option.
 
-Each fields default name in the map is the field name but can be specified in the struct field's tag value. The "gorethink" key in
+Each fields default name in the map is the field name but can be specified in the struct field's tag value. The "rethinkdb" key in
 the struct field's tag value is the key name, followed by an optional comma
 and options. Examples:
 
 ```go
 // Field is ignored by this package.
-Field int `gorethink:"-"`
+Field int `rethinkdb:"-"`
 // Field appears as key "myName".
-Field int `gorethink:"myName"`
+Field int `rethinkdb:"myName"`
 // Field appears as key "myName" and
 // the field is omitted from the object if its value is empty,
 // as defined above.
-Field int `gorethink:"myName,omitempty"`
+Field int `rethinkdb:"myName,omitempty"`
 // Field appears as key "Field" (the default), but
 // the field is skipped if empty.
 // Note the leading comma.
-Field int `gorethink:",omitempty"`
+Field int `rethinkdb:",omitempty"`
 // When the tag name includes an index expression
 // a compound field is created
-Field1 int `gorethink:"myName[0]"`
-Field2 int `gorethink:"myName[1]"`
+Field1 int `rethinkdb:"myName[0]"`
+Field2 int `rethinkdb:"myName[1]"`
 ```
 
 **NOTE:** It is strongly recommended that struct tags are used to explicitly define the mapping between your Go type and how the data is stored by RethinkDB. This is especially important when using an `Id` field as by default RethinkDB will create a field named `id` as the primary key (note that the RethinkDB field is lowercase but the Go version starts with a capital letter).
 
 When encoding maps with non-string keys the key values are automatically converted to strings where possible, however it is recommended that you use strings where possible (for example `map[string]T`).
 
-If you wish to use the `json` tags for GoRethink then you can call `SetTags("gorethink", "json")` when starting your program, this will cause GoRethink to check for `json` tags after checking for `gorethink` tags. By default this feature is disabled. This function will also let you support any other tags, the driver will check for tags in the same order as the parameters.
+If you wish to use the `json` tags for RethinkDB-go then you can call `SetTags("rethinkdb", "json")` when starting your program, this will cause RethinkDB-go to check for `json` tags after checking for `rethinkdb` tags. By default this feature is disabled. This function will also let you support any other tags, the driver will check for tags in the same order as the parameters.
+
+**NOTE:** Old-style `gorethink` struct tags are supported but deprecated.
 
 ### Pseudo-types
 
-RethinkDB contains some special types which can be used to store special value types, currently supports are binary values, times and geometry data types. GoRethink supports these data types natively however there are some gotchas:
- - Time types: To store times in RethinkDB with GoRethink you must pass a `time.Time` value to your query, due to the way Go works type aliasing or embedding is not support here
+RethinkDB contains some special types which can be used to store special value types, currently supports are binary values, times and geometry data types. RethinkDB-go supports these data types natively however there are some gotchas:
+ - Time types: To store times in RethinkDB with RethinkDB-go you must pass a `time.Time` value to your query, due to the way Go works type aliasing or embedding is not support here
  - Binary types: To store binary data pass a byte slice (`[]byte`) to your query
- - Geometry types: As Go does not include any built-in data structures for storing geometry data GoRethink includes its own in the `github.com/gorethink/gorethink/types` package, Any of the types (`Geometry`, `Point`, `Line` and `Lines`) can be passed to a query to create a RethinkDB geometry type.
+ - Geometry types: As Go does not include any built-in data structures for storing geometry data RethinkDB-go includes its own in the `github.com/rethinkdb/rethinkdb-go/types` package, Any of the types (`Geometry`, `Point`, `Line` and `Lines`) can be passed to a query to create a RethinkDB geometry type.
 
 ### Compound Keys
 
-RethinkDB unfortunately does not support compound primary keys using multiple fields however it does support compound keys using an array of values. For example if you wanted to create a compound key for a book where the key contained the author ID and book name then the ID might look like this `["author_id", "book name"]`. Luckily GoRethink allows you to easily manage these keys while keeping the fields separate in your structs. For example:
+RethinkDB unfortunately does not support compound primary keys using multiple fields however it does support compound keys using an array of values. For example if you wanted to create a compound key for a book where the key contained the author ID and book name then the ID might look like this `["author_id", "book name"]`. Luckily RethinkDB-go allows you to easily manage these keys while keeping the fields separate in your structs. For example:
 
 ```go
 type Book struct {
-  AuthorID string `gorethink:"id[0]"`
-  Name     string `gorethink:"id[1]"`
+  AuthorID string `rethinkdb:"id[0]"`
+  Name     string `rethinkdb:"id[1]"`
 }
 // Creates the following document in RethinkDB
 {"id": [AUTHORID, NAME]}
@@ -329,20 +328,20 @@ type Book struct {
 
 ### References
 
-Sometimes you may want to use a Go struct that references a document in another table, instead of creating a new struct which is just used when writing to RethinkDB you can annotate your struct with the reference tag option. This will tell GoRethink that when encoding your data it should "pluck" the ID field from the nested document and use that instead.
+Sometimes you may want to use a Go struct that references a document in another table, instead of creating a new struct which is just used when writing to RethinkDB you can annotate your struct with the reference tag option. This will tell RethinkDB-go that when encoding your data it should "pluck" the ID field from the nested document and use that instead.
 
-This is all quite complicated so hopefully this example should help. First lets assume you have two types `Author` and `Book` and you want to insert a new book into your database however you dont want to include the entire author struct in the books table. As you can see the `Author` field in the `Book` struct has some extra tags, firstly we have added the `reference` tag option which tells GoRethink to pluck a field from the `Author` struct instead of inserting the whole author document. We also have the `gorethink_ref` tag which tells GoRethink to look for the `id` field in the `Author` document, without this tag GoRethink would instead look for the `author_id` field.
+This is all quite complicated so hopefully this example should help. First lets assume you have two types `Author` and `Book` and you want to insert a new book into your database however you dont want to include the entire author struct in the books table. As you can see the `Author` field in the `Book` struct has some extra tags, firstly we have added the `reference` tag option which tells RethinkDB-go to pluck a field from the `Author` struct instead of inserting the whole author document. We also have the `rethinkdb_ref` tag which tells RethinkDB-go to look for the `id` field in the `Author` document, without this tag RethinkDB-go would instead look for the `author_id` field.
 
 ```go
 type Author struct {
-    ID      string  `gorethink:"id,omitempty"`
-    Name    string  `gorethink:"name"`
+    ID      string  `rethinkdb:"id,omitempty"`
+    Name    string  `rethinkdb:"name"`
 }
 
 type Book struct {
-    ID      string  `gorethink:"id,omitempty"`
-    Title   string  `gorethink:"title"`
-    Author  Author `gorethink:"author_id,reference" gorethink_ref:"id"`
+    ID      string  `rethinkdb:"id,omitempty"`
+    Title   string  `rethinkdb:"title"`
+    Author  Author `rethinkdb:"author_id,reference" rethinkdb_ref:"id"`
 }
 ```
 
@@ -356,7 +355,7 @@ The resulting data in RethinkDB should look something like this:
 }
 ```
 
-If you wanted to read back the book with the author included then you could run the following GoRethink query:
+If you wanted to read back the book with the author included then you could run the following RethinkDB-go query:
 
 ```go
 r.Table("books").Get("1").Merge(func(p r.Term) interface{} {
@@ -370,9 +369,9 @@ You are also able to reference an array of documents, for example if each book s
 
 ```go
 type Book struct {
-    ID       string  `gorethink:"id,omitempty"`
-    Title    string  `gorethink:"title"`
-    Authors  []Author `gorethink:"author_ids,reference" gorethink_ref:"id"`
+    ID       string  `rethinkdb:"id,omitempty"`
+    Title    string  `rethinkdb:"title"`
+    Authors  []Author `rethinkdb:"author_ids,reference" rethinkdb_ref:"id"`
 }
 ```
 
@@ -396,11 +395,11 @@ r.Table("books").Get("book_1").Merge(func(p r.Term) interface{} {
 
 ### Custom `Marshaler`s/`Unmarshaler`s
 
-Sometimes the default behaviour for converting Go types to and from ReQL is not desired, for these situations the driver allows you to implement both the [`Marshaler`](https://godoc.org/github.com/gorethink/gorethink/encoding#Marshaler) and [`Unmarshaler`](https://godoc.org/github.com/gorethink/gorethink/encoding#Unmarshaler) interfaces. These interfaces might look familiar if you are using to using the `encoding/json` package however instead of dealing with `[]byte` the interfaces deal with `interface{}` values (which are later encoded by the `encoding/json` package when communicating with the database).
+Sometimes the default behaviour for converting Go types to and from ReQL is not desired, for these situations the driver allows you to implement both the [`Marshaler`](https://godoc.org/github.com/rethinkdb/rethinkdb-go/encoding#Marshaler) and [`Unmarshaler`](https://godoc.org/github.com/rethinkdb/rethinkdb-go/encoding#Unmarshaler) interfaces. These interfaces might look familiar if you are using to using the `encoding/json` package however instead of dealing with `[]byte` the interfaces deal with `interface{}` values (which are later encoded by the `encoding/json` package when communicating with the database).
 
-An good example of how to use these interfaces is in the [`types`](https://github.com/gorethink/gorethink/blob/master/types/geometry.go#L84-L106) package, in this package the `Point` type is encoded as the `GEOMETRY` pseudo-type instead of a normal JSON object.
+An good example of how to use these interfaces is in the [`types`](https://github.com/rethinkdb/rethinkdb-go/blob/master/types/geometry.go#L84-L106) package, in this package the `Point` type is encoded as the `GEOMETRY` pseudo-type instead of a normal JSON object.
 
-On the other side, you can implement external encode/decode functions with [`SetTypeEncoding`](https://godoc.org/github.com/gorethink/gorethink/encoding#SetTypeEncoding) function.
+On the other side, you can implement external encode/decode functions with [`SetTypeEncoding`](https://godoc.org/github.com/rethinkdb/rethinkdb-go/encoding#SetTypeEncoding) function.
 
 ## Logging
 
@@ -461,7 +460,7 @@ The mocking implementation is based on amazing https://github.com/stretchr/testi
 
 ## Benchmarks
 
-Everyone wants their project's benchmarks to be speedy. And while we know that rethinkDb and the gorethink driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please.
+Everyone wants their project's benchmarks to be speedy. And while we know that RethinkDB and the RethinkDB-go driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please.
 
 Thanks to @jaredfolkins for the contribution.
 
@@ -493,13 +492,13 @@ BenchmarkSequentialSoftWritesParallel10      10000                           263
 
 ## Examples
 
-Many functions have examples and are viewable in the godoc, alternatively view some more full features examples on the [wiki](https://github.com/gorethink/gorethink/wiki/Examples).
+Many functions have examples and are viewable in the godoc, alternatively view some more full features examples on the [wiki](https://github.com/rethinkdb/rethinkdb-go/wiki/Examples).
 
 Another good place to find examples are the tests, almost every term will have a couple of tests that demonstrate how they can be used.
 
 ## Further reading
 
-- [GoRethink Goes 1.0](https://www.compose.io/articles/gorethink-goes-1-0/)
+- [RethinkDB-go Goes 1.0](https://www.compose.io/articles/gorethink-goes-1-0/)
 - [Go, RethinkDB & Changefeeds](https://www.compose.io/articles/go-rethinkdb-and-changefeeds-part-1/)
 - [Build an IRC bot in Go with RethinkDB changefeeds](http://rethinkdb.com/blog/go-irc-bot/)
 
@@ -518,7 +517,3 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
-## Donations
-
-[![Donations](https://pledgie.com/campaigns/29517.png "Donations")](https://pledgie.com/campaigns/29517)

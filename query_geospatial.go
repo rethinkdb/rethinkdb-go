@@ -1,15 +1,15 @@
-package gorethink
+package rethinkdb
 
 import (
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // CircleOpts contains the optional arguments for the Circle term.
 type CircleOpts struct {
-	NumVertices interface{} `gorethink:"num_vertices,omitempty"`
-	GeoSystem   interface{} `gorethink:"geo_system,omitempty"`
-	Unit        interface{} `gorethink:"unit,omitempty"`
-	Fill        interface{} `gorethink:"fill,omitempty"`
+	NumVertices interface{} `rethinkdb:"num_vertices,omitempty"`
+	GeoSystem   interface{} `rethinkdb:"geo_system,omitempty"`
+	Unit        interface{} `rethinkdb:"unit,omitempty"`
+	Fill        interface{} `rethinkdb:"fill,omitempty"`
 }
 
 func (o CircleOpts) toMap() map[string]interface{} {
@@ -30,8 +30,8 @@ func Circle(point, radius interface{}, optArgs ...CircleOpts) Term {
 
 // DistanceOpts contains the optional arguments for the Distance term.
 type DistanceOpts struct {
-	GeoSystem interface{} `gorethink:"geo_system,omitempty"`
-	Unit      interface{} `gorethink:"unit,omitempty"`
+	GeoSystem interface{} `rethinkdb:"geo_system,omitempty"`
+	Unit      interface{} `rethinkdb:"unit,omitempty"`
 }
 
 func (o DistanceOpts) toMap() map[string]interface{} {
@@ -79,7 +79,7 @@ func (t Term) ToGeoJSON(args ...interface{}) Term {
 
 // GetIntersectingOpts contains the optional arguments for the GetIntersecting term.
 type GetIntersectingOpts struct {
-	Index interface{} `gorethink:"index,omitempty"`
+	Index interface{} `rethinkdb:"index,omitempty"`
 }
 
 func (o GetIntersectingOpts) toMap() map[string]interface{} {
@@ -99,11 +99,11 @@ func (t Term) GetIntersecting(args interface{}, optArgs ...GetIntersectingOpts) 
 
 // GetNearestOpts contains the optional arguments for the GetNearest term.
 type GetNearestOpts struct {
-	Index      interface{} `gorethink:"index,omitempty"`
-	MaxResults interface{} `gorethink:"max_results,omitempty"`
-	MaxDist    interface{} `gorethink:"max_dist,omitempty"`
-	Unit       interface{} `gorethink:"unit,omitempty"`
-	GeoSystem  interface{} `gorethink:"geo_system,omitempty"`
+	Index      interface{} `rethinkdb:"index,omitempty"`
+	MaxResults interface{} `rethinkdb:"max_results,omitempty"`
+	MaxDist    interface{} `rethinkdb:"max_dist,omitempty"`
+	Unit       interface{} `rethinkdb:"unit,omitempty"`
+	GeoSystem  interface{} `rethinkdb:"geo_system,omitempty"`
 }
 
 func (o GetNearestOpts) toMap() map[string]interface{} {

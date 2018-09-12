@@ -5,12 +5,12 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/gorethink/gorethink.v4"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
 )
 
 type object struct {
-	ID    int64  `gorethink:"id,omitempty"`
-	Name  string `gorethink:"name"`
+	ID    int64  `rethinkdb:"id,omitempty"`
+	Name  string `rethinkdb:"name"`
 	Attrs []attr
 }
 
@@ -190,13 +190,13 @@ func (s *RethinkSuite) TestCursorAtomArray(c *test.C) {
 }
 
 func (s *RethinkSuite) TestEmptyResults(c *test.C) {
-	r.DBCreate("test").Exec(session)
-	r.DB("test").TableCreate("test").Exec(session)
-	res, err := r.DB("test").Table("test").Get("missing value").Run(session)
+	r.DBCreate("test_empty_res").Exec(session)
+	r.DB("test_empty_res").TableCreate("test_empty_res").Exec(session)
+	res, err := r.DB("test_empty_res").Table("test_empty_res").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 
-	res, err = r.DB("test").Table("test").Get("missing value").Run(session)
+	res, err = r.DB("test_empty_res").Table("test_empty_res").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	var response interface{}
 	err = res.One(&response)
@@ -207,23 +207,23 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 
-	res, err = r.DB("test").Table("test").Get("missing value").Run(session)
+	res, err = r.DB("test_empty_res").Table("test_empty_res").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 
-	res, err = r.DB("test").Table("test").GetAll("missing value", "another missing value").Run(session)
+	res, err = r.DB("test_empty_res").Table("test_empty_res").GetAll("missing value", "another missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Next(&response), test.Equals, false)
 
 	var obj object
 	obj.Name = "missing value"
-	res, err = r.DB("test").Table("test").Filter(obj).Run(session)
+	res, err = r.DB("test_empty_res").Table("test_empty_res").Filter(obj).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
 
 	var objP *object
 
-	res, err = r.DB("test").Table("test").Get("missing value").Run(session)
+	res, err = r.DB("test_empty_res").Table("test_empty_res").Get("missing value").Run(session)
 	res.Next(&objP)
 	c.Assert(err, test.IsNil)
 	c.Assert(objP, test.IsNil)
@@ -231,14 +231,14 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 
 func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	// Ensure table + database exist
-	r.DBCreate("test").Exec(session)
-	r.DB("test").TableDrop("Table3").Exec(session)
-	r.DB("test").TableCreate("Table3").Exec(session)
-	r.DB("test").Table("Table3").IndexCreate("num").Exec(session)
-	r.DB("test").Table("Table3").IndexWait().Exec(session)
+	r.DBCreate("test_cur_all").Exec(session)
+	r.DB("test_cur_all").TableDrop("Table3All").Exec(session)
+	r.DB("test_cur_all").TableCreate("Table3All").Exec(session)
+	r.DB("test_cur_all").Table("Table3All").IndexCreate("num").Exec(session)
+	r.DB("test_cur_all").Table("Table3All").IndexWait().Exec(session)
 
 	// Insert rows
-	r.DB("test").Table("Table3").Insert([]interface{}{
+	r.DB("test_cur_all").Table("Table3All").Insert([]interface{}{
 		map[string]interface{}{
 			"id":   2,
 			"name": "Object 1",
@@ -258,7 +258,7 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 	}).Exec(session)
 
 	// Test query
-	query := r.DB("test").Table("Table3").OrderBy("id")
+	query := r.DB("test_cur_all").Table("Table3All").OrderBy("id")
 	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
@@ -288,15 +288,15 @@ func (s *RethinkSuite) TestCursorAll(c *test.C) {
 
 func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	// Ensure table + database exist
-	r.DBCreate("test").Exec(session)
-	r.DB("test").TableDrop("Table3").Exec(session)
-	r.DB("test").TableCreate("Table3").Exec(session)
-	r.DB("test").Table("Table3").Wait().Exec(session)
-	r.DB("test").Table("Table3").IndexCreate("num").Exec(session)
-	r.DB("test").Table("Table3").IndexWait().Exec(session)
+	r.DBCreate("test_cur_lis").Exec(session)
+	r.DB("test_cur_lis").TableDrop("Table3Listen").Exec(session)
+	r.DB("test_cur_lis").TableCreate("Table3Listen").Exec(session)
+	r.DB("test_cur_lis").Table("Table3Listen").Wait().Exec(session)
+	r.DB("test_cur_lis").Table("Table3Listen").IndexCreate("num").Exec(session)
+	r.DB("test_cur_lis").Table("Table3Listen").IndexWait().Exec(session)
 
 	// Insert rows
-	r.DB("test").Table("Table3").Insert([]interface{}{
+	r.DB("test_cur_lis").Table("Table3Listen").Insert([]interface{}{
 		map[string]interface{}{
 			"id":   2,
 			"name": "Object 1",
@@ -316,7 +316,7 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 	}).Exec(session)
 
 	// Test query
-	query := r.DB("test").Table("Table3").OrderBy("id")
+	query := r.DB("test_cur_lis").Table("Table3Listen").OrderBy("id")
 	res, err := query.Run(session)
 	c.Assert(err, test.IsNil)
 
@@ -350,13 +350,13 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 
 func (s *RethinkSuite) TestCursorChangesClose(c *test.C) {
 	// Ensure table + database exist
-	r.DBCreate("test").Exec(session)
-	r.DB("test").TableDrop("Table3").Exec(session)
-	r.DB("test").TableCreate("Table3").Exec(session)
+	r.DBCreate("test_cur_change").Exec(session)
+	r.DB("test_cur_change").TableDrop("Table3Close").Exec(session)
+	r.DB("test_cur_change").TableCreate("Table3Close").Exec(session)
 
 	// Test query
 	// res, err := DB("test").Table("Table3").Changes().Run(session)
-	res, err := r.DB("test").Table("Table3").Changes().Run(session)
+	res, err := r.DB("test_cur_change").Table("Table3Close").Changes().Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res, test.NotNil)
 

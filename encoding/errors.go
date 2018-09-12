@@ -12,7 +12,7 @@ type MarshalerError struct {
 }
 
 func (e *MarshalerError) Error() string {
-	return "gorethink: error calling MarshalRQL for type " + e.Type.String() + ": " + e.Err.Error()
+	return "rethinkdb: error calling MarshalRQL for type " + e.Type.String() + ": " + e.Err.Error()
 }
 
 type InvalidUnmarshalError struct {
@@ -21,13 +21,13 @@ type InvalidUnmarshalError struct {
 
 func (e *InvalidUnmarshalError) Error() string {
 	if e.Type == nil {
-		return "gorethink: UnmarshalRQL(nil)"
+		return "rethinkdb: UnmarshalRQL(nil)"
 	}
 
 	if e.Type.Kind() != reflect.Ptr {
-		return "gorethink: UnmarshalRQL(non-pointer " + e.Type.String() + ")"
+		return "rethinkdb: UnmarshalRQL(non-pointer " + e.Type.String() + ")"
 	}
-	return "gorethink: UnmarshalRQL(nil " + e.Type.String() + ")"
+	return "rethinkdb: UnmarshalRQL(nil " + e.Type.String() + ")"
 }
 
 // An InvalidTypeError describes a value that was
@@ -39,9 +39,9 @@ type DecodeTypeError struct {
 
 func (e *DecodeTypeError) Error() string {
 	if e.Reason != "" {
-		return "gorethink: could not decode type " + e.SrcType.String() + " into Go value of type " + e.DestType.String() + ": " + e.Reason
+		return "rethinkdb: could not decode type " + e.SrcType.String() + " into Go value of type " + e.DestType.String() + ": " + e.Reason
 	} else {
-		return "gorethink: could not decode type " + e.SrcType.String() + " into Go value of type " + e.DestType.String()
+		return "rethinkdb: could not decode type " + e.SrcType.String() + " into Go value of type " + e.DestType.String()
 	}
 }
 
@@ -52,7 +52,7 @@ type UnsupportedTypeError struct {
 }
 
 func (e *UnsupportedTypeError) Error() string {
-	return "gorethink: unsupported type: " + e.Type.String()
+	return "rethinkdb: unsupported type: " + e.Type.String()
 }
 
 // An UnsupportedTypeError is returned by Marshal when attempting
@@ -62,7 +62,7 @@ type UnexpectedTypeError struct {
 }
 
 func (e *UnexpectedTypeError) Error() string {
-	return "gorethink: expected type: " + e.DestType.String() + ", got " + e.SrcType.String()
+	return "rethinkdb: expected type: " + e.DestType.String() + ", got " + e.SrcType.String()
 }
 
 type UnsupportedValueError struct {
@@ -71,7 +71,7 @@ type UnsupportedValueError struct {
 }
 
 func (e *UnsupportedValueError) Error() string {
-	return "gorethink: unsupported value: " + e.Str
+	return "rethinkdb: unsupported value: " + e.Str
 }
 
 // Error implements the error interface and can represents multiple

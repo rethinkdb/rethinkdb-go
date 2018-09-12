@@ -1,17 +1,17 @@
-package gorethink
+package rethinkdb
 
 import (
-	p "gopkg.in/gorethink/gorethink.v4/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
 )
 
 // TableCreateOpts contains the optional arguments for the TableCreate term
 type TableCreateOpts struct {
-	PrimaryKey           interface{} `gorethink:"primary_key,omitempty"`
-	Durability           interface{} `gorethink:"durability,omitempty"`
-	Shards               interface{} `gorethink:"shards,omitempty"`
-	Replicas             interface{} `gorethink:"replicas,omitempty"`
-	PrimaryReplicaTag    interface{} `gorethink:"primary_replica_tag,omitempty"`
-	NonVotingReplicaTags interface{} `gorethink:"nonvoting_replica_tags,omitempty"`
+	PrimaryKey           interface{} `rethinkdb:"primary_key,omitempty"`
+	Durability           interface{} `rethinkdb:"durability,omitempty"`
+	Shards               interface{} `rethinkdb:"shards,omitempty"`
+	Replicas             interface{} `rethinkdb:"replicas,omitempty"`
+	PrimaryReplicaTag    interface{} `rethinkdb:"primary_replica_tag,omitempty"`
+	NonVotingReplicaTags interface{} `rethinkdb:"nonvoting_replica_tags,omitempty"`
 }
 
 func (o TableCreateOpts) toMap() map[string]interface{} {
@@ -64,8 +64,8 @@ func (t Term) TableList(args ...interface{}) Term {
 
 // IndexCreateOpts contains the optional arguments for the IndexCreate term
 type IndexCreateOpts struct {
-	Multi interface{} `gorethink:"multi,omitempty"`
-	Geo   interface{} `gorethink:"geo,omitempty"`
+	Multi interface{} `rethinkdb:"multi,omitempty"`
+	Geo   interface{} `rethinkdb:"geo,omitempty"`
 }
 
 func (o IndexCreateOpts) toMap() map[string]interface{} {
@@ -120,7 +120,7 @@ func (t Term) IndexList(args ...interface{}) Term {
 
 // IndexRenameOpts contains the optional arguments for the IndexRename term
 type IndexRenameOpts struct {
-	Overwrite interface{} `gorethink:"overwrite,omitempty"`
+	Overwrite interface{} `rethinkdb:"overwrite,omitempty"`
 }
 
 func (o IndexRenameOpts) toMap() map[string]interface{} {
@@ -150,12 +150,12 @@ func (t Term) IndexWait(args ...interface{}) Term {
 
 // ChangesOpts contains the optional arguments for the Changes term
 type ChangesOpts struct {
-	Squash              interface{} `gorethink:"squash,omitempty"`
-	IncludeInitial      interface{} `gorethink:"include_initial,omitempty"`
-	IncludeStates       interface{} `gorethink:"include_states,omitempty"`
-	IncludeOffsets      interface{} `gorethink:"include_offsets,omitempty"`
-	IncludeTypes        interface{} `gorethink:"include_types,omitempty"`
-	ChangefeedQueueSize interface{} `gorethink:"changefeed_queue_size,omitempty"`
+	Squash              interface{} `rethinkdb:"squash,omitempty"`
+	IncludeInitial      interface{} `rethinkdb:"include_initial,omitempty"`
+	IncludeStates       interface{} `rethinkdb:"include_states,omitempty"`
+	IncludeOffsets      interface{} `rethinkdb:"include_offsets,omitempty"`
+	IncludeTypes        interface{} `rethinkdb:"include_types,omitempty"`
+	ChangefeedQueueSize interface{} `rethinkdb:"changefeed_queue_size,omitempty"`
 }
 
 // ChangesOpts contains the optional arguments for the Changes term

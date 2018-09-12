@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Tests of conversion to and from the RQL null type
@@ -36,10 +36,10 @@ func (suite *DatumNullSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_dnull").Exec(suite.session)
+	err = r.DBCreate("db_dnull").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_dnull").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
 }
@@ -49,7 +49,7 @@ func (suite *DatumNullSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DBDrop("db_dnull").Exec(suite.session)
 
 		suite.session.Close()
 	}

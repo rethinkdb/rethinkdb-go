@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Tests meta queries for databases
@@ -36,10 +36,10 @@ func (suite *MetaDbsSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_dbs").Exec(suite.session)
+	err = r.DBCreate("db_dbs").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_dbs").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
 }
@@ -49,7 +49,7 @@ func (suite *MetaDbsSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DBDrop("db_dbs").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -61,7 +61,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #6
 		/* bag(['rethinkdb', 'test']) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{"rethinkdb", "test"})
+		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "db_dbs"})
 		/* r.db_list() */
 
 		suite.T().Log("About to run line #6: r.DBList()")
@@ -106,7 +106,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #18
 		/* bag(['rethinkdb', 'a', 'b', 'test']) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{"rethinkdb", "a", "b", "test"})
+		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "a", "b", "db_dbs"})
 		/* r.db_list() */
 
 		suite.T().Log("About to run line #18: r.DBList()")
@@ -151,7 +151,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #31
 		/* bag(['rethinkdb', 'a', 'test']) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{"rethinkdb", "a", "test"})
+		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "a", "db_dbs"})
 		/* r.db_list() */
 
 		suite.T().Log("About to run line #31: r.DBList()")
@@ -181,7 +181,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #37
 		/* bag(['rethinkdb', 'test']) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{"rethinkdb", "test"})
+		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "db_dbs"})
 		/* r.db_list() */
 
 		suite.T().Log("About to run line #37: r.DBList()")

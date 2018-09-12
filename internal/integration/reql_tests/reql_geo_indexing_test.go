@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Test ReQL interface to geo indexes
@@ -36,16 +36,16 @@ func (suite *GeoIndexingSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_geo_index").Exec(suite.session)
+	err = r.DBCreate("db_geo_index").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_geo_index").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("test").TableDrop("tbl").Exec(suite.session)
-	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
+	r.DB("db_geo_index").TableDrop("table_test_indexing").Exec(suite.session)
+	err = r.DB("db_geo_index").TableCreate("table_test_indexing").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
+	err = r.DB("db_geo_index").Table("table_test_indexing").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *GeoIndexingSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("test").TableDrop("tbl").Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DB("db_geo_index").TableDrop("table_test_indexing").Exec(suite.session)
+		r.DBDrop("db_geo_index").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,8 +64,8 @@ func (suite *GeoIndexingSuite) TearDownSuite() {
 func (suite *GeoIndexingSuite) TestCases() {
 	suite.T().Log("Running GeoIndexingSuite: Test ReQL interface to geo indexes")
 
-	tbl := r.DB("test").Table("tbl")
-	_ = tbl // Prevent any noused variable errors
+	table_test_indexing := r.DB("db_geo_index").Table("table_test_indexing")
+	_ = table_test_indexing // Prevent any noused variable errors
 
 	// geo/indexing.yaml line #4
 	// rows = [{'id':0, 'g':r.point(10,10), 'm':[r.point(0,0),r.point(1,0),r.point(2,0)]},{'id':1, 'g':r.polygon([0,0], [0,1], [1,1], [1,0])},{'id':2, 'g':r.line([0.000002,-1], [-0.000001,1])}]
@@ -78,11 +78,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #8
 		/* ({'deleted':0,'inserted':3,'skipped':0,'errors':0,'replaced':0,'unchanged':0}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "inserted": 3, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0}
-		/* tbl.insert(rows) */
+		/* table_test_indexing.insert(rows) */
 
-		suite.T().Log("About to run line #8: tbl.Insert(rows)")
+		suite.T().Log("About to run line #8: table_test_indexing.Insert(rows)")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(rows), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.Insert(rows), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -93,11 +93,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #12
 		/* {'created':1} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
-		/* tbl.index_create('g', geo=true) */
+		/* table_test_indexing.index_create('g', geo=true) */
 
-		suite.T().Log("About to run line #12: tbl.IndexCreate('g').OptArgs(r.IndexCreateOpts{Geo: true, })")
+		suite.T().Log("About to run line #12: table_test_indexing.IndexCreate('g').OptArgs(r.IndexCreateOpts{Geo: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("g").OptArgs(r.IndexCreateOpts{Geo: true}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.IndexCreate("g").OptArgs(r.IndexCreateOpts{Geo: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -108,11 +108,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #16
 		/* {'created':1} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
-		/* tbl.index_create('m', geo=true, multi=true) */
+		/* table_test_indexing.index_create('m', geo=true, multi=true) */
 
-		suite.T().Log("About to run line #16: tbl.IndexCreate('m').OptArgs(r.IndexCreateOpts{Geo: true, Multi: true, })")
+		suite.T().Log("About to run line #16: table_test_indexing.IndexCreate('m').OptArgs(r.IndexCreateOpts{Geo: true, Multi: true, })")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("m").OptArgs(r.IndexCreateOpts{Geo: true, Multi: true}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.IndexCreate("m").OptArgs(r.IndexCreateOpts{Geo: true, Multi: true}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -123,11 +123,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #19
 		/* {'created':1} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
-		/* tbl.index_create('other') */
+		/* table_test_indexing.index_create('other') */
 
-		suite.T().Log("About to run line #19: tbl.IndexCreate('other')")
+		suite.T().Log("About to run line #19: table_test_indexing.IndexCreate('other')")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("other"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.IndexCreate("other"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -138,11 +138,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #23
 		/* {'created':1} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
-		/* tbl.index_create('point_det', lambda x: r.point(x, x) ) */
+		/* table_test_indexing.index_create('point_det', lambda x: r.point(x, x) ) */
 
-		suite.T().Log("About to run line #23: tbl.IndexCreateFunc('point_det', func(x r.Term) interface{} { return r.Point(x, x)})")
+		suite.T().Log("About to run line #23: table_test_indexing.IndexCreateFunc('point_det', func(x r.Term) interface{} { return r.Point(x, x)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("point_det", func(x r.Term) interface{} { return r.Point(x, x) }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.IndexCreateFunc("point_det", func(x r.Term) interface{} { return r.Point(x, x) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -153,11 +153,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #27
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* tbl.index_wait() */
+		/* table_test_indexing.index_wait() */
 
-		suite.T().Log("About to run line #27: tbl.IndexWait()")
+		suite.T().Log("About to run line #27: table_test_indexing.IndexWait()")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexWait(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.IndexWait(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -168,11 +168,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #32
 		/* err('ReqlQueryLogicError', 'Could not prove function deterministic.  Index functions must be deterministic.') */
 		var expected_ Err = err("ReqlQueryLogicError", "Could not prove function deterministic.  Index functions must be deterministic.")
-		/* tbl.index_create('point_det', lambda x: r.line(x, x) ) */
+		/* table_test_indexing.index_create('point_det', lambda x: r.line(x, x) ) */
 
-		suite.T().Log("About to run line #32: tbl.IndexCreateFunc('point_det', func(x r.Term) interface{} { return r.Line(x, x)})")
+		suite.T().Log("About to run line #32: table_test_indexing.IndexCreateFunc('point_det', func(x r.Term) interface{} { return r.Line(x, x)})")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreateFunc("point_det", func(x r.Term) interface{} { return r.Line(x, x) }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.IndexCreateFunc("point_det", func(x r.Term) interface{} { return r.Line(x, x) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -183,11 +183,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #37
 		/* err('ReqlQueryLogicError', 'Index `other` is not a geospatial index.  get_intersecting can only be used with a geospatial index.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Index `other` is not a geospatial index.  get_intersecting can only be used with a geospatial index.")
-		/* tbl.get_intersecting(r.point(0,0), index='other').count() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='other').count() */
 
-		suite.T().Log("About to run line #37: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'other', }).Count()")
+		suite.T().Log("About to run line #37: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'other', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "other"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "other"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -198,11 +198,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #41
 		/* err_regex('ReqlOpFailedError', 'Index `missing` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]', [0]) */
 		var expected_ Err = err_regex("ReqlOpFailedError", "Index `missing` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
-		/* tbl.get_intersecting(r.point(0,0), index='missing').count() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='missing').count() */
 
-		suite.T().Log("About to run line #41: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'missing', }).Count()")
+		suite.T().Log("About to run line #41: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'missing', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "missing"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "missing"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -213,11 +213,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #44
 		/* err('ReqlQueryLogicError', 'get_intersecting requires an index argument.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "get_intersecting requires an index argument.")
-		/* tbl.get_intersecting(r.point(0,0)).count() */
+		/* table_test_indexing.get_intersecting(r.point(0,0)).count() */
 
-		suite.T().Log("About to run line #44: tbl.GetIntersecting(r.Point(0, 0)).Count()")
+		suite.T().Log("About to run line #44: table_test_indexing.GetIntersecting(r.Point(0, 0)).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -228,11 +228,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #47
 		/* err('ReqlQueryLogicError', 'Index `g` is a geospatial index.  Only get_nearest and get_intersecting can use a geospatial index.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Index `g` is a geospatial index.  Only get_nearest and get_intersecting can use a geospatial index.")
-		/* tbl.get_all(0, index='g').count() */
+		/* table_test_indexing.get_all(0, index='g').count() */
 
-		suite.T().Log("About to run line #47: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #47: table_test_indexing.GetAll(0).OptArgs(r.GetAllOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetAll(0).OptArgs(r.GetAllOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -243,11 +243,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #51
 		/* err('ReqlQueryLogicError', 'Index `g` is a geospatial index.  Only get_nearest and get_intersecting can use a geospatial index.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Index `g` is a geospatial index.  Only get_nearest and get_intersecting can use a geospatial index.")
-		/* tbl.between(0, 1, index='g').count() */
+		/* table_test_indexing.between(0, 1, index='g').count() */
 
-		suite.T().Log("About to run line #51: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #51: table_test_indexing.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.Between(0, 1).OptArgs(r.BetweenOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -258,11 +258,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #55
 		/* err('ReqlQueryLogicError', 'Index `g` is a geospatial index.  Only get_nearest and get_intersecting can use a geospatial index.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Index `g` is a geospatial index.  Only get_nearest and get_intersecting can use a geospatial index.")
-		/* tbl.order_by(index='g').count() */
+		/* table_test_indexing.order_by(index='g').count() */
 
-		suite.T().Log("About to run line #55: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #55: table_test_indexing.OrderBy().OptArgs(r.OrderByOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.OrderBy().OptArgs(r.OrderByOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -273,11 +273,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #77
 		/* err('ReqlQueryLogicError', 'get_intersecting cannot use the primary index.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "get_intersecting cannot use the primary index.")
-		/* tbl.get_intersecting(r.point(0,0), index='id').count() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='id').count() */
 
-		suite.T().Log("About to run line #77: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'id', }).Count()")
+		suite.T().Log("About to run line #77: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'id', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "id"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "id"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -288,11 +288,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #82
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.get_intersecting(r.point(0,0), index='g').count() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='g').count() */
 
-		suite.T().Log("About to run line #82: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #82: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -303,11 +303,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #86
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.get_intersecting(r.point(10,10), index='g').count() */
+		/* table_test_indexing.get_intersecting(r.point(10,10), index='g').count() */
 
-		suite.T().Log("About to run line #86: tbl.GetIntersecting(r.Point(10, 10)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #86: table_test_indexing.GetIntersecting(r.Point(10, 10)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(10, 10)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(10, 10)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -318,11 +318,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #90
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.get_intersecting(r.point(0.5,0.5), index='g').count() */
+		/* table_test_indexing.get_intersecting(r.point(0.5,0.5), index='g').count() */
 
-		suite.T().Log("About to run line #90: tbl.GetIntersecting(r.Point(0.5, 0.5)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #90: table_test_indexing.GetIntersecting(r.Point(0.5, 0.5)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0.5, 0.5)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0.5, 0.5)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -333,11 +333,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #94
 		/* 0 */
 		var expected_ int = 0
-		/* tbl.get_intersecting(r.point(20,20), index='g').count() */
+		/* table_test_indexing.get_intersecting(r.point(20,20), index='g').count() */
 
-		suite.T().Log("About to run line #94: tbl.GetIntersecting(r.Point(20, 20)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #94: table_test_indexing.GetIntersecting(r.Point(20, 20)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(20, 20)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(20, 20)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -348,11 +348,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #98
 		/* 2 */
 		var expected_ int = 2
-		/* tbl.get_intersecting(r.polygon([0,0], [1,0], [1,1], [0,1]), index='g').count() */
+		/* table_test_indexing.get_intersecting(r.polygon([0,0], [1,0], [1,1], [0,1]), index='g').count() */
 
-		suite.T().Log("About to run line #98: tbl.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1})).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #98: table_test_indexing.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1})).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1})).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{1, 0}, []interface{}{1, 1}, []interface{}{0, 1})).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -363,11 +363,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #102
 		/* 3 */
 		var expected_ int = 3
-		/* tbl.get_intersecting(r.line([0,0], [10,10]), index='g').count() */
+		/* table_test_indexing.get_intersecting(r.line([0,0], [10,10]), index='g').count() */
 
-		suite.T().Log("About to run line #102: tbl.GetIntersecting(r.Line([]interface{}{0, 0}, []interface{}{10, 10})).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
+		suite.T().Log("About to run line #102: table_test_indexing.GetIntersecting(r.Line([]interface{}{0, 0}, []interface{}{10, 10})).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Line([]interface{}{0, 0}, []interface{}{10, 10})).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Line([]interface{}{0, 0}, []interface{}{10, 10})).OptArgs(r.GetIntersectingOpts{Index: "g"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -378,11 +378,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #106
 		/* ("SELECTION<STREAM>") */
 		var expected_ string = "SELECTION<STREAM>"
-		/* tbl.get_intersecting(r.point(0,0), index='g').type_of() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='g').type_of() */
 
-		suite.T().Log("About to run line #106: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).TypeOf()")
+		suite.T().Log("About to run line #106: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -393,11 +393,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #110
 		/* ("SELECTION<STREAM>") */
 		var expected_ string = "SELECTION<STREAM>"
-		/* tbl.get_intersecting(r.point(0,0), index='g').filter(true).type_of() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='g').filter(true).type_of() */
 
-		suite.T().Log("About to run line #110: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Filter(true).TypeOf()")
+		suite.T().Log("About to run line #110: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Filter(true).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Filter(true).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Filter(true).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -408,11 +408,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #114
 		/* ("STREAM") */
 		var expected_ string = "STREAM"
-		/* tbl.get_intersecting(r.point(0,0), index='g').map(r.row).type_of() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='g').map(r.row).type_of() */
 
-		suite.T().Log("About to run line #114: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Map(r.Row).TypeOf()")
+		suite.T().Log("About to run line #114: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'g', }).Map(r.Row).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Map(r.Row).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "g"}).Map(r.Row).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -423,11 +423,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #119
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.get_intersecting(r.point(0,0), index='m').count() */
+		/* table_test_indexing.get_intersecting(r.point(0,0), index='m').count() */
 
-		suite.T().Log("About to run line #119: tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
+		suite.T().Log("About to run line #119: table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(0, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -438,11 +438,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #123
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.get_intersecting(r.point(1,0), index='m').count() */
+		/* table_test_indexing.get_intersecting(r.point(1,0), index='m').count() */
 
-		suite.T().Log("About to run line #123: tbl.GetIntersecting(r.Point(1, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
+		suite.T().Log("About to run line #123: table_test_indexing.GetIntersecting(r.Point(1, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(1, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(1, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -453,11 +453,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #127
 		/* 1 */
 		var expected_ int = 1
-		/* tbl.get_intersecting(r.point(2,0), index='m').count() */
+		/* table_test_indexing.get_intersecting(r.point(2,0), index='m').count() */
 
-		suite.T().Log("About to run line #127: tbl.GetIntersecting(r.Point(2, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
+		suite.T().Log("About to run line #127: table_test_indexing.GetIntersecting(r.Point(2, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(2, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(2, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -468,11 +468,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #131
 		/* 0 */
 		var expected_ int = 0
-		/* tbl.get_intersecting(r.point(3,0), index='m').count() */
+		/* table_test_indexing.get_intersecting(r.point(3,0), index='m').count() */
 
-		suite.T().Log("About to run line #131: tbl.GetIntersecting(r.Point(3, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
+		suite.T().Log("About to run line #131: table_test_indexing.GetIntersecting(r.Point(3, 0)).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Point(3, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Point(3, 0)).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -483,11 +483,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #136
 		/* 2 */
 		var expected_ int = 2
-		/* tbl.get_intersecting(r.polygon([0,0], [0,1], [1,1], [1,0]), index='m').count() */
+		/* table_test_indexing.get_intersecting(r.polygon([0,0], [0,1], [1,1], [1,0]), index='m').count() */
 
-		suite.T().Log("About to run line #136: tbl.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 1}, []interface{}{1, 0})).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
+		suite.T().Log("About to run line #136: table_test_indexing.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 1}, []interface{}{1, 0})).OptArgs(r.GetIntersectingOpts{Index: 'm', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 1}, []interface{}{1, 0})).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetIntersecting(r.Polygon([]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 1}, []interface{}{1, 0})).OptArgs(r.GetIntersectingOpts{Index: "m"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -498,11 +498,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #142
 		/* err('ReqlQueryLogicError', 'Index `other` is not a geospatial index.  get_nearest can only be used with a geospatial index.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Index `other` is not a geospatial index.  get_nearest can only be used with a geospatial index.")
-		/* tbl.get_nearest(r.point(0,0), index='other') */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='other') */
 
-		suite.T().Log("About to run line #142: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'other', })")
+		suite.T().Log("About to run line #142: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'other', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "other"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "other"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -513,11 +513,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #146
 		/* err_regex('ReqlOpFailedError', 'Index `missing` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]', [0]) */
 		var expected_ Err = err_regex("ReqlOpFailedError", "Index `missing` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
-		/* tbl.get_nearest(r.point(0,0), index='missing') */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='missing') */
 
-		suite.T().Log("About to run line #146: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'missing', })")
+		suite.T().Log("About to run line #146: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'missing', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "missing"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "missing"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -528,11 +528,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #149
 		/* err('ReqlQueryLogicError', 'get_nearest requires an index argument.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "get_nearest requires an index argument.")
-		/* tbl.get_nearest(r.point(0,0)) */
+		/* table_test_indexing.get_nearest(r.point(0,0)) */
 
-		suite.T().Log("About to run line #149: tbl.GetNearest(r.Point(0, 0))")
+		suite.T().Log("About to run line #149: table_test_indexing.GetNearest(r.Point(0, 0))")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -543,11 +543,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #170
 		/* err('ReqlQueryLogicError', 'get_nearest cannot use the primary index.', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "get_nearest cannot use the primary index.")
-		/* tbl.get_nearest(r.point(0,0), index='id').count() */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='id').count() */
 
-		suite.T().Log("About to run line #170: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'id', }).Count()")
+		suite.T().Log("About to run line #170: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'id', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "id"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "id"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -558,11 +558,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #175
 		/* ([{'dist':0,'doc':{'id':1}},{'dist':0.055659745396754216,'doc':{'id':2}}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"dist": 0, "doc": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"dist": 0.055659745396754216, "doc": map[interface{}]interface{}{"id": 2}}}
-		/* tbl.get_nearest(r.point(0,0), index='g').pluck('dist', {'doc':'id'}) */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g').pluck('dist', {'doc':'id'}) */
 
-		suite.T().Log("About to run line #175: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
+		suite.T().Log("About to run line #175: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -573,11 +573,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #179
 		/* ([{'dist':0,'doc':{'id':2}},{'dist':0.11130264976984369,'doc':{'id':1}}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"dist": 0, "doc": map[interface{}]interface{}{"id": 2}}, map[interface{}]interface{}{"dist": 0.11130264976984369, "doc": map[interface{}]interface{}{"id": 1}}}
-		/* tbl.get_nearest(r.point(-0.000001,1), index='g').pluck('dist', {'doc':'id'}) */
+		/* table_test_indexing.get_nearest(r.point(-0.000001,1), index='g').pluck('dist', {'doc':'id'}) */
 
-		suite.T().Log("About to run line #179: tbl.GetNearest(r.Point(-1e-06, 1)).OptArgs(r.GetNearestOpts{Index: 'g', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
+		suite.T().Log("About to run line #179: table_test_indexing.GetNearest(r.Point(-1e-06, 1)).OptArgs(r.GetNearestOpts{Index: 'g', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(-1e-06, 1)).OptArgs(r.GetNearestOpts{Index: "g"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(-1e-06, 1)).OptArgs(r.GetNearestOpts{Index: "g"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -588,11 +588,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #183
 		/* ([{'dist':0,'doc':{'id':1}},{'dist':0.055659745396754216,'doc':{'id':2}},{'dist':1565109.0992178896,'doc':{'id':0}}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"dist": 0, "doc": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"dist": 0.055659745396754216, "doc": map[interface{}]interface{}{"id": 2}}, map[interface{}]interface{}{"dist": 1565109.0992178896, "doc": map[interface{}]interface{}{"id": 0}}}
-		/* tbl.get_nearest(r.point(0,0), index='g', max_dist=1565110).pluck('dist', {'doc':'id'}) */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g', max_dist=1565110).pluck('dist', {'doc':'id'}) */
 
-		suite.T().Log("About to run line #183: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1565110, }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
+		suite.T().Log("About to run line #183: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1565110, }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1565110}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1565110}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -603,11 +603,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #187
 		/* ([{'dist':0,'doc':{'id':1}},{'dist':0.055659745396754216,'doc':{'id':2}}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"dist": 0, "doc": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"dist": 0.055659745396754216, "doc": map[interface{}]interface{}{"id": 2}}}
-		/* tbl.get_nearest(r.point(0,0), index='g', max_dist=1565110, max_results=2).pluck('dist', {'doc':'id'}) */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g', max_dist=1565110, max_results=2).pluck('dist', {'doc':'id'}) */
 
-		suite.T().Log("About to run line #187: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1565110, MaxResults: 2, }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
+		suite.T().Log("About to run line #187: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1565110, MaxResults: 2, }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1565110, MaxResults: 2}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1565110, MaxResults: 2}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -618,11 +618,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #191
 		/* err('ReqlQueryLogicError', 'The distance has become too large for continuing the indexed nearest traversal.  Consider specifying a smaller `max_dist` parameter.  (Radius must be smaller than a quarter of the circumference along the minor axis of the reference ellipsoid.  Got 10968937.995244588703m, but must be smaller than 9985163.1855612862855m.)', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "The distance has become too large for continuing the indexed nearest traversal.  Consider specifying a smaller `max_dist` parameter.  (Radius must be smaller than a quarter of the circumference along the minor axis of the reference ellipsoid.  Got 10968937.995244588703m, but must be smaller than 9985163.1855612862855m.)")
-		/* tbl.get_nearest(r.point(0,0), index='g', max_dist=10000000).pluck('dist', {'doc':'id'}) */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g', max_dist=10000000).pluck('dist', {'doc':'id'}) */
 
-		suite.T().Log("About to run line #191: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 10000000, }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
+		suite.T().Log("About to run line #191: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 10000000, }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 10000000}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 10000000}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -633,11 +633,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #195
 		/* ([{'dist':0,'doc':{'id':1}},{'dist':0.00005565974539675422,'doc':{'id':2}},{'dist':1565.1090992178897,'doc':{'id':0}}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"dist": 0, "doc": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"dist": 5.565974539675422e-05, "doc": map[interface{}]interface{}{"id": 2}}, map[interface{}]interface{}{"dist": 1565.1090992178897, "doc": map[interface{}]interface{}{"id": 0}}}
-		/* tbl.get_nearest(r.point(0,0), index='g', max_dist=1566, unit='km').pluck('dist', {'doc':'id'}) */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g', max_dist=1566, unit='km').pluck('dist', {'doc':'id'}) */
 
-		suite.T().Log("About to run line #195: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1566, Unit: 'km', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
+		suite.T().Log("About to run line #195: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1566, Unit: 'km', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1566, Unit: "km"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1566, Unit: "km"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -648,11 +648,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #198
 		/* ([{'dist':0, 'doc':{'id':1}}, {'dist':8.726646259990191e-09, 'doc':{'id':2}}, {'dist':0.24619691677893205, 'doc':{'id':0}}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"dist": 0, "doc": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"dist": 8.726646259990191e-09, "doc": map[interface{}]interface{}{"id": 2}}, map[interface{}]interface{}{"dist": 0.24619691677893205, "doc": map[interface{}]interface{}{"id": 0}}}
-		/* tbl.get_nearest(r.point(0,0), index='g', max_dist=1, geo_system='unit_sphere').pluck('dist', {'doc':'id'}) */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g', max_dist=1, geo_system='unit_sphere').pluck('dist', {'doc':'id'}) */
 
-		suite.T().Log("About to run line #198: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1, GeoSystem: 'unit_sphere', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
+		suite.T().Log("About to run line #198: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', MaxDist: 1, GeoSystem: 'unit_sphere', }).Pluck('dist', map[interface{}]interface{}{'doc': 'id', })")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1, GeoSystem: "unit_sphere"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g", MaxDist: 1, GeoSystem: "unit_sphere"}).Pluck("dist", map[interface{}]interface{}{"doc": "id"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -663,11 +663,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #202
 		/* ("ARRAY") */
 		var expected_ string = "ARRAY"
-		/* tbl.get_nearest(r.point(0,0), index='g').type_of() */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g').type_of() */
 
-		suite.T().Log("About to run line #202: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', }).TypeOf()")
+		suite.T().Log("About to run line #202: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', }).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g"}).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g"}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -678,11 +678,11 @@ func (suite *GeoIndexingSuite) TestCases() {
 		// geo/indexing.yaml line #206
 		/* ("ARRAY") */
 		var expected_ string = "ARRAY"
-		/* tbl.get_nearest(r.point(0,0), index='g').map(r.row).type_of() */
+		/* table_test_indexing.get_nearest(r.point(0,0), index='g').map(r.row).type_of() */
 
-		suite.T().Log("About to run line #206: tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', }).Map(r.Row).TypeOf()")
+		suite.T().Log("About to run line #206: table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: 'g', }).Map(r.Row).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g"}).Map(r.Row).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_indexing.GetNearest(r.Point(0, 0)).OptArgs(r.GetNearestOpts{Index: "g"}).Map(r.Row).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Test duplicate indexes with squashing
@@ -36,16 +36,16 @@ func (suite *ChangefeedsIdxcopySuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_feed_idxcopy").Exec(suite.session)
+	err = r.DBCreate("db_feed_idxcopy").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_feed_idxcopy").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("test").TableDrop("tbl").Exec(suite.session)
-	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
+	r.DB("db_feed_idxcopy").TableDrop("table_test_changefeed_idx").Exec(suite.session)
+	err = r.DB("db_feed_idxcopy").TableCreate("table_test_changefeed_idx").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
+	err = r.DB("db_feed_idxcopy").Table("table_test_changefeed_idx").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *ChangefeedsIdxcopySuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("test").TableDrop("tbl").Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DB("db_feed_idxcopy").TableDrop("table_test_changefeed_idx").Exec(suite.session)
+		r.DBDrop("db_feed_idxcopy").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,18 +64,18 @@ func (suite *ChangefeedsIdxcopySuite) TearDownSuite() {
 func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	suite.T().Log("Running ChangefeedsIdxcopySuite: Test duplicate indexes with squashing")
 
-	tbl := r.DB("test").Table("tbl")
-	_ = tbl // Prevent any noused variable errors
+	table_test_changefeed_idx := r.DB("db_feed_idxcopy").Table("table_test_changefeed_idx")
+	_ = table_test_changefeed_idx // Prevent any noused variable errors
 
 	{
 		// changefeeds/idxcopy.yaml line #4
 		/* partial({'created':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"created": 1})
-		/* tbl.index_create('a') */
+		/* table_test_changefeed_idx.index_create('a') */
 
-		suite.T().Log("About to run line #4: tbl.IndexCreate('a')")
+		suite.T().Log("About to run line #4: table_test_changefeed_idx.IndexCreate('a')")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexCreate("a"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_changefeed_idx.IndexCreate("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -86,11 +86,11 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 		// changefeeds/idxcopy.yaml line #6
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* tbl.index_wait('a') */
+		/* table_test_changefeed_idx.index_wait('a') */
 
-		suite.T().Log("About to run line #6: tbl.IndexWait('a')")
+		suite.T().Log("About to run line #6: table_test_changefeed_idx.IndexWait('a')")
 
-		runAndAssert(suite.Suite, expected_, tbl.IndexWait("a"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_changefeed_idx.IndexWait("a"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -98,10 +98,10 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	}
 
 	// changefeeds/idxcopy.yaml line #8
-	// feed = tbl.order_by(index='a').limit(10).changes(squash=2).limit(9)
-	suite.T().Log("Possibly executing: var feed r.Term = tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'a', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: 2, }).Limit(9)")
+	// feed = table_test_changefeed_idx.order_by(index='a').limit(10).changes(squash=2).limit(9)
+	suite.T().Log("Possibly executing: var feed r.Term = table_test_changefeed_idx.OrderBy().OptArgs(r.OrderByOpts{Index: 'a', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: 2, }).Limit(9)")
 
-	feed := maybeRun(tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "a"}).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: 2}).Limit(9), suite.session, r.RunOpts{
+	feed := maybeRun(table_test_changefeed_idx.OrderBy().OptArgs(r.OrderByOpts{Index: "a"}).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: 2}).Limit(9), suite.session, r.RunOpts{
 		MaxBatchRows: 1,
 	})
 	_ = feed // Prevent any noused variable errors
@@ -110,11 +110,11 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 		// changefeeds/idxcopy.yaml line #15
 		/* partial({'inserted':12, 'errors':0}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 12, "errors": 0})
-		/* tbl.insert(r.range(0, 12).map({'id':r.row, 'a':5})) */
+		/* table_test_changefeed_idx.insert(r.range(0, 12).map({'id':r.row, 'a':5})) */
 
-		suite.T().Log("About to run line #15: tbl.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{'id': r.Row, 'a': 5, }))")
+		suite.T().Log("About to run line #15: table_test_changefeed_idx.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{'id': r.Row, 'a': 5, }))")
 
-		runAndAssert(suite.Suite, expected_, tbl.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{"id": r.Row, "a": 5})), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_changefeed_idx.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{"id": r.Row, "a": 5})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -125,11 +125,11 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 		// changefeeds/idxcopy.yaml line #20
 		/* partial({'deleted':3, 'errors':0}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"deleted": 3, "errors": 0})
-		/* tbl.get_all(1, 8, 9, index='id').delete() */
+		/* table_test_changefeed_idx.get_all(1, 8, 9, index='id').delete() */
 
-		suite.T().Log("About to run line #20: tbl.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: 'id', }).Delete()")
+		suite.T().Log("About to run line #20: table_test_changefeed_idx.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: 'id', }).Delete()")
 
-		runAndAssert(suite.Suite, expected_, tbl.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: "id"}).Delete(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, table_test_changefeed_idx.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: "id"}).Delete(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

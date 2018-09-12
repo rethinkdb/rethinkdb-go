@@ -27,3 +27,4 @@ _testmain.go
 .wercker
 
 cover.html
+.idea/

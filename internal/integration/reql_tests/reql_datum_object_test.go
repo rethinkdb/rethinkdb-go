@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/gorethink/gorethink.v4"
-	"gopkg.in/gorethink/gorethink.v4/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
 )
 
 // Tests conversion to and from the RQL object type
@@ -36,10 +36,10 @@ func (suite *DatumObjectSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("test").Exec(suite.session)
-	err = r.DBCreate("test").Exec(suite.session)
+	r.DBDrop("db_dobj").Exec(suite.session)
+	err = r.DBCreate("db_dobj").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("test").Wait().Exec(suite.session)
+	err = r.DB("db_dobj").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
 }
@@ -49,7 +49,7 @@ func (suite *DatumObjectSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DBDrop("test").Exec(suite.session)
+		r.DBDrop("db_dobj").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -291,7 +291,7 @@ func (suite *DatumObjectSuite) TestCases() {
 
 		suite.T().Log("About to run line #84: r.Object('g', r.DB('test'))")
 
-		runAndAssert(suite.Suite, expected_, r.Object("g", r.DB("test")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Object("g", r.DB("db_dobj")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

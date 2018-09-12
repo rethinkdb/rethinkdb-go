@@ -1,11 +1,11 @@
-package gorethink
+package rethinkdb
 
 import (
 	"reflect"
 
 	"github.com/sirupsen/logrus"
 
-	"gopkg.in/gorethink/gorethink.v4/encoding"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/encoding"
 	"io/ioutil"
 )
 
@@ -52,7 +52,8 @@ func SetVerbose(verbose bool) {
 // SetTags allows you to override the tags used when decoding or encoding
 // structs. The driver will check for the tags in the same order that they were
 // passed into this function. If no parameters are passed then the driver will
-// default to checking for the gorethink tag (the gorethink tag is always included)
+// default to checking for the rethinkdb tag (the rethinkdb tag is always included)
+// Old-style gorethink tag is also supported but deprecated
 func SetTags(tags ...string) {
-	encoding.Tags = append(tags, "gorethink")
+	encoding.Tags = append(tags, encoding.TagName, encoding.OldTagName)
 }
