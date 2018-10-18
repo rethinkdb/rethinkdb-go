@@ -209,12 +209,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 	}
 
 	if noreply, ok := q.Opts["noreply"]; ok && noreply.(bool) {
-		select {
-		case c.readRequestsChan <- tokenAndPromise{ctx: ctx, query: &q, span: fetchingSpan}:
-			return nil, nil, nil
-		case <-ctx.Done():
-			return c.stopQuery(&q)
-		}
+		return nil, nil, nil
 	}
 
 	promise := make(chan responseAndCursor, 1)
