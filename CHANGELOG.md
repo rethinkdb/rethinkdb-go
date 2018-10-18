@@ -2,6 +2,10 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v5.0.1 - 2018-10-18
+
+- Fix noreply queries memory leak due unnecessary for responses
+
 ## v5.0.0 - 2018-09-12
 
 - Moved to rethinkdb organization

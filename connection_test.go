@@ -143,30 +143,6 @@ func (s *ConnectionSuite) TestConnection_Query_NoReplyOk(c *test.C) {
 	conn.AssertExpectations(c)
 }
 
-func (s *ConnectionSuite) TestConnection_Query_NoReplyTimeoutWrite(c *test.C) {
-	ctx, cancel := context.WithCancel(context.Background())
-	token := int64(1)
-	q := testQuery(DB("db").Table("table").Get("id"))
-	q.Opts["noreply"] = true
-	writeData := serializeQuery(token, q)
-	stopData := serializeQuery(token, newStopQuery(token))
-
-	conn := &connMock{}
-	conn.On("Write", writeData).Return(len(writeData), nil)
-	conn.On("Write", stopData).Return(len(stopData), nil)
-	conn.On("SetWriteDeadline").Return(nil)
-
-	connection := newConnection(conn, "addr", &ConnectOpts{ReadTimeout: time.Millisecond, WriteTimeout: time.Millisecond})
-	connection.readRequestsChan = make(chan tokenAndPromise, 0)
-	cancel()
-	response, cursor, err := connection.Query(ctx, q)
-
-	c.Assert(response, test.IsNil)
-	c.Assert(cursor, test.IsNil)
-	c.Assert(err, test.Equals, ErrQueryTimeout)
-	conn.AssertExpectations(c)
-}
-
 func (s *ConnectionSuite) TestConnection_Query_TimeoutWrite(c *test.C) {
 	ctx, cancel := context.WithCancel(context.Background())
 	token := int64(1)
