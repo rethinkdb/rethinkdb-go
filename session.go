@@ -64,11 +64,11 @@ type ConnectOpts struct {
 	// UseJSONNumber indicates whether the cursors running in this session should
 	// use json.Number instead of float64 while unmarshaling documents with
 	// interface{}. The default is `false`.
-	UseJSONNumber bool
+	UseJSONNumber bool `rethinkdb:"use_json_number,omitempty"`
 	// NumRetries is the number of times a query is retried if a connection
 	// error is detected, queries are not retried if RethinkDB returns a
 	// runtime error.
-	NumRetries int
+	NumRetries int `rethinkdb:"num_retries,omitempty"`
 
 	// InitialCap is used by the internal connection pool and is used to
 	// configure how many connections are created for each host when the
@@ -91,12 +91,12 @@ type ConnectOpts struct {
 	DiscoverHosts bool `rethinkdb:"discover_hosts,omitempty"`
 	// HostDecayDuration is used by the go-hostpool package to calculate a weighted
 	// score when selecting a host. By default a value of 5 minutes is used.
-	HostDecayDuration time.Duration
+	HostDecayDuration time.Duration `rethinkdb:"host_decay_duration,omitempty"`
 
 	// UseOpentracing is used to enable creating opentracing-go spans for queries.
 	// Each span is created as child of span from the context in `RunOpts`.
 	// This span lasts from point the query created to the point when cursor closed.
-	UseOpentracing bool
+	UseOpentracing bool `rethinkdb:"use_opentracing,omitempty"`
 
 	// Deprecated: This function is no longer used due to changes in the
 	// way hosts are selected.
