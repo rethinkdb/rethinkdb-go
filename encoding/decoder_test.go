@@ -433,7 +433,7 @@ func TestDecodeUnmarshalerPointer(t *testing.T) {
 		t.Errorf("got error %v, expected nil", err)
 	}
 	if !jsonEqual(out, want) {
-		t.Errorf("got %q, want %q", out, want)
+		t.Errorf("got %+v, want %+v", out, want)
 	}
 }
 
@@ -587,7 +587,7 @@ func TestDecodeCustomTypeEncodingPointer(t *testing.T) {
 		t.Errorf("got error %v, expected nil", err)
 	}
 	if !jsonEqual(out, want) {
-		t.Errorf("got %q, want %q", out, want)
+		t.Errorf("got %+v, want %+v", out, want)
 	}
 }
 
