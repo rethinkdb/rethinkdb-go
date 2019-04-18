@@ -368,27 +368,3 @@ func (t *simpleTestingT) FailNow() {
 func (t *simpleTestingT) Failed() bool {
 	return t.failed
 }
-
-func TestSomething(t *testing.T) {
-	mock := NewMock()
-	ch := make(chan interface{})
-	mock.On(Table("people")).Return([]interface{}{ch, ch}, nil)
-	go func() {
-		ch <- map[string]interface{}{"id": 1, "name": "John Smith"}
-		ch <- map[string]interface{}{"id": 2, "name": "Jane Smith"}
-	}()
-	cursor, err := Table("people").Run(mock)
-	if err != nil {
-		t.Errorf("err is: %v", err)
-	}
-
-	var rows []interface{}
-	err = cursor.All(&rows)
-	if err != nil {
-		t.Errorf("err is: %v", err)
-	}
-
-	// Test result of rows
-
-	mock.AssertExpectations(t)
-}
