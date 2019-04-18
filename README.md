@@ -456,6 +456,39 @@ func TestSomething(t *testing.T) {
 }
 ```
 
+If you want the cursor to block on some of the response values, you can pass in
+a value of type `chan interface{}` and the cursor will block until a value is
+available to read on the channel.  Or you can pass in a function with signature
+`func() interface{}`: the cursor will call the function (which may block).  Here
+is the example above adapted to use a channel.
+
+```go
+func TestSomething(t *testing.T) {
+	mock := r.NewMock()
+	ch := make(chan interface{})
+	mock.On(r.Table("people")).Return([]interface{}{ch, ch}, nil)
+	go func() {
+		ch <- map[string]interface{}{"id": 1, "name": "John Smith"}
+		ch <- map[string]interface{}{"id": 2, "name": "Jane Smith"}
+	}()
+	cursor, err := r.Table("people").Run(mock)
+	if err != nil {
+		t.Errorf("err is: %v", err)
+	}
+
+	var rows []interface{}
+	err = cursor.All(&rows)
+	if err != nil {
+		t.Errorf("err is: %v", err)
+	}
+
+	// Test result of rows
+
+	mock.AssertExpectations(t)
+}
+
+```
+
 The mocking implementation is based on amazing https://github.com/stretchr/testify library, thanks to @stretchr for their awesome work!
 
 ## Benchmarks
@@ -464,17 +497,17 @@ Everyone wants their project's benchmarks to be speedy. And while we know that R
 
 Thanks to @jaredfolkins for the contribution.
 
-| Type    |  Value   |
-| --- | --- |
-| **Model Name** | MacBook Pro |
-| **Model Identifier** | MacBookPro11,3 |
-| **Processor Name** | Intel Core i7 |
-| **Processor Speed** | 2.3 GHz |
-| **Number of Processors** | 1 |
-| **Total Number of Cores** | 4 |
-| **L2 Cache (per Core)** | 256 KB |
-| **L3 Cache** | 6 MB |
-| **Memory** | 16 GB |
+| Type                      | Value          |
+| ------------------------- | -------------- |
+| **Model Name**            | MacBook Pro    |
+| **Model Identifier**      | MacBookPro11,3 |
+| **Processor Name**        | Intel Core i7  |
+| **Processor Speed**       | 2.3 GHz        |
+| **Number of Processors**  | 1              |
+| **Total Number of Cores** | 4              |
+| **L2 Cache (per Core)**   | 256 KB         |
+| **L3 Cache**              | 6 MB           |
+| **Memory**                | 16 GB          |
 
 ```bash
 BenchmarkBatch200RandomWrites                20                              557227775                     ns/op
