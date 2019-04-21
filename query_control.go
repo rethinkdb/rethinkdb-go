@@ -223,8 +223,8 @@ func Error(args ...interface{}) Term {
 	return constructRootTerm("Error", p.Term_ERROR, args, map[string]interface{}{})
 }
 
-// Args is a special term usd to splice an array of arguments into another term.
-// This is useful when you want to call a varadic term such as GetAll with a set
+// Args is a special term used to splice an array of arguments into another term.
+// This is useful when you want to call a variadic term such as GetAll with a set
 // of arguments provided at runtime.
 func Args(args ...interface{}) Term {
 	return constructRootTerm("Args", p.Term_ARGS, args, map[string]interface{}{})
