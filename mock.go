@@ -1,8 +1,11 @@
 package rethinkdb
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"gopkg.in/check.v1"
+	"net"
 	"reflect"
 	"sync"
 	"time"
@@ -338,41 +341,39 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 		return nil, query.Error
 	}
 
+	var conn *Connection = nil
+	responseVal := reflect.ValueOf(query.Response)
+	if responseVal.Kind() == reflect.Chan || responseVal.Kind() == reflect.Func {
+		conn = newConnection(newMockConn(query.Response), "mock", &ConnectOpts{})
+
+		query.Query.Type = p.Query_CONTINUE
+		query.Query.Token = conn.nextToken()
+
+		conn.runConnection()
+	}
+
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
 	// Build cursor and return
-	c := newCursor(ctx, nil, "", query.Query.Token, query.Query.Term, query.Query.Opts)
+	c := newCursor(ctx, conn, "", query.Query.Token, query.Query.Term, query.Query.Opts)
 	c.finished = true
 	c.fetching = false
 	c.isAtom = true
 
-	responseVal := reflect.ValueOf(query.Response)
 	if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
 		for i := 0; i < responseVal.Len(); i++ {
-			c.buffer = append(c.buffer, getMockValue(responseVal.Index(i).Interface()))
+			c.buffer = append(c.buffer, responseVal.Index(i).Interface())
 		}
+	} else if conn != nil {
+		conn.cursors[query.Query.Token] = c
+		c.finished = false
 	} else {
-		c.buffer = append(c.buffer, getMockValue(query.Response))
+		c.buffer = append(c.buffer, query.Response)
 	}
 
 	return c, nil
-}
-
-// getMockValue turns some responses to delayedData:  values of "chan
-// interface{}" type will turn to delayed data that produce data when there is
-// an element available on the channel.  Values of "func() interface{}" type
-// will produce data by calling the function.
-func getMockValue(val interface{}) interface{} {
-	switch v := val.(type) {
-	case chan interface{}:
-		return delayedData{
-			f: func() interface{} { return <-v },
-		}
-	case func() interface{}:
-		return delayedData{
-			f: v,
-		}
-	default:
-		return val
-	}
 }
 
 func (m *Mock) Exec(ctx context.Context, q Query) error {
@@ -422,3 +423,82 @@ func (m *Mock) queries() []MockQuery {
 	defer m.mu.Unlock()
 	return append([]MockQuery{}, m.Queries...)
 }
+
+type mockConn struct {
+	c           *check.C
+	mu          sync.Mutex
+	value       []byte
+	tokens      chan int64
+	valueGetter func() []interface{}
+}
+
+func newMockConn(responseGetter interface{}) *mockConn {
+	c := &mockConn{tokens: make(chan int64, 1)}
+	switch g := responseGetter.(type) {
+	case chan []interface{}:
+		c.valueGetter = func() []interface{} { return <-g }
+	case func() []interface{}:
+		c.valueGetter = g
+	default:
+		panic(fmt.Sprintf("unsupported value generator type: %T", responseGetter))
+	}
+	return c
+}
+
+func (c *mockConn) Read(b []byte) (n int, err error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.value == nil {
+		values := c.valueGetter()
+
+		jresps := make([]json.RawMessage, len(values))
+		for i := range values {
+			jresps[i], err = json.Marshal(values[i])
+			if err != nil {
+				panic(fmt.Sprintf("failed to encode response: %v", err))
+			}
+		}
+
+		token := <-c.tokens
+		resp := Response{
+			Token:     token,
+			Responses: jresps,
+			Type:      p.Response_SUCCESS_PARTIAL,
+		}
+		if values == nil {
+			resp.Type = p.Response_SUCCESS_SEQUENCE
+		}
+
+		c.value, err = json.Marshal(resp)
+		if err != nil {
+			panic(fmt.Sprintf("failed to encode response: %v", err))
+		}
+
+		if len(b) != respHeaderLen {
+			panic("wrong header len")
+		}
+		binary.LittleEndian.PutUint64(b[:8], uint64(token))
+		binary.LittleEndian.PutUint32(b[8:], uint32(len(c.value)))
+		return len(b), nil
+	} else {
+		copy(b, c.value)
+		c.value = nil
+		return len(b), nil
+	}
+}
+
+func (c *mockConn) Write(b []byte) (n int, err error) {
+	if len(b) < 8 {
+		panic("bad socket write")
+	}
+	token := int64(binary.LittleEndian.Uint64(b[:8]))
+	c.tokens <- token
+	return len(b), nil
+}
+func (c *mockConn) Close() error                       { panic("not implemented") }
+func (c *mockConn) LocalAddr() net.Addr                { panic("not implemented") }
+func (c *mockConn) RemoteAddr() net.Addr               { panic("not implemented") }
+func (c *mockConn) SetDeadline(t time.Time) error      { panic("not implemented") }
+func (c *mockConn) SetReadDeadline(t time.Time) error  { panic("not implemented") }
+func (c *mockConn) SetWriteDeadline(t time.Time) error { panic("not implemented") }

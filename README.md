@@ -465,11 +465,15 @@ is the example above adapted to use a channel.
 ```go
 func TestSomething(t *testing.T) {
 	mock := r.NewMock()
-	ch := make(chan interface{})
-	mock.On(r.Table("people")).Return([]interface{}{ch, ch}, nil)
+	ch := make(chan []interface{})
+	mock.On(r.Table("people")).Return(ch, nil)
 	go func() {
-		ch <- map[string]interface{}{"id": 1, "name": "John Smith"}
-		ch <- map[string]interface{}{"id": 2, "name": "Jane Smith"}
+		ch <- []interface{}{
+			map[string]interface{}{"id": 1, "name": "John Smith"},
+			map[string]interface{}{"id": 2, "name": "Jane Smith"},
+		}
+		ch <- []interface{}{map[string]interface{}{"id": 3, "name": "Jack Smith"}}
+		close(ch)
 	}()
 	cursor, err := r.Table("people").Run(mock)
 	if err != nil {

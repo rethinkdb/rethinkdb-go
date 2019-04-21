@@ -208,13 +208,6 @@ func (c *Cursor) Next(dest interface{}) bool {
 	return hasMore
 }
 
-// This can be used for testing.  Typically the function would block to simulate
-// network lag and test concurrency.
-type delayedData struct {
-	f    func() interface{} // This function produces the data
-	data interface{}        // This is initially nil, then equal to f()
-}
-
 func (c *Cursor) nextLocked(dest interface{}, progressCursor bool) (bool, error) {
 	for {
 		if err := c.seekCursor(true); err != nil {
@@ -233,17 +226,6 @@ func (c *Cursor) nextLocked(dest interface{}, progressCursor bool) (bool, error)
 			data := c.buffer[0]
 			if progressCursor {
 				c.buffer = c.buffer[1:]
-			}
-			if dd, ok := data.(delayedData); ok {
-				if dd.data == nil {
-
-					// Here we remove the lock as in c.fetchMore() because the
-					// function is likely to block.
-					c.mu.Unlock()
-					dd.data = dd.f()
-					c.mu.Lock()
-				}
-				data = dd.data
 			}
 			err := encoding.Decode(dest, data)
 			if err != nil {

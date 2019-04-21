@@ -57,8 +57,6 @@ func (s *MockSuite) TestMockRunSuccessSingleResult(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, tests.JsonEquals, map[string]interface{}{"id": "mocked"})
 	mock.AssertExpectations(c)
-
-	res.Close()
 }
 
 func (s *MockSuite) TestMockRunSuccessMultipleResults(c *test.C) {
@@ -76,17 +74,17 @@ func (s *MockSuite) TestMockRunSuccessMultipleResults(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, tests.JsonEquals, []interface{}{map[string]interface{}{"id": "mocked"}})
 	mock.AssertExpectations(c)
-
-	res.Close()
 }
 
 func (s *MockSuite) TestMockRunSuccessChannel(c *test.C) {
 	mock := NewMock()
-	ch := make(chan interface{})
-	mock.On(DB("test").Table("test")).Return([]interface{}{ch, ch}, nil)
+	ch := make(chan []interface{})
+	mock.On(DB("test").Table("test")).Return(ch, nil)
 	go func() {
-		ch <- 1
-		ch <- 2
+		ch <- []interface{}{1, 2}
+		ch <- []interface{}{3}
+		ch <- []interface{}{4}
+		close(ch)
 	}()
 	res, err := DB("test").Table("test").Run(mock)
 	c.Assert(err, test.IsNil)
@@ -95,20 +93,21 @@ func (s *MockSuite) TestMockRunSuccessChannel(c *test.C) {
 	err = res.All(&response)
 
 	c.Assert(err, test.IsNil)
-	c.Assert(response, tests.JsonEquals, []interface{}{1, 2})
+	c.Assert(response, tests.JsonEquals, []interface{}{1, 2, 3, 4})
 	mock.AssertExpectations(c)
-
-	res.Close()
 }
 
 func (s *MockSuite) TestMockRunSuccessFunction(c *test.C) {
 	mock := NewMock()
 	n := 0
-	f := func() interface{} {
+	f := func() []interface{} {
 		n++
-		return n
+		if n == 4 {
+			return nil
+		}
+		return []interface{}{n}
 	}
-	mock.On(DB("test").Table("test")).Return([]interface{}{f, f, 3}, nil)
+	mock.On(DB("test").Table("test")).Return(f, nil)
 	res, err := DB("test").Table("test").Run(mock)
 	c.Assert(err, test.IsNil)
 
@@ -118,8 +117,6 @@ func (s *MockSuite) TestMockRunSuccessFunction(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, tests.JsonEquals, []interface{}{1, 2, 3})
 	mock.AssertExpectations(c)
-
-	res.Close()
 }
 
 func (s *MockSuite) TestMockRunSuccessMultipleResults_type(c *test.C) {
