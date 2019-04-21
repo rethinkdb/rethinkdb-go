@@ -372,6 +372,15 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 	} else if conn != nil {
 		conn.cursors[query.Query.Token] = c
 		c.finished = false
+		c.releaseConn = func() error {
+			return conn.Close()
+		}
+		c.mu.Lock()
+		err := c.fetchMore()
+		c.mu.Unlock()
+		if err != nil {
+			return nil, err
+		}
 	} else {
 		c.buffer = append(c.buffer, query.Response)
 	}
@@ -499,7 +508,7 @@ func (c *mockConn) Write(b []byte) (n int, err error) {
 	c.tokens <- token
 	return len(b), nil
 }
-func (c *mockConn) Close() error                       { panic("not implemented") }
+func (c *mockConn) Close() error                       { return nil }
 func (c *mockConn) LocalAddr() net.Addr                { panic("not implemented") }
 func (c *mockConn) RemoteAddr() net.Addr               { panic("not implemented") }
 func (c *mockConn) SetDeadline(t time.Time) error      { panic("not implemented") }
