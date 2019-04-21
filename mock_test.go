@@ -3,9 +3,10 @@ package rethinkdb
 import (
 	"fmt"
 
+	"testing"
+
 	test "gopkg.in/check.v1"
 	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/integration/tests"
-	"testing"
 )
 
 // Hook up gocheck into the gotest runner.
@@ -74,6 +75,48 @@ func (s *MockSuite) TestMockRunSuccessMultipleResults(c *test.C) {
 
 	c.Assert(err, test.IsNil)
 	c.Assert(response, tests.JsonEquals, []interface{}{map[string]interface{}{"id": "mocked"}})
+	mock.AssertExpectations(c)
+
+	res.Close()
+}
+
+func (s *MockSuite) TestMockRunSuccessChannel(c *test.C) {
+	mock := NewMock()
+	ch := make(chan interface{})
+	mock.On(DB("test").Table("test")).Return([]interface{}{ch, ch}, nil)
+	go func() {
+		ch <- 1
+		ch <- 2
+	}()
+	res, err := DB("test").Table("test").Run(mock)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, tests.JsonEquals, []interface{}{1, 2})
+	mock.AssertExpectations(c)
+
+	res.Close()
+}
+
+func (s *MockSuite) TestMockRunSuccessFunction(c *test.C) {
+	mock := NewMock()
+	n := 0
+	f := func() interface{} {
+		n++
+		return n
+	}
+	mock.On(DB("test").Table("test")).Return([]interface{}{f, f, 3}, nil)
+	res, err := DB("test").Table("test").Run(mock)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, tests.JsonEquals, []interface{}{1, 2, 3})
 	mock.AssertExpectations(c)
 
 	res.Close()
