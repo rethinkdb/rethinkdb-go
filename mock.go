@@ -107,13 +107,16 @@ func (mq *MockQuery) unlock() {
 //
 //    mock.On(r.Table("test")).Return(nil, errors.New("failed"))
 //
-// values of "chan interface{}" type will turn to delayed data that produce data
-// when there is an element available on the channel.  Values of "func()
-// interface{}" type will produce data by calling the function. E.g.
+// values of `chan []interface{}` type will turn to delayed data that produce data
+// when there is an elements available on the channel. These elements are chunk of responses.
+// Values of `func() []interface{}` type will produce data by calling the function. E.g.
+// Closing channel or returning nil from func means end of data.
 //
-//    f := func() interface{} { return 2 }
-//    ch := make(chan interface{})
-//    mock.On(r.Table("test")).Return([]interface{}{ch, f, 3})
+//    f := func() []interface{} { return []interface{}{1, 2} }
+//    mock.On(r.Table("test1")).Return(f)
+//
+//    ch := make(chan []interface{})
+//    mock.On(r.Table("test1")).Return(ch)
 //
 //    Running the query above will block until a value is pushed onto ch.
 func (mq *MockQuery) Return(response interface{}, err error) *MockQuery {
