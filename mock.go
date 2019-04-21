@@ -103,6 +103,16 @@ func (mq *MockQuery) unlock() {
 // Return specifies the return arguments for the expectation.
 //
 //    mock.On(r.Table("test")).Return(nil, errors.New("failed"))
+//
+// values of "chan interface{}" type will turn to delayed data that produce data
+// when there is an element available on the channel.  Values of "func()
+// interface{}" type will produce data by calling the function. E.g.
+//
+//    f := func() interface{} { return 2 }
+//    ch := make(chan interface{})
+//    mock.On(r.Table("test")).Return([]interface{}{ch, f, 3})
+//
+//    Running the query above will block until a value is pushed onto ch.
 func (mq *MockQuery) Return(response interface{}, err error) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -337,13 +347,32 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 	responseVal := reflect.ValueOf(query.Response)
 	if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
 		for i := 0; i < responseVal.Len(); i++ {
-			c.buffer = append(c.buffer, responseVal.Index(i).Interface())
+			c.buffer = append(c.buffer, getMockValue(responseVal.Index(i).Interface()))
 		}
 	} else {
-		c.buffer = append(c.buffer, query.Response)
+		c.buffer = append(c.buffer, getMockValue(query.Response))
 	}
 
 	return c, nil
+}
+
+// getMockValue turns some responses to delayedData:  values of "chan
+// interface{}" type will turn to delayed data that produce data when there is
+// an element available on the channel.  Values of "func() interface{}" type
+// will produce data by calling the function.
+func getMockValue(val interface{}) interface{} {
+	switch v := val.(type) {
+	case chan interface{}:
+		return delayedData{
+			f: func() interface{} { return <-v },
+		}
+	case func() interface{}:
+		return delayedData{
+			f: v,
+		}
+	default:
+		return val
+	}
 }
 
 func (m *Mock) Exec(ctx context.Context, q Query) error {
