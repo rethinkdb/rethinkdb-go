@@ -344,45 +344,31 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 		return nil, query.Error
 	}
 
-	var conn *Connection = nil
-	responseVal := reflect.ValueOf(query.Response)
-	if responseVal.Kind() == reflect.Chan || responseVal.Kind() == reflect.Func {
-		conn = newConnection(newMockConn(query.Response), "mock", &ConnectOpts{})
-
-		query.Query.Type = p.Query_CONTINUE
-		query.Query.Token = conn.nextToken()
-
-		conn.runConnection()
-	}
-
 	if ctx == nil {
 		ctx = context.Background()
 	}
+
+	conn := newConnection(newMockConn(query.Response), "mock", &ConnectOpts{})
+
+	query.Query.Type = p.Query_CONTINUE
+	query.Query.Token = conn.nextToken()
 
 	// Build cursor and return
 	c := newCursor(ctx, conn, "", query.Query.Token, query.Query.Term, query.Query.Opts)
 	c.finished = true
 	c.fetching = false
 	c.isAtom = true
+	c.finished = false
+	c.releaseConn = func() error { return conn.Close() }
 
-	if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
-		for i := 0; i < responseVal.Len(); i++ {
-			c.buffer = append(c.buffer, responseVal.Index(i).Interface())
-		}
-	} else if conn != nil {
-		conn.cursors[query.Query.Token] = c
-		c.finished = false
-		c.releaseConn = func() error {
-			return conn.Close()
-		}
-		c.mu.Lock()
-		err := c.fetchMore()
-		c.mu.Unlock()
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		c.buffer = append(c.buffer, query.Response)
+	conn.cursors[query.Query.Token] = c
+	conn.runConnection()
+
+	c.mu.Lock()
+	err := c.fetchMore()
+	c.mu.Unlock()
+	if err != nil {
+		return nil, err
 	}
 
 	return c, nil
@@ -444,17 +430,37 @@ type mockConn struct {
 	valueGetter func() []interface{}
 }
 
-func newMockConn(responseGetter interface{}) *mockConn {
+func newMockConn(response interface{}) *mockConn {
 	c := &mockConn{tokens: make(chan int64, 1)}
-	switch g := responseGetter.(type) {
+	switch g := response.(type) {
 	case chan []interface{}:
 		c.valueGetter = func() []interface{} { return <-g }
 	case func() []interface{}:
 		c.valueGetter = g
 	default:
-		panic(fmt.Sprintf("unsupported value generator type: %T", responseGetter))
+		responseVal := reflect.ValueOf(response)
+		if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
+			responses := make([]interface{}, responseVal.Len())
+			for i := 0; i < responseVal.Len(); i++ {
+				responses[i] = responseVal.Index(i).Interface()
+			}
+			c.valueGetter = funcGetter(responses)
+		} else {
+			c.valueGetter = funcGetter([]interface{}{response})
+		}
 	}
 	return c
+}
+
+func funcGetter(responses []interface{}) func() []interface{} {
+	done := false
+	return func() []interface{} {
+		if done {
+			return nil
+		}
+		done = true
+		return responses
+	}
 }
 
 func (c *mockConn) Read(b []byte) (n int, err error) {
