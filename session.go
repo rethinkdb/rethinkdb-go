@@ -119,7 +119,7 @@ func (o ConnectOpts) toMap() map[string]interface{} {
 // Basic connection example:
 //
 // 	session, err := r.Connect(r.ConnectOpts{
-// 		Host: "localhost:28015",
+// 		Address: "localhost:28015",
 // 		Database: "test",
 // 		AuthKey:  "14daak1cad13dj",
 // 	})
@@ -127,7 +127,7 @@ func (o ConnectOpts) toMap() map[string]interface{} {
 // Cluster connection example:
 //
 // 	session, err := r.Connect(r.ConnectOpts{
-// 		Hosts: []string{"localhost:28015", "localhost:28016"},
+// 		Addresses: []string{"localhost:28015", "localhost:28016"},
 // 		Database: "test",
 // 		AuthKey:  "14daak1cad13dj",
 // 	})
