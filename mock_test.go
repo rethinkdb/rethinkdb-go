@@ -350,6 +350,27 @@ func (s *MockSuite) TestMockAnything(c *test.C) {
 	mock.AssertExpectations(c)
 }
 
+func (s *MockSuite) TestMockRethinkStructsRunWrite(c *test.C) {
+	mock := NewMock()
+	mock.On(DB("test").Table("test").Update(map[string]int{"val": 1})).Return(WriteResponse{
+		Replaced: 1,
+		Changes: []ChangeResponse{
+			{NewValue: map[string]interface{}{"val": 1}, OldValue: map[string]interface{}{"val": 0}},
+		},
+	}, nil)
+
+	res, err := DB("test").Table("test").Update(map[string]int{"val": 1}).RunWrite(mock)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(res, tests.JsonEquals, WriteResponse{
+		Replaced: 1,
+		Changes: []ChangeResponse{
+			{NewValue: map[string]interface{}{"val": 1}, OldValue: map[string]interface{}{"val": 0}},
+		},
+	})
+	mock.AssertExpectations(c)
+}
+
 type simpleTestingT struct {
 	failed bool
 }

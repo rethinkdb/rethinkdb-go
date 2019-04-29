@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"gopkg.in/check.v1"
+	"gopkg.in/rethinkdb/rethinkdb-go.v5/encoding"
 	"net"
 	"reflect"
 	"sync"
@@ -472,7 +473,11 @@ func (c *mockConn) Read(b []byte) (n int, err error) {
 
 		jresps := make([]json.RawMessage, len(values))
 		for i := range values {
-			jresps[i], err = json.Marshal(values[i])
+			coded, err := encoding.Encode(values[i])
+			if err != nil {
+				panic(fmt.Sprintf("failed to encode response: %v", err))
+			}
+			jresps[i], err = json.Marshal(coded)
 			if err != nil {
 				panic(fmt.Sprintf("failed to encode response: %v", err))
 			}
