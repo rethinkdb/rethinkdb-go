@@ -293,6 +293,7 @@ type ChangeResponse struct {
 	OldValue interface{} `rethinkdb:"old_val,omitempty"`
 	State    string      `rethinkdb:"state,omitempty"`
 	Error    string      `rethinkdb:"error,omitempty"`
+	Type     string      `rethinkdb:"type,omitempty"`
 }
 
 // RunOpts contains the optional arguments for the Run function.
