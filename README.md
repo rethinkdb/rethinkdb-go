@@ -460,21 +460,15 @@ The mocking implementation is based on amazing https://github.com/stretchr/testi
 
 ## Benchmarks
 
-Everyone wants their project's benchmarks to be speedy. And while we know that RethinkDB and the RethinkDB-go driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please.
-
-Thanks to @jaredfolkins for the contribution.
+Everyone wants their project's benchmarks to be speedy. And while we know that RethinkDB and the RethinkDB-go driver are quite fast, our primary goal is for our benchmarks to be correct. They are designed to give you, the user, an accurate picture of writes and reads per second (w/s). If you come up with a accurate test that meets this aim, submit a pull request please.
 
 | Type    |  Value   |
 | --- | --- |
-| **Model Name** | MacBook Pro |
-| **Model Identifier** | MacBookPro11,3 |
-| **Processor Name** | Intel Core i7 |
-| **Processor Speed** | 2.3 GHz |
+| **Processor Name** | Intel(R) Core(TM) i7-9700K CPU @ 3.60GHz |
+| **Processor Speed** | 3.6 GHz |
 | **Number of Processors** | 1 |
-| **Total Number of Cores** | 4 |
-| **L2 Cache (per Core)** | 256 KB |
-| **L3 Cache** | 6 MB |
-| **Memory** | 16 GB |
+| **Total Number of Cores** | 8 |
+| **Memory** | 16 GB @ DDR4-3600 |
 
 ```bash
 BenchmarkRead-8                             1000           2013503 ns/op            5313 B/op         95 allocs/op
