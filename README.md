@@ -477,17 +477,14 @@ Thanks to @jaredfolkins for the contribution.
 | **Memory** | 16 GB |
 
 ```bash
-BenchmarkBatch200RandomWrites                20                              557227775                     ns/op
-BenchmarkBatch200RandomWritesParallel10      30                              354465417                     ns/op
-BenchmarkBatch200SoftRandomWritesParallel10  100                             761639276                     ns/op
-BenchmarkRandomWrites                        100                             10456580                      ns/op
-BenchmarkRandomWritesParallel10              1000                            1614175                       ns/op
-BenchmarkRandomSoftWrites                    3000                            589660                        ns/op
-BenchmarkRandomSoftWritesParallel10          10000                           247588                        ns/op
-BenchmarkSequentialWrites                    50                              24408285                      ns/op
-BenchmarkSequentialWritesParallel10          1000                            1755373                       ns/op
-BenchmarkSequentialSoftWrites                3000                            631211                        ns/op
-BenchmarkSequentialSoftWritesParallel10      10000                           263481                        ns/op
+BenchmarkRead-8                             1000           2013503 ns/op            5313 B/op         95 allocs/op
+BenchmarkReadParallel-8                     1000           1600969 ns/op           24995 B/op        342 allocs/op
+BenchmarkReadBatch-8                        1000           2220125 ns/op            5081 B/op         75 allocs/op
+BenchmarkReadBatchParallel-8                1000           1917141 ns/op           25756 B/op        330 allocs/op
+BenchmarkInsert-8                            200           6795686 ns/op            8747 B/op        156 allocs/op
+BenchmarkInsertParallel-8                   1000           1124237 ns/op           24953 B/op        391 allocs/op
+BenchmarkInsertBatch1000-8                    10         116974200 ns/op         2639406 B/op      21191 allocs/op
+BenchmarkInsertBatch1000Parallel-8            30          50111843 ns/op         2762491 B/op      24009 allocs/op
 ```
 
 ## Examples

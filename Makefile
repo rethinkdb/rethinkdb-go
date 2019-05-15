@@ -1,8 +1,16 @@
-test:
-	test -d ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5 && mv ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5 ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5.bak; true
-	cp -R . ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5
-	go test -coverprofile=cover.out -race gopkg.in/rethinkdb/rethinkdb-go.v5; true
-	go tool cover -html=cover.out -o cover.html; true
-	rm -f cover.out; true
-	rm -rf ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5
-	test -d ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5.bak && mv ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5.bak ${GOPATH}/src/gopkg.in/rethinkdb/rethinkdb-go.v5; true
+test: ut it
+
+ut:
+	go test -coverprofile=cover.out -race . ./encoding
+	go tool cover -html=cover.out -o cover.html
+	rm -f cover.out
+
+it:
+	go test -race ./internal/integration/reql_tests ./internal/integration/tests
+
+bench:
+	# better run with rethinkdb tmpfs
+	go test -bench=. -benchmem ./internal/integration/benchmark
+
+fmt:
+	go fmt ./...
