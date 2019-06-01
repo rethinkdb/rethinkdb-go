@@ -471,14 +471,14 @@ Everyone wants their project's benchmarks to be speedy. And while we know that R
 | **Memory** | 16 GB @ DDR4-3600 |
 
 ```bash
-BenchmarkRead-8                             1000           2013503 ns/op            5313 B/op         95 allocs/op
-BenchmarkReadParallel-8                     1000           1600969 ns/op           24995 B/op        342 allocs/op
-BenchmarkReadBatch-8                        1000           2220125 ns/op            5081 B/op         75 allocs/op
-BenchmarkReadBatchParallel-8                1000           1917141 ns/op           25756 B/op        330 allocs/op
-BenchmarkInsert-8                            200           6795686 ns/op            8747 B/op        156 allocs/op
-BenchmarkInsertParallel-8                   1000           1124237 ns/op           24953 B/op        391 allocs/op
-BenchmarkInsertBatch1000-8                    10         116974200 ns/op         2639406 B/op      21191 allocs/op
-BenchmarkInsertBatch1000Parallel-8            30          50111843 ns/op         2762491 B/op      24009 allocs/op
+BenchmarkRead-8                             1000           1671417 ns/op            5310 B/op         95 allocs/op
+BenchmarkReadParallel-8                     2000            571864 ns/op           16237 B/op        248 allocs/op
+BenchmarkReadBatch-8                        1000           2269213 ns/op            5081 B/op         75 allocs/op
+BenchmarkReadBatchParallel-8                1000           1793209 ns/op           22170 B/op        312 allocs/op
+BenchmarkInsert-8                            200           6927721 ns/op            8747 B/op        156 allocs/op
+BenchmarkInsertParallel-8                   1000           1292878 ns/op           26883 B/op        405 allocs/op
+BenchmarkInsertBatch1000-8                    10         126221370 ns/op         2639266 B/op      21191 allocs/op
+BenchmarkInsertBatch1000Parallel-8            30          49299283 ns/op         2762438 B/op      24001 allocs/op
 ```
 
 ## Examples
