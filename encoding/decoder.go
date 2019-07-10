@@ -78,7 +78,10 @@ func valueDecoder(dv, sv reflect.Value, blank bool) decoderFunc {
 
 	if dv.IsValid() {
 		dv = indirect(dv, false)
-		if blank {
+		if sv.Kind() == reflect.Ptr {
+			sv = indirect(sv, false)
+			dv.Set(sv)
+		} else if blank {
 			dv.Set(reflect.Zero(dv.Type()))
 		}
 	}
