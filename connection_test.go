@@ -3,13 +3,15 @@ package rethinkdb
 import (
 	"encoding/binary"
 	"encoding/json"
+	"io"
+	"os"
+	"time"
+
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/mocktracer"
 	"golang.org/x/net/context"
 	test "gopkg.in/check.v1"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
-	"io"
-	"time"
 )
 
 type ConnectionSuite struct{}
@@ -306,7 +308,6 @@ func (s *ConnectionSuite) TestConnection_readResponse_TimeoutHeader(c *test.C) {
 	timeout := time.Second
 
 	conn := &connMock{}
-	conn.On("SetReadDeadline").Return(nil)
 	conn.On("Read", respHeaderLen).Return(nil, 0, io.EOF)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{ReadTimeout: timeout})
@@ -519,6 +520,36 @@ func (s *ConnectionSuite) TestConnection_processResponse_UnexpectedOk(c *test.C)
 	c.Assert(resp, test.IsNil)
 	c.Assert(cursor, test.IsNil)
 	c.Assert(err, test.FitsTypeOf, RQLDriverError{})
+}
+
+func (s *ConnectionSuite) TestConnection_idleConnectionRemainsUsable(c *test.C) {
+	address := os.Getenv("RETHINK_ADDR")
+	if "" == address {
+		c.Skip("set RETHINK_ADDR environment variable to a running rethinkdb addr:port")
+	}
+
+	sess, err := Connect(ConnectOpts{
+		Address:     address,
+		NumRetries:  1,
+		InitialCap:  1,
+		ReadTimeout: 3 * time.Second,
+	})
+
+	c.Assert(err, test.IsNil)
+
+	cur, err := DBList().Run(sess)
+	c.Assert(err, test.IsNil)
+
+	var out []string
+	err = cur.All(&out)
+	c.Assert(err, test.IsNil)
+
+	time.Sleep(6 * time.Second)
+
+	cur, err = DBList().Run(sess)
+	c.Assert(err, test.IsNil)
+	err = cur.All(&out)
+	c.Assert(err, test.IsNil)
 }
 
 func testQuery(t Term) Query {

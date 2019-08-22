@@ -402,11 +402,6 @@ func (c *Connection) nextToken() int64 {
 // readResponse attempts to read a Response from the server, if no response
 // could be read then an error is returned.
 func (c *Connection) readResponse() (*Response, error) {
-	// Set timeout
-	if c.opts.ReadTimeout != 0 {
-		c.Conn.SetReadDeadline(time.Now().Add(c.opts.ReadTimeout))
-	}
-
 	// Read response header (token+length)
 	headerBuf := [respHeaderLen]byte{}
 	if _, err := c.read(headerBuf[:]); err != nil {
