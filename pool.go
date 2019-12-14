@@ -2,9 +2,8 @@ package rethinkdb
 
 import (
 	"errors"
-	"fmt"
-	"net"
 	"sync"
+	"sync/atomic"
 
 	"golang.org/x/net/context"
 	"gopkg.in/fatih/pool.v2"
@@ -19,7 +18,8 @@ type Pool struct {
 	host Host
 	opts *ConnectOpts
 
-	pool pool.Pool
+	conns   []*Connection
+	pointer int32
 
 	mu     sync.RWMutex // protects following fields
 	closed bool
@@ -36,36 +36,31 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 
 	maxOpen := opts.MaxOpen
 	if maxOpen <= 0 {
-		maxOpen = 2
+		maxOpen = 1
 	}
 
-	p, err := pool.NewChannelPool(initialCap, maxOpen, func() (net.Conn, error) {
-		conn, err := NewConnection(host.String(), opts)
+	conns := make([]*Connection, maxOpen)
+	var err error
+	for i := range conns {
+		conns[i], err = NewConnection(host.String(), opts)
 		if err != nil {
 			return nil, err
 		}
-
-		return conn, err
-	})
-	if err != nil {
-		return nil, err
 	}
 
 	return &Pool{
-		pool: p,
-		host: host,
-		opts: opts,
+		conns:   conns,
+		pointer: -1,
+		host:    host,
+		opts:    opts,
 	}, nil
 }
 
 // Ping verifies a connection to the database is still alive,
 // establishing a connection if necessary.
 func (p *Pool) Ping() error {
-	_, pc, err := p.conn()
-	if err != nil {
-		return err
-	}
-	return pc.Close()
+	_, _, err := p.conn()
+	return err
 }
 
 // Close closes the database, releasing any open resources.
@@ -79,37 +74,32 @@ func (p *Pool) Close() error {
 		return nil
 	}
 
-	p.pool.Close()
+	for _, c := range p.conns {
+		err := c.Close()
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
 
 func (p *Pool) conn() (*Connection, *pool.PoolConn, error) {
 	p.mu.RLock()
-	defer p.mu.RUnlock()
 
 	if p.closed {
+		p.mu.RUnlock()
 		return nil, nil, errPoolClosed
 	}
+	p.mu.RUnlock()
 
-	nc, err := p.pool.Get()
-	if err != nil {
-		return nil, nil, err
+	pos := atomic.AddInt32(&p.pointer, 1)
+	if pos == int32(len(p.conns)) {
+		atomic.StoreInt32(&p.pointer, 0)
 	}
+	pos = pos % int32(len(p.conns))
 
-	pc, ok := nc.(*pool.PoolConn)
-	if !ok {
-		// This should never happen!
-		return nil, nil, fmt.Errorf("Invalid connection in pool")
-	}
-
-	conn, ok := pc.Conn.(*Connection)
-	if !ok {
-		// This should never happen!
-		return nil, nil, fmt.Errorf("Invalid connection in pool")
-	}
-
-	return conn, pc, nil
+	return p.conns[pos], nil, nil
 }
 
 // SetInitialPoolCap sets the initial capacity of the connection pool.
@@ -138,39 +128,23 @@ func (p *Pool) SetMaxOpenConns(n int) {
 
 // Exec executes a query without waiting for any response.
 func (p *Pool) Exec(ctx context.Context, q Query) error {
-	c, pc, err := p.conn()
+	c, _, err := p.conn()
 	if err != nil {
 		return err
 	}
-	defer pc.Close()
 
 	_, _, err = c.Query(ctx, q)
-
-	if c.isBad() {
-		pc.MarkUnusable()
-	}
-
 	return err
 }
 
 // Query executes a query and waits for the response
 func (p *Pool) Query(ctx context.Context, q Query) (*Cursor, error) {
-	c, pc, err := p.conn()
+	c, _, err := p.conn()
 	if err != nil {
 		return nil, err
 	}
 
 	_, cursor, err := c.Query(ctx, q)
-
-	if err == nil {
-		cursor.releaseConn = releaseConn(c, pc)
-	} else {
-		if c.isBad() {
-			pc.MarkUnusable()
-		}
-		pc.Close()
-	}
-
 	return cursor, err
 }
 
@@ -178,27 +152,11 @@ func (p *Pool) Query(ctx context.Context, q Query) (*Cursor, error) {
 func (p *Pool) Server() (ServerResponse, error) {
 	var response ServerResponse
 
-	c, pc, err := p.conn()
+	c, _, err := p.conn()
 	if err != nil {
 		return response, err
 	}
-	defer pc.Close()
 
 	response, err = c.Server()
-
-	if c.isBad() {
-		pc.MarkUnusable()
-	}
-
 	return response, err
-}
-
-func releaseConn(c *Connection, pc *pool.PoolConn) func() error {
-	return func() error {
-		if c.isBad() {
-			pc.MarkUnusable()
-		}
-
-		return pc.Close()
-	}
 }
