@@ -227,7 +227,6 @@ func (c *Cursor) nextLocked(dest interface{}, progressCursor bool) (bool, error)
 			if progressCursor {
 				c.buffer = c.buffer[1:]
 			}
-
 			err := encoding.Decode(dest, data)
 			if err != nil {
 				return false, err
@@ -494,7 +493,6 @@ func (c *Cursor) Listen(channel interface{}) {
 			if !c.Next(elemp.Interface()) {
 				break
 			}
-
 			channelv.Send(elemp.Elem())
 		}
 

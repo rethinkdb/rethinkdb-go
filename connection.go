@@ -464,7 +464,7 @@ func (c *Connection) processResponse(ctx context.Context, q Query, response *Res
 	case p.Response_WAIT_COMPLETE:
 		return c.processWaitResponse(response)
 	default:
-		return nil, nil, RQLDriverError{rqlError("Unexpected response type: %v")}
+		return nil, nil, RQLDriverError{rqlError(fmt.Sprintf("Unexpected response type: %v", response.Type.String()))}
 	}
 }
 

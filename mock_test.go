@@ -3,9 +3,10 @@ package rethinkdb
 import (
 	"fmt"
 
+	"testing"
+
 	test "gopkg.in/check.v1"
 	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/integration/tests"
-	"testing"
 )
 
 // Hook up gocheck into the gotest runner.
@@ -56,8 +57,6 @@ func (s *MockSuite) TestMockRunSuccessSingleResult(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, tests.JsonEquals, map[string]interface{}{"id": "mocked"})
 	mock.AssertExpectations(c)
-
-	res.Close()
 }
 
 func (s *MockSuite) TestMockRunSuccessMultipleResults(c *test.C) {
@@ -75,8 +74,49 @@ func (s *MockSuite) TestMockRunSuccessMultipleResults(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, tests.JsonEquals, []interface{}{map[string]interface{}{"id": "mocked"}})
 	mock.AssertExpectations(c)
+}
 
-	res.Close()
+func (s *MockSuite) TestMockRunSuccessChannel(c *test.C) {
+	mock := NewMock()
+	ch := make(chan []interface{})
+	mock.On(DB("test").Table("test")).Return(ch, nil)
+	go func() {
+		ch <- []interface{}{1, 2}
+		ch <- []interface{}{3}
+		ch <- []interface{}{4}
+		close(ch)
+	}()
+	res, err := DB("test").Table("test").Run(mock)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, tests.JsonEquals, []interface{}{1, 2, 3, 4})
+	mock.AssertExpectations(c)
+}
+
+func (s *MockSuite) TestMockRunSuccessFunction(c *test.C) {
+	mock := NewMock()
+	n := 0
+	f := func() []interface{} {
+		n++
+		if n == 4 {
+			return nil
+		}
+		return []interface{}{n}
+	}
+	mock.On(DB("test").Table("test")).Return(f, nil)
+	res, err := DB("test").Table("test").Run(mock)
+	c.Assert(err, test.IsNil)
+
+	var response []interface{}
+	err = res.All(&response)
+
+	c.Assert(err, test.IsNil)
+	c.Assert(response, tests.JsonEquals, []interface{}{1, 2, 3})
+	mock.AssertExpectations(c)
 }
 
 func (s *MockSuite) TestMockRunSuccessMultipleResults_type(c *test.C) {
@@ -307,6 +347,27 @@ func (s *MockSuite) TestMockAnything(c *test.C) {
 	c.Assert(err, test.IsNil)
 	c.Assert(response, tests.JsonEquals, "okay4")
 
+	mock.AssertExpectations(c)
+}
+
+func (s *MockSuite) TestMockRethinkStructsRunWrite(c *test.C) {
+	mock := NewMock()
+	mock.On(DB("test").Table("test").Update(map[string]int{"val": 1})).Return(WriteResponse{
+		Replaced: 1,
+		Changes: []ChangeResponse{
+			{NewValue: map[string]interface{}{"val": 1}, OldValue: map[string]interface{}{"val": 0}},
+		},
+	}, nil)
+
+	res, err := DB("test").Table("test").Update(map[string]int{"val": 1}).RunWrite(mock)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(res, tests.JsonEquals, WriteResponse{
+		Replaced: 1,
+		Changes: []ChangeResponse{
+			{NewValue: map[string]interface{}{"val": 1}, OldValue: map[string]interface{}{"val": 0}},
+		},
+	})
 	mock.AssertExpectations(c)
 }
 

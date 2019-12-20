@@ -227,3 +227,24 @@ func ExampleTerm_Delete_many() {
 	// Output:
 	// 4 rows deleted
 }
+
+func ExampleTerm_SetWriteHook() {
+	resp, err := r.DB("test").Table("test").SetWriteHook(
+		func(id r.Term, oldVal r.Term, newVal r.Term) r.Term {
+			return r.Branch(oldVal.And(newVal),
+				newVal.Merge(map[string]r.Term{"write_counter": oldVal.Field("write_counter").Add(1)}),
+				newVal,
+				newVal.Merge(r.Expr(map[string]int{"write_counter": 1})),
+				nil,
+			)
+		}).RunWrite(session)
+
+	if err != nil {
+		fmt.Print(err)
+		return
+	}
+
+	fmt.Printf("%d hook created", resp.Created)
+	// Output:
+	// 1 hook created
+}

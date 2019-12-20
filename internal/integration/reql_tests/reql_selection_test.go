@@ -250,7 +250,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #86
 		/* err("ReqlQueryLogicError", 'Database name `%` invalid (Use A-Za-z0-9_ only).', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Database name `%` invalid (Use A-Za-z0-9_ only).")
+		var expected_ Err = err("ReqlQueryLogicError", "Database name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
 		/* r.db('%') */
 
 		suite.T().Log("About to run line #86: r.DB('%')")
@@ -265,7 +265,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #89
 		/* err("ReqlQueryLogicError", 'Table name `%` invalid (Use A-Za-z0-9_ only).', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Table name `%` invalid (Use A-Za-z0-9_ only).")
+		var expected_ Err = err("ReqlQueryLogicError", "Table name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
 		/* r.db('test').table('%') */
 
 		suite.T().Log("About to run line #89: r.DB('test').Table('%')")
