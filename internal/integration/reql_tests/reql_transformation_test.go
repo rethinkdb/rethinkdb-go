@@ -551,7 +551,7 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #163
 		/* err('ReqlQueryLogicError', 'Indexed order_by can only be performed on a TABLE or TABLE_SLICE.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE.")
+		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE. Make sure order_by comes before any transformations (such as map) or filters.")
 		/* table_test_transformation.order_by('id').order_by(index='id')[0] */
 
 		suite.T().Log("About to run line #163: table_test_transformation.OrderBy('id').OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).AtIndex(0)")
@@ -566,7 +566,7 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #168
 		/* err('ReqlQueryLogicError', 'Indexed order_by can only be performed on a TABLE or TABLE_SLICE.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE.")
+		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE. Make sure order_by comes before any transformations (such as map) or filters.")
 		/* table_test_transformation.order_by('id').order_by(index='a')[0] */
 
 		suite.T().Log("About to run line #168: table_test_transformation.OrderBy('id').OrderBy().OptArgs(r.OrderByOpts{Index: 'a', }).AtIndex(0)")
@@ -806,7 +806,7 @@ func (suite *TransformationSuite) TestCases() {
 	{
 		// transformation.yaml line #234
 		/* err('ReqlQueryLogicError', 'Indexed order_by can only be performed on a TABLE or TABLE_SLICE.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE.")
+		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE. Make sure order_by comes before any transformations (such as map) or filters.")
 		/* table_test_transformation.order_by('missing').order_by(index='id').nth(0) */
 
 		suite.T().Log("About to run line #234: table_test_transformation.OrderBy('missing').OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Nth(0)")

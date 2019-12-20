@@ -59,6 +59,7 @@ func (suite *TimeoutSuite) TestCases() {
 	suite.T().Log("Running TimeoutSuite: Tests timeouts.")
 
 	{
+		// r.JS default timeout is 5 sec
 		// timeout.yaml line #5
 		/* err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 5.000 seconds.", [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 5.000 seconds.")

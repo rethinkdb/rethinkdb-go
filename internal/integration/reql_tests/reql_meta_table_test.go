@@ -83,7 +83,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #9
 		/* ({'type':'DB','name':'rethinkdb','id':null}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": nil}
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"type": "DB", "name": "rethinkdb"})
 		/* r.db('rethinkdb').info() */
 
 		suite.T().Log("About to run line #9: r.DB('rethinkdb').Info()")
@@ -100,7 +100,7 @@ func (suite *MetaTableSuite) TestCases() {
 		/* partial({'db':{'type':'DB','name':'rethinkdb','id':null},
 		'type':'TABLE','id':null,'name':'stats',
 		'indexes':[],'primary_key':'id'}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"db": map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": nil}, "type": "TABLE", "id": nil, "name": "stats", "indexes": []interface{}{}, "primary_key": "id"})
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"db": map[interface{}]interface{}{"type": "DB", "name": "rethinkdb"}, "type": "TABLE", "name": "stats", "indexes": []interface{}{}, "primary_key": "id"})
 		/* r.db('rethinkdb').table('stats').info() */
 
 		suite.T().Log("About to run line #12: r.DB('rethinkdb').Table('stats').Info()")
