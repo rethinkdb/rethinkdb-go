@@ -14,7 +14,7 @@ import (
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
 	"golang.org/x/net/context"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 	"sync"
 )
 

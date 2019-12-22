@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	test "gopkg.in/check.v1"
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/integration/tests"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/internal/integration/tests"
 )
 
 // Hook up gocheck into the gotest runner.

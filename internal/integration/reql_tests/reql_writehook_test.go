@@ -2,8 +2,8 @@ package reql_tests
 
 import (
 	"github.com/stretchr/testify/suite"
-	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/internal/compare"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/internal/compare"
 	"testing"
 )
 

@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // Node represents a database server in the cluster

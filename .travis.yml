@@ -9,7 +9,7 @@ go:
 
 cache: apt
 
-go_import_path: gopkg.in/rethinkdb/rethinkdb-go.v5
+go_import_path: gopkg.in/rethinkdb/rethinkdb-go.v6
 
 install: go get -t ./...
 

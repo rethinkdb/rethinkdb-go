@@ -6,7 +6,7 @@ import (
 
 	test "gopkg.in/check.v1"
 
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/types"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/types"
 )
 
 type jsonChecker struct {

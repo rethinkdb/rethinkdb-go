@@ -9,8 +9,8 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"golang.org/x/net/context"
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/encoding"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 var (

@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/encoding"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
 	"io/ioutil"
 )
 

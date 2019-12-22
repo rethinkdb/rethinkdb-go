@@ -8,7 +8,7 @@
 
 ![RethinkDB-go Logo](https://raw.github.com/wiki/rethinkdb/rethinkdb-go/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v5.1.0 (RethinkDB v2.4)
+Current version: v6.0.0 (RethinkDB v2.4)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -17,10 +17,10 @@ If you need any help you can find me on the [RethinkDB slack](https://rethinkdb.
 ## Installation
 
 ```
-go get gopkg.in/rethinkdb/rethinkdb-go.v5
+go get gopkg.in/rethinkdb/rethinkdb-go.v6
 ```
 
-Replace `v5` with `v4` or `v3` to use previous versions.
+Replace `v6` with `v5` or `v4` to use previous versions.
 
 ## Example
 
@@ -32,7 +32,7 @@ import (
 	"fmt"
 	"log"
 
-	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
 func Example() {

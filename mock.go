@@ -5,14 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"gopkg.in/check.v1"
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/encoding"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
 	"net"
 	"reflect"
 	"sync"
 	"time"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // Mocking is based on the amazing package github.com/stretchr/testify

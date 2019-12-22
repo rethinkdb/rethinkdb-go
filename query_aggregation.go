@@ -1,6 +1,6 @@
 package rethinkdb
 
-import p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+import p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 
 // Aggregation
 // These commands are used to compute smaller values from large sequences.

@@ -1,7 +1,7 @@
 package rethinkdb
 
 import (
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // Rethinkdb proposal: https://github.com/rethinkdb/rethinkdb/issues/5813
