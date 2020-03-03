@@ -33,7 +33,9 @@ func newTypeEncoder(t reflect.Type, allowAddr bool) encoderFunc {
 		return intEncoder
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 		return uintEncoder
-	case reflect.Float32, reflect.Float64:
+	case reflect.Float32:
+		return float32Encoder
+	case reflect.Float64:
 		return floatEncoder
 	case reflect.String:
 		return stringEncoder
@@ -113,6 +115,10 @@ func uintEncoder(v reflect.Value) (interface{}, error) {
 
 func floatEncoder(v reflect.Value) (interface{}, error) {
 	return v.Float(), nil
+}
+
+func float32Encoder(v reflect.Value) (interface{}, error) {
+	return float32(v.Float()), nil
 }
 
 func stringEncoder(v reflect.Value) (interface{}, error) {
