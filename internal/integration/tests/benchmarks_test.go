@@ -9,6 +9,62 @@ import (
 	"time"
 )
 
+func BenchmarkConnectionPoolLightweightQuery_Single(b *testing.B) {
+	q := r.Random()
+
+	for i := 0; i < b.N; i++ {
+		var num float64
+		err := q.ReadOne(&num, session)
+		if err != nil {
+			b.Errorf("read random number failed: %v", err)
+		}
+	}
+}
+
+func BenchmarkConnectionPoolLightweightQuery_Parallel(b *testing.B) {
+	q := r.Random()
+
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			var num float64
+			err := q.ReadOne(&num, session)
+			if err != nil {
+				b.Errorf("read random number failed: %v", err)
+			}
+		}
+	})
+}
+
+func BenchmarkConnectionPoolLightweightQuery_Parallel3X(b *testing.B) {
+	q := r.Random()
+
+	b.SetParallelism(3)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			var num float64
+			err := q.ReadOne(&num, session)
+			if err != nil {
+				b.Errorf("read random number failed: %v", err)
+			}
+		}
+	})
+}
+
+func BenchmarkConnectionPoolLightweightQuery_Parallel10X(b *testing.B) {
+	q := r.Random()
+
+	b.SetParallelism(10)
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			var num float64
+			err := q.ReadOne(&num, session)
+			if err != nil {
+				b.Errorf("read random number failed: %v", err)
+			}
+		}
+	})
+}
+
 func BenchmarkBatch200RandomWrites(b *testing.B) {
 
 	var term r.Term
