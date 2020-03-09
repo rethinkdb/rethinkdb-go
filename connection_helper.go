@@ -17,10 +17,14 @@ func (c *Connection) read(buf []byte) (total int, err error) {
 }
 
 func (c *Connection) contextFromConnectionOpts() context.Context {
-	sum := c.opts.ReadTimeout + c.opts.WriteTimeout
-	if c.opts.ReadTimeout == 0 || c.opts.WriteTimeout == 0 {
+	// back compatibility
+	min := c.opts.ReadTimeout
+	if c.opts.WriteTimeout < min {
+		min = c.opts.WriteTimeout
+	}
+	if min == 0 {
 		return context.Background()
 	}
-	ctx, _ := context.WithTimeout(context.Background(), sum)
+	ctx, _ := context.WithTimeout(context.Background(), min)
 	return ctx
 }

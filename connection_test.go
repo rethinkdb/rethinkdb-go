@@ -25,9 +25,9 @@ func (s *ConnectionSuite) TestConnection_Query_Ok(c *test.C) {
 	header := respHeader(token, respData)
 
 	conn := &connMock{}
-	conn.On("Write", writeData).Return(len(writeData), nil)
-	conn.On("Read", respHeaderLen).Return(header, respHeaderLen, nil)
-	conn.On("Read", len(respData)).Return(respData, len(respData), nil)
+	conn.On("Write", writeData).Return(len(writeData), nil, nil)
+	conn.On("Read", respHeaderLen).Return(header, respHeaderLen, nil, nil)
+	conn.On("Read", len(respData)).Return(respData, len(respData), nil, nil)
 	conn.On("Close").Return(nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
@@ -60,9 +60,9 @@ func (s *ConnectionSuite) TestConnection_Query_DefaultDBOk(c *test.C) {
 	header := respHeader(token, respData)
 
 	conn := &connMock{}
-	conn.On("Write", writeData).Return(len(writeData), nil)
-	conn.On("Read", respHeaderLen).Return(header, respHeaderLen, nil)
-	conn.On("Read", len(respData)).Return(respData, len(respData), nil)
+	conn.On("Write", writeData).Return(len(writeData), nil, nil)
+	conn.On("Read", respHeaderLen).Return(header, respHeaderLen, nil, nil)
+	conn.On("Read", len(respData)).Return(respData, len(respData), nil, nil)
 	conn.On("Close").Return(nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{Database: "db"})
@@ -106,7 +106,7 @@ func (s *ConnectionSuite) TestConnection_Query_SendFail(c *test.C) {
 	writeData := serializeQuery(token, q)
 
 	conn := &connMock{}
-	conn.On("Write", writeData).Return(0, io.EOF)
+	conn.On("Write", writeData).Return(0, io.EOF, nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
 	response, cursor, err := connection.Query(ctx, q)
@@ -126,9 +126,9 @@ func (s *ConnectionSuite) TestConnection_Query_NoReplyOk(c *test.C) {
 	header := respHeader(token, respData)
 
 	conn := &connMock{}
-	conn.On("Write", writeData).Return(len(writeData), nil)
-	conn.On("Read", respHeaderLen).Return(header, respHeaderLen, nil)
-	conn.On("Read", len(respData)).Return(respData, len(respData), nil)
+	conn.On("Write", writeData).Return(len(writeData), nil, nil)
+	conn.On("Read", respHeaderLen).Return(header, respHeaderLen, nil, nil)
+	conn.On("Read", len(respData)).Return(respData, len(respData), nil, nil)
 	conn.On("Close").Return(nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
@@ -151,9 +151,8 @@ func (s *ConnectionSuite) TestConnection_Query_TimeoutWrite(c *test.C) {
 	stopData := serializeQuery(token, newStopQuery(token))
 
 	conn := &connMock{}
-	conn.On("Write", writeData).Return(len(writeData), nil)
-	conn.On("Write", stopData).Return(len(stopData), nil)
-	conn.On("SetWriteDeadline").Return(nil)
+	conn.On("Write", writeData).Return(len(writeData), nil, nil)
+	conn.On("Write", stopData).Return(len(stopData), nil, nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{ReadTimeout: time.Millisecond, WriteTimeout: time.Millisecond})
 	connection.readRequestsChan = make(chan tokenAndPromise, 0)
@@ -174,9 +173,8 @@ func (s *ConnectionSuite) TestConnection_Query_TimeoutRead(c *test.C) {
 	stopData := serializeQuery(token, newStopQuery(token))
 
 	conn := &connMock{}
-	conn.On("Write", writeData).Return(len(writeData), nil)
-	conn.On("Write", stopData).Return(len(stopData), nil)
-	conn.On("SetWriteDeadline").Return(nil)
+	conn.On("Write", writeData).Return(len(writeData), nil, 10*time.Millisecond)
+	conn.On("Write", stopData).Return(len(stopData), nil, nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{ReadTimeout: time.Millisecond, WriteTimeout: time.Millisecond})
 	response, cursor, err := connection.Query(ctx, q)
@@ -196,7 +194,7 @@ func (s *ConnectionSuite) TestConnection_Query_SendFailTracing(c *test.C) {
 	writeData := serializeQuery(token, q)
 
 	conn := &connMock{}
-	conn.On("Write", writeData).Return(0, io.EOF)
+	conn.On("Write", writeData).Return(0, io.EOF, nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{UseOpentracing: true})
 	response, cursor, err := connection.Query(ctx, q)
@@ -306,8 +304,7 @@ func (s *ConnectionSuite) TestConnection_readResponse_TimeoutHeader(c *test.C) {
 	timeout := time.Second
 
 	conn := &connMock{}
-	conn.On("SetReadDeadline").Return(nil)
-	conn.On("Read", respHeaderLen).Return(nil, 0, io.EOF)
+	conn.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{ReadTimeout: timeout})
 
@@ -325,8 +322,8 @@ func (s *ConnectionSuite) TestConnection_readResponse_BodySocketErr(c *test.C) {
 	header := respHeader(token, respData)
 
 	conn := &connMock{}
-	conn.On("Read", respHeaderLen).Return(header, len(header), nil)
-	conn.On("Read", len(respData)).Return(nil, 0, io.EOF)
+	conn.On("Read", respHeaderLen).Return(header, len(header), nil, nil)
+	conn.On("Read", len(respData)).Return(nil, 0, io.EOF, nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
 
@@ -344,8 +341,8 @@ func (s *ConnectionSuite) TestConnection_readResponse_BodyUnmarshalErr(c *test.C
 	header := respHeader(token, respData)
 
 	conn := &connMock{}
-	conn.On("Read", respHeaderLen).Return(header, len(header), nil)
-	conn.On("Read", len(respData)).Return(make([]byte, len(respData)), len(respData), nil)
+	conn.On("Read", respHeaderLen).Return(header, len(header), nil, nil)
+	conn.On("Read", len(respData)).Return(make([]byte, len(respData)), len(respData), nil, nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
 

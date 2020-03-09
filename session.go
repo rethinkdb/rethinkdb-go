@@ -46,9 +46,11 @@ type ConnectOpts struct {
 	Timeout time.Duration `rethinkdb:"timeout,omitempty" json:"timeout,omitempty"`
 	// WriteTimeout is the amount of time the driver will wait when sending the
 	// query to the server
+	// Deprecated: use RunOpts.Context instead
 	WriteTimeout time.Duration `rethinkdb:"write_timeout,omitempty" json:"write_timeout,omitempty"`
 	// ReadTimeout is the amount of time the driver will wait for a response from
 	// the server when executing queries.
+	// Deprecated: use RunOpts.Context instead
 	ReadTimeout time.Duration `rethinkdb:"read_timeout,omitempty" json:"read_timeout,omitempty"`
 	// KeepAlivePeriod is the keep alive period used by the connection, by default
 	// this is 30s. It is not possible to disable keep alive messages
@@ -76,10 +78,8 @@ type ConnectOpts struct {
 	// the first query is executed.
 	InitialCap int `rethinkdb:"initial_cap,omitempty" json:"initial_cap,omitempty"`
 	// MaxOpen is used by the internal connection pool and is used to configure
-	// the maximum number of connections held in the pool. If all available
-	// connections are being used then the driver will open new connections as
-	// needed however they will not be returned to the pool. By default the
-	// maximum number of connections is 2
+	// the maximum number of connections held in the pool. By default the
+	// maximum number of connections is 1
 	MaxOpen int `rethinkdb:"max_open,omitempty" json:"max_open,omitempty"`
 
 	// Below options are for cluster discovery, please note there is a high

@@ -16,11 +16,19 @@ func (m *connMock) Read(b []byte) (n int, err error) {
 	if ok {
 		copy(b, rbuf)
 	}
+	timeout := args.Get(3)
+	if timeout != nil {
+		time.Sleep(timeout.(time.Duration))
+	}
 	return args.Int(1), args.Error(2)
 }
 
 func (m *connMock) Write(b []byte) (n int, err error) {
 	args := m.Called(b)
+	timeout := args.Get(2)
+	if timeout != nil {
+		time.Sleep(timeout.(time.Duration))
+	}
 	return args.Int(0), args.Error(1)
 }
 

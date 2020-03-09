@@ -158,3 +158,49 @@ func (s *RethinkSuite) TestSessionConnectUsername(c *test.C) {
 	_, err = r.Expr("Hello World").Run(session)
 	c.Assert(err, test.IsNil)
 }
+
+func (s *RethinkSuite) TestSessionIdleConnectionRemainsUsableSmallTimeout(c *test.C) {
+	session, err := r.Connect(r.ConnectOpts{
+		Address:      url,
+		NumRetries:   1,
+		InitialCap:   1,
+		ReadTimeout:  10 * time.Millisecond,
+		WriteTimeout: 10 * time.Millisecond,
+	})
+	c.Assert(err, test.IsNil)
+
+	time.Sleep(20 * time.Millisecond)
+
+	var num int
+	err = r.Expr(5).ReadOne(&num, session)
+	c.Assert(err, test.IsNil)
+	c.Assert(num, test.Equals, 5)
+
+	time.Sleep(20 * time.Millisecond)
+
+	err = r.Expr(6).ReadOne(&num, session)
+	c.Assert(err, test.IsNil)
+	c.Assert(num, test.Equals, 6)
+}
+
+func (s *RethinkSuite) TestSessionIdleConnectionRemainsUsableNoTimeout(c *test.C) {
+	session, err := r.Connect(r.ConnectOpts{
+		Address:    url,
+		NumRetries: 1,
+		InitialCap: 1,
+	})
+	c.Assert(err, test.IsNil)
+
+	time.Sleep(10 * time.Millisecond)
+
+	var num int
+	err = r.Expr(5).ReadOne(&num, session)
+	c.Assert(err, test.IsNil)
+	c.Assert(num, test.Equals, 5)
+
+	time.Sleep(10 * time.Millisecond)
+
+	err = r.Expr(6).ReadOne(&num, session)
+	c.Assert(err, test.IsNil)
+	c.Assert(num, test.Equals, 6)
+}
