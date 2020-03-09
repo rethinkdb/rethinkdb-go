@@ -378,11 +378,6 @@ func (c *Connection) sendQuery(q Query) error {
 	binary.LittleEndian.PutUint64(b, uint64(q.Token))
 	binary.LittleEndian.PutUint32(b[8:], uint32(len(b)-respHeaderLen))
 
-	// Set timeout
-	if c.opts.WriteTimeout != 0 {
-		c.Conn.SetWriteDeadline(time.Now().Add(c.opts.WriteTimeout))
-	}
-
 	// Send the JSON encoding of the query itself.
 	if err = c.writeData(b); err != nil {
 		c.setBad()
@@ -402,10 +397,8 @@ func (c *Connection) nextToken() int64 {
 // readResponse attempts to read a Response from the server, if no response
 // could be read then an error is returned.
 func (c *Connection) readResponse() (*Response, error) {
-	// Set timeout
-	if c.opts.ReadTimeout != 0 {
-		c.Conn.SetReadDeadline(time.Now().Add(c.opts.ReadTimeout))
-	}
+	// due to this is pooled connection, it always reads from socket even if idle
+	// timeouts should be only on query-level with context
 
 	// Read response header (token+length)
 	headerBuf := [respHeaderLen]byte{}

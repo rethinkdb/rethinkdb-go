@@ -6,7 +6,6 @@ import (
 	"sync/atomic"
 
 	"golang.org/x/net/context"
-	"gopkg.in/fatih/pool.v2"
 )
 
 var (
@@ -59,7 +58,7 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 // Ping verifies a connection to the database is still alive,
 // establishing a connection if necessary.
 func (p *Pool) Ping() error {
-	_, _, err := p.conn()
+	_, err := p.conn()
 	return err
 }
 
@@ -84,12 +83,12 @@ func (p *Pool) Close() error {
 	return nil
 }
 
-func (p *Pool) conn() (*Connection, *pool.PoolConn, error) {
+func (p *Pool) conn() (*Connection, error) {
 	p.mu.RLock()
 
 	if p.closed {
 		p.mu.RUnlock()
-		return nil, nil, errPoolClosed
+		return nil, errPoolClosed
 	}
 	p.mu.RUnlock()
 
@@ -99,7 +98,7 @@ func (p *Pool) conn() (*Connection, *pool.PoolConn, error) {
 	}
 	pos = pos % int32(len(p.conns))
 
-	return p.conns[pos], nil, nil
+	return p.conns[pos], nil
 }
 
 // SetInitialPoolCap sets the initial capacity of the connection pool.
@@ -128,7 +127,7 @@ func (p *Pool) SetMaxOpenConns(n int) {
 
 // Exec executes a query without waiting for any response.
 func (p *Pool) Exec(ctx context.Context, q Query) error {
-	c, _, err := p.conn()
+	c, err := p.conn()
 	if err != nil {
 		return err
 	}
@@ -139,7 +138,7 @@ func (p *Pool) Exec(ctx context.Context, q Query) error {
 
 // Query executes a query and waits for the response
 func (p *Pool) Query(ctx context.Context, q Query) (*Cursor, error) {
-	c, _, err := p.conn()
+	c, err := p.conn()
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +151,7 @@ func (p *Pool) Query(ctx context.Context, q Query) (*Cursor, error) {
 func (p *Pool) Server() (ServerResponse, error) {
 	var response ServerResponse
 
-	c, _, err := p.conn()
+	c, err := p.conn()
 	if err != nil {
 		return response, err
 	}

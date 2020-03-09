@@ -10,6 +10,8 @@ import (
 )
 
 var (
+	// Log is logger for debug purpuses.
+	// deprecated
 	Log *logrus.Logger
 )
 
