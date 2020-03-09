@@ -2,7 +2,6 @@ package rethinkdb
 
 import (
 	"fmt"
-
 	"testing"
 
 	test "gopkg.in/check.v1"
@@ -348,6 +347,54 @@ func (s *MockSuite) TestMockAnything(c *test.C) {
 	c.Assert(response, tests.JsonEquals, "okay4")
 
 	mock.AssertExpectations(c)
+}
+
+func (s *MockSuite) TestMockMapSliceResultOk(c *test.C) {
+	type Some struct {
+		Id string
+	}
+
+	result := []map[string]interface{}{
+		{"Id": "test1"},
+		{"Id": "test2"},
+	}
+
+	mock := NewMock()
+	q := DB("test").Table("test").GetAll()
+	mock.On(q).Return(result, nil)
+	res, err := q.Run(mock)
+	c.Assert(err, test.IsNil)
+
+	var casted []*Some
+	err = res.All(&casted)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(casted[0].Id, test.Equals, "test1")
+	c.Assert(casted[1].Id, test.Equals, "test2")
+}
+
+func (s *MockSuite) TestMockPointerSliceResultOk(c *test.C) {
+	type Some struct {
+		Id string
+	}
+
+	result := []*Some{
+		{Id: "test1"},
+		{Id: "test2"},
+	}
+
+	mock := NewMock()
+	q := DB("test").Table("test").GetAll()
+	mock.On(q).Return(result, nil)
+	res, err := q.Run(mock)
+	c.Assert(err, test.IsNil)
+
+	var casted []*Some
+	err = res.All(&casted)
+	c.Assert(err, test.IsNil)
+
+	c.Assert(casted[0].Id, test.Equals, "test1")
+	c.Assert(casted[1].Id, test.Equals, "test2")
 }
 
 func (s *MockSuite) TestMockRethinkStructsRunWrite(c *test.C) {
