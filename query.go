@@ -289,11 +289,13 @@ type WriteResponse struct {
 // ChangeResponse is a helper type used when dealing with changefeeds. The type
 // contains both the value before the query and the new value.
 type ChangeResponse struct {
-	NewValue interface{} `rethinkdb:"new_val,omitempty"`
-	OldValue interface{} `rethinkdb:"old_val,omitempty"`
-	State    string      `rethinkdb:"state,omitempty"`
-	Error    string      `rethinkdb:"error,omitempty"`
-	Type     string      `rethinkdb:"type,omitempty"`
+	NewValue  interface{} `rethinkdb:"new_val,omitempty"`
+	OldValue  interface{} `rethinkdb:"old_val,omitempty"`
+	State     string      `rethinkdb:"state,omitempty"`
+	Error     string      `rethinkdb:"error,omitempty"`
+	Type      string      `rethinkdb:"type,omitempty"`
+	OldOffset int         `rethinkdb:"old_offset,omitempty"`
+	NewOffset int         `rethinkdb:"new_offset,omitempty"`
 }
 
 // RunOpts contains the optional arguments for the Run function.

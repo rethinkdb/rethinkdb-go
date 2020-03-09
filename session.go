@@ -78,10 +78,8 @@ type ConnectOpts struct {
 	// the first query is executed.
 	InitialCap int `rethinkdb:"initial_cap,omitempty" json:"initial_cap,omitempty"`
 	// MaxOpen is used by the internal connection pool and is used to configure
-	// the maximum number of connections held in the pool. If all available
-	// connections are being used then the driver will open new connections as
-	// needed however they will not be returned to the pool. By default the
-	// maximum number of connections is 2
+	// the maximum number of connections held in the pool. By default the
+	// maximum number of connections is 1
 	MaxOpen int `rethinkdb:"max_open,omitempty" json:"max_open,omitempty"`
 
 	// Below options are for cluster discovery, please note there is a high

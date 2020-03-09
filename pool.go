@@ -12,6 +12,11 @@ var (
 	errPoolClosed = errors.New("rethinkdb: pool is closed")
 )
 
+const (
+	poolIsNotClosed int32 = 0
+	poolIsClosed    int32 = 1
+)
+
 // A Pool is used to store a pool of connections to a single RethinkDB server
 type Pool struct {
 	host Host
@@ -19,9 +24,9 @@ type Pool struct {
 
 	conns   []*Connection
 	pointer int32
+	closed  int32
 
-	mu     sync.RWMutex // protects following fields
-	closed bool
+	mu sync.Mutex // protects lazy creating connections
 }
 
 // NewPool creates a new connection pool for the given host
@@ -40,7 +45,7 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 
 	conns := make([]*Connection, maxOpen)
 	var err error
-	for i := range conns {
+	for i := 0; i < opts.InitialCap; i++ {
 		conns[i], err = NewConnection(host.String(), opts)
 		if err != nil {
 			return nil, err
@@ -52,6 +57,7 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 		pointer: -1,
 		host:    host,
 		opts:    opts,
+		closed:  poolIsNotClosed,
 	}, nil
 }
 
@@ -67,11 +73,17 @@ func (p *Pool) Ping() error {
 // It is rare to Close a Pool, as the Pool handle is meant to be
 // long-lived and shared between many goroutines.
 func (p *Pool) Close() error {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	if p.closed {
+	if atomic.LoadInt32(&p.closed) == poolIsClosed {
 		return nil
 	}
+
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.closed == poolIsClosed {
+		return nil
+	}
+	p.closed = poolIsClosed
 
 	for _, c := range p.conns {
 		err := c.Close()
@@ -84,19 +96,28 @@ func (p *Pool) Close() error {
 }
 
 func (p *Pool) conn() (*Connection, error) {
-	p.mu.RLock()
-
-	if p.closed {
-		p.mu.RUnlock()
+	if atomic.LoadInt32(&p.closed) == poolIsClosed {
 		return nil, errPoolClosed
 	}
-	p.mu.RUnlock()
 
 	pos := atomic.AddInt32(&p.pointer, 1)
 	if pos == int32(len(p.conns)) {
 		atomic.StoreInt32(&p.pointer, 0)
 	}
 	pos = pos % int32(len(p.conns))
+
+	if p.conns[pos] == nil {
+		p.mu.Lock()
+		defer p.mu.Unlock()
+
+		if p.conns[pos] == nil {
+			var err error
+			p.conns[pos], err = NewConnection(p.host.String(), p.opts)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
 
 	return p.conns[pos], nil
 }

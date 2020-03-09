@@ -7,6 +7,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Reworked and tested new connection pools with multiple queries per connection
 - Socket Read- and WriteTimeout replaced with context timeout
 - Mock assert fix
+- Connection pool fixed initial size
+- Changes added offsets
 
 ## v6.0.0 - 2019-12-22
 
