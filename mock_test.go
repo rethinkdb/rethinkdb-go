@@ -2,7 +2,6 @@ package rethinkdb
 
 import (
 	"fmt"
-
 	"testing"
 
 	test "gopkg.in/check.v1"
