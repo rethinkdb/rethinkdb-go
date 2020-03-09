@@ -1,14 +1,15 @@
 package rethinkdb
 
 import (
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // InsertOpts contains the optional arguments for the Insert term
 type InsertOpts struct {
-	Durability    interface{} `rethinkdb:"durability,omitempty"`
-	ReturnChanges interface{} `rethinkdb:"return_changes,omitempty"`
-	Conflict      interface{} `rethinkdb:"conflict,omitempty"`
+	Durability      interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges   interface{} `gorethink:"return_changes,omitempty"`
+	Conflict        interface{} `gorethink:"conflict,omitempty"`
+	IgnoreWriteHook interface{} `gorethink:"ignore_write_hook,omitempty"`
 }
 
 func (o InsertOpts) toMap() map[string]interface{} {
@@ -27,10 +28,11 @@ func (t Term) Insert(arg interface{}, optArgs ...InsertOpts) Term {
 
 // UpdateOpts contains the optional arguments for the Update term
 type UpdateOpts struct {
-	Durability    interface{} `rethinkdb:"durability,omitempty"`
-	ReturnChanges interface{} `rethinkdb:"return_changes,omitempty"`
-	NonAtomic     interface{} `rethinkdb:"non_atomic,omitempty"`
-	Conflict      interface{} `rethinkdb:"conflict,omitempty"`
+	Durability      interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges   interface{} `gorethink:"return_changes,omitempty"`
+	NonAtomic       interface{} `gorethink:"non_atomic,omitempty"`
+	Conflict        interface{} `gorethink:"conflict,omitempty"`
+	IgnoreWriteHook interface{} `gorethink:"ignore_write_hook,omitempty"`
 }
 
 func (o UpdateOpts) toMap() map[string]interface{} {
@@ -50,9 +52,10 @@ func (t Term) Update(arg interface{}, optArgs ...UpdateOpts) Term {
 
 // ReplaceOpts contains the optional arguments for the Replace term
 type ReplaceOpts struct {
-	Durability    interface{} `rethinkdb:"durability,omitempty"`
-	ReturnChanges interface{} `rethinkdb:"return_changes,omitempty"`
-	NonAtomic     interface{} `rethinkdb:"non_atomic,omitempty"`
+	Durability      interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges   interface{} `gorethink:"return_changes,omitempty"`
+	NonAtomic       interface{} `gorethink:"non_atomic,omitempty"`
+	IgnoreWriteHook interface{} `gorethink:"ignore_write_hook,omitempty"`
 }
 
 func (o ReplaceOpts) toMap() map[string]interface{} {
@@ -72,8 +75,9 @@ func (t Term) Replace(arg interface{}, optArgs ...ReplaceOpts) Term {
 
 // DeleteOpts contains the optional arguments for the Delete term
 type DeleteOpts struct {
-	Durability    interface{} `rethinkdb:"durability,omitempty"`
-	ReturnChanges interface{} `rethinkdb:"return_changes,omitempty"`
+	Durability      interface{} `gorethink:"durability,omitempty"`
+	ReturnChanges   interface{} `gorethink:"return_changes,omitempty"`
+	IgnoreWriteHook interface{} `gorethink:"ignore_write_hook,omitempty"`
 }
 
 func (o DeleteOpts) toMap() map[string]interface{} {

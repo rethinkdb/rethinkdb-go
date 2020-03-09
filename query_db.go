@@ -1,7 +1,7 @@
 package rethinkdb
 
 import (
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // DBCreate creates a database. A RethinkDB database is a collection of tables,

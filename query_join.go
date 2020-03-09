@@ -1,7 +1,7 @@
 package rethinkdb
 
 import (
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // InnerJoin returns the inner product of two sequences (e.g. a table, a filter result)

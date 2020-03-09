@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v6.0.0 - 2019-12-22
+
+- 2.4 RethinkDB support
+- Added JSON tags to ConnectOpts to make it serializable
+- Blocking mocks for responses
+- Fix Connect documentation
+- Added Type to ChangeResponse
+- Added bitwise operations support
+- Added write hooks support
+
 ## v5.0.1 - 2018-10-18
 
 - Fix noreply queries memory leak due unnecessary for responses

@@ -1,14 +1,18 @@
 package rethinkdb
 
 import (
+	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"gopkg.in/check.v1"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
+	"net"
 	"reflect"
 	"sync"
 	"time"
 
 	"golang.org/x/net/context"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // Mocking is based on the amazing package github.com/stretchr/testify
@@ -103,6 +107,19 @@ func (mq *MockQuery) unlock() {
 // Return specifies the return arguments for the expectation.
 //
 //    mock.On(r.Table("test")).Return(nil, errors.New("failed"))
+//
+// values of `chan []interface{}` type will turn to delayed data that produce data
+// when there is an elements available on the channel. These elements are chunk of responses.
+// Values of `func() []interface{}` type will produce data by calling the function. E.g.
+// Closing channel or returning nil from func means end of data.
+//
+//    f := func() []interface{} { return []interface{}{1, 2} }
+//    mock.On(r.Table("test1")).Return(f)
+//
+//    ch := make(chan []interface{})
+//    mock.On(r.Table("test1")).Return(ch)
+//
+//    Running the query above will block until a value is pushed onto ch.
 func (mq *MockQuery) Return(response interface{}, err error) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -328,19 +345,31 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 		return nil, query.Error
 	}
 
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	conn := newConnection(newMockConn(query.Response), "mock", &ConnectOpts{})
+
+	query.Query.Type = p.Query_CONTINUE
+	query.Query.Token = conn.nextToken()
+
 	// Build cursor and return
-	c := newCursor(ctx, nil, "", query.Query.Token, query.Query.Term, query.Query.Opts)
+	c := newCursor(ctx, conn, "", query.Query.Token, query.Query.Term, query.Query.Opts)
 	c.finished = true
 	c.fetching = false
 	c.isAtom = true
+	c.finished = false
+	c.releaseConn = func() error { return conn.Close() }
 
-	responseVal := reflect.ValueOf(query.Response)
-	if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
-		for i := 0; i < responseVal.Len(); i++ {
-			c.buffer = append(c.buffer, responseVal.Index(i).Interface())
-		}
-	} else {
-		c.buffer = append(c.buffer, query.Response)
+	conn.cursors[query.Query.Token] = c
+	conn.runConnection()
+
+	c.mu.Lock()
+	err := c.fetchMore()
+	c.mu.Unlock()
+	if err != nil {
+		return nil, err
 	}
 
 	return c, nil
@@ -393,3 +422,106 @@ func (m *Mock) queries() []MockQuery {
 	defer m.mu.Unlock()
 	return append([]MockQuery{}, m.Queries...)
 }
+
+type mockConn struct {
+	c           *check.C
+	mu          sync.Mutex
+	value       []byte
+	tokens      chan int64
+	valueGetter func() []interface{}
+}
+
+func newMockConn(response interface{}) *mockConn {
+	c := &mockConn{tokens: make(chan int64, 1)}
+	switch g := response.(type) {
+	case chan []interface{}:
+		c.valueGetter = func() []interface{} { return <-g }
+	case func() []interface{}:
+		c.valueGetter = g
+	default:
+		responseVal := reflect.ValueOf(response)
+		if responseVal.Kind() == reflect.Slice || responseVal.Kind() == reflect.Array {
+			responses := make([]interface{}, responseVal.Len())
+			for i := 0; i < responseVal.Len(); i++ {
+				responses[i] = responseVal.Index(i).Interface()
+			}
+			c.valueGetter = funcGetter(responses)
+		} else {
+			c.valueGetter = funcGetter([]interface{}{response})
+		}
+	}
+	return c
+}
+
+func funcGetter(responses []interface{}) func() []interface{} {
+	done := false
+	return func() []interface{} {
+		if done {
+			return nil
+		}
+		done = true
+		return responses
+	}
+}
+
+func (c *mockConn) Read(b []byte) (n int, err error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.value == nil {
+		values := c.valueGetter()
+
+		jresps := make([]json.RawMessage, len(values))
+		for i := range values {
+			coded, err := encoding.Encode(values[i])
+			if err != nil {
+				panic(fmt.Sprintf("failed to encode response: %v", err))
+			}
+			jresps[i], err = json.Marshal(coded)
+			if err != nil {
+				panic(fmt.Sprintf("failed to encode response: %v", err))
+			}
+		}
+
+		token := <-c.tokens
+		resp := Response{
+			Token:     token,
+			Responses: jresps,
+			Type:      p.Response_SUCCESS_PARTIAL,
+		}
+		if values == nil {
+			resp.Type = p.Response_SUCCESS_SEQUENCE
+		}
+
+		c.value, err = json.Marshal(resp)
+		if err != nil {
+			panic(fmt.Sprintf("failed to encode response: %v", err))
+		}
+
+		if len(b) != respHeaderLen {
+			panic("wrong header len")
+		}
+		binary.LittleEndian.PutUint64(b[:8], uint64(token))
+		binary.LittleEndian.PutUint32(b[8:], uint32(len(c.value)))
+		return len(b), nil
+	} else {
+		copy(b, c.value)
+		c.value = nil
+		return len(b), nil
+	}
+}
+
+func (c *mockConn) Write(b []byte) (n int, err error) {
+	if len(b) < 8 {
+		panic("bad socket write")
+	}
+	token := int64(binary.LittleEndian.Uint64(b[:8]))
+	c.tokens <- token
+	return len(b), nil
+}
+func (c *mockConn) Close() error                       { return nil }
+func (c *mockConn) LocalAddr() net.Addr                { panic("not implemented") }
+func (c *mockConn) RemoteAddr() net.Addr               { panic("not implemented") }
+func (c *mockConn) SetDeadline(t time.Time) error      { panic("not implemented") }
+func (c *mockConn) SetReadDeadline(t time.Time) error  { panic("not implemented") }
+func (c *mockConn) SetWriteDeadline(t time.Time) error { panic("not implemented") }

@@ -9,8 +9,8 @@ import (
 
 	"github.com/opentracing/opentracing-go"
 	"golang.org/x/net/context"
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/encoding"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 var (
@@ -227,7 +227,6 @@ func (c *Cursor) nextLocked(dest interface{}, progressCursor bool) (bool, error)
 			if progressCursor {
 				c.buffer = c.buffer[1:]
 			}
-
 			err := encoding.Decode(dest, data)
 			if err != nil {
 				return false, err
@@ -494,7 +493,6 @@ func (c *Cursor) Listen(channel interface{}) {
 			if !c.Next(elemp.Interface()) {
 				break
 			}
-
 			channelv.Send(elemp.Elem())
 		}
 

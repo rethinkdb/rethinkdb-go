@@ -8,7 +8,7 @@
 
 ![RethinkDB-go Logo](https://raw.github.com/wiki/rethinkdb/rethinkdb-go/gopher-and-thinker-s.png "Golang Gopher and RethinkDB Thinker")
 
-Current version: v5.0.1 (RethinkDB v2.3)
+Current version: v6.0.0 (RethinkDB v2.4)
 
 Please note that this version of the driver only supports versions of RethinkDB using the v0.4 protocol (any versions of the driver older than RethinkDB 2.0 will not work).
 
@@ -17,10 +17,10 @@ If you need any help you can find me on the [RethinkDB slack](https://rethinkdb.
 ## Installation
 
 ```
-go get gopkg.in/rethinkdb/rethinkdb-go.v5
+go get gopkg.in/rethinkdb/rethinkdb-go.v6
 ```
 
-Replace `v5` with `v4` or `v3` to use previous versions.
+Replace `v6` with `v5` or `v4` to use previous versions.
 
 ## Example
 
@@ -32,7 +32,7 @@ import (
 	"fmt"
 	"log"
 
-	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
 func Example() {
@@ -456,6 +456,43 @@ func TestSomething(t *testing.T) {
 }
 ```
 
+If you want the cursor to block on some of the response values, you can pass in
+a value of type `chan interface{}` and the cursor will block until a value is
+available to read on the channel.  Or you can pass in a function with signature
+`func() interface{}`: the cursor will call the function (which may block).  Here
+is the example above adapted to use a channel.
+
+```go
+func TestSomething(t *testing.T) {
+	mock := r.NewMock()
+	ch := make(chan []interface{})
+	mock.On(r.Table("people")).Return(ch, nil)
+	go func() {
+		ch <- []interface{}{
+			map[string]interface{}{"id": 1, "name": "John Smith"},
+			map[string]interface{}{"id": 2, "name": "Jane Smith"},
+		}
+		ch <- []interface{}{map[string]interface{}{"id": 3, "name": "Jack Smith"}}
+		close(ch)
+	}()
+	cursor, err := r.Table("people").Run(mock)
+	if err != nil {
+		t.Errorf("err is: %v", err)
+	}
+
+	var rows []interface{}
+	err = cursor.All(&rows)
+	if err != nil {
+		t.Errorf("err is: %v", err)
+	}
+
+	// Test result of rows
+
+	mock.AssertExpectations(t)
+}
+
+```
+
 The mocking implementation is based on amazing https://github.com/stretchr/testify library, thanks to @stretchr for their awesome work!
 
 ## Benchmarks
@@ -464,17 +501,17 @@ Everyone wants their project's benchmarks to be speedy. And while we know that R
 
 Thanks to @jaredfolkins for the contribution.
 
-| Type    |  Value   |
-| --- | --- |
-| **Model Name** | MacBook Pro |
-| **Model Identifier** | MacBookPro11,3 |
-| **Processor Name** | Intel Core i7 |
-| **Processor Speed** | 2.3 GHz |
-| **Number of Processors** | 1 |
-| **Total Number of Cores** | 4 |
-| **L2 Cache (per Core)** | 256 KB |
-| **L3 Cache** | 6 MB |
-| **Memory** | 16 GB |
+| Type                      | Value          |
+| ------------------------- | -------------- |
+| **Model Name**            | MacBook Pro    |
+| **Model Identifier**      | MacBookPro11,3 |
+| **Processor Name**        | Intel Core i7  |
+| **Processor Speed**       | 2.3 GHz        |
+| **Number of Processors**  | 1              |
+| **Total Number of Cores** | 4              |
+| **L2 Cache (per Core)**   | 256 KB         |
+| **L3 Cache**              | 6 MB           |
+| **Memory**                | 16 GB          |
 
 ```bash
 BenchmarkBatch200RandomWrites                20                              557227775                     ns/op

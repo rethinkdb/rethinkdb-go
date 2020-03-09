@@ -6,8 +6,8 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"gopkg.in/rethinkdb/rethinkdb-go.v5/encoding"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v5/ql2"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 // Helper functions for constructing terms

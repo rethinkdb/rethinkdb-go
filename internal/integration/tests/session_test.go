@@ -5,7 +5,7 @@ import (
 	"time"
 
 	test "gopkg.in/check.v1"
-	r "gopkg.in/rethinkdb/rethinkdb-go.v5"
+	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
 func (s *RethinkSuite) TestSessionConnect(c *test.C) {
