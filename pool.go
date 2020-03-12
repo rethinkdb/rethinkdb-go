@@ -86,9 +86,11 @@ func (p *Pool) Close() error {
 	p.closed = poolIsClosed
 
 	for _, c := range p.conns {
-		err := c.Close()
-		if err != nil {
-			return err
+		if c != nil {
+			err := c.Close()
+			if err != nil {
+				return err
+			}
 		}
 	}
 
