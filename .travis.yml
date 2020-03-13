@@ -5,8 +5,6 @@ go:
   - 1.13.x
   - 1.14.x
 
-cache: apt
-
 go_import_path: gopkg.in/rethinkdb/rethinkdb-go.v6
 
 install: go get -t ./...
