@@ -3,7 +3,7 @@ module gopkg.in/rethinkdb/rethinkdb-go.v6
 require (
 	github.com/bitly/go-hostpool v0.1.0 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
-	github.com/cenkalti/backoff v2.2.1+incompatible
+	github.com/cenkalti/backoff/v4 v4.0.0
 	github.com/golang/protobuf v1.3.4
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed
 	github.com/kr/pretty v0.1.0 // indirect
