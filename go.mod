@@ -3,8 +3,7 @@ module gopkg.in/rethinkdb/rethinkdb-go.v6
 require (
 	github.com/bitly/go-hostpool v0.1.0 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
-	github.com/cenkalti/backoff v2.2.1+incompatible
-	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.0.0
 	github.com/golang/protobuf v1.3.4
 	github.com/hailocab/go-hostpool v0.0.0-20160125115350-e80d13ce29ed
 	github.com/kr/pretty v0.1.0 // indirect
@@ -18,7 +17,6 @@ require (
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f
 	gopkg.in/gemnasium/logrus-airbrake-hook.v2 v2.1.2 // indirect
