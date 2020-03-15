@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	backoff "github.com/cenkalti/backoff/v4"
+	"github.com/cenkalti/backoff"
 	"github.com/hailocab/go-hostpool"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
