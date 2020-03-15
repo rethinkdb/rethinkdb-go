@@ -22,3 +22,4 @@ before_script:
 script:
   - go test -race .
   - go test -tags='cluster' -short -race -v ./...
+  - GOMODULE111=off go test .

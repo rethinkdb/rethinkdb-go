@@ -22,11 +22,11 @@ const (
 	respHeaderLen          = 12
 	defaultKeepAlivePeriod = time.Second * 30
 
-	notBad = 0
-	bad    = 1
+	connNotBad = 0
+	connBad    = 1
 
-	working = 0
-	closed  = 1
+	connWorking = 0
+	connClosed  = 1
 )
 
 // Response represents the raw response from a query, most of the time you
@@ -122,8 +122,8 @@ func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection
 		opts:             opts,
 		cursors:          make(map[int64]*Cursor),
 		stopReadChan:     make(chan bool, 1),
-		bad:              notBad,
-		closed:           working,
+		bad:              connNotBad,
+		closed:           connWorking,
 		readRequestsChan: make(chan tokenAndPromise, 16),
 		responseChan:     make(chan responseAndError, 16),
 	}
@@ -186,7 +186,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		parentSpan := opentracing.SpanFromContext(ctx)
 		if parentSpan != nil {
 			if q.Type == p.Query_START {
-				querySpan := c.startTracingSpan(parentSpan, &q) // will be Finished when cursor closed
+				querySpan := c.startTracingSpan(parentSpan, &q) // will be Finished when cursor connClosed
 				parentSpan = querySpan
 				ctx = opentracing.ContextWithSpan(ctx, querySpan)
 			}
@@ -230,7 +230,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 func (c *Connection) stopQuery(q *Query) (*Response, *Cursor, error) {
 	if q.Type != p.Query_STOP {
 		stopQuery := newStopQuery(q.Token)
-		c.Query(c.contextFromConnectionOpts(), stopQuery)
+		_, _, _ = c.Query(c.contextFromConnectionOpts(), stopQuery)
 	}
 	return nil, nil, ErrQueryTimeout
 }
@@ -289,10 +289,10 @@ func (c *Connection) processResponses() {
 					}
 				}
 				readRequests = []tokenAndPromise{}
-				c.Close()
+				_ = c.Close()
 				continue
 			}
-			if respPair.response == nil && respPair.err == nil { // responseChan is closed
+			if respPair.response == nil && respPair.err == nil { // responseChan is connClosed
 				continue
 			}
 
@@ -526,19 +526,19 @@ func (c *Connection) processWaitResponse(response *Response) (*Response, *Cursor
 }
 
 func (c *Connection) setBad() {
-	atomic.StoreInt32(&c.bad, bad)
+	atomic.StoreInt32(&c.bad, connBad)
 }
 
 func (c *Connection) isBad() bool {
-	return atomic.LoadInt32(&c.bad) == bad
+	return atomic.LoadInt32(&c.bad) == connBad
 }
 
 func (c *Connection) setClosed() {
-	atomic.StoreInt32(&c.closed, closed)
+	atomic.StoreInt32(&c.closed, connClosed)
 }
 
 func (c *Connection) isClosed() bool {
-	return atomic.LoadInt32(&c.closed) == closed
+	return atomic.LoadInt32(&c.closed) == connClosed
 }
 
 func getReadRequest(list []tokenAndPromise, token int64) (tokenAndPromise, bool) {

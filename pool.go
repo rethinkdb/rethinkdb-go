@@ -17,6 +17,8 @@ const (
 	poolIsClosed    int32 = 1
 )
 
+type connFactory func(host string, opts *ConnectOpts) (*Connection, error)
+
 // A Pool is used to store a pool of connections to a single RethinkDB server
 type Pool struct {
 	host Host
@@ -25,6 +27,8 @@ type Pool struct {
 	conns   []*Connection
 	pointer int32
 	closed  int32
+
+	connFactory connFactory
 
 	mu sync.Mutex // protects lazy creating connections
 }
@@ -43,21 +47,24 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 		maxOpen = 1
 	}
 
+	factoryMethod := NewConnection
+
 	conns := make([]*Connection, maxOpen)
 	var err error
 	for i := 0; i < opts.InitialCap; i++ {
-		conns[i], err = NewConnection(host.String(), opts)
+		conns[i], err = factoryMethod(host.String(), opts)
 		if err != nil {
 			return nil, err
 		}
 	}
 
 	return &Pool{
-		conns:   conns,
-		pointer: -1,
-		host:    host,
-		opts:    opts,
-		closed:  poolIsNotClosed,
+		conns:       conns,
+		pointer:     -1,
+		host:        host,
+		opts:        opts,
+		connFactory: factoryMethod,
+		closed:      poolIsNotClosed,
 	}, nil
 }
 
@@ -108,16 +115,26 @@ func (p *Pool) conn() (*Connection, error) {
 	}
 	pos = pos % int32(len(p.conns))
 
+	var err error
+
 	if p.conns[pos] == nil {
 		p.mu.Lock()
 		defer p.mu.Unlock()
 
 		if p.conns[pos] == nil {
-			var err error
-			p.conns[pos], err = NewConnection(p.host.String(), p.opts)
+			p.conns[pos], err = p.connFactory(p.host.String(), p.opts)
 			if err != nil {
 				return nil, err
 			}
+		}
+	} else if p.conns[pos].isBad() {
+		// connBad connection needs to be reconnected
+		p.mu.Lock()
+		defer p.mu.Unlock()
+
+		p.conns[pos], err = p.connFactory(p.host.String(), p.opts)
+		if err != nil {
+			return nil, err
 		}
 	}
 

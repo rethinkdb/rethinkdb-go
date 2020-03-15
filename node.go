@@ -13,26 +13,24 @@ type Node struct {
 	Host    Host
 	aliases []Host
 
-	cluster *Cluster
-	pool    *Pool
+	pool *Pool
 
 	mu     sync.RWMutex
 	closed bool
 }
 
-func newNode(id string, aliases []Host, cluster *Cluster, pool *Pool) *Node {
+func newNode(id string, aliases []Host, pool *Pool) *Node {
 	node := &Node{
 		ID:      id,
 		Host:    aliases[0],
 		aliases: aliases,
-		cluster: cluster,
 		pool:    pool,
 	}
 
 	return node
 }
 
-// Closed returns true if the node is closed
+// Closed returns true if the node is connClosed
 func (n *Node) Closed() bool {
 	n.mu.RLock()
 	defer n.mu.RUnlock()
@@ -121,7 +119,6 @@ func (n *Node) Server() (ServerResponse, error) {
 type nodeStatus struct {
 	ID      string `rethinkdb:"id"`
 	Name    string `rethinkdb:"name"`
-	Status  string `rethinkdb:"status"`
 	Network struct {
 		Hostname           string `rethinkdb:"hostname"`
 		ClusterPort        int64  `rethinkdb:"cluster_port"`

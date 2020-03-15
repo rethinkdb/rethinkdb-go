@@ -95,7 +95,7 @@ type ConnectOpts struct {
 
 	// UseOpentracing is used to enable creating opentracing-go spans for queries.
 	// Each span is created as child of span from the context in `RunOpts`.
-	// This span lasts from point the query created to the point when cursor closed.
+	// This span lasts from point the query created to the point when cursor connClosed.
 	UseOpentracing bool `json:"use_opentracing,omitempty"`
 
 	// Deprecated: This function is no longer used due to changes in the

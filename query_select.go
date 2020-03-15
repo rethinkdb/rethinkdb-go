@@ -99,8 +99,8 @@ func (o BetweenOpts) toMap() map[string]interface{} {
 // index, leftBound, and rightBound. If index is set to the name of a secondary
 // index, between will return all documents where that index’s value is in the
 // specified range (it uses the primary key by default). leftBound or rightBound
-// may be set to open or closed to indicate whether or not to include that endpoint
-// of the range (by default, leftBound is closed and rightBound is open).
+// may be set to open or connClosed to indicate whether or not to include that endpoint
+// of the range (by default, leftBound is connClosed and rightBound is open).
 //
 // You may also use the special constants r.minval and r.maxval for boundaries,
 // which represent “less than any index key” and “more than any index key”

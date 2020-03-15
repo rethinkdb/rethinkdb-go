@@ -1,16 +1,24 @@
 package rethinkdb
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
-	backoff "github.com/cenkalti/backoff/v4"
 	"github.com/hailocab/go-hostpool"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
+	"gopkg.in/cenkalti/backoff.v4"
+)
+
+var errClusterClosed = errors.New("rethinkdb: cluster is closed")
+
+const (
+	clusterWorking = 0
+	clusterClosed  = 1
 )
 
 // A Cluster represents a connection to a RethinkDB cluster, a cluster is created
@@ -27,7 +35,7 @@ type Cluster struct {
 	seeds  []Host // Initial host nodes specified by user.
 	hp     hostpool.HostPool
 	nodes  map[string]*Node // Active nodes in cluster.
-	closed bool
+	closed int32            // 0 - working, 1 - closed
 
 	nodeIndex int64
 }
@@ -35,23 +43,20 @@ type Cluster struct {
 // NewCluster creates a new cluster by connecting to the given hosts.
 func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
 	c := &Cluster{
-		hp:    hostpool.NewEpsilonGreedy([]string{}, opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{}),
-		seeds: hosts,
-		opts:  opts,
+		hp:     hostpool.NewEpsilonGreedy([]string{}, opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{}),
+		seeds:  hosts,
+		opts:   opts,
+		closed: clusterWorking,
 	}
 
 	// Attempt to connect to each host and discover any additional hosts if host
 	// discovery is enabled
-	if err := c.connectNodes(c.getSeeds()); err != nil {
+	if err := c.connectCluster(); err != nil {
 		return nil, err
 	}
 
 	if !c.IsConnected() {
 		return nil, ErrNoConnectionsStarted
-	}
-
-	if opts.DiscoverHosts {
-		go c.discover()
 	}
 
 	return c, nil
@@ -148,7 +153,7 @@ func (c *Cluster) SetMaxOpenConns(n int) {
 
 // Close closes the cluster
 func (c *Cluster) Close(optArgs ...CloseOpts) error {
-	if c.closed {
+	if c.isClosed() {
 		return nil
 	}
 
@@ -160,9 +165,13 @@ func (c *Cluster) Close(optArgs ...CloseOpts) error {
 	}
 
 	c.hp.Close()
-	c.closed = true
+	atomic.StoreInt32(&c.closed, clusterClosed)
 
 	return nil
+}
+
+func (c *Cluster) isClosed() bool {
+	return atomic.LoadInt32(&c.closed) == clusterClosed
 }
 
 // discover attempts to find new nodes in the cluster using the current nodes
@@ -174,10 +183,17 @@ func (c *Cluster) discover() {
 
 	// Keep trying to discover new nodes
 	for {
-		backoff.RetryNotify(func() error {
+		if c.isClosed() {
+			return
+		}
+
+		_ = backoff.RetryNotify(func() error {
+			if c.isClosed() {
+				return backoff.Permanent(errClusterClosed)
+			}
 			// If no hosts try seeding nodes
 			if len(c.GetNodes()) == 0 {
-				c.connectNodes(c.getSeeds())
+				return c.connectCluster()
 			}
 
 			return c.listenForNodeChanges()
@@ -197,7 +213,7 @@ func (c *Cluster) listenForNodeChanges() error {
 	}
 
 	q, err := newQuery(
-		DB("rethinkdb").Table("server_status").Changes(),
+		DB(SystemDatabase).Table(ServerStatusSystemTable).Changes(),
 		map[string]interface{}{},
 		c.opts,
 	)
@@ -210,27 +226,28 @@ func (c *Cluster) listenForNodeChanges() error {
 		hpr.Mark(err)
 		return err
 	}
+	defer func() { _ = cursor.Close() }()
 
 	// Keep reading node status updates from changefeed
 	var result struct {
-		NewVal nodeStatus `rethinkdb:"new_val"`
-		OldVal nodeStatus `rethinkdb:"old_val"`
+		NewVal *nodeStatus `rethinkdb:"new_val"`
+		OldVal *nodeStatus `rethinkdb:"old_val"`
 	}
 	for cursor.Next(&result) {
 		addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
 		addr = strings.ToLower(addr)
 
-		switch result.NewVal.Status {
-		case "connected":
-			// Connect to node using exponential backoff (give up after waiting 5s)
-			// to give the node time to start-up.
-			b := backoff.NewExponentialBackOff()
-			b.MaxElapsedTime = time.Second * 5
+		if result.NewVal != nil && result.OldVal == nil {
+			// added new node
+			if !c.nodeExists(result.NewVal.ID) {
+				// Connect to node using exponential backoff (give up after waiting 5s)
+				// to give the node time to start-up.
+				b := backoff.NewExponentialBackOff()
+				b.MaxElapsedTime = time.Second * 5
 
-			backoff.Retry(func() error {
-				node, err := c.connectNodeWithStatus(result.NewVal)
-				if err == nil {
-					if !c.nodeExists(node) {
+				err = backoff.Retry(func() error {
+					node, err := c.connectNodeWithStatus(result.NewVal)
+					if err == nil {
 						c.addNode(node)
 
 						Log.WithFields(logrus.Fields{
@@ -238,10 +255,21 @@ func (c *Cluster) listenForNodeChanges() error {
 							"host": node.Host.String(),
 						}).Debug("Connected to node")
 					}
+					return err
+				}, b)
+				if err != nil {
+					return err
 				}
-
-				return err
-			}, b)
+			}
+		} else if result.OldVal != nil && result.NewVal == nil {
+			// removed old node
+			oldNode := c.removeNode(result.OldVal.ID)
+			if oldNode != nil {
+				_ = oldNode.Close()
+			}
+		} else {
+			// node updated
+			// nothing to do - assuming node can't change it's hostname in a single Changes() message
 		}
 	}
 
@@ -250,7 +278,7 @@ func (c *Cluster) listenForNodeChanges() error {
 	return err
 }
 
-func (c *Cluster) connectNodes(hosts []Host) error {
+func (c *Cluster) connectCluster() error {
 	// Add existing nodes to map
 	nodeSet := map[string]*Node{}
 	for _, node := range c.GetNodes() {
@@ -260,77 +288,40 @@ func (c *Cluster) connectNodes(hosts []Host) error {
 	var attemptErr error
 
 	// Attempt to connect to each seed host
-	for _, host := range hosts {
+	for _, host := range c.seeds {
 		conn, err := NewConnection(host.String(), c.opts)
 		if err != nil {
 			attemptErr = err
 			Log.Warnf("Error creating connection: %s", err.Error())
 			continue
 		}
-		defer conn.Close()
 
-		if c.opts.DiscoverHosts {
-			q, err := newQuery(
-				DB("rethinkdb").Table("server_status"),
-				map[string]interface{}{},
-				c.opts,
-			)
-			if err != nil {
-				Log.Warnf("Error building query: %s", err)
-				continue
-			}
+		svrRsp, err := conn.Server()
+		if err != nil {
+			attemptErr = err
+			Log.Warnf("Error fetching server ID: %s", err)
+			_ = conn.Close()
+			continue
+		}
+		_ = conn.Close()
 
-			_, cursor, err := conn.Query(nil, q) // nil = connection opts' timeout
-			if err != nil {
-				attemptErr = err
-				Log.Warnf("Error fetching cluster status: %s", err)
-				continue
-			}
+		node, err := c.connectNode(svrRsp.ID, []Host{host})
+		if err != nil {
+			attemptErr = err
+			Log.Warnf("Error connecting to node: %s", err)
+			continue
+		}
 
-			var results []nodeStatus
-			err = cursor.All(&results)
-			if err != nil {
-				attemptErr = err
-				continue
-			}
+		if _, ok := nodeSet[node.ID]; !ok {
+			Log.WithFields(logrus.Fields{
+				"id":   node.ID,
+				"host": node.Host.String(),
+			}).Debug("Connected to node")
 
-			for _, result := range results {
-				node, err := c.connectNodeWithStatus(result)
-				if err == nil {
-					if _, ok := nodeSet[node.ID]; !ok {
-						Log.WithFields(logrus.Fields{
-							"id":   node.ID,
-							"host": node.Host.String(),
-						}).Debug("Connected to node")
-						nodeSet[node.ID] = node
-					}
-				} else {
-					attemptErr = err
-					Log.Warnf("Error connecting to node: %s", err)
-				}
-			}
+			nodeSet[node.ID] = node
 		} else {
-			svrRsp, err := conn.Server()
-			if err != nil {
-				attemptErr = err
-				Log.Warnf("Error fetching server ID: %s", err)
-				continue
-			}
-
-			node, err := c.connectNode(svrRsp.ID, []Host{host})
-			if err == nil {
-				if _, ok := nodeSet[node.ID]; !ok {
-					Log.WithFields(logrus.Fields{
-						"id":   node.ID,
-						"host": node.Host.String(),
-					}).Debug("Connected to node")
-
-					nodeSet[node.ID] = node
-				}
-			} else {
-				attemptErr = err
-				Log.Warnf("Error connecting to node: %s", err)
-			}
+			// dublicate node
+			_ = node.Close()
 		}
 	}
 
@@ -338,19 +329,26 @@ func (c *Cluster) connectNodes(hosts []Host) error {
 	// include driver errors such as if there was an issue building the
 	// query
 	if len(nodeSet) == 0 {
-		return attemptErr
+		if attemptErr != nil {
+			return attemptErr
+		}
+		return ErrNoConnections
 	}
 
-	nodes := []*Node{}
+	var nodes []*Node
 	for _, node := range nodeSet {
 		nodes = append(nodes, node)
 	}
-	c.setNodes(nodes)
+	c.replaceNodes(nodes)
+
+	if c.opts.DiscoverHosts {
+		go c.discover()
+	}
 
 	return nil
 }
 
-func (c *Cluster) connectNodeWithStatus(s nodeStatus) (*Node, error) {
+func (c *Cluster) connectNodeWithStatus(s *nodeStatus) (*Node, error) {
 	aliases := make([]Host, len(s.Network.CanonicalAddresses))
 	for i, aliasAddress := range s.Network.CanonicalAddresses {
 		aliases[i] = NewHost(aliasAddress.Host, int(s.Network.ReqlPort))
@@ -387,31 +385,12 @@ func (c *Cluster) connectNode(id string, aliases []Host) (*Node, error) {
 		return nil, ErrInvalidNode
 	}
 
-	return newNode(id, aliases, c, pool), nil
+	return newNode(id, aliases, pool), nil
 }
 
-// IsConnected returns true if cluster has nodes and is not already closed.
+// IsConnected returns true if cluster has nodes and is not already connClosed.
 func (c *Cluster) IsConnected() bool {
-	c.mu.RLock()
-	closed := c.closed
-	c.mu.RUnlock()
-
-	return (len(c.GetNodes()) > 0) && !closed
-}
-
-// AddSeeds adds new seed hosts to the cluster.
-func (c *Cluster) AddSeeds(hosts []Host) {
-	c.mu.Lock()
-	c.seeds = append(c.seeds, hosts...)
-	c.mu.Unlock()
-}
-
-func (c *Cluster) getSeeds() []Host {
-	c.mu.RLock()
-	seeds := c.seeds
-	c.mu.RUnlock()
-
-	return seeds
+	return (len(c.GetNodes()) > 0) && !c.isClosed()
 }
 
 // GetNextNode returns a random node on the cluster
@@ -436,18 +415,20 @@ func (c *Cluster) GetNextNode() (*Node, hostpool.HostPoolResponse, error) {
 // GetNodes returns a list of all nodes in the cluster
 func (c *Cluster) GetNodes() []*Node {
 	c.mu.RLock()
+	defer c.mu.RUnlock()
 	nodes := make([]*Node, 0, len(c.nodes))
 	for _, n := range c.nodes {
 		nodes = append(nodes, n)
 	}
-	c.mu.RUnlock()
 
 	return nodes
 }
 
-func (c *Cluster) nodeExists(search *Node) bool {
-	for _, node := range c.GetNodes() {
-		if node.ID == search.ID {
+func (c *Cluster) nodeExists(nodeID string) bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	for _, node := range c.nodes {
+		if node.ID == nodeID {
 			return true
 		}
 	}
@@ -455,22 +436,24 @@ func (c *Cluster) nodeExists(search *Node) bool {
 }
 
 func (c *Cluster) addNode(node *Node) {
-	c.mu.RLock()
-	nodes := append(c.GetNodes(), node)
-	c.mu.RUnlock()
+	host := node.Host.String()
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	if _, exist := c.nodes[host]; exist {
+		// addNode() should be called only if the node doesn't exist
+		return
+	}
 
-	c.setNodes(nodes)
+	c.nodes[host] = node
+
+	hosts := make([]string, 0, len(c.nodes))
+	for _, n := range c.nodes {
+		hosts = append(hosts, n.Host.String())
+	}
+	c.hp.SetHosts(hosts)
 }
 
-func (c *Cluster) addNodes(nodesToAdd []*Node) {
-	c.mu.RLock()
-	nodes := append(c.GetNodes(), nodesToAdd...)
-	c.mu.RUnlock()
-
-	c.setNodes(nodes)
-}
-
-func (c *Cluster) setNodes(nodes []*Node) {
+func (c *Cluster) replaceNodes(nodes []*Node) {
 	nodesMap := make(map[string]*Node, len(nodes))
 	hosts := make([]string, len(nodes))
 	for i, node := range nodes {
@@ -486,32 +469,29 @@ func (c *Cluster) setNodes(nodes []*Node) {
 	c.mu.Unlock()
 }
 
-func (c *Cluster) removeNode(nodeID string) {
-	nodes := c.GetNodes()
-	nodeArray := make([]*Node, len(nodes)-1)
-	count := 0
-
-	// Add nodes that are not in remove list.
-	for _, n := range nodes {
-		if n.ID != nodeID {
-			nodeArray[count] = n
-			count++
+func (c *Cluster) removeNode(nodeID string) *Node {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	var rmNode *Node
+	for _, node := range c.nodes {
+		if node.ID == nodeID {
+			rmNode = node
+			break
 		}
 	}
-
-	// Do sanity check to make sure assumptions are correct.
-	if count < len(nodeArray) {
-		// Resize array.
-		nodeArray2 := make([]*Node, count)
-		copy(nodeArray2, nodeArray)
-		nodeArray = nodeArray2
+	if rmNode == nil {
+		return nil
 	}
 
-	c.setNodes(nodeArray)
-}
+	delete(c.nodes, rmNode.Host.String())
 
-func (c *Cluster) nextNodeIndex() int64 {
-	return atomic.AddInt64(&c.nodeIndex, 1)
+	hosts := make([]string, 0, len(c.nodes))
+	for _, n := range c.nodes {
+		hosts = append(hosts, n.Host.String())
+	}
+	c.hp.SetHosts(hosts)
+
+	return rmNode
 }
 
 func (c *Cluster) numRetries() int {
