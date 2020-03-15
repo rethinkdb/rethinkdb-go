@@ -70,6 +70,7 @@ type ConnectOpts struct {
 	// NumRetries is the number of times a query is retried if a connection
 	// error is detected, queries are not retried if RethinkDB returns a
 	// runtime error.
+	// Default is 3.
 	NumRetries int `json:"num_retries,omitempty"`
 
 	// InitialCap is used by the internal connection pool and is used to

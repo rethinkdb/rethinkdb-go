@@ -3,6 +3,7 @@ package rethinkdb
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -37,29 +38,44 @@ type Cluster struct {
 	nodes  map[string]*Node // Active nodes in cluster.
 	closed int32            // 0 - working, 1 - closed
 
-	nodeIndex int64
+	connFactory connFactory
+
+	discoverInterval time.Duration
 }
 
 // NewCluster creates a new cluster by connecting to the given hosts.
 func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
 	c := &Cluster{
-		hp:     hostpool.NewEpsilonGreedy([]string{}, opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{}),
-		seeds:  hosts,
-		opts:   opts,
-		closed: clusterWorking,
+		hp:          newHostPool(opts),
+		seeds:       hosts,
+		opts:        opts,
+		closed:      clusterWorking,
+		connFactory: NewConnection,
 	}
 
-	// Attempt to connect to each host and discover any additional hosts if host
-	// discovery is enabled
-	if err := c.connectCluster(); err != nil {
+	err := c.run()
+	if err != nil {
 		return nil, err
 	}
 
-	if !c.IsConnected() {
-		return nil, ErrNoConnectionsStarted
+	return c, nil
+}
+
+func newHostPool(opts *ConnectOpts) hostpool.HostPool {
+	return hostpool.NewEpsilonGreedy([]string{}, opts.HostDecayDuration, &hostpool.LinearEpsilonValueCalculator{})
+}
+
+func (c *Cluster) run() error {
+	// Attempt to connect to each host and discover any additional hosts if host
+	// discovery is enabled
+	if err := c.connectCluster(); err != nil {
+		return err
 	}
 
-	return c, nil
+	if !c.IsConnected() {
+		return ErrNoConnectionsStarted
+	}
+	return nil
 }
 
 // Query executes a ReQL query using the cluster to connect to the database
@@ -180,6 +196,9 @@ func (c *Cluster) discover() {
 	b := backoff.NewExponentialBackOff()
 	// Never finish retrying (max interval is still 60s)
 	b.MaxElapsedTime = 0
+	if c.discoverInterval != 0 {
+		b.InitialInterval = c.discoverInterval
+	}
 
 	// Keep trying to discover new nodes
 	for {
@@ -213,7 +232,7 @@ func (c *Cluster) listenForNodeChanges() error {
 	}
 
 	q, err := newQuery(
-		DB(SystemDatabase).Table(ServerStatusSystemTable).Changes(),
+		DB(SystemDatabase).Table(ServerStatusSystemTable).Changes(ChangesOpts{IncludeInitial: true}),
 		map[string]interface{}{},
 		c.opts,
 	)
@@ -279,17 +298,12 @@ func (c *Cluster) listenForNodeChanges() error {
 }
 
 func (c *Cluster) connectCluster() error {
-	// Add existing nodes to map
 	nodeSet := map[string]*Node{}
-	for _, node := range c.GetNodes() {
-		nodeSet[node.ID] = node
-	}
-
 	var attemptErr error
 
 	// Attempt to connect to each seed host
 	for _, host := range c.seeds {
-		conn, err := NewConnection(host.String(), c.opts)
+		conn, err := c.connFactory(host.String(), c.opts)
 		if err != nil {
 			attemptErr = err
 			Log.Warnf("Error creating connection: %s", err.Error())
@@ -362,7 +376,7 @@ func (c *Cluster) connectNode(id string, aliases []Host) (*Node, error) {
 	var err error
 
 	for len(aliases) > 0 {
-		pool, err = NewPool(aliases[0], c.opts)
+		pool, err = newPool(aliases[0], c.opts, c.connFactory)
 		if err != nil {
 			aliases = aliases[1:]
 			continue
@@ -462,6 +476,8 @@ func (c *Cluster) replaceNodes(nodes []*Node) {
 		nodesMap[host] = node
 		hosts[i] = host
 	}
+
+	sort.Strings(hosts) // unit tests stability
 
 	c.mu.Lock()
 	c.nodes = nodesMap

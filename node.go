@@ -117,15 +117,19 @@ func (n *Node) Server() (ServerResponse, error) {
 }
 
 type nodeStatus struct {
-	ID      string `rethinkdb:"id"`
-	Name    string `rethinkdb:"name"`
-	Network struct {
-		Hostname           string `rethinkdb:"hostname"`
-		ClusterPort        int64  `rethinkdb:"cluster_port"`
-		ReqlPort           int64  `rethinkdb:"reql_port"`
-		CanonicalAddresses []struct {
-			Host string `rethinkdb:"host"`
-			Port int64  `rethinkdb:"port"`
-		} `rethinkdb:"canonical_addresses"`
-	} `rethinkdb:"network"`
+	ID      string            `rethinkdb:"id"`
+	Name    string            `rethinkdb:"name"`
+	Network nodeStatusNetwork `rethinkdb:"network"`
+}
+
+type nodeStatusNetwork struct {
+	Hostname           string                  `rethinkdb:"hostname"`
+	ClusterPort        int64                   `rethinkdb:"cluster_port"`
+	ReqlPort           int64                   `rethinkdb:"reql_port"`
+	CanonicalAddresses []nodeStatusNetworkAddr `rethinkdb:"canonical_addresses"`
+}
+
+type nodeStatusNetworkAddr struct {
+	Host string `rethinkdb:"host"`
+	Port int64  `rethinkdb:"port"`
 }

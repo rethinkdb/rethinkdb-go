@@ -35,6 +35,10 @@ type Pool struct {
 
 // NewPool creates a new connection pool for the given host
 func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
+	return newPool(host, opts, NewConnection)
+}
+
+func newPool(host Host, opts *ConnectOpts, connFactory connFactory) (*Pool, error) {
 	initialCap := opts.InitialCap
 	if initialCap <= 0 {
 		// Fallback to MaxIdle if InitialCap is zero, this should be removed
@@ -47,12 +51,10 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 		maxOpen = 1
 	}
 
-	factoryMethod := NewConnection
-
 	conns := make([]*Connection, maxOpen)
 	var err error
 	for i := 0; i < opts.InitialCap; i++ {
-		conns[i], err = factoryMethod(host.String(), opts)
+		conns[i], err = connFactory(host.String(), opts)
 		if err != nil {
 			return nil, err
 		}
@@ -63,7 +65,7 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 		pointer:     -1,
 		host:        host,
 		opts:        opts,
-		connFactory: factoryMethod,
+		connFactory: connFactory,
 		closed:      poolIsNotClosed,
 	}, nil
 }

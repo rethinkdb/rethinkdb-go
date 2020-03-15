@@ -320,6 +320,16 @@ func (c *Connection) processResponses() {
 					close(rr.promise)
 				}
 			}
+		recheckRequests:
+			for {
+				select {
+				case rr := <-c.readRequestsChan:
+					rr.promise <- responseAndCursor{err: ErrConnectionClosed}
+					close(rr.promise)
+				default:
+					break recheckRequests
+				}
+			}
 			c.cursors = nil
 			return
 		}

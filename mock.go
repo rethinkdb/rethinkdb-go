@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/check.v1"
 	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
 	"net"
 	"reflect"
@@ -424,7 +423,6 @@ func (m *Mock) queries() []MockQuery {
 }
 
 type mockConn struct {
-	c           *check.C
 	mu          sync.Mutex
 	value       []byte
 	tokens      chan int64
