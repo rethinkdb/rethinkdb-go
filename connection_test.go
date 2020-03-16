@@ -10,8 +10,29 @@ import (
 	test "gopkg.in/check.v1"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 	"io"
+	"sync"
 	"time"
 )
+
+func runConnection(c *Connection) <-chan struct{} {
+	wg := &sync.WaitGroup{}
+	wg.Add(2)
+	go func() {
+		c.readSocket()
+		wg.Done()
+	}()
+	go func() {
+		c.processResponses()
+		wg.Done()
+	}()
+
+	doneChan := make(chan struct{})
+	go func() {
+		wg.Wait()
+		close(doneChan)
+	}()
+	return doneChan
+}
 
 type ConnectionSuite struct{}
 
@@ -32,9 +53,10 @@ func (s *ConnectionSuite) TestConnection_Query_Ok(c *test.C) {
 	conn.On("Close").Return(nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
-	connection.runConnection()
+	closed := runConnection(connection)
 	response, cursor, err := connection.Query(ctx, q)
 	connection.Close()
+	<-closed
 
 	c.Assert(response, test.NotNil)
 	c.Assert(response.Token, test.Equals, token)
@@ -67,9 +89,10 @@ func (s *ConnectionSuite) TestConnection_Query_DefaultDBOk(c *test.C) {
 	conn.On("Close").Return(nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{Database: "db"})
-	connection.runConnection()
+	done := runConnection(connection)
 	response, cursor, err := connection.Query(ctx, q)
 	connection.Close()
+	<-done
 
 	c.Assert(response, test.NotNil)
 	c.Assert(response.Token, test.Equals, token)
@@ -133,10 +156,10 @@ func (s *ConnectionSuite) TestConnection_Query_NoReplyOk(c *test.C) {
 	conn.On("Close").Return(nil)
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
-	connection.runConnection()
+	done := runConnection(connection)
 	response, cursor, err := connection.Query(nil, q)
-	time.Sleep(5 * time.Millisecond)
 	connection.Close()
+	<-done
 
 	c.Assert(response, test.IsNil)
 	c.Assert(cursor, test.IsNil)

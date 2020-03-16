@@ -362,7 +362,8 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 	c.releaseConn = func() error { return conn.Close() }
 
 	conn.cursors[query.Query.Token] = c
-	conn.runConnection()
+	go conn.readSocket()
+	go conn.processResponses()
 
 	c.mu.Lock()
 	err := c.fetchMore()

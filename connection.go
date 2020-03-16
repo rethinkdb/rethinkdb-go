@@ -110,7 +110,10 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 		return nil, err
 	}
 
-	c.runConnection()
+	// NOTE: mock.go: Mock.Query()
+	// NOTE: connection_test.go: runConnection()
+	go c.readSocket()
+	go c.processResponses()
 
 	return c, nil
 }
@@ -128,11 +131,6 @@ func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection
 		responseChan:     make(chan responseAndError, 16),
 	}
 	return c
-}
-
-func (c *Connection) runConnection() {
-	go c.readSocket()
-	go c.processResponses()
 }
 
 // Close closes the underlying net.Conn

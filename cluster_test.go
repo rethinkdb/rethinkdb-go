@@ -24,9 +24,9 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 
 	conn1 := &connMock{}
 	expectServerQuery(conn1, 1, node1)
-	conn1.OnCloseReturn(nil)
+	conn1.onCloseReturn(nil)
 	conn2 := &connMock{}
-	conn2.OnCloseReturn(nil)
+	conn2.onCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -44,9 +44,10 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	conn1.waitDone()
+	conn2.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2)
 }
 
@@ -58,14 +59,14 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 
 	conn1 := &connMock{}
 	expectServerQuery(conn1, 1, node1)
-	conn1.OnCloseReturn(nil)
+	conn1.onCloseReturn(nil)
 	conn2 := &connMock{}
-	conn2.OnCloseReturn(nil)
+	conn2.onCloseReturn(nil)
 	conn3 := &connMock{}
 	expectServerQuery(conn3, 1, node2)
-	conn3.OnCloseReturn(nil)
+	conn3.onCloseReturn(nil)
 	conn4 := &connMock{}
-	conn4.OnCloseReturn(nil)
+	conn4.onCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -85,9 +86,12 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	conn1.waitDone()
+	conn2.waitDone()
+	conn3.waitDone()
+	conn4.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2, conn3, conn4)
 }
 
@@ -119,9 +123,9 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 
 	conn1 := &connMock{}
 	expectServerQuery(conn1, 1, node1)
-	conn1.OnCloseReturn(nil)
+	conn1.onCloseReturn(nil)
 	conn2 := &connMock{}
-	conn2.OnCloseReturn(nil)
+	conn2.onCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -140,9 +144,10 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	conn1.waitDone()
+	conn2.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2)
 }
 
@@ -174,7 +179,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 
 	conn1 := &connMock{}
 	expectServerQueryFail(conn1, 1, io.EOF)
-	conn1.OnCloseReturn(nil)
+	conn1.onCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -200,7 +205,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 
 	conn1 := &connMock{}
 	expectServerQuery(conn1, 1, node1)
-	conn1.OnCloseReturn(nil)
+	conn1.onCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -231,14 +236,14 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 
 	conn1 := &connMock{}
 	expectServerQuery(conn1, 1, node1)
-	conn1.OnCloseReturn(nil)
+	conn1.onCloseReturn(nil)
 	conn2 := &connMock{}
 	expectServerStatus(conn2, 1, []string{node1, node2, node3}, []Host{host1, host2, host3})
-	conn2.OnCloseReturn(nil)
+	conn2.onCloseReturn(nil)
 	conn3 := &connMock{}
-	conn3.OnCloseReturn(nil)
+	conn3.onCloseReturn(nil)
 	conn4 := &connMock{} // doesn't need call Server() due to it's known through ServerStatus()
-	conn4.OnCloseReturn(nil)
+	conn4.onCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -259,9 +264,13 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
+	time.Sleep(10 * time.Millisecond) // time to run discover backgroup goroutine
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	conn1.waitDone()
+	conn2.waitDone()
+	conn3.waitDone()
+	conn4.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2, conn3, conn4)
 }
 
@@ -275,17 +284,17 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 
 	conn1 := &connMock{}
 	expectServerQuery(conn1, 1, node1)
-	conn1.OnCloseReturn(nil)
+	conn1.onCloseReturn(nil)
 	conn2 := &connMock{}
 	expectServerStatus(conn2, 1, []string{node1, node2, node3}, []Host{host1, host2, host3})
-	conn2.OnCloseReturn(nil)
+	conn2.onCloseReturn(nil)
 	conn3 := &connMock{}
 	expectServerQuery(conn3, 1, node2)
-	conn3.OnCloseReturn(nil)
+	conn3.onCloseReturn(nil)
 	conn4 := &connMock{}
-	conn4.OnCloseReturn(nil)
+	conn4.onCloseReturn(nil)
 	conn5 := &connMock{} // doesn't need call Server() due to it's known through ServerStatus()
-	conn5.OnCloseReturn(nil)
+	conn5.onCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -307,9 +316,13 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
+	time.Sleep(10 * time.Millisecond) // time to run discover backgroup goroutine
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	conn1.waitDone()
+	conn2.waitDone()
+	conn3.waitDone()
+	conn4.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2, conn3, conn4, conn5)
 }
 
@@ -326,7 +339,11 @@ func mockedConnectionFactory(dial *mockDial) connFactory {
 		}
 
 		connection = newConnection(args.Get(0).(net.Conn), host, opts)
-		connection.runConnection()
+		done := runConnection(connection)
+
+		m := args.Get(0).(*connMock)
+		m.done = done
+
 		return connection, nil
 	}
 }

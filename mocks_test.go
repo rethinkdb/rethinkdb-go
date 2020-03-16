@@ -9,9 +9,14 @@ import (
 
 type connMock struct {
 	mock.Mock
+	done <-chan struct{}
 }
 
-func (m *connMock) OnCloseReturn(err error) {
+func (m *connMock) waitDone() {
+	<-m.done
+}
+
+func (m *connMock) onCloseReturn(err error) {
 	closeChan := make(chan struct{})
 	m.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil).Once().Run(func(args mock.Arguments) {
 		<-closeChan
