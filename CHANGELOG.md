@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## v6.2.0 - 2020-03-16
+
+- Backoff v4
+- Reworked cluster discovery
+- Fix rare connection goroutine leak
+
 ## v6.1.0 - 2020-03-09
 
 - Reworked and tested new connection pools with multiple queries per connection
