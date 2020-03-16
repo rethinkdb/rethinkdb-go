@@ -196,6 +196,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, RQLConnectionError{rqlError(io.EOF.Error())})
+	conn1.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1)
 }
 
@@ -223,6 +224,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, io.EOF)
+	conn1.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1)
 }
 
