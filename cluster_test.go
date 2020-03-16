@@ -23,12 +23,14 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 	node1 := "node1"
 
 	conn1 := &connMock{}
-	expectServerQuery(conn1, 1)
-	expectServerResponse(conn1, 1, node1)
-	conn1.On("Close").Return(nil)
+	expectServerQuery(conn1, 1, node1)
+	conn1.OnCloseReturn(nil)
+	conn2 := &connMock{}
+	conn2.OnCloseReturn(nil)
 
 	dialMock := &mockDial{}
-	dialMock.On("Dial", host1.String()).Return(conn1, nil).Twice()
+	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
+	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once()
 
 	opts := &ConnectOpts{}
 	seeds := []Host{host1}
@@ -42,8 +44,10 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	conn1.AssertExpectations(c)
-	dialMock.AssertExpectations(c)
+	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
+	err = cluster.Close()
+	c.Assert(err, test.IsNil)
+	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2)
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
@@ -53,17 +57,21 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 	node2 := "node2"
 
 	conn1 := &connMock{}
-	expectServerQuery(conn1, 1)
-	expectServerResponse(conn1, 1, node1)
-	conn1.On("Close").Return(nil)
+	expectServerQuery(conn1, 1, node1)
+	conn1.OnCloseReturn(nil)
 	conn2 := &connMock{}
-	expectServerQuery(conn2, 1)
-	expectServerResponse(conn2, 1, node2)
-	conn2.On("Close").Return(nil)
+	conn2.OnCloseReturn(nil)
+	conn3 := &connMock{}
+	expectServerQuery(conn3, 1, node2)
+	conn3.OnCloseReturn(nil)
+	conn4 := &connMock{}
+	conn4.OnCloseReturn(nil)
 
 	dialMock := &mockDial{}
-	dialMock.On("Dial", host1.String()).Return(conn1, nil).Twice()
-	dialMock.On("Dial", host2.String()).Return(conn2, nil).Twice()
+	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
+	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once()
+	dialMock.On("Dial", host2.String()).Return(conn3, nil).Once()
+	dialMock.On("Dial", host2.String()).Return(conn4, nil).Once()
 
 	opts := &ConnectOpts{}
 	seeds := []Host{host1, host2}
@@ -77,9 +85,10 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	conn1.AssertExpectations(c)
-	conn2.AssertExpectations(c)
-	dialMock.AssertExpectations(c)
+	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
+	err = cluster.Close()
+	c.Assert(err, test.IsNil)
+	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2, conn3, conn4)
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_DialFail(c *test.C) {
@@ -100,7 +109,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_DialFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, io.EOF)
-	dialMock.AssertExpectations(c)
+	mock.AssertExpectationsForObjects(c, dialMock)
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C) {
@@ -109,12 +118,14 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 	node1 := "node1"
 
 	conn1 := &connMock{}
-	expectServerQuery(conn1, 1)
-	expectServerResponse(conn1, 1, node1)
-	conn1.On("Close").Return(nil)
+	expectServerQuery(conn1, 1, node1)
+	conn1.OnCloseReturn(nil)
+	conn2 := &connMock{}
+	conn2.OnCloseReturn(nil)
 
 	dialMock := &mockDial{}
-	dialMock.On("Dial", host1.String()).Return(conn1, nil).Twice()
+	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
+	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once()
 	dialMock.On("Dial", host2.String()).Return(nil, io.EOF).Once()
 
 	opts := &ConnectOpts{}
@@ -129,8 +140,10 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	conn1.AssertExpectations(c)
-	dialMock.AssertExpectations(c)
+	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
+	err = cluster.Close()
+	c.Assert(err, test.IsNil)
+	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2)
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
@@ -153,16 +166,15 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, io.EOF)
-	dialMock.AssertExpectations(c)
+	mock.AssertExpectationsForObjects(c, dialMock)
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 	host1 := Host{Name: "host1", Port: 28015}
 
 	conn1 := &connMock{}
-	expectServerQuery(conn1, 1)
-	expectServerResponseError(conn1, io.EOF)
-	conn1.On("Close").Return(nil)
+	expectServerQueryFail(conn1, 1, io.EOF)
+	conn1.OnCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -179,8 +191,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, RQLConnectionError{rqlError(io.EOF.Error())})
-	conn1.AssertExpectations(c)
-	dialMock.AssertExpectations(c)
+	mock.AssertExpectationsForObjects(c, dialMock, conn1)
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
@@ -188,9 +199,8 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 	node1 := "node1"
 
 	conn1 := &connMock{}
-	expectServerQuery(conn1, 1)
-	expectServerResponse(conn1, 1, node1)
-	conn1.On("Close").Return(nil)
+	expectServerQuery(conn1, 1, node1)
+	conn1.OnCloseReturn(nil)
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
@@ -208,8 +218,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, io.EOF)
-	conn1.AssertExpectations(c)
-	dialMock.AssertExpectations(c)
+	mock.AssertExpectationsForObjects(c, dialMock, conn1)
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
@@ -221,24 +230,19 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 	node3 := "node3"
 
 	conn1 := &connMock{}
-	expectServerQuery(conn1, 1)
-	expectServerResponse(conn1, 1, node1)
-	conn1.On("Close").Return(nil)
+	expectServerQuery(conn1, 1, node1)
+	conn1.OnCloseReturn(nil)
 	conn2 := &connMock{}
-	expectServerStatus(conn2, 1)
-	expectServerStatusContinue(conn2, 1)
-	expectServerStatusResponse(conn2, 1, []string{node1, node2, node3}, []Host{host1, host2, host3})
-	conn2.On("Close").Return(nil)
+	expectServerStatus(conn2, 1, []string{node1, node2, node3}, []Host{host1, host2, host3})
+	conn2.OnCloseReturn(nil)
 	conn3 := &connMock{}
-	expectRunRead(conn3)
-	conn3.On("Close").Return(nil)
+	conn3.OnCloseReturn(nil)
 	conn4 := &connMock{} // doesn't need call Server() due to it's known through ServerStatus()
-	expectRunRead(conn4)
-	conn4.On("Close").Return(nil)
+	conn4.OnCloseReturn(nil)
 
 	dialMock := &mockDial{}
-	dialMock.On("Dial", host1.String()).Return(conn1, nil).Twice()
-	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once() // conn1 is bad cause expectServerResponse returns io.EOF
+	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
+	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once()
 	dialMock.On("Dial", host2.String()).Return(conn3, nil).Once()
 	dialMock.On("Dial", host3.String()).Return(conn4, nil).Once()
 
@@ -254,14 +258,59 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 	}
 
 	err := cluster.run()
-	time.Sleep(10 * time.Millisecond) // wait for backgroud discover works
-	_ = cluster.Close()
 	c.Assert(err, test.IsNil)
-	conn1.AssertExpectations(c)
-	conn2.AssertExpectations(c)
-	conn3.AssertExpectations(c)
-	conn4.AssertExpectations(c)
-	dialMock.AssertExpectations(c)
+	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
+	err = cluster.Close()
+	c.Assert(err, test.IsNil)
+	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2, conn3, conn4)
+}
+
+func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
+	host1 := Host{Name: "host1", Port: 28015}
+	host2 := Host{Name: "host2", Port: 28016}
+	host3 := Host{Name: "2.2.2.2", Port: 3333}
+	node1 := "node1"
+	node2 := "node2"
+	node3 := "node3"
+
+	conn1 := &connMock{}
+	expectServerQuery(conn1, 1, node1)
+	conn1.OnCloseReturn(nil)
+	conn2 := &connMock{}
+	expectServerStatus(conn2, 1, []string{node1, node2, node3}, []Host{host1, host2, host3})
+	conn2.OnCloseReturn(nil)
+	conn3 := &connMock{}
+	expectServerQuery(conn3, 1, node2)
+	conn3.OnCloseReturn(nil)
+	conn4 := &connMock{}
+	conn4.OnCloseReturn(nil)
+	conn5 := &connMock{} // doesn't need call Server() due to it's known through ServerStatus()
+	conn5.OnCloseReturn(nil)
+
+	dialMock := &mockDial{}
+	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
+	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once()
+	dialMock.On("Dial", host2.String()).Return(conn3, nil).Once()
+	dialMock.On("Dial", host2.String()).Return(conn4, nil).Once()
+	dialMock.On("Dial", host3.String()).Return(conn5, nil).Once()
+
+	opts := &ConnectOpts{DiscoverHosts: true}
+	seeds := []Host{host1, host2}
+	cluster := &Cluster{
+		hp:               newHostPool(opts),
+		seeds:            seeds,
+		opts:             opts,
+		closed:           clusterWorking,
+		connFactory:      mockedConnectionFactory(dialMock),
+		discoverInterval: 10 * time.Second,
+	}
+
+	err := cluster.run()
+	c.Assert(err, test.IsNil)
+	time.Sleep(5 * time.Millisecond) // wait connection goroutines start socket reading to match mock calls stability
+	err = cluster.Close()
+	c.Assert(err, test.IsNil)
+	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2, conn3, conn4, conn5)
 }
 
 type mockDial struct {
@@ -282,10 +331,44 @@ func mockedConnectionFactory(dial *mockDial) connFactory {
 	}
 }
 
-func expectServerQuery(conn *connMock, token int64) {
+func expectServerQuery(conn *connMock, token int64, nodeID string) {
+	writeChan := make(chan struct{})
+	readChan := make(chan struct{})
+
+	rawQ := makeServerQueryRaw(token)
+	conn.On("Write", rawQ).Return(0, nil, nil).Once().Run(func(args mock.Arguments) {
+		close(writeChan)
+	})
+
+	rawR := makeServerResponseRaw(token, nodeID)
+	rawH := makeResponseHeaderRaw(token, len(rawR))
+
+	conn.On("Read", respHeaderLen).Return(rawH, len(rawH), nil, nil).Once().Run(func(args mock.Arguments) {
+		<-writeChan
+		close(readChan)
+	})
+	conn.On("Read", len(rawR)).Return(rawR, len(rawR), nil, nil).Once().Run(func(args mock.Arguments) {
+		<-readChan
+	})
+}
+
+func expectServerQueryFail(conn *connMock, token int64, err error) {
+	writeChan := make(chan struct{})
+
+	rawQ := makeServerQueryRaw(token)
+	conn.On("Write", rawQ).Return(0, nil, nil).Once().Run(func(args mock.Arguments) {
+		close(writeChan)
+	})
+
+	conn.On("Read", respHeaderLen).Return(nil, 0, err, nil).Once().Run(func(args mock.Arguments) {
+		<-writeChan
+	})
+}
+
+func makeServerQueryRaw(token int64) []byte {
 	buf := &bytes.Buffer{}
 	buf.Grow(respHeaderLen)
-	buf.Write(buf.Bytes()[:respHeaderLen]) // reserve for header
+	buf.Write(buf.Bytes()[:respHeaderLen])
 	enc := json.NewEncoder(buf)
 
 	q := Query{
@@ -293,104 +376,101 @@ func expectServerQuery(conn *connMock, token int64) {
 		Type:  p.Query_SERVER_INFO,
 	}
 
-	// Build query
-	_ = enc.Encode(q.Build())
-
+	err := enc.Encode(q.Build())
+	if err != nil {
+		panic(fmt.Sprintf("must encode failed: %v", err))
+	}
 	b := buf.Bytes()
-
-	// Write header
 	binary.LittleEndian.PutUint64(b, uint64(q.Token))
 	binary.LittleEndian.PutUint32(b[8:], uint32(len(b)-respHeaderLen))
-
-	conn.On("Write", b).Return(0, nil, nil).Once()
+	return b
 }
 
-func expectServerResponse(conn *connMock, token int64, nodeID string) {
+func makeResponseHeaderRaw(token int64, respLen int) []byte {
 	buf1 := &bytes.Buffer{}
 	buf1.Grow(respHeaderLen)
 	buf1.Write(buf1.Bytes()[:respHeaderLen]) // reserve for header
+	b1 := buf1.Bytes()
+	binary.LittleEndian.PutUint64(b1, uint64(token))
+	binary.LittleEndian.PutUint32(b1[8:], uint32(respLen))
+	return b1
+}
 
+func makeServerResponseRaw(token int64, nodeID string) []byte {
 	buf2 := &bytes.Buffer{}
 	enc := json.NewEncoder(buf2)
 
 	coded, err := encoding.Encode(&ServerResponse{ID: nodeID})
 	if err != nil {
-		panic(fmt.Sprintf("failed to encode response: %v", err))
+		panic(fmt.Sprintf("must encode response failed: %v", err))
 	}
 	jresp, err := json.Marshal(coded)
 	if err != nil {
-		panic(fmt.Sprintf("failed to encode response: %v", err))
+		panic(fmt.Sprintf("must encode response failed: %v", err))
 	}
+
 	resp := Response{Token: token, Type: p.Response_SERVER_INFO, Responses: []json.RawMessage{jresp}}
-	_ = enc.Encode(resp)
+	err = enc.Encode(resp)
+	if err != nil {
+		panic(fmt.Sprintf("must encode failed: %v", err))
+	}
 
-	b1 := buf1.Bytes()
-	b2 := buf2.Bytes()
-	// Write header
-	binary.LittleEndian.PutUint64(b1, uint64(token))
-	binary.LittleEndian.PutUint32(b1[8:], uint32(len(b2)))
-
-	conn.On("Read", respHeaderLen).Return(b1, len(b1), nil, nil).Once()
-	conn.On("Read", len(b2)).Return(b2, len(b2), nil, nil).Once()
-	conn.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil)
+	return buf2.Bytes()
 }
 
-func expectRunRead(conn *connMock) {
-	conn.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil)
+func expectServerStatus(conn *connMock, token int64, nodeIDs []string, hosts []Host) {
+	writeChan := make(chan struct{})
+	readHChan := make(chan struct{})
+	readRChan := make(chan struct{})
+
+	rawQ := makeServerStatusQueryRaw(token)
+	conn.On("Write", rawQ).Return(0, nil, nil).Once().Run(func(args mock.Arguments) {
+		close(writeChan)
+	})
+
+	rawR := makeServerStatusResponseRaw(token, nodeIDs, hosts)
+	rawH := makeResponseHeaderRaw(token, len(rawR))
+
+	conn.On("Read", respHeaderLen).Return(rawH, len(rawH), nil, nil).Once().Run(func(args mock.Arguments) {
+		<-writeChan
+		close(readHChan)
+	})
+	conn.On("Read", len(rawR)).Return(rawR, len(rawR), nil, nil).Once().Run(func(args mock.Arguments) {
+		<-readHChan
+		close(readRChan)
+	})
+
+	rawQ2 := makeContinueQueryRaw(token)
+	conn.On("Write", rawQ2).Return(0, nil, nil).Once().Run(func(args mock.Arguments) {
+		<-readRChan
+	})
 }
 
-func expectServerResponseError(conn *connMock, err error) {
-	conn.On("Read", respHeaderLen).Return(nil, 0, err, nil).Once()
-	conn.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil)
-}
-
-func expectServerStatus(conn *connMock, token int64) {
+func makeServerStatusQueryRaw(token int64) []byte {
 	buf := &bytes.Buffer{}
 	buf.Grow(respHeaderLen)
 	buf.Write(buf.Bytes()[:respHeaderLen]) // reserve for header
 	enc := json.NewEncoder(buf)
 
 	t := DB(SystemDatabase).Table(ServerStatusSystemTable).Changes(ChangesOpts{IncludeInitial: true})
-	q, _ := newQuery(t, map[string]interface{}{}, &ConnectOpts{})
+	q, err := newQuery(t, map[string]interface{}{}, &ConnectOpts{})
+	if err != nil {
+		panic(fmt.Sprintf("must newQuery failed: %v", err))
+	}
 	q.Token = token
 
-	// Build query
-	_ = enc.Encode(q.Build())
+	err = enc.Encode(q.Build())
+	if err != nil {
+		panic(fmt.Sprintf("must encode failed: %v", err))
+	}
 
 	b := buf.Bytes()
-
-	// Write header
 	binary.LittleEndian.PutUint64(b, uint64(q.Token))
 	binary.LittleEndian.PutUint32(b[8:], uint32(len(b)-respHeaderLen))
-
-	conn.On("Write", b).Return(0, nil, nil).Once()
+	return b
 }
 
-func expectServerStatusContinue(conn *connMock, token int64) {
-	buf := &bytes.Buffer{}
-	buf.Grow(respHeaderLen)
-	buf.Write(buf.Bytes()[:respHeaderLen]) // reserve for header
-	enc := json.NewEncoder(buf)
-
-	q := Query{Token: token, Type: p.Query_CONTINUE}
-
-	// Build query
-	_ = enc.Encode(q.Build())
-
-	b := buf.Bytes()
-
-	// Write header
-	binary.LittleEndian.PutUint64(b, uint64(q.Token))
-	binary.LittleEndian.PutUint32(b[8:], uint32(len(b)-respHeaderLen))
-
-	conn.On("Write", b).Return(0, nil, nil).Once()
-}
-
-func expectServerStatusResponse(conn *connMock, token int64, nodeIDs []string, hosts []Host) {
-	buf1 := &bytes.Buffer{}
-	buf1.Grow(respHeaderLen)
-	buf1.Write(buf1.Bytes()[:respHeaderLen]) // reserve for header
-
+func makeServerStatusResponseRaw(token int64, nodeIDs []string, hosts []Host) []byte {
 	buf2 := &bytes.Buffer{}
 	enc := json.NewEncoder(buf2)
 
@@ -409,24 +489,36 @@ func expectServerStatusResponse(conn *connMock, token int64, nodeIDs []string, h
 
 		coded, err := encoding.Encode(&change{NewVal: status})
 		if err != nil {
-			panic(fmt.Sprintf("failed to encode response: %v", err))
+			panic(fmt.Sprintf("must encode response failed: %v", err))
 		}
 		jresps[i], err = json.Marshal(coded)
 		if err != nil {
-			panic(fmt.Sprintf("failed to encode response: %v", err))
+			panic(fmt.Sprintf("must encode response failed: %v", err))
 		}
 	}
 
 	resp := Response{Token: token, Type: p.Response_SUCCESS_PARTIAL, Responses: jresps}
-	_ = enc.Encode(resp)
+	err := enc.Encode(resp)
+	if err != nil {
+		panic(fmt.Sprintf("must encode failed: %v", err))
+	}
+	return buf2.Bytes()
+}
 
-	b1 := buf1.Bytes()
-	b2 := buf2.Bytes()
-	// Write header
-	binary.LittleEndian.PutUint64(b1, uint64(token))
-	binary.LittleEndian.PutUint32(b1[8:], uint32(len(b2)))
+func makeContinueQueryRaw(token int64) []byte {
+	buf := &bytes.Buffer{}
+	buf.Grow(respHeaderLen)
+	buf.Write(buf.Bytes()[:respHeaderLen]) // reserve for header
+	enc := json.NewEncoder(buf)
 
-	conn.On("Read", respHeaderLen).Return(b1, len(b1), nil, nil).Once()
-	conn.On("Read", len(b2)).Return(b2, len(b2), nil, nil).Once()
-	conn.On("Read", respHeaderLen).Return(nil, 0, nil, 10*time.Second)
+	q := Query{Token: token, Type: p.Query_CONTINUE}
+	err := enc.Encode(q.Build())
+	if err != nil {
+		panic(fmt.Sprintf("must encode failed: %v", err))
+	}
+
+	b := buf.Bytes()
+	binary.LittleEndian.PutUint64(b, uint64(q.Token))
+	binary.LittleEndian.PutUint32(b[8:], uint32(len(b)-respHeaderLen))
+	return b
 }

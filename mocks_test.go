@@ -2,12 +2,23 @@ package rethinkdb
 
 import (
 	"github.com/stretchr/testify/mock"
+	"io"
 	"net"
 	"time"
 )
 
 type connMock struct {
 	mock.Mock
+}
+
+func (m *connMock) OnCloseReturn(err error) {
+	closeChan := make(chan struct{})
+	m.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil).Once().Run(func(args mock.Arguments) {
+		<-closeChan
+	})
+	m.On("Close").Return(err).Once().Run(func(args mock.Arguments) {
+		close(closeChan)
+	})
 }
 
 func (m *connMock) Read(b []byte) (n int, err error) {

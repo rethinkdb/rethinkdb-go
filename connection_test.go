@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/mocktracer"
+	"github.com/stretchr/testify/mock"
 	"golang.org/x/net/context"
 	test "gopkg.in/check.v1"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
@@ -212,18 +213,24 @@ func (s *ConnectionSuite) TestConnection_processResponses_SocketErr(c *test.C) {
 	promise3 := make(chan responseAndCursor, 1)
 
 	conn := &connMock{}
-	conn.On("Close").Return(nil)
-
 	connection := newConnection(conn, "addr", &ConnectOpts{})
 
-	go connection.processResponses()
+	conn.On("Close").Return(nil).Run(func(args mock.Arguments) {
+		close(connection.responseChan)
+	})
+
+	done := make(chan struct{})
+	go func() {
+		connection.processResponses()
+		close(done)
+	}()
 
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 1}, promise: promise1}
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 2}, promise: promise2}
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 2}, promise: promise3}
 	time.Sleep(5 * time.Millisecond)
 	connection.responseChan <- responseAndError{err: io.EOF}
-	time.Sleep(5 * time.Millisecond)
+	<-done
 
 	select {
 	case f := <-promise1:
@@ -254,13 +261,16 @@ func (s *ConnectionSuite) TestConnection_processResponses_StopOk(c *test.C) {
 
 	connection := newConnection(nil, "addr", &ConnectOpts{})
 
-	go connection.processResponses()
+	done := make(chan struct{})
+	go func() {
+		connection.processResponses()
+		close(done)
+	}()
 
 	connection.readRequestsChan <- tokenAndPromise{query: &Query{Token: 1}, promise: promise1}
+	time.Sleep(5 * time.Millisecond)
 	close(connection.responseChan)
-	time.Sleep(5 * time.Millisecond)
-	close(connection.stopReadChan)
-	time.Sleep(5 * time.Millisecond)
+	<-done
 
 	select {
 	case f := <-promise1:

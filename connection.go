@@ -255,16 +255,16 @@ func (c *Connection) readSocket() {
 	for {
 		response, err := c.readResponse()
 
-		respPair := responseAndError{
+		c.responseChan <- responseAndError{
 			response: response,
 			err:      err,
 		}
 
 		select {
-		case c.responseChan <- respPair:
 		case <-c.stopReadChan:
 			close(c.responseChan)
 			return
+		default:
 		}
 	}
 }
@@ -278,22 +278,19 @@ func (c *Connection) processResponses() {
 		var ok bool
 
 		select {
-		case respPair := <-c.responseChan:
+		case respPair, openned := <-c.responseChan:
 			if respPair.err != nil {
 				// Transport socket error, can't continue to work
-				// Don't know return to who - return to all
-				for _, rr := range readRequests {
-					if rr.promise != nil {
-						rr.promise <- responseAndCursor{err: respPair.err}
-						close(rr.promise)
-					}
-				}
+				// Don't know return to who (no token) - return to all
+				broadcastError(readRequests, respPair.err)
 				readRequests = []tokenAndPromise{}
-				_ = c.Close()
+				_ = c.Close() // next `if` will be called indirect cascade by closing chans
 				continue
 			}
-			if respPair.response == nil && respPair.err == nil { // responseChan is connClosed
-				continue
+			if !openned { // responseChan is connClosed (stopReadChan is closed too)
+				broadcastError(readRequests, ErrConnectionClosed)
+				c.cursors = nil
+				return
 			}
 
 			response = respPair.response
@@ -312,32 +309,21 @@ func (c *Connection) processResponses() {
 				continue
 			}
 			responses = removeResponse(responses, readRequest.query.Token)
-
-		case <-c.stopReadChan:
-			for _, rr := range readRequests {
-				if rr.promise != nil {
-					rr.promise <- responseAndCursor{err: ErrConnectionClosed}
-					close(rr.promise)
-				}
-			}
-		recheckRequests:
-			for {
-				select {
-				case rr := <-c.readRequestsChan:
-					rr.promise <- responseAndCursor{err: ErrConnectionClosed}
-					close(rr.promise)
-				default:
-					break recheckRequests
-				}
-			}
-			c.cursors = nil
-			return
 		}
 
 		response, cursor, err := c.processResponse(readRequest.ctx, *readRequest.query, response, readRequest.span)
 		if readRequest.promise != nil {
 			readRequest.promise <- responseAndCursor{response: response, cursor: cursor, err: err}
 			close(readRequest.promise)
+		}
+	}
+}
+
+func broadcastError(readRequests []tokenAndPromise, err error) {
+	for _, rr := range readRequests {
+		if rr.promise != nil {
+			rr.promise <- responseAndCursor{err: err}
+			close(rr.promise)
 		}
 	}
 }
