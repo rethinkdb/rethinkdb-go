@@ -108,11 +108,11 @@ func (p *Pool) conn() (*Connection, error) {
 	}
 	pos = pos % int32(len(p.conns))
 
-	if p.conns[pos] == nil {
+	if p.conns[pos] == nil || p.conns[pos].isClosed() {
 		p.mu.Lock()
 		defer p.mu.Unlock()
 
-		if p.conns[pos] == nil {
+		if p.conns[pos] == nil || p.conns[pos].isClosed() {
 			var err error
 			p.conns[pos], err = NewConnection(p.host.String(), p.opts)
 			if err != nil {
