@@ -278,6 +278,9 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 	conn2.waitFinalRead()
 	conn3.waitFinalRead()
 	conn4.waitFinalRead()
+	for !cluster.nodeExists(node2) || !cluster.nodeExists(node3) { // wait node to be added to list to be closed with cluster
+		time.Sleep(time.Millisecond)
+	}
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
 	conn1.waitDone()
@@ -334,6 +337,9 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 	conn3.waitFinalRead()
 	conn4.waitFinalRead()
 	conn5.waitFinalRead()
+	for !cluster.nodeExists(node3) { // wait node to be added to list to be closed with cluster
+		time.Sleep(time.Millisecond)
+	}
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
 	conn1.waitDone()
@@ -476,7 +482,8 @@ func expectServerStatus(conn *connMock, token int64, nodeIDs []string, hosts []H
 	})
 
 	rawQ2 := makeContinueQueryRaw(token)
-	conn.On("Write", rawQ2).Return(0, nil, nil).Once().Run(func(args mock.Arguments) {
+	// maybe - connection may be closed until cursor fetchs next batch
+	conn.On("Write", rawQ2).Return(0, nil, nil).Maybe().Run(func(args mock.Arguments) {
 		<-readRChan
 	})
 }
