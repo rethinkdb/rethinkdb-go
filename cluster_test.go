@@ -22,6 +22,18 @@ var _ = test.Suite(&ClusterSuite{})
 func init() {
 	go func() {
 		time.Sleep(240 * time.Second)
+
+		mut.Lock()
+		defer mut.Unlock()
+
+		fmt.Printf("conman: %v\n", len(conman))
+		for c, lc := range conman {
+			fmt.Printf("%v: list %v\n", c, len(lc.list))
+			for _, s := range lc.list {
+				fmt.Printf("%v: %v\n", c, s)
+			}
+		}
+
 		syscall.Kill(syscall.Getpid(), syscall.SIGTRAP)
 	}()
 }
@@ -383,7 +395,7 @@ func mockedConnectionFactory(dial *mockDial) connFactory {
 		done := runConnection(connection)
 
 		m := args.Get(0).(*connMock)
-		fmt.Printf("dial %s: %p\n", host, m)
+		fmt.Printf("dial %s: %p\n", host, connection)
 		m.setDone(done)
 
 		return connection, nil

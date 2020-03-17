@@ -143,7 +143,7 @@ func (c *Cursor) Close() error {
 	if conn == nil {
 		return nil
 	}
-	if conn.Conn == nil {
+	if conn.isClosed() {
 		return nil
 	}
 
