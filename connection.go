@@ -169,6 +169,8 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		ctx = c.contextFromConnectionOpts()
 	}
 
+	fmt.Printf("%p: query %v\n", c, q.Type)
+
 	// Add token if query is a START/NOREPLY_WAIT
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT || q.Type == p.Query_SERVER_INFO {
 		q.Token = c.nextToken()
@@ -217,16 +219,21 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 	promise := make(chan responseAndCursor, 1)
 	select {
 	case c.readRequestsChan <- tokenAndPromise{ctx: ctx, query: &q, span: fetchingSpan, promise: promise}:
+		fmt.Printf("%p: readRequestsChan <-\n", c)
 	case <-ctx.Done():
+		fmt.Printf("%p: <- ctxDone1\n", c)
 		return c.stopQuery(&q)
 	}
 
 	select {
 	case future := <-promise:
+		fmt.Printf("%p: <- promise\n", c)
 		return future.response, future.cursor, future.err
 	case <-ctx.Done():
+		fmt.Printf("%p: <- ctxDone2\n", c)
 		return c.stopQuery(&q)
 	case <-c.stopProcessingChan: // connection readRequests processing stopped, promise can be never answered
+		fmt.Printf("%p: <- stopProcessingChan\n", c)
 		return nil, nil, ErrConnectionClosed
 	}
 }

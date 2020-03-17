@@ -28,7 +28,7 @@ func init() {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewSingle_NoDiscover_Ok")
 	host1 := Host{Name: "host1", Port: 28015}
 	node1 := "node1"
 
@@ -64,7 +64,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewMultiple_NoDiscover_Ok")
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28015}
 	node1 := "node1"
@@ -113,7 +113,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_DialFail(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewSingle_NoDiscover_DialFail")
 	host1 := Host{Name: "host1", Port: 28015}
 
 	dialMock := &mockDial{}
@@ -135,7 +135,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_DialFail(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewMultiple_NoDiscover_DialHalfFail")
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28015}
 	node1 := "node1"
@@ -173,7 +173,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewMultiple_NoDiscover_DialFail")
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28015}
 
@@ -197,7 +197,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewSingle_NoDiscover_ServerFail")
 	host1 := Host{Name: "host1", Port: 28015}
 
 	conn1 := &connMock{}
@@ -224,7 +224,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewSingle_NoDiscover_PingFail")
 	host1 := Host{Name: "host1", Port: 28015}
 	node1 := "node1"
 
@@ -253,7 +253,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewSingle_Discover_Ok")
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "1.1.1.1", Port: 2222}
 	host3 := Host{Name: "2.2.2.2", Port: 3333}
@@ -308,7 +308,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
-	fmt.Println("start test")
+	fmt.Println("start test TestCluster_NewMultiple_Discover_Ok")
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28016}
 	host3 := Host{Name: "2.2.2.2", Port: 3333}
