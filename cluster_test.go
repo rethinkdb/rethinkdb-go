@@ -11,12 +11,20 @@ import (
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 	"io"
 	"net"
+	"syscall"
 	"time"
 )
 
 type ClusterSuite struct{}
 
 var _ = test.Suite(&ClusterSuite{})
+
+func init() {
+	go func() {
+		time.Sleep(240 * time.Second)
+		syscall.Kill(syscall.Getpid(), syscall.SIGTRAP)
+	}()
+}
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 	host1 := Host{Name: "host1", Port: 28015}
