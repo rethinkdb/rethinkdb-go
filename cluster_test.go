@@ -44,6 +44,8 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	conn1.waitFinalRead()
+	conn2.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
 	conn1.waitDone()
@@ -86,6 +88,10 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	conn1.waitFinalRead()
+	conn2.waitFinalRead()
+	conn3.waitFinalRead()
+	conn4.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
 	conn1.waitDone()
@@ -144,6 +150,8 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	conn1.waitFinalRead()
+	conn2.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
 	conn1.waitDone()
@@ -266,7 +274,10 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	time.Sleep(10 * time.Millisecond) // time to run discover backgroup goroutine
+	conn1.waitFinalRead()
+	conn2.waitFinalRead()
+	conn3.waitFinalRead()
+	conn4.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
 	conn1.waitDone()
@@ -318,13 +329,18 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
-	time.Sleep(10 * time.Millisecond) // time to run discover backgroup goroutine
+	conn1.waitFinalRead()
+	conn2.waitFinalRead()
+	conn3.waitFinalRead()
+	conn4.waitFinalRead()
+	conn5.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
 	conn1.waitDone()
 	conn2.waitDone()
 	conn3.waitDone()
 	conn4.waitDone()
+	conn5.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2, conn3, conn4, conn5)
 }
 
@@ -344,7 +360,7 @@ func mockedConnectionFactory(dial *mockDial) connFactory {
 		done := runConnection(connection)
 
 		m := args.Get(0).(*connMock)
-		m.done = done
+		m.setDone(done)
 
 		return connection, nil
 	}
