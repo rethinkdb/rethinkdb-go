@@ -4,7 +4,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"io"
 	"net"
-	"sync"
 	"time"
 )
 
@@ -12,29 +11,27 @@ type connMock struct {
 	mock.Mock
 	done      <-chan struct{}
 	finalRead chan struct{}
-	mu        sync.Mutex
+	doneSet   chan struct{}
 }
 
 func (m *connMock) setDone(done <-chan struct{}) {
-	m.mu.Lock()
 	m.done = done
-	m.mu.Unlock()
+	close(m.doneSet)
 }
 
 func (m *connMock) waitFinalRead() {
+	<-m.doneSet
 	<-m.finalRead
 }
 
 func (m *connMock) waitDone() {
-	m.mu.Lock()
-	done := m.done
-	m.mu.Unlock()
-	<-done
+	<-m.done
 }
 
 func (m *connMock) onCloseReturn(err error) {
 	closeChan := make(chan struct{})
 	m.finalRead = make(chan struct{})
+	m.doneSet = make(chan struct{})
 	m.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil).Once().Run(func(args mock.Arguments) {
 		close(m.finalRead)
 		<-closeChan
