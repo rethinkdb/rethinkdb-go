@@ -23,17 +23,6 @@ func init() {
 	go func() {
 		time.Sleep(240 * time.Second)
 
-		mut.Lock()
-		defer mut.Unlock()
-
-		fmt.Printf("conman: %v\n", len(conman))
-		for c, lc := range conman {
-			fmt.Printf("%v: list %v\n", c, len(lc.list))
-			for _, s := range lc.list {
-				fmt.Printf("%v: %v\n", c, s)
-			}
-		}
-
 		syscall.Kill(syscall.Getpid(), syscall.SIGTRAP)
 	}()
 }

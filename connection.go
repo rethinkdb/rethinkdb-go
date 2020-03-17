@@ -18,32 +18,6 @@ import (
 	"sync"
 )
 
-var mut sync.RWMutex
-
-type conlog struct {
-	list []string
-}
-
-var conman map[string]*conlog = make(map[string]*conlog)
-
-func addconman(c *Connection) {
-	mut.Lock()
-	conman[fmt.Sprintf("%p", c)] = &conlog{list: []string{}}
-	mut.Unlock()
-}
-
-func delconman(c *Connection) {
-	mut.Lock()
-	delete(conman, fmt.Sprintf("%p", c))
-	mut.Unlock()
-}
-
-func getconman(c *Connection) *conlog {
-	mut.RLock()
-	defer mut.RUnlock()
-	return conman[fmt.Sprintf("%p", c)]
-}
-
 const (
 	respHeaderLen          = 12
 	defaultKeepAlivePeriod = time.Second * 30
@@ -158,7 +132,6 @@ func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection
 		responseChan:       make(chan responseAndError, 16),
 		stopProcessingChan: make(chan struct{}),
 	}
-	addconman(c)
 	return c
 }
 
@@ -170,8 +143,7 @@ func (c *Connection) Close() error {
 	defer c.mu.Unlock()
 
 	if !c.isClosed() {
-		cl := getconman(c)
-		cl.list = append(cl.list, fmt.Sprintf("Close()"))
+		fmt.Printf("%p: Close()\n", c)
 
 		c.setClosed()
 		close(c.stopReadChan)
@@ -287,8 +259,7 @@ func (c *Connection) readSocket() {
 	for {
 		response, err := c.readResponse()
 
-		cl := getconman(c)
-		cl.list = append(cl.list, fmt.Sprintf("Read(): %v, %v", response == nil, err))
+		fmt.Printf("%p: Read() = %v, %v\n", c, response == nil, err)
 
 		c.responseChan <- responseAndError{
 			response: response,
@@ -327,8 +298,6 @@ func (c *Connection) processResponses() {
 				broadcastError(readRequests, ErrConnectionClosed)
 				c.cursors = nil
 
-				fmt.Printf("%p: delete\n", c)
-				delconman(c)
 				return
 			}
 
