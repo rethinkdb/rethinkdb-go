@@ -143,6 +143,7 @@ func (c *Connection) Close() error {
 	defer c.mu.Unlock()
 
 	if !c.isClosed() {
+		fmt.Printf("%p: close()\n", c.Conn)
 		c.setClosed()
 		close(c.stopReadChan)
 		err = c.Conn.Close()
