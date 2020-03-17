@@ -49,15 +49,16 @@ type Connection struct {
 	address string
 	opts    *ConnectOpts
 
-	_                [4]byte
-	token            int64
-	cursors          map[int64]*Cursor
-	bad              int32 // 0 - not bad, 1 - bad
-	closed           int32 // 0 - working, 1 - closed
-	stopReadChan     chan bool
-	readRequestsChan chan tokenAndPromise
-	responseChan     chan responseAndError
-	mu               sync.Mutex
+	_                  [4]byte
+	token              int64
+	cursors            map[int64]*Cursor
+	bad                int32 // 0 - not bad, 1 - bad
+	closed             int32 // 0 - working, 1 - closed
+	stopReadChan       chan bool
+	readRequestsChan   chan tokenAndPromise
+	responseChan       chan responseAndError
+	stopProcessingChan chan struct{}
+	mu                 sync.Mutex
 }
 
 type responseAndError struct {
@@ -120,15 +121,16 @@ func NewConnection(address string, opts *ConnectOpts) (*Connection, error) {
 
 func newConnection(conn net.Conn, address string, opts *ConnectOpts) *Connection {
 	c := &Connection{
-		Conn:             conn,
-		address:          address,
-		opts:             opts,
-		cursors:          make(map[int64]*Cursor),
-		stopReadChan:     make(chan bool, 1),
-		bad:              connNotBad,
-		closed:           connWorking,
-		readRequestsChan: make(chan tokenAndPromise, 16),
-		responseChan:     make(chan responseAndError, 16),
+		Conn:               conn,
+		address:            address,
+		opts:               opts,
+		cursors:            make(map[int64]*Cursor),
+		stopReadChan:       make(chan bool, 1),
+		bad:                connNotBad,
+		closed:             connWorking,
+		readRequestsChan:   make(chan tokenAndPromise, 16),
+		responseChan:       make(chan responseAndError, 16),
+		stopProcessingChan: make(chan struct{}),
 	}
 	return c
 }
@@ -222,6 +224,8 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		return future.response, future.cursor, future.err
 	case <-ctx.Done():
 		return c.stopQuery(&q)
+	case <-c.stopProcessingChan: // connection readRequests processing stopped, promise can be never answered
+		return nil, nil, ErrConnectionClosed
 	}
 }
 
@@ -286,6 +290,7 @@ func (c *Connection) processResponses() {
 				continue
 			}
 			if !openned { // responseChan is connClosed (stopReadChan is closed too)
+				close(c.stopProcessingChan)
 				broadcastError(readRequests, ErrConnectionClosed)
 				c.cursors = nil
 				return
