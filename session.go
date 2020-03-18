@@ -104,8 +104,6 @@ type ConnectOpts struct {
 	NodeRefreshInterval time.Duration `rethinkdb:"node_refresh_interval,omitempty" json:"node_refresh_interval,omitempty"`
 	// Deprecated: Use InitialCap instead
 	MaxIdle int `rethinkdb:"max_idle,omitempty" json:"max_idle,omitempty"`
-
-	//testname string
 }
 
 func (o ConnectOpts) toMap() map[string]interface{} {
