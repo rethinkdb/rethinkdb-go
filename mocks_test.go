@@ -9,9 +9,8 @@ import (
 
 type connMock struct {
 	mock.Mock
-	done      <-chan struct{}
-	finalRead chan struct{}
-	doneSet   chan struct{}
+	done    <-chan struct{}
+	doneSet chan struct{}
 }
 
 func (m *connMock) setDone(done <-chan struct{}) {
@@ -19,9 +18,8 @@ func (m *connMock) setDone(done <-chan struct{}) {
 	close(m.doneSet)
 }
 
-func (m *connMock) waitFinalRead() {
+func (m *connMock) waitDial() {
 	<-m.doneSet
-	<-m.finalRead
 }
 
 func (m *connMock) waitDone() {
@@ -30,11 +28,9 @@ func (m *connMock) waitDone() {
 
 func (m *connMock) onCloseReturn(err error) {
 	closeChan := make(chan struct{})
-	m.finalRead = make(chan struct{})
 	m.doneSet = make(chan struct{})
 	// Maybe - Connection can be closed by Close() before Read() occurs when stopReadChan closed
 	m.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil).Maybe().Run(func(args mock.Arguments) {
-		close(m.finalRead)
 		<-closeChan
 	})
 	m.On("Close").Return(err).Once().Run(func(args mock.Arguments) {
