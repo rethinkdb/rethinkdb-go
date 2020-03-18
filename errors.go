@@ -24,7 +24,7 @@ var (
 	ErrNoConnections = errors.New("rethinkdb: no connections were available")
 	// ErrConnectionClosed is returned when trying to send a query with a connClosed
 	// connection.
-	ErrConnectionClosed = errors.New("rethinkdb: the connection is connClosed")
+	ErrConnectionClosed = errors.New("rethinkdb: the connection is closed")
 	// ErrQueryTimeout is returned when query context deadline exceeded.
 	ErrQueryTimeout = errors.New("rethinkdb: query timeout")
 )
