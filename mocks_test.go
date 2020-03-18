@@ -32,7 +32,8 @@ func (m *connMock) onCloseReturn(err error) {
 	closeChan := make(chan struct{})
 	m.finalRead = make(chan struct{})
 	m.doneSet = make(chan struct{})
-	m.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil).Once().Run(func(args mock.Arguments) {
+	// Maybe - Connection can be closed by Close() before Read() occurs when stopReadChan closed
+	m.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil).Maybe().Run(func(args mock.Arguments) {
 		close(m.finalRead)
 		<-closeChan
 	})

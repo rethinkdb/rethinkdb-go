@@ -143,7 +143,7 @@ func (c *Connection) Close() error {
 	defer c.mu.Unlock()
 
 	if !c.isClosed() {
-		fmt.Printf("%p: Close() %v\n", c, c.opts.testname)
+		//fmt.Printf("%p: Close() %v\n", c, c.opts.testname)
 
 		c.setClosed()
 		close(c.stopReadChan)
@@ -169,7 +169,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		ctx = c.contextFromConnectionOpts()
 	}
 
-	fmt.Printf("%p: query %v %v\n", c, q.Type, c.opts.testname)
+	//fmt.Printf("%p: query %v %v\n", c, q.Type, c.opts.testname)
 
 	// Add token if query is a START/NOREPLY_WAIT
 	if q.Type == p.Query_START || q.Type == p.Query_NOREPLY_WAIT || q.Type == p.Query_SERVER_INFO {
@@ -219,21 +219,21 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 	promise := make(chan responseAndCursor, 1)
 	select {
 	case c.readRequestsChan <- tokenAndPromise{ctx: ctx, query: &q, span: fetchingSpan, promise: promise}:
-		fmt.Printf("%p: readRequestsChan <- %v\n", c, c.opts.testname)
+		//fmt.Printf("%p: readRequestsChan <- %v\n", c, c.opts.testname)
 	case <-ctx.Done():
-		fmt.Printf("%p: <- ctxDone1 %v\n", c, c.opts.testname)
+		//fmt.Printf("%p: <- ctxDone1 %v\n", c, c.opts.testname)
 		return c.stopQuery(&q)
 	}
 
 	select {
 	case future := <-promise:
-		fmt.Printf("%p: <- promise %v\n", c, c.opts.testname)
+		//fmt.Printf("%p: <- promise %v\n", c, c.opts.testname)
 		return future.response, future.cursor, future.err
 	case <-ctx.Done():
-		fmt.Printf("%p: <- ctxDone2 %v\n", c, c.opts.testname)
+		//fmt.Printf("%p: <- ctxDone2 %v\n", c, c.opts.testname)
 		return c.stopQuery(&q)
 	case <-c.stopProcessingChan: // connection readRequests processing stopped, promise can be never answered
-		fmt.Printf("%p: <- stopProcessingChan %v\n", c, c.opts.testname)
+		//fmt.Printf("%p: <- stopProcessingChan %v\n", c, c.opts.testname)
 		return nil, nil, ErrConnectionClosed
 	}
 }
@@ -266,7 +266,7 @@ func (c *Connection) readSocket() {
 	for {
 		response, err := c.readResponse()
 
-		fmt.Printf("%p: Read() = %v, %v %v\n", c, response != nil, err, c.opts.testname)
+		//fmt.Printf("%p: Read() = %v, %v %v\n", c, response != nil, err, c.opts.testname)
 
 		c.responseChan <- responseAndError{
 			response: response,
