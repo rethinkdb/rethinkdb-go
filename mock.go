@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/check.v1"
 	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
 	"net"
 	"reflect"
@@ -63,7 +62,7 @@ type MockQuery struct {
 	Repeatability int
 
 	// Holds a channel that will be used to block the Return until it either
-	// recieves a message or is closed. nil means it returns immediately.
+	// recieves a message or is connClosed. nil means it returns immediately.
 	WaitFor <-chan time.Time
 
 	// Amount of times this query has been executed
@@ -155,7 +154,7 @@ func (mq *MockQuery) Times(i int) *MockQuery {
 	return mq
 }
 
-// WaitUntil sets the channel that will block the mock's return until its closed
+// WaitUntil sets the channel that will block the mock's return until its connClosed
 // or a message is received.
 //
 //    mock.On(r.Table("test")).WaitUntil(time.After(time.Second))
@@ -363,7 +362,8 @@ func (m *Mock) Query(ctx context.Context, q Query) (*Cursor, error) {
 	c.releaseConn = func() error { return conn.Close() }
 
 	conn.cursors[query.Query.Token] = c
-	conn.runConnection()
+	go conn.readSocket()
+	go conn.processResponses()
 
 	c.mu.Lock()
 	err := c.fetchMore()
@@ -424,7 +424,6 @@ func (m *Mock) queries() []MockQuery {
 }
 
 type mockConn struct {
-	c           *check.C
 	mu          sync.Mutex
 	value       []byte
 	tokens      chan int64
@@ -513,7 +512,7 @@ func (c *mockConn) Read(b []byte) (n int, err error) {
 
 func (c *mockConn) Write(b []byte) (n int, err error) {
 	if len(b) < 8 {
-		panic("bad socket write")
+		panic("connBad socket write")
 	}
 	token := int64(binary.LittleEndian.Uint64(b[:8]))
 	c.tokens <- token

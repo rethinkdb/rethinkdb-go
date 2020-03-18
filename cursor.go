@@ -15,7 +15,7 @@ import (
 
 var (
 	errNilCursor    = errors.New("cursor is nil")
-	errCursorClosed = errors.New("connection closed, cannot read cursor")
+	errCursorClosed = errors.New("connection connClosed, cannot read cursor")
 )
 
 func newCursor(ctx context.Context, conn *Connection, cursorType string, token int64, term *Term, opts map[string]interface{}) *Cursor {
@@ -120,7 +120,7 @@ func (c *Cursor) Err() error {
 }
 
 // Close closes the cursor, preventing further enumeration. If the end is
-// encountered, the cursor is closed automatically. Close is idempotent.
+// encountered, the cursor is connClosed automatically. Close is idempotent.
 func (c *Cursor) Close() error {
 	if c == nil {
 		return errNilCursor
@@ -131,7 +131,7 @@ func (c *Cursor) Close() error {
 
 	var err error
 
-	// If cursor is already closed return immediately
+	// If cursor is already connClosed return immediately
 	closed := c.closed
 	if closed {
 		return nil
@@ -143,7 +143,7 @@ func (c *Cursor) Close() error {
 	if conn == nil {
 		return nil
 	}
-	if conn.Conn == nil {
+	if conn.isClosed() {
 		return nil
 	}
 
@@ -386,7 +386,7 @@ func (c *Cursor) All(result interface{}) error {
 	resultv.Elem().Set(slicev.Slice(0, i))
 
 	if err := c.Err(); err != nil {
-		c.Close()
+		_ = c.Close()
 		return err
 	}
 
@@ -601,7 +601,7 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 	}
 
 	// Loop over loading data, applying skips as necessary and loading more data as needed
-	// until either the cursor is closed or finished, or we have applied all outstanding
+	// until either the cursor is connClosed or finished, or we have applied all outstanding
 	// skips and data is available
 	for {
 		c.applyPendingSkips(bufferResponse) // if we are buffering the responses, skip can drain from the buffer

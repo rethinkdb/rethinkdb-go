@@ -2,12 +2,40 @@ package rethinkdb
 
 import (
 	"github.com/stretchr/testify/mock"
+	"io"
 	"net"
 	"time"
 )
 
 type connMock struct {
 	mock.Mock
+	done    <-chan struct{}
+	doneSet chan struct{}
+}
+
+func (m *connMock) setDone(done <-chan struct{}) {
+	m.done = done
+	close(m.doneSet)
+}
+
+func (m *connMock) waitDial() {
+	<-m.doneSet
+}
+
+func (m *connMock) waitDone() {
+	<-m.done
+}
+
+func (m *connMock) onCloseReturn(err error) {
+	closeChan := make(chan struct{})
+	m.doneSet = make(chan struct{})
+	// Maybe - Connection can be closed by Close() before Read() occurs when stopReadChan closed
+	m.On("Read", respHeaderLen).Return(nil, 0, io.EOF, nil).Maybe().Run(func(args mock.Arguments) {
+		<-closeChan
+	})
+	m.On("Close").Return(err).Once().Run(func(args mock.Arguments) {
+		close(closeChan)
+	})
 }
 
 func (m *connMock) Read(b []byte) (n int, err error) {

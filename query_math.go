@@ -179,7 +179,7 @@ func (o RandomOpts) toMap() map[string]interface{} {
 // Note: Any integer responses can be be coerced to floating-points, when
 // unmarshaling to a Go floating-point type. The last argument given will always
 // be the ‘open’ side of the range,  but when generating a floating-point
-// number, the ‘open’ side may be less than the ‘closed’ side.
+// number, the ‘open’ side may be less than the ‘connClosed’ side.
 func Random(args ...interface{}) Term {
 	var opts = map[string]interface{}{}
 
