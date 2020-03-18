@@ -28,7 +28,10 @@ func init() {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
-	fmt.Println("start test TestCluster_NewSingle_NoDiscover_Ok")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 	node1 := "node1"
 
@@ -42,7 +45,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
 	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once()
 
-	opts := &ConnectOpts{}
+	opts := &ConnectOpts{testname: testn}
 	seeds := []Host{host1}
 	cluster := &Cluster{
 		hp:          newHostPool(opts),
@@ -54,17 +57,22 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitFinalReads test %v\n", testn)
 	conn1.waitFinalRead()
 	conn2.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitDones test %v\n", testn)
 	conn1.waitDone()
 	conn2.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2)
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
-	fmt.Println("start test TestCluster_NewMultiple_NoDiscover_Ok")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28015}
 	node1 := "node1"
@@ -87,7 +95,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 	dialMock.On("Dial", host2.String()).Return(conn3, nil).Once()
 	dialMock.On("Dial", host2.String()).Return(conn4, nil).Once()
 
-	opts := &ConnectOpts{}
+	opts := &ConnectOpts{testname: testn}
 	seeds := []Host{host1, host2}
 	cluster := &Cluster{
 		hp:          newHostPool(opts),
@@ -99,12 +107,14 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitFinalReads test %v\n", testn)
 	conn1.waitFinalRead()
 	conn2.waitFinalRead()
 	conn3.waitFinalRead()
 	conn4.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitDones test %v\n", testn)
 	conn1.waitDone()
 	conn2.waitDone()
 	conn3.waitDone()
@@ -113,13 +123,16 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_DialFail(c *test.C) {
-	fmt.Println("start test TestCluster_NewSingle_NoDiscover_DialFail")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(nil, io.EOF).Once()
 
-	opts := &ConnectOpts{}
+	opts := &ConnectOpts{testname: testn}
 	seeds := []Host{host1}
 	cluster := &Cluster{
 		hp:          newHostPool(opts),
@@ -135,7 +148,10 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_DialFail(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C) {
-	fmt.Println("start test TestCluster_NewMultiple_NoDiscover_DialHalfFail")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28015}
 	node1 := "node1"
@@ -151,7 +167,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 	dialMock.On("Dial", host1.String()).Return(conn2, nil).Once()
 	dialMock.On("Dial", host2.String()).Return(nil, io.EOF).Once()
 
-	opts := &ConnectOpts{}
+	opts := &ConnectOpts{testname: testn}
 	seeds := []Host{host1, host2}
 	cluster := &Cluster{
 		hp:          newHostPool(opts),
@@ -163,17 +179,22 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitFinalReads test %v\n", testn)
 	conn1.waitFinalRead()
 	conn2.waitFinalRead()
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitDones test %v\n", testn)
 	conn1.waitDone()
 	conn2.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1, conn2)
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
-	fmt.Println("start test TestCluster_NewMultiple_NoDiscover_DialFail")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28015}
 
@@ -181,7 +202,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
 	dialMock.On("Dial", host1.String()).Return(nil, io.EOF).Once()
 	dialMock.On("Dial", host2.String()).Return(nil, io.EOF).Once()
 
-	opts := &ConnectOpts{}
+	opts := &ConnectOpts{testname: testn}
 	seeds := []Host{host1, host2}
 	cluster := &Cluster{
 		hp:          newHostPool(opts),
@@ -197,7 +218,10 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
-	fmt.Println("start test TestCluster_NewSingle_NoDiscover_ServerFail")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 
 	conn1 := &connMock{}
@@ -207,7 +231,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 	dialMock := &mockDial{}
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
 
-	opts := &ConnectOpts{}
+	opts := &ConnectOpts{testname: testn}
 	seeds := []Host{host1}
 	cluster := &Cluster{
 		hp:          newHostPool(opts),
@@ -219,12 +243,16 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, RQLConnectionError{rqlError(io.EOF.Error())})
+	fmt.Printf("waitDones test %v\n", testn)
 	conn1.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1)
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
-	fmt.Println("start test TestCluster_NewSingle_NoDiscover_PingFail")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 	node1 := "node1"
 
@@ -236,7 +264,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 	dialMock.On("Dial", host1.String()).Return(conn1, nil).Once()
 	dialMock.On("Dial", host1.String()).Return(nil, io.EOF).Once()
 
-	opts := &ConnectOpts{}
+	opts := &ConnectOpts{testname: testn}
 	seeds := []Host{host1}
 	cluster := &Cluster{
 		hp:          newHostPool(opts),
@@ -248,12 +276,16 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.Equals, io.EOF)
+	fmt.Printf("waitDones test %v\n", testn)
 	conn1.waitDone()
 	mock.AssertExpectationsForObjects(c, dialMock, conn1)
 }
 
 func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
-	fmt.Println("start test TestCluster_NewSingle_Discover_Ok")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "1.1.1.1", Port: 2222}
 	host3 := Host{Name: "2.2.2.2", Port: 3333}
@@ -278,7 +310,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 	dialMock.On("Dial", host2.String()).Return(conn3, nil).Once()
 	dialMock.On("Dial", host3.String()).Return(conn4, nil).Once()
 
-	opts := &ConnectOpts{DiscoverHosts: true}
+	opts := &ConnectOpts{DiscoverHosts: true, testname: testn}
 	seeds := []Host{host1}
 	cluster := &Cluster{
 		hp:               newHostPool(opts),
@@ -291,6 +323,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitFinalReads test %v\n", testn)
 	conn1.waitFinalRead()
 	conn2.waitFinalRead()
 	conn3.waitFinalRead()
@@ -300,6 +333,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 	}
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitDones test %v\n", testn)
 	conn1.waitDone()
 	conn2.waitDone()
 	conn3.waitDone()
@@ -308,7 +342,10 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 }
 
 func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
-	fmt.Println("start test TestCluster_NewMultiple_Discover_Ok")
+	testn := "TestCluster_NewSingle_NoDiscover_Ok"
+	fmt.Printf("start test %v\n", testn)
+	defer fmt.Printf("test done %v\n", testn)
+
 	host1 := Host{Name: "host1", Port: 28015}
 	host2 := Host{Name: "host2", Port: 28016}
 	host3 := Host{Name: "2.2.2.2", Port: 3333}
@@ -337,7 +374,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 	dialMock.On("Dial", host2.String()).Return(conn4, nil).Once()
 	dialMock.On("Dial", host3.String()).Return(conn5, nil).Once()
 
-	opts := &ConnectOpts{DiscoverHosts: true}
+	opts := &ConnectOpts{DiscoverHosts: true, testname: testn}
 	seeds := []Host{host1, host2}
 	cluster := &Cluster{
 		hp:               newHostPool(opts),
@@ -350,6 +387,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 
 	err := cluster.run()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitFinalReads test %v\n", testn)
 	conn1.waitFinalRead()
 	conn2.waitFinalRead()
 	conn3.waitFinalRead()
@@ -360,6 +398,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 	}
 	err = cluster.Close()
 	c.Assert(err, test.IsNil)
+	fmt.Printf("waitDones test %v\n", testn)
 	conn1.waitDone()
 	conn2.waitDone()
 	conn3.waitDone()

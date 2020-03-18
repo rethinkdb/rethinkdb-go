@@ -301,6 +301,9 @@ func (c *Cluster) connectCluster() error {
 	nodeSet := map[string]*Node{}
 	var attemptErr error
 
+	fmt.Printf("connect cluster %v\n", c.opts.testname)
+	defer fmt.Printf("connect cluster done %v\n", c.opts.testname)
+
 	// Attempt to connect to each seed host
 	for _, host := range c.seeds {
 		conn, err := c.connFactory(host.String(), c.opts)
@@ -315,9 +318,14 @@ func (c *Cluster) connectCluster() error {
 			attemptErr = err
 			Log.Warnf("Error fetching server ID: %s", err)
 			_ = conn.Close()
+
+			fmt.Printf("conn.Server() error: %v %v\n", err, c.opts.testname)
+
 			continue
 		}
 		_ = conn.Close()
+
+		fmt.Printf("conn.Server() resp %v %v\n", svrRsp.ID, c.opts.testname)
 
 		node, err := c.connectNode(svrRsp.ID, []Host{host})
 		if err != nil {
