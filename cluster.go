@@ -12,7 +12,7 @@ import (
 	"github.com/hailocab/go-hostpool"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
-	"gopkg.in/cenkalti/backoff.v4"
+	"gopkg.in/cenkalti/backoff.v2"
 )
 
 var errClusterClosed = errors.New("rethinkdb: cluster is closed")

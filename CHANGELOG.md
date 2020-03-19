@@ -2,7 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## v6.2.0 - 2020-03-16
+## v6.2.1 - 2020-03-19
+
+- Revert backoff v4 for gopath compatibility
+
+## v6.2.0 - 2020-03-18
 
 - Backoff v4
 - Reworked cluster discovery
