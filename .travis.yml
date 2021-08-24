@@ -8,8 +8,8 @@ go:
 go_import_path: gopkg.in/rethinkdb/rethinkdb-go.v6
 
 before_script:
-  - source /etc/lsb-release && echo "deb http://download.rethinkdb.com/apt $DISTRIB_CODENAME main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
-  - wget -qO- http://download.rethinkdb.com/apt/pubkey.gpg | sudo apt-key add -
+  - source /etc/lsb-release && echo "deb https://download.rethinkdb.com/repository/ubuntu-$TRAVIS_DIST $TRAVIS_DIST main" | sudo tee /etc/apt/sources.list.d/rethinkdb.list
+  - wget -qO- https://download.rethinkdb.com/repository/raw/pubkey.gpg | sudo apt-key add -
   - sudo apt-get update
   - sudo apt-get install rethinkdb
   - rethinkdb > /dev/null 2>&1 &
