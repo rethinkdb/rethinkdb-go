@@ -8,3 +8,7 @@ integration:
 
 benchpool:
 	go test -v -cpu 1,2,4,8,16,24,32,64,128,256 -bench=BenchmarkConnectionPool -run ^$ ./internal/integration/tests/
+
+generate:
+	go generate ./internal/...
+

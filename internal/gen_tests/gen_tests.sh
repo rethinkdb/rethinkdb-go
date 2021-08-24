@@ -2,13 +2,15 @@
 
 set -e
 
-if [[ $REQL_TEST_DIR == "" ]]
+if [[ ! -d $REQL_TEST_DIR ]]
 then
-    echo "\$REQL_TEST_DIR must be specified"
+    echo "REQL_TEST_DIR must be set to the local copy of the https://github.com/rethinkdb/rethinkdb/tree/next/test/rql_test/src/ directory."
     exit 1
 fi
 
-../gen_tests/gen_tests.py --test-dir=$REQL_TEST_DIR
+SCRIPT_DIR=$(dirname "$0")
+
+$SCRIPT_DIR/gen_tests.py --test-dir=$REQL_TEST_DIR
 
 goimports -w . > /dev/null
 
