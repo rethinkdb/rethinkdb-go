@@ -51,7 +51,7 @@ GO_KEYWORDS = [
 
 def main():
     logging.basicConfig(format="[%(name)s] %(message)s", level=logging.INFO)
-    start = time.clock()
+    start = time.perf_counter()
     args = parse_args()
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -81,7 +81,7 @@ def main():
             test_output_dir=args.test_output_dir,
             renderer=renderer,
         ).load().render()
-    logger.info("Finished in %s seconds", time.clock() - start)
+    logger.info("Finished in %s seconds", time.perf_counter() - start)
 
 
 def parse_args():
