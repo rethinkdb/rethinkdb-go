@@ -129,7 +129,7 @@ def import_python_driver(py_driver_dir):
     '''Imports the test driver header'''
     stashed_path = sys.path
     sys.path.insert(0, os.path.realpath(py_driver_dir))
-    import rethinkdb as r
+    from rethinkdb import r
     sys.path = stashed_path
     return r
 
