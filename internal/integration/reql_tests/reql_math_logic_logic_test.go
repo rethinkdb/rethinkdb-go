@@ -36,10 +36,10 @@ func (suite *MathLogicLogicSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_logic2").Exec(suite.session)
-	err = r.DBCreate("db_logic2").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_logic2").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
 }
@@ -49,7 +49,7 @@ func (suite *MathLogicLogicSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DBDrop("db_logic2").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -704,62 +704,62 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	}
 
 	{
-		// math_logic/logic.yaml line #155
+		// math_logic/logic.yaml line #156
 		/* true */
 		var expected_ bool = true
 		/* r.expr(1) & True */
 
-		suite.T().Log("About to run line #155: r.Expr(1).And(true)")
+		suite.T().Log("About to run line #156: r.Expr(1).And(true)")
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).And(true), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #155")
+		suite.T().Log("Finished running line #156")
 	}
 
 	{
-		// math_logic/logic.yaml line #159
+		// math_logic/logic.yaml line #160
 		/* ("str") */
 		var expected_ string = "str"
 		/* r.expr(False) | 'str' */
 
-		suite.T().Log("About to run line #159: r.Expr(false).Or('str')")
+		suite.T().Log("About to run line #160: r.Expr(false).Or('str')")
 
 		runAndAssert(suite.Suite, expected_, r.Expr(false).Or("str"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #159")
+		suite.T().Log("Finished running line #160")
 	}
 
 	{
-		// math_logic/logic.yaml line #163
+		// math_logic/logic.yaml line #164
 		/* false */
 		var expected_ bool = false
 		/* ~r.expr(1) */
 
-		suite.T().Log("About to run line #163: r.Expr(1).Not()")
+		suite.T().Log("About to run line #164: r.Expr(1).Not()")
 
 		runAndAssert(suite.Suite, expected_, r.Expr(1).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #163")
+		suite.T().Log("Finished running line #164")
 	}
 
 	{
-		// math_logic/logic.yaml line #167
+		// math_logic/logic.yaml line #168
 		/* true */
 		var expected_ bool = true
 		/* ~r.expr(null) */
 
-		suite.T().Log("About to run line #167: r.Expr(nil).Not()")
+		suite.T().Log("About to run line #168: r.Expr(nil).Not()")
 
 		runAndAssert(suite.Suite, expected_, r.Expr(nil).Not(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #167")
+		suite.T().Log("Finished running line #168")
 	}
 }

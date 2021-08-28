@@ -300,17 +300,18 @@ type ChangeResponse struct {
 
 // RunOpts contains the optional arguments for the Run function.
 type RunOpts struct {
-	DB             interface{} `rethinkdb:"db,omitempty"`
-	Db             interface{} `rethinkdb:"db,omitempty"` // Deprecated
-	Profile        interface{} `rethinkdb:"profile,omitempty"`
-	Durability     interface{} `rethinkdb:"durability,omitempty"`
-	UseOutdated    interface{} `rethinkdb:"use_outdated,omitempty"` // Deprecated
-	ArrayLimit     interface{} `rethinkdb:"array_limit,omitempty"`
-	TimeFormat     interface{} `rethinkdb:"time_format,omitempty"`
-	GroupFormat    interface{} `rethinkdb:"group_format,omitempty"`
-	BinaryFormat   interface{} `rethinkdb:"binary_format,omitempty"`
-	GeometryFormat interface{} `rethinkdb:"geometry_format,omitempty"`
-	ReadMode       interface{} `rethinkdb:"read_mode,omitempty"`
+	DB                  interface{} `rethinkdb:"db,omitempty"`
+	Db                  interface{} `rethinkdb:"db,omitempty"` // Deprecated
+	Profile             interface{} `rethinkdb:"profile,omitempty"`
+	Durability          interface{} `rethinkdb:"durability,omitempty"`
+	UseOutdated         interface{} `rethinkdb:"use_outdated,omitempty"` // Deprecated
+	ArrayLimit          interface{} `rethinkdb:"array_limit,omitempty"`
+	TimeFormat          interface{} `rethinkdb:"time_format,omitempty"`
+	GroupFormat         interface{} `rethinkdb:"group_format,omitempty"`
+	BinaryFormat        interface{} `rethinkdb:"binary_format,omitempty"`
+	GeometryFormat      interface{} `rethinkdb:"geometry_format,omitempty"`
+	ReadMode            interface{} `rethinkdb:"read_mode,omitempty"`
+	ChangefeedQueueSize interface{} `rethinkdb:"changefeed_queue_size,omitempty"`
 
 	MinBatchRows              interface{} `rethinkdb:"min_batch_rows,omitempty"`
 	MaxBatchRows              interface{} `rethinkdb:"max_batch_rows,omitempty"`

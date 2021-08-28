@@ -36,16 +36,16 @@ func (suite *ChangefeedsIncludeStatesSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_feed_include").Exec(suite.session)
-	err = r.DBCreate("db_feed_include").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_feed_include").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("db_feed_include").TableDrop("table_test_changefeed_include").Exec(suite.session)
-	err = r.DB("db_feed_include").TableCreate("table_test_changefeed_include").Exec(suite.session)
+	r.DB("test").TableDrop("tbl").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_feed_include").Table("table_test_changefeed_include").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *ChangefeedsIncludeStatesSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("db_feed_include").TableDrop("table_test_changefeed_include").Exec(suite.session)
-		r.DBDrop("db_feed_include").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,18 +64,18 @@ func (suite *ChangefeedsIncludeStatesSuite) TearDownSuite() {
 func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	suite.T().Log("Running ChangefeedsIncludeStatesSuite: Test `include_states`")
 
-	table_test_changefeed_include := r.DB("db_feed_include").Table("table_test_changefeed_include")
-	_ = table_test_changefeed_include // Prevent any noused variable errors
+	tbl := r.DB("test").Table("tbl")
+	_ = tbl // Prevent any noused variable errors
 
 	{
 		// changefeeds/include_states.yaml line #4
 		/* [{'state':'ready'}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "ready"}}
-		/* table_test_changefeed_include.changes(squash=true, include_states=true).limit(1) */
+		/* tbl.changes(squash=true, include_states=true).limit(1) */
 
-		suite.T().Log("About to run line #4: table_test_changefeed_include.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, }).Limit(1)")
+		suite.T().Log("About to run line #4: tbl.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, }).Limit(1)")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true}).Limit(1), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true}).Limit(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -86,11 +86,11 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 		// changefeeds/include_states.yaml line #9
 		/* [{'state':'initializing'}, {'new_val':null}, {'state':'ready'}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": nil}, map[interface{}]interface{}{"state": "ready"}}
-		/* table_test_changefeed_include.get(0).changes(squash=true, include_states=true, include_initial=true).limit(3) */
+		/* tbl.get(0).changes(squash=true, include_states=true, include_initial=true).limit(3) */
 
-		suite.T().Log("About to run line #9: table_test_changefeed_include.Get(0).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(3)")
+		suite.T().Log("About to run line #9: tbl.Get(0).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(3)")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.Get(0).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true}).Limit(3), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(0).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true}).Limit(3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -101,11 +101,11 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 		// changefeeds/include_states.yaml line #14
 		/* [{'state':'initializing'}, {'state':'ready'}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"state": "ready"}}
-		/* table_test_changefeed_include.order_by(index='id').limit(10).changes(squash=true, include_states=true, include_initial=true).limit(2) */
+		/* tbl.order_by(index='id').limit(10).changes(squash=true, include_states=true, include_initial=true).limit(2) */
 
-		suite.T().Log("About to run line #14: table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(2)")
+		suite.T().Log("About to run line #14: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(2)")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true}).Limit(2), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true}).Limit(2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -116,11 +116,11 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 		// changefeeds/include_states.yaml line #19
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* table_test_changefeed_include.insert({'id':1}) */
+		/* tbl.insert({'id':1}) */
 
-		suite.T().Log("About to run line #19: table_test_changefeed_include.Insert(map[interface{}]interface{}{'id': 1, })")
+		suite.T().Log("About to run line #19: tbl.Insert(map[interface{}]interface{}{'id': 1, })")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.Insert(map[interface{}]interface{}{"id": 1}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -131,11 +131,11 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 		// changefeeds/include_states.yaml line #21
 		/* [{'state':'initializing'}, {'new_val':{'id':1}}, {'state':'ready'}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"state": "ready"}}
-		/* table_test_changefeed_include.order_by(index='id').limit(10).changes(squash=true, include_states=true, include_initial=true).limit(3) */
+		/* tbl.order_by(index='id').limit(10).changes(squash=true, include_states=true, include_initial=true).limit(3) */
 
-		suite.T().Log("About to run line #21: table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(3)")
+		suite.T().Log("About to run line #21: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(3)")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true}).Limit(3), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true}).Limit(3), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -143,21 +143,21 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	}
 
 	// changefeeds/include_states.yaml line #26
-	// table_test_changefeed_includechanges = table_test_changefeed_include.changes(squash=true, include_states=true)
-	suite.T().Log("Possibly executing: var table_test_changefeed_includechanges r.Term = table_test_changefeed_include.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, })")
+	// tblchanges = tbl.changes(squash=true, include_states=true)
+	suite.T().Log("Possibly executing: var tblchanges r.Term = tbl.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, })")
 
-	table_test_changefeed_includechanges := maybeRun(table_test_changefeed_include.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true}), suite.session, r.RunOpts{})
-	_ = table_test_changefeed_includechanges // Prevent any noused variable errors
+	tblchanges := maybeRun(tbl.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true}), suite.session, r.RunOpts{})
+	_ = tblchanges // Prevent any noused variable errors
 
 	{
 		// changefeeds/include_states.yaml line #30
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* table_test_changefeed_include.insert({'id':2}) */
+		/* tbl.insert({'id':2}) */
 
-		suite.T().Log("About to run line #30: table_test_changefeed_include.Insert(map[interface{}]interface{}{'id': 2, })")
+		suite.T().Log("About to run line #30: tbl.Insert(map[interface{}]interface{}{'id': 2, })")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.Insert(map[interface{}]interface{}{"id": 2}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 2}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -168,30 +168,30 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 		// changefeeds/include_states.yaml line #32
 		/* [{'state':'ready'},{'new_val':{'id':2},'old_val':null}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 2}, "old_val": nil}}
-		/* fetch(table_test_changefeed_includechanges, 2) */
+		/* fetch(tblchanges, 2) */
 
-		suite.T().Log("About to run line #32: fetch(table_test_changefeed_includechanges, 2)")
+		suite.T().Log("About to run line #32: fetch(tblchanges, 2)")
 
-		fetchAndAssert(suite.Suite, expected_, table_test_changefeed_includechanges, 2)
+		fetchAndAssert(suite.Suite, expected_, tblchanges, 2)
 		suite.T().Log("Finished running line #32")
 	}
 
 	// changefeeds/include_states.yaml line #35
-	// getchanges = table_test_changefeed_include.get(2).changes(include_states=true, include_initial=true)
-	suite.T().Log("Possibly executing: var getchanges r.Term = table_test_changefeed_include.Get(2).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true, })")
+	// getchanges = tbl.get(2).changes(include_states=true, include_initial=true)
+	suite.T().Log("Possibly executing: var getchanges r.Term = tbl.Get(2).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true, })")
 
-	getchanges := maybeRun(table_test_changefeed_include.Get(2).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true}), suite.session, r.RunOpts{})
+	getchanges := maybeRun(tbl.Get(2).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true}), suite.session, r.RunOpts{})
 	_ = getchanges // Prevent any noused variable errors
 
 	{
 		// changefeeds/include_states.yaml line #39
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* table_test_changefeed_include.get(2).update({'a':1}) */
+		/* tbl.get(2).update({'a':1}) */
 
-		suite.T().Log("About to run line #39: table_test_changefeed_include.Get(2).Update(map[interface{}]interface{}{'a': 1, })")
+		suite.T().Log("About to run line #39: tbl.Get(2).Update(map[interface{}]interface{}{'a': 1, })")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.Get(2).Update(map[interface{}]interface{}{"a": 1}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(2).Update(map[interface{}]interface{}{"a": 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -211,28 +211,28 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	}
 
 	// changefeeds/include_states.yaml line #44
-	// limitchanges = table_test_changefeed_include.order_by(index='id').limit(10).changes(include_states=true, include_initial=true)
-	suite.T().Log("Possibly executing: var limitchanges r.Term = table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true, })")
+	// limitchanges = tbl.order_by(index='id').limit(10).changes(include_states=true, include_initial=true)
+	suite.T().Log("Possibly executing: var limitchanges r.Term = tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true, })")
 
-	limitchanges := maybeRun(table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true}), suite.session, r.RunOpts{})
+	limitchanges := maybeRun(tbl.OrderBy().OptArgs(r.OrderByOpts{Index: "id"}).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true}), suite.session, r.RunOpts{})
 	_ = limitchanges // Prevent any noused variable errors
 
 	// changefeeds/include_states.yaml line #48
-	// limitchangesdesc = table_test_changefeed_include.order_by(index=r.desc('id')).limit(10).changes(include_states=true, include_initial=true)
-	suite.T().Log("Possibly executing: var limitchangesdesc r.Term = table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc('id'), }).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true, })")
+	// limitchangesdesc = tbl.order_by(index=r.desc('id')).limit(10).changes(include_states=true, include_initial=true)
+	suite.T().Log("Possibly executing: var limitchangesdesc r.Term = tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc('id'), }).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true, })")
 
-	limitchangesdesc := maybeRun(table_test_changefeed_include.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc("id")}).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true}), suite.session, r.RunOpts{})
+	limitchangesdesc := maybeRun(tbl.OrderBy().OptArgs(r.OrderByOpts{Index: r.Desc("id")}).Limit(10).Changes().OptArgs(r.ChangesOpts{IncludeStates: true, IncludeInitial: true}), suite.session, r.RunOpts{})
 	_ = limitchangesdesc // Prevent any noused variable errors
 
 	{
 		// changefeeds/include_states.yaml line #52
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* table_test_changefeed_include.insert({'id':3}) */
+		/* tbl.insert({'id':3}) */
 
-		suite.T().Log("About to run line #52: table_test_changefeed_include.Insert(map[interface{}]interface{}{'id': 3, })")
+		suite.T().Log("About to run line #52: tbl.Insert(map[interface{}]interface{}{'id': 3, })")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_include.Insert(map[interface{}]interface{}{"id": 3}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": 3}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
