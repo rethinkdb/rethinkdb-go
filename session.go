@@ -82,6 +82,10 @@ type ConnectOpts struct {
 	// the maximum number of connections held in the pool. By default the
 	// maximum number of connections is 1
 	MaxOpen int `rethinkdb:"max_open,omitempty" json:"max_open,omitempty"`
+	// BusyPoolWait is called by the internal connection pool to wait when
+	// every connection in the pool is already in use.  If nil a short
+	// default delay will be used.
+	BusyPoolWait PoolBusyWaitFunc
 
 	// Below options are for cluster discovery, please note there is a high
 	// probability of these changing as the API is still being worked on.
@@ -293,7 +297,8 @@ func (s *Session) Database() string {
 	return s.opts.Database
 }
 
-// Query executes a ReQL query using the session to connect to the database
+// Query executes a ReQL query using the session to connect to the database.
+// The returned cursor should be closed (either directly or indirectly) when it is no longer needed.
 func (s *Session) Query(ctx context.Context, q Query) (*Cursor, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

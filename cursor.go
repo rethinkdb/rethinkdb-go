@@ -15,7 +15,7 @@ import (
 
 var (
 	errNilCursor    = errors.New("cursor is nil")
-	errCursorClosed = errors.New("connection connClosed, cannot read cursor")
+	errCursorClosed = errors.New("connection closed, cannot read cursor")
 )
 
 func newCursor(ctx context.Context, conn *Connection, cursorType string, token int64, term *Term, opts map[string]interface{}) *Cursor {
@@ -120,8 +120,8 @@ func (c *Cursor) Err() error {
 }
 
 // Close closes the cursor, preventing further enumeration. If the end is
-// encountered, the cursor is connClosed automatically. Close is idempotent.
-func (c *Cursor) Close() error {
+// encountered, the cursor is closed automatically. Close is idempotent.
+func (c *Cursor) Close() (result error) {
 	if c == nil {
 		return errNilCursor
 	}
@@ -129,12 +129,19 @@ func (c *Cursor) Close() error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	var err error
-
-	// If cursor is already connClosed return immediately
+	// If cursor is already closed return immediately
 	closed := c.closed
 	if closed {
 		return nil
+	}
+
+	if c.releaseConn != nil {
+		defer func() {
+			err := c.releaseConn()
+			if err != nil {
+				result = err
+			}
+		}()
 	}
 
 	// Get connection and check its valid, don't need to lock as this is only
@@ -148,14 +155,10 @@ func (c *Cursor) Close() error {
 	}
 
 	// Stop any unfinished queries
+	var err error
+
 	if !c.finished {
 		_, _, err = conn.Query(c.ctx, newStopQuery(c.token))
-	}
-
-	if c.releaseConn != nil {
-		if err := c.releaseConn(); err != nil {
-			return err
-		}
 	}
 
 	if span := opentracing.SpanFromContext(c.ctx); span != nil {
@@ -601,7 +604,7 @@ func (c *Cursor) seekCursor(bufferResponse bool) error {
 	}
 
 	// Loop over loading data, applying skips as necessary and loading more data as needed
-	// until either the cursor is connClosed or finished, or we have applied all outstanding
+	// until either the cursor is closed or finished, or we have applied all outstanding
 	// skips and data is available
 	for {
 		c.applyPendingSkips(bufferResponse) // if we are buffering the responses, skip can drain from the buffer

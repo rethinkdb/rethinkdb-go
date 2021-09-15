@@ -87,7 +87,8 @@ func (n *Node) NoReplyWait() error {
 	})
 }
 
-// Query executes a ReQL query using this nodes connection pool.
+// Query executes a ReQL query using this node's connection pool.
+// The returned cursor should be closed (either directly or indirectly) when it is no longer needed.
 func (n *Node) Query(ctx context.Context, q Query) (cursor *Cursor, err error) {
 	if n.Closed() {
 		return nil, ErrInvalidNode

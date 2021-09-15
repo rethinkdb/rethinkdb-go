@@ -78,7 +78,8 @@ func (c *Cluster) run() error {
 	return nil
 }
 
-// Query executes a ReQL query using the cluster to connect to the database
+// Query executes a ReQL query using the cluster to connect to the database.
+// The returned cursor should be closed (either directly or indirectly) when it is no longer needed.
 func (c *Cluster) Query(ctx context.Context, q Query) (cursor *Cursor, err error) {
 	for i := 0; i < c.numRetries(); i++ {
 		var node *Node

@@ -11,11 +11,13 @@ require (
 	github.com/onsi/ginkgo v1.12.0 // indirect
 	github.com/onsi/gomega v1.9.0 // indirect
 	github.com/opentracing/opentracing-go v1.1.0
+	github.com/silentred/gid v1.0.1
 	github.com/sirupsen/logrus v1.0.6
 	github.com/stretchr/objx v0.2.0 // indirect
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/crypto v0.0.0-20200302210943-78000ba7a073
 	golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
+	golang.org/x/sync v0.0.0-20180314180146-1d60e4601c6f
 	gopkg.in/airbrake/gobrake.v2 v2.0.9 // indirect
 	gopkg.in/cenkalti/backoff.v2 v2.2.1
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f
@@ -23,4 +25,4 @@ require (
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
 
-go 1.14
+go 1.12

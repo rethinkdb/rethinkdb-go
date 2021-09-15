@@ -1,21 +1,21 @@
 package rethinkdb
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"net"
+	"sync"
 	"sync/atomic"
 	"time"
 
-	"bytes"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
 	"golang.org/x/net/context"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
-	"sync"
 )
 
 const (
@@ -60,6 +60,8 @@ type Connection struct {
 	stopProcessingChan chan struct{}
 	mu                 sync.Mutex
 }
+
+type connFactory func(host string, opts *ConnectOpts) (*Connection, error)
 
 type responseAndError struct {
 	response *Response
