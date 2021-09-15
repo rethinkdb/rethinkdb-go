@@ -5,13 +5,14 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
+	"time"
+
 	"github.com/stretchr/testify/mock"
 	test "gopkg.in/check.v1"
 	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
-	"io"
-	"net"
-	"time"
 )
 
 type ClusterSuite struct{}
@@ -360,20 +361,20 @@ type mockDial struct {
 }
 
 func mockedConnectionFactory(dial *mockDial) connFactory {
-	return func(host string, opts *ConnectOpts) (connection *Connection, err error) {
+	return func(host string, opts *ConnectOpts) (connection, error) {
 		args := dial.MethodCalled("Dial", host)
-		err = args.Error(1)
+		err := args.Error(1)
 		if err != nil {
 			return nil, err
 		}
 
-		connection = newConnection(args.Get(0).(net.Conn), host, opts)
-		done := runConnection(connection)
+		conn := newConnection(args.Get(0).(net.Conn), host, opts)
+		done := runConnection(conn)
 
 		m := args.Get(0).(*connMock)
 		m.setDone(done)
 
-		return connection, nil
+		return conn, nil
 	}
 }
 

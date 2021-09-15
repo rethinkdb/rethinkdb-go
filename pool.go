@@ -42,7 +42,7 @@ type Pool struct {
 }
 
 type countedConn struct {
-	conn        *Connection
+	conn        connection
 	mu          int64
 	refCount    int64
 	goroutineID int64
@@ -50,7 +50,9 @@ type countedConn struct {
 
 // NewPool creates a new connection pool for the given host
 func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
-	return newPool(host, opts, NewConnection)
+	return newPool(host, opts, func(host string, opts *ConnectOpts) (connection, error) {
+		return NewConnection(host, opts)
+	})
 }
 
 func newPool(host Host, opts *ConnectOpts, connFactory connFactory) (*Pool, error) {
@@ -232,7 +234,7 @@ func (p *Pool) Server() (ServerResponse, error) {
 }
 
 // getConnection returns a valid (usable) connection from the pool having the given index.
-func (p *Pool) getConnection(pos int) (*Connection, error) {
+func (p *Pool) getConnection(pos int) (connection, error) {
 	conn := &p.countedConns[pos].conn
 	var err error
 

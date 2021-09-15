@@ -61,7 +61,7 @@ func newCursor(ctx context.Context, conn *Connection, cursorType string, token i
 type Cursor struct {
 	releaseConn func() error
 
-	conn       *Connection
+	conn       connection
 	connOpts   *ConnectOpts
 	token      int64
 	cursorType string

@@ -61,7 +61,15 @@ type Connection struct {
 	mu                 sync.Mutex
 }
 
-type connFactory func(host string, opts *ConnectOpts) (*Connection, error)
+type connection interface {
+	Server() (ServerResponse, error)
+	Query(context.Context, Query) (*Response, *Cursor, error)
+	Close() error
+	isBad() bool
+	isClosed() bool
+}
+
+type connFactory func(host string, opts *ConnectOpts) (connection, error)
 
 type responseAndError struct {
 	response *Response

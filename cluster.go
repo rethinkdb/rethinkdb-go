@@ -46,11 +46,13 @@ type Cluster struct {
 // NewCluster creates a new cluster by connecting to the given hosts.
 func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
 	c := &Cluster{
-		hp:          newHostPool(opts),
-		seeds:       hosts,
-		opts:        opts,
-		closed:      clusterWorking,
-		connFactory: NewConnection,
+		hp:     newHostPool(opts),
+		seeds:  hosts,
+		opts:   opts,
+		closed: clusterWorking,
+		connFactory: func(host string, opts *ConnectOpts) (connection, error) {
+			return NewConnection(host, opts)
+		},
 	}
 
 	err := c.run()
