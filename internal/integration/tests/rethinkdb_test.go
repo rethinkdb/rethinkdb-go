@@ -75,12 +75,12 @@ func testBenchmarkSetup() {
 	r.DBDrop("benchmarks").Exec(session)
 	r.DBCreate("benchmarks").Exec(session)
 
-	r.DB("benchmarks").TableDrop("benchmarks").Run(session)
-	r.DB("benchmarks").TableCreate("benchmarks").Run(session)
+	r.DB("benchmarks").TableDrop("benchmarks").Exec(session)
+	r.DB("benchmarks").TableCreate("benchmarks").Exec(session)
 }
 
 func testBenchmarkTeardown() {
-	r.DBDrop("benchmarks").Run(session)
+	r.DBDrop("benchmarks").Exec(session)
 }
 
 func TestMain(m *testing.M) {
@@ -274,7 +274,7 @@ func (s *RethinkSuite) BenchmarkGet(c *test.C) {
 			"id": i,
 		})
 	}
-	r.DB("testb1").Table("TestManyBench1").Insert(data).Run(session)
+	r.DB("testb1").Table("TestManyBench1").Insert(data).Exec(session)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
@@ -310,7 +310,7 @@ func (s *RethinkSuite) BenchmarkGetStruct(c *test.C) {
 			}},
 		})
 	}
-	r.DB("testb2").Table("TestManyBench2").Insert(data).Run(session)
+	r.DB("testb2").Table("TestManyBench2").Insert(data).Exec(session)
 
 	for i := 0; i < c.N; i++ {
 		n := rand.Intn(100)
@@ -340,7 +340,7 @@ func (s *RethinkSuite) BenchmarkSelectMany(c *test.C) {
 			"id": i,
 		})
 	}
-	r.DB("testb3").Table("TestManyBench3").Insert(data).Run(session)
+	r.DB("testb3").Table("TestManyBench3").Insert(data).Exec(session)
 
 	for i := 0; i < c.N; i++ {
 		// Test query
@@ -373,7 +373,7 @@ func (s *RethinkSuite) BenchmarkSelectManyStruct(c *test.C) {
 			}},
 		})
 	}
-	r.DB("testb4").Table("TestManyBench4").Insert(data).Run(session)
+	r.DB("testb4").Table("TestManyBench4").Insert(data).Exec(session)
 
 	for i := 0; i < c.N; i++ {
 		// Test query

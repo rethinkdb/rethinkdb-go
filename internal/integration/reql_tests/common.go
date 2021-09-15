@@ -53,6 +53,10 @@ func runAndAssert(suite suite.Suite, expected, v interface{}, session *r.Session
 	}
 
 	assertExpected(suite, expected, cursor, err)
+
+	if cursor != nil {
+		cursor.Close()
+	}
 }
 
 func fetchAndAssert(suite suite.Suite, expected, result interface{}, count int) {
@@ -81,6 +85,16 @@ func fetchAndAssert(suite suite.Suite, expected, result interface{}, count int) 
 	}
 
 	assertExpected(suite, expected, cursor, err)
+
+	if cursor != nil {
+		/* Cursors should ordinarily be closed when they are no longer needed, otherwise an application using
+		   multiple goroutines might hang waiting for a free connection in the pool.  However, some of the
+		   generated changefeed tests expect the cursor will return additional changes after fetchAndAssert()
+		   is called.  This means we must leave test cursors hanging open for these tests to pass.
+		*/
+
+		//cursor.Close()
+	}
 }
 
 func maybeLen(v interface{}) interface{} {

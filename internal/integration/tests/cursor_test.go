@@ -1,7 +1,6 @@
 package tests
 
 import (
-	"fmt"
 	"time"
 
 	test "gopkg.in/check.v1"
@@ -195,6 +194,8 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	res, err := r.DB("test_empty_res").Table("test_empty_res").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 
 	res, err = r.DB("test_empty_res").Table("test_empty_res").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
@@ -206,20 +207,28 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	res, err = r.Expr(nil).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 
 	res, err = r.DB("test_empty_res").Table("test_empty_res").Get("missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 
 	res, err = r.DB("test_empty_res").Table("test_empty_res").GetAll("missing value", "another missing value").Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.Next(&response), test.Equals, false)
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 
 	var obj object
 	obj.Name = "missing value"
 	res, err = r.DB("test_empty_res").Table("test_empty_res").Filter(obj).Run(session)
 	c.Assert(err, test.IsNil)
 	c.Assert(res.IsNil(), test.Equals, true)
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 
 	var objP *object
 
@@ -227,6 +236,8 @@ func (s *RethinkSuite) TestEmptyResults(c *test.C) {
 	res.Next(&objP)
 	c.Assert(err, test.IsNil)
 	c.Assert(objP, test.IsNil)
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorAll(c *test.C) {
@@ -346,6 +357,9 @@ func (s *RethinkSuite) TestCursorListen(c *test.C) {
 			}},
 		},
 	})
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorChangesClose(c *test.C) {
@@ -424,6 +438,9 @@ func (s *RethinkSuite) TestCursorReuseResult(c *test.C) {
 		i++
 	}
 	c.Assert(res.Err(), test.IsNil)
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorNextResponse(c *test.C) {
@@ -434,6 +451,9 @@ func (s *RethinkSuite) TestCursorNextResponse(c *test.C) {
 	b, ok := res.NextResponse()
 	c.Assert(ok, test.Equals, true)
 	c.Assert(b, JsonEquals, []byte(`5`))
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorNextResponse_object(c *test.C) {
@@ -444,6 +464,9 @@ func (s *RethinkSuite) TestCursorNextResponse_object(c *test.C) {
 	b, ok := res.NextResponse()
 	c.Assert(ok, test.Equals, true)
 	c.Assert(b, JsonEquals, []byte(`{"foo":"bar"}`))
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorPeek_idempotency(c *test.C) {
@@ -460,6 +483,8 @@ func (s *RethinkSuite) TestCursorPeek_idempotency(c *test.C) {
 		c.Assert(hasMore, test.Equals, true)
 	}
 
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorPeek_wrong_type(c *test.C) {
@@ -476,6 +501,9 @@ func (s *RethinkSuite) TestCursorPeek_wrong_type(c *test.C) {
 	c.Assert(err, test.NotNil)
 	c.Assert(hasMore, test.Equals, false)
 	c.Assert(res.Err(), test.IsNil)
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorPeek_usage(c *test.C) {
@@ -495,6 +523,9 @@ func (s *RethinkSuite) TestCursorPeek_usage(c *test.C) {
 	hasMore = res.Next(&result)
 	c.Assert(result, test.Equals, 2)
 	c.Assert(hasMore, test.Equals, true)
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestCursorSkip(c *test.C) {
@@ -507,26 +538,7 @@ func (s *RethinkSuite) TestCursorSkip(c *test.C) {
 	hasMore := res.Next(&result)
 	c.Assert(result, test.Equals, 2)
 	c.Assert(hasMore, test.Equals, true)
-}
 
-func ExampleCursor_Peek() {
-	res, err := r.Expr([]int{1, 2, 3}).Run(session)
-	if err != nil {
-		fmt.Print(err)
-		return
-	}
-
-	var result, altResult int
-	wasRead, err := res.Peek(&result) // Result is now 1
-	if err != nil {
-		fmt.Print(err)
-		return
-	} else if !wasRead {
-		fmt.Print("No data to read!")
-	}
-
-	res.Next(&altResult) // altResult is also 1, peek didn't progress the cursor
-
-	res.Skip()        // progress the cursor, skipping 2
-	res.Peek(&result) // result is now 3
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }

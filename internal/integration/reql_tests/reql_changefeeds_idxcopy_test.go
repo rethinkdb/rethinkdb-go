@@ -53,6 +53,14 @@ func (suite *ChangefeedsIdxcopySuite) TearDownSuite() {
 	suite.T().Log("Tearing down ChangefeedsIdxcopySuite")
 
 	if suite.session != nil {
+		/* TearDownSuite() will block if a cursor is left open by a test, because:
+		     * the pool only contains one connection by default,
+		     * that connection can only be used by the goroutine that acquired it (until it's released), and
+			 * stretchr/testify/suite runs SetupTest() and TestCases() in a different goroutine than TearDownSuite().
+		*/
+		err := suite.session.Reconnect()
+		suite.Require().NoError(err, "Error returned when reconnecting to server")
+
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
 		r.DB("db_feed_idxcopy").TableDrop("table_test_changefeed_idx").Exec(suite.session)
 		r.DBDrop("db_feed_idxcopy").Exec(suite.session)

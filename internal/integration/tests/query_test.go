@@ -485,6 +485,9 @@ func (s *RethinkSuite) TestTableChanges(c *test.C) {
 	wg.Wait()
 
 	c.Assert(n, test.Equals, 10)
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
@@ -599,6 +602,9 @@ func (s *RethinkSuite) TestTableChangesIncludeInitial(c *test.C) {
 	wg.Wait()
 
 	c.Assert(n, test.Equals, 10)
+
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
 
 func (s *RethinkSuite) TestWriteReference(c *test.C) {
@@ -773,5 +779,6 @@ func (s *RethinkSuite) TestSelectManyRows(c *test.C) {
 	c.Assert(res.Err(), test.IsNil)
 	c.Assert(n, test.Equals, 10000)
 
-	res.Close()
+	err = res.Close()
+	c.Assert(err, test.IsNil)
 }
