@@ -36,16 +36,16 @@ func (suite *ChangefeedsTableSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_feed_table").Exec(suite.session)
-	err = r.DBCreate("db_feed_table").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_feed_table").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("db_feed_table").TableDrop("table_test_changefeed_table").Exec(suite.session)
-	err = r.DB("db_feed_table").TableCreate("table_test_changefeed_table").Exec(suite.session)
+	r.DB("test").TableDrop("tbl").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_feed_table").Table("table_test_changefeed_table").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *ChangefeedsTableSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("db_feed_table").TableDrop("table_test_changefeed_table").Exec(suite.session)
-		r.DBDrop("db_feed_table").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,25 +64,25 @@ func (suite *ChangefeedsTableSuite) TearDownSuite() {
 func (suite *ChangefeedsTableSuite) TestCases() {
 	suite.T().Log("Running ChangefeedsTableSuite: Test changefeeds on a table")
 
-	table_test_changefeed_table := r.DB("db_feed_table").Table("table_test_changefeed_table")
-	_ = table_test_changefeed_table // Prevent any noused variable errors
+	tbl := r.DB("test").Table("tbl")
+	_ = tbl // Prevent any noused variable errors
 
 	// changefeeds/table.yaml line #9
-	// all = table_test_changefeed_table.changes()
-	suite.T().Log("Possibly executing: var all r.Term = table_test_changefeed_table.Changes()")
+	// all = tbl.changes()
+	suite.T().Log("Possibly executing: var all r.Term = tbl.Changes()")
 
-	all := maybeRun(table_test_changefeed_table.Changes(), suite.session, r.RunOpts{})
+	all := maybeRun(tbl.Changes(), suite.session, r.RunOpts{})
 	_ = all // Prevent any noused variable errors
 
 	{
 		// changefeeds/table.yaml line #15
 		/* partial({'errors':0, 'inserted':2}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 2})
-		/* table_test_changefeed_table.insert([{'id':1}, {'id':2}]) */
+		/* tbl.insert([{'id':1}, {'id':2}]) */
 
-		suite.T().Log("About to run line #15: table_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }})")
+		suite.T().Log("About to run line #15: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }})")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{"id": 1}, map[interface{}]interface{}{"id": 2}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 1}, map[interface{}]interface{}{"id": 2}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -105,11 +105,11 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 		// changefeeds/table.yaml line #22
 		/* partial({'errors':0, 'replaced':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
-		/* table_test_changefeed_table.get(1).update({'version':1}) */
+		/* tbl.get(1).update({'version':1}) */
 
-		suite.T().Log("About to run line #22: table_test_changefeed_table.Get(1).Update(map[interface{}]interface{}{'version': 1, })")
+		suite.T().Log("About to run line #22: tbl.Get(1).Update(map[interface{}]interface{}{'version': 1, })")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_table.Get(1).Update(map[interface{}]interface{}{"version": 1}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(1).Update(map[interface{}]interface{}{"version": 1}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -132,11 +132,11 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 		// changefeeds/table.yaml line #29
 		/* partial({'errors':0, 'deleted':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
-		/* table_test_changefeed_table.get(1).delete() */
+		/* tbl.get(1).delete() */
 
-		suite.T().Log("About to run line #29: table_test_changefeed_table.Get(1).Delete()")
+		suite.T().Log("About to run line #29: tbl.Get(1).Delete()")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_table.Get(1).Delete(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(1).Delete(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -156,21 +156,21 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	}
 
 	// changefeeds/table.yaml line #36
-	// pluck = table_test_changefeed_table.changes().pluck({'new_val':['version']})
-	suite.T().Log("Possibly executing: var pluck r.Term = table_test_changefeed_table.Changes().Pluck(map[interface{}]interface{}{'new_val': []interface{}{'version'}, })")
+	// pluck = tbl.changes().pluck({'new_val':['version']})
+	suite.T().Log("Possibly executing: var pluck r.Term = tbl.Changes().Pluck(map[interface{}]interface{}{'new_val': []interface{}{'version'}, })")
 
-	pluck := maybeRun(table_test_changefeed_table.Changes().Pluck(map[interface{}]interface{}{"new_val": []interface{}{"version"}}), suite.session, r.RunOpts{})
+	pluck := maybeRun(tbl.Changes().Pluck(map[interface{}]interface{}{"new_val": []interface{}{"version"}}), suite.session, r.RunOpts{})
 	_ = pluck // Prevent any noused variable errors
 
 	{
 		// changefeeds/table.yaml line #37
 		/* partial({'errors':0, 'inserted':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
-		/* table_test_changefeed_table.insert([{'id':5, 'version':5}]) */
+		/* tbl.insert([{'id':5, 'version':5}]) */
 
-		suite.T().Log("About to run line #37: table_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{'id': 5, 'version': 5, }})")
+		suite.T().Log("About to run line #37: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 5, 'version': 5, }})")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{"id": 5, "version": 5}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 5, "version": 5}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -193,11 +193,11 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 		// changefeeds/table.yaml line #44
 		/* err('ReqlQueryLogicError', "Cannot call a terminal (`reduce`, `count`, etc.) on an infinite stream (such as a changefeed).") */
 		var expected_ Err = err("ReqlQueryLogicError", "Cannot call a terminal (`reduce`, `count`, etc.) on an infinite stream (such as a changefeed).")
-		/* table_test_changefeed_table.changes().order_by('id') */
+		/* tbl.changes().order_by('id') */
 
-		suite.T().Log("About to run line #44: table_test_changefeed_table.Changes().OrderBy('id')")
+		suite.T().Log("About to run line #44: tbl.Changes().OrderBy('id')")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_table.Changes().OrderBy("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Changes().OrderBy("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -205,165 +205,167 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	}
 
 	// changefeeds/table.yaml line #59
-	// overflow = table_test_changefeed_table.changes(changefeed_queue_size=100)
-	suite.T().Log("Possibly executing: var overflow r.Term = table_test_changefeed_table.Changes().OptArgs(r.ChangesOpts{ChangefeedQueueSize: 100, })")
+	// overflow = tbl.changes()
+	suite.T().Log("Possibly executing: var overflow r.Term = tbl.Changes()")
 
-	overflow := maybeRun(table_test_changefeed_table.Changes().OptArgs(r.ChangesOpts{ChangefeedQueueSize: 100}), suite.session, r.RunOpts{})
+	overflow := maybeRun(tbl.Changes(), suite.session, r.RunOpts{
+		ChangefeedQueueSize: 100,
+	})
 	_ = overflow // Prevent any noused variable errors
 
 	{
-		// changefeeds/table.yaml line #62
+		// changefeeds/table.yaml line #64
 		/* AnythingIsFine */
 		var expected_ string = compare.AnythingIsFine
-		/* table_test_changefeed_table.insert(r.range(200).map(lambda x: {})) */
+		/* tbl.insert(r.range(200).map(lambda x: {})) */
 
-		suite.T().Log("About to run line #62: table_test_changefeed_table.Insert(r.Range(200).Map(func(x r.Term) interface{} { return map[interface{}]interface{}{}}))")
+		suite.T().Log("About to run line #64: tbl.Insert(r.Range(200).Map(func(x r.Term) interface{} { return map[interface{}]interface{}{}}))")
 
-		runAndAssert(suite.Suite, expected_, table_test_changefeed_table.Insert(r.Range(200).Map(func(x r.Term) interface{} { return map[interface{}]interface{}{} })), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(r.Range(200).Map(func(x r.Term) interface{} { return map[interface{}]interface{}{} })), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #62")
+		suite.T().Log("Finished running line #64")
 	}
 
 	{
-		// changefeeds/table.yaml line #64
+		// changefeeds/table.yaml line #66
 		/* partial([{'error': regex('Changefeed cache over array size limit, skipped \d+ elements.')}]) */
 		var expected_ compare.Expected = compare.PartialMatch([]interface{}{map[interface{}]interface{}{"error": compare.MatchesRegexp("Changefeed cache over array size limit, skipped \\d+ elements.")}})
 		/* fetch(overflow, 90) */
 
-		suite.T().Log("About to run line #64: fetch(overflow, 90)")
+		suite.T().Log("About to run line #66: fetch(overflow, 90)")
 
 		fetchAndAssert(suite.Suite, expected_, overflow, 90)
-		suite.T().Log("Finished running line #64")
+		suite.T().Log("Finished running line #66")
 	}
 
-	// changefeeds/table.yaml line #69
-	// vtable_test_changefeed_table = r.db('rethinkdb').table('_debug_scratch')
-	suite.T().Log("Possibly executing: var vtable_test_changefeed_table r.Term = r.DB('rethinkdb').Table('_debug_scratch')")
+	// changefeeds/table.yaml line #71
+	// vtbl = r.db('rethinkdb').table('_debug_scratch')
+	suite.T().Log("Possibly executing: var vtbl r.Term = r.DB('rethinkdb').Table('_debug_scratch')")
 
-	vtable_test_changefeed_table := r.DB("rethinkdb").Table("_debug_scratch")
-	_ = vtable_test_changefeed_table // Prevent any noused variable errors
+	vtbl := r.DB("rethinkdb").Table("_debug_scratch")
+	_ = vtbl // Prevent any noused variable errors
 
-	// changefeeds/table.yaml line #70
-	// allVirtual = vtable_test_changefeed_table.changes()
-	suite.T().Log("Possibly executing: var allVirtual r.Term = vtable_test_changefeed_table.Changes()")
+	// changefeeds/table.yaml line #72
+	// allVirtual = vtbl.changes()
+	suite.T().Log("Possibly executing: var allVirtual r.Term = vtbl.Changes()")
 
-	allVirtual := maybeRun(vtable_test_changefeed_table.Changes(), suite.session, r.RunOpts{})
+	allVirtual := maybeRun(vtbl.Changes(), suite.session, r.RunOpts{})
 	_ = allVirtual // Prevent any noused variable errors
 
 	{
-		// changefeeds/table.yaml line #74
+		// changefeeds/table.yaml line #76
 		/* partial({'errors':0, 'inserted':2}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 2})
-		/* vtable_test_changefeed_table.insert([{'id':1}, {'id':2}]) */
+		/* vtbl.insert([{'id':1}, {'id':2}]) */
 
-		suite.T().Log("About to run line #74: vtable_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }})")
+		suite.T().Log("About to run line #76: vtbl.Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }})")
 
-		runAndAssert(suite.Suite, expected_, vtable_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{"id": 1}, map[interface{}]interface{}{"id": 2}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, vtbl.Insert([]interface{}{map[interface{}]interface{}{"id": 1}, map[interface{}]interface{}{"id": 2}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #74")
-	}
-
-	{
-		// changefeeds/table.yaml line #76
-		/* bag([{'old_val':null, 'new_val':{'id':1}}, {'old_val':null, 'new_val':{'id':2}}]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 2}}})
-		/* fetch(allVirtual, 2) */
-
-		suite.T().Log("About to run line #76: fetch(allVirtual, 2)")
-
-		fetchAndAssert(suite.Suite, expected_, allVirtual, 2)
 		suite.T().Log("Finished running line #76")
 	}
 
 	{
-		// changefeeds/table.yaml line #81
-		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
-		/* vtable_test_changefeed_table.get(1).update({'version':1}) */
+		// changefeeds/table.yaml line #78
+		/* bag([{'old_val':null, 'new_val':{'id':1}}, {'old_val':null, 'new_val':{'id':2}}]) */
+		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 2}}})
+		/* fetch(allVirtual, 2) */
 
-		suite.T().Log("About to run line #81: vtable_test_changefeed_table.Get(1).Update(map[interface{}]interface{}{'version': 1, })")
+		suite.T().Log("About to run line #78: fetch(allVirtual, 2)")
 
-		runAndAssert(suite.Suite, expected_, vtable_test_changefeed_table.Get(1).Update(map[interface{}]interface{}{"version": 1}), suite.session, r.RunOpts{
-			GeometryFormat: "raw",
-			GroupFormat:    "map",
-		})
-		suite.T().Log("Finished running line #81")
+		fetchAndAssert(suite.Suite, expected_, allVirtual, 2)
+		suite.T().Log("Finished running line #78")
 	}
 
 	{
 		// changefeeds/table.yaml line #83
-		/* [{'old_val':{'id':1}, 'new_val':{'id':1, 'version':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "version": 1}}}
-		/* fetch(allVirtual, 1) */
+		/* partial({'errors':0, 'replaced':1}) */
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		/* vtbl.get(1).update({'version':1}) */
 
-		suite.T().Log("About to run line #83: fetch(allVirtual, 1)")
+		suite.T().Log("About to run line #83: vtbl.Get(1).Update(map[interface{}]interface{}{'version': 1, })")
 
-		fetchAndAssert(suite.Suite, expected_, allVirtual, 1)
+		runAndAssert(suite.Suite, expected_, vtbl.Get(1).Update(map[interface{}]interface{}{"version": 1}), suite.session, r.RunOpts{
+			GeometryFormat: "raw",
+			GroupFormat:    "map",
+		})
 		suite.T().Log("Finished running line #83")
 	}
 
 	{
-		// changefeeds/table.yaml line #88
-		/* partial({'errors':0, 'deleted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
-		/* vtable_test_changefeed_table.get(1).delete() */
+		// changefeeds/table.yaml line #85
+		/* [{'old_val':{'id':1}, 'new_val':{'id':1, 'version':1}}] */
+		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "version": 1}}}
+		/* fetch(allVirtual, 1) */
 
-		suite.T().Log("About to run line #88: vtable_test_changefeed_table.Get(1).Delete()")
+		suite.T().Log("About to run line #85: fetch(allVirtual, 1)")
 
-		runAndAssert(suite.Suite, expected_, vtable_test_changefeed_table.Get(1).Delete(), suite.session, r.RunOpts{
-			GeometryFormat: "raw",
-			GroupFormat:    "map",
-		})
-		suite.T().Log("Finished running line #88")
+		fetchAndAssert(suite.Suite, expected_, allVirtual, 1)
+		suite.T().Log("Finished running line #85")
 	}
 
 	{
 		// changefeeds/table.yaml line #90
+		/* partial({'errors':0, 'deleted':1}) */
+		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
+		/* vtbl.get(1).delete() */
+
+		suite.T().Log("About to run line #90: vtbl.Get(1).Delete()")
+
+		runAndAssert(suite.Suite, expected_, vtbl.Get(1).Delete(), suite.session, r.RunOpts{
+			GeometryFormat: "raw",
+			GroupFormat:    "map",
+		})
+		suite.T().Log("Finished running line #90")
+	}
+
+	{
+		// changefeeds/table.yaml line #92
 		/* [{'old_val':{'id':1, 'version':1}, 'new_val':null}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "version": 1}, "new_val": nil}}
 		/* fetch(allVirtual, 1) */
 
-		suite.T().Log("About to run line #90: fetch(allVirtual, 1)")
+		suite.T().Log("About to run line #92: fetch(allVirtual, 1)")
 
 		fetchAndAssert(suite.Suite, expected_, allVirtual, 1)
-		suite.T().Log("Finished running line #90")
+		suite.T().Log("Finished running line #92")
 	}
 
-	// changefeeds/table.yaml line #95
-	// vpluck = vtable_test_changefeed_table.changes().pluck({'new_val':['version']})
-	suite.T().Log("Possibly executing: var vpluck r.Term = vtable_test_changefeed_table.Changes().Pluck(map[interface{}]interface{}{'new_val': []interface{}{'version'}, })")
+	// changefeeds/table.yaml line #97
+	// vpluck = vtbl.changes().pluck({'new_val':['version']})
+	suite.T().Log("Possibly executing: var vpluck r.Term = vtbl.Changes().Pluck(map[interface{}]interface{}{'new_val': []interface{}{'version'}, })")
 
-	vpluck := maybeRun(vtable_test_changefeed_table.Changes().Pluck(map[interface{}]interface{}{"new_val": []interface{}{"version"}}), suite.session, r.RunOpts{})
+	vpluck := maybeRun(vtbl.Changes().Pluck(map[interface{}]interface{}{"new_val": []interface{}{"version"}}), suite.session, r.RunOpts{})
 	_ = vpluck // Prevent any noused variable errors
 
 	{
-		// changefeeds/table.yaml line #96
+		// changefeeds/table.yaml line #98
 		/* partial({'errors':0, 'inserted':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
-		/* vtable_test_changefeed_table.insert([{'id':5, 'version':5}]) */
+		/* vtbl.insert([{'id':5, 'version':5}]) */
 
-		suite.T().Log("About to run line #96: vtable_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{'id': 5, 'version': 5, }})")
+		suite.T().Log("About to run line #98: vtbl.Insert([]interface{}{map[interface{}]interface{}{'id': 5, 'version': 5, }})")
 
-		runAndAssert(suite.Suite, expected_, vtable_test_changefeed_table.Insert([]interface{}{map[interface{}]interface{}{"id": 5, "version": 5}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, vtbl.Insert([]interface{}{map[interface{}]interface{}{"id": 5, "version": 5}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #96")
+		suite.T().Log("Finished running line #98")
 	}
 
 	{
-		// changefeeds/table.yaml line #98
+		// changefeeds/table.yaml line #100
 		/* [{'new_val':{'version':5}}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"version": 5}}}
 		/* fetch(vpluck, 1) */
 
-		suite.T().Log("About to run line #98: fetch(vpluck, 1)")
+		suite.T().Log("About to run line #100: fetch(vpluck, 1)")
 
 		fetchAndAssert(suite.Suite, expected_, vpluck, 1)
-		suite.T().Log("Finished running line #98")
+		suite.T().Log("Finished running line #100")
 	}
 }

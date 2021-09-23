@@ -36,26 +36,26 @@ func (suite *SelectionSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_sele").Exec(suite.session)
-	err = r.DBCreate("db_sele").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_sele").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("db_sele").TableDrop("table_test_selection").Exec(suite.session)
-	err = r.DB("db_sele").TableCreate("table_test_selection").Exec(suite.session)
+	r.DB("test").TableDrop("tbl").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_sele").Table("table_test_selection").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
-	r.DB("db_sele").TableDrop("table_test_selection2").Exec(suite.session)
-	err = r.DB("db_sele").TableCreate("table_test_selection2").Exec(suite.session)
+	r.DB("test").TableDrop("tbl2").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl2").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_sele").Table("table_test_selection2").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl2").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
-	r.DB("db_sele").TableDrop("table_test_selection3").Exec(suite.session)
-	err = r.DB("db_sele").TableCreate("table_test_selection3").Exec(suite.session)
+	r.DB("test").TableDrop("tbl3").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl3").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_sele").Table("table_test_selection3").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl3").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -64,10 +64,10 @@ func (suite *SelectionSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("db_sele").TableDrop("table_test_selection").Exec(suite.session)
-		r.DB("db_sele").TableDrop("table_test_selection2").Exec(suite.session)
-		r.DB("db_sele").TableDrop("table_test_selection3").Exec(suite.session)
-		r.DBDrop("db_sele").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl2").Exec(suite.session)
+		r.DB("test").TableDrop("tbl3").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -76,29 +76,29 @@ func (suite *SelectionSuite) TearDownSuite() {
 func (suite *SelectionSuite) TestCases() {
 	suite.T().Log("Running SelectionSuite: Tests that manipulation data in tables")
 
-	table_test_selection := r.DB("db_sele").Table("table_test_selection")
-	_ = table_test_selection // Prevent any noused variable errors
-	table_test_selection2 := r.DB("db_sele").Table("table_test_selection2")
-	_ = table_test_selection2 // Prevent any noused variable errors
-	table_test_selection3 := r.DB("db_sele").Table("table_test_selection3")
-	_ = table_test_selection3 // Prevent any noused variable errors
+	tbl := r.DB("test").Table("tbl")
+	_ = tbl // Prevent any noused variable errors
+	tbl2 := r.DB("test").Table("tbl2")
+	_ = tbl2 // Prevent any noused variable errors
+	tbl3 := r.DB("test").Table("tbl3")
+	_ = tbl3 // Prevent any noused variable errors
 
 	{
 		// selection.yaml line #6
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
-		/* table_test_selection.insert([{'id':i, 'a':i%4} for i in xrange(100)]) */
+		/* tbl.insert([{'id':i, 'a':i%4} for i in xrange(100)]) */
 
-		suite.T().Log("About to run line #6: table_test_selection.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), })\n    }\n    return res\n}()))")
+		suite.T().Log("About to run line #6: tbl.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), })\n    }\n    return res\n}()))")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Insert(func() []interface{} {
+		runAndAssert(suite.Suite, expected_, tbl.Insert((func() []interface{} {
 			res := []interface{}{}
 			for iterator_ := 0; iterator_ < 100; iterator_++ {
 				i := iterator_
 				res = append(res, map[interface{}]interface{}{"id": i, "a": r.Mod(i, 4)})
 			}
 			return res
-		}()), suite.session, r.RunOpts{
+		}())), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -109,11 +109,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #18
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
-		/* table_test_selection2.insert([{'id':i, 'b':i%4} for i in xrange(100)]) */
+		/* tbl2.insert([{'id':i, 'b':i%4} for i in xrange(100)]) */
 
-		suite.T().Log("About to run line #18: table_test_selection2.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'b': r.Mod(i, 4), })\n    }\n    return res\n}()))")
+		suite.T().Log("About to run line #18: tbl2.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'b': r.Mod(i, 4), })\n    }\n    return res\n}()))")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection2.Insert((func() []interface{} {
+		runAndAssert(suite.Suite, expected_, tbl2.Insert((func() []interface{} {
 			res := []interface{}{}
 			for iterator_ := 0; iterator_ < 100; iterator_++ {
 				i := iterator_
@@ -131,11 +131,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #31
 		/* 'TABLE' */
 		var expected_ string = "TABLE"
-		/* table_test_selection.type_of() */
+		/* tbl.type_of() */
 
-		suite.T().Log("About to run line #31: table_test_selection.TypeOf()")
+		suite.T().Log("About to run line #31: tbl.TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -160,12 +160,12 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #39
 		/* err("ReqlOpFailedError", 'Table `test.missing` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `db_sele.missing` does not exist.")
+		var expected_ Err = err("ReqlOpFailedError", "Table `test.missing` does not exist.")
 		/* r.db('test').table('missing') */
 
 		suite.T().Log("About to run line #39: r.DB('test').Table('missing')")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_sele").Table("missing"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").Table("missing"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -176,11 +176,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #43
 		/* ({"errors":1,"inserted":0}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"errors": 1, "inserted": 0}
-		/* table_test_selection.insert({"id":"\x00"}).pluck("errors","inserted") */
+		/* tbl.insert({"id":"\x00"}).pluck("errors","inserted") */
 
-		suite.T().Log("About to run line #43: table_test_selection.Insert(map[interface{}]interface{}{'id': '\\u0000', }).Pluck('errors', 'inserted')")
+		suite.T().Log("About to run line #43: tbl.Insert(map[interface{}]interface{}{'id': '\\u0000', }).Pluck('errors', 'inserted')")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Insert(map[interface{}]interface{}{"id": "\u0000"}).Pluck("errors", "inserted"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": "\u0000"}).Pluck("errors", "inserted"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -191,11 +191,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #46
 		/* ({"errors":1,"inserted":0}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"errors": 1, "inserted": 0}
-		/* table_test_selection.insert({"id":["embedded",["null\x00"]]}).pluck("errors","inserted") */
+		/* tbl.insert({"id":["embedded",["null\x00"]]}).pluck("errors","inserted") */
 
-		suite.T().Log("About to run line #46: table_test_selection.Insert(map[interface{}]interface{}{'id': []interface{}{'embedded', []interface{}{'null\\u0000'}}, }).Pluck('errors', 'inserted')")
+		suite.T().Log("About to run line #46: tbl.Insert(map[interface{}]interface{}{'id': []interface{}{'embedded', []interface{}{'null\\u0000'}}, }).Pluck('errors', 'inserted')")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Insert(map[interface{}]interface{}{"id": []interface{}{"embedded", []interface{}{"null\u0000"}}}).Pluck("errors", "inserted"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert(map[interface{}]interface{}{"id": []interface{}{"embedded", []interface{}{"null\u0000"}}}).Pluck("errors", "inserted"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -206,11 +206,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #51
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
-		/* table_test_selection3.insert({'id':u'Здравствуй','value':u'Земля!'}) */
+		/* tbl3.insert({'id':u'Здравствуй','value':u'Земля!'}) */
 
-		suite.T().Log("About to run line #51: table_test_selection3.Insert(map[interface{}]interface{}{'id': 'Здравствуй', 'value': 'Земля!', })")
+		suite.T().Log("About to run line #51: tbl3.Insert(map[interface{}]interface{}{'id': 'Здравствуй', 'value': 'Земля!', })")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection3.Insert(map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Insert(map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -221,11 +221,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #60
 		/* {u'id':u'Здравствуй',u'value':u'Земля!'} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}
-		/* table_test_selection3.get('Здравствуй') */
+		/* tbl3.get('Здравствуй') */
 
-		suite.T().Log("About to run line #60: table_test_selection3.Get('Здравствуй')")
+		suite.T().Log("About to run line #60: tbl3.Get('Здравствуй')")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection3.Get("Здравствуй"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Get("Здравствуй"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -236,11 +236,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #73
 		/* [{u'id':u'Здравствуй',u'value':u'Земля!'}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}}
-		/* table_test_selection3.filter({'value':'Земля!'}) */
+		/* tbl3.filter({'value':'Земля!'}) */
 
-		suite.T().Log("About to run line #73: table_test_selection3.Filter(map[interface{}]interface{}{'value': 'Земля!', })")
+		suite.T().Log("About to run line #73: tbl3.Filter(map[interface{}]interface{}{'value': 'Земля!', })")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection3.Filter(map[interface{}]interface{}{"value": "Земля!"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl3.Filter(map[interface{}]interface{}{"value": "Земля!"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -249,7 +249,7 @@ func (suite *SelectionSuite) TestCases() {
 
 	{
 		// selection.yaml line #86
-		/* err("ReqlQueryLogicError", 'Database name `%` invalid (Use A-Za-z0-9_ only).', [0]) */
+		/* err("ReqlQueryLogicError", 'Database name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Database name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
 		/* r.db('%') */
 
@@ -264,13 +264,13 @@ func (suite *SelectionSuite) TestCases() {
 
 	{
 		// selection.yaml line #89
-		/* err("ReqlQueryLogicError", 'Table name `%` invalid (Use A-Za-z0-9_ only).', [0]) */
+		/* err("ReqlQueryLogicError", 'Table name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Table name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
 		/* r.db('test').table('%') */
 
 		suite.T().Log("About to run line #89: r.DB('test').Table('%')")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_sele").Table("%"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").Table("%"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -281,11 +281,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #93
 		/* 100 */
 		var expected_ int = 100
-		/* table_test_selection.count() */
+		/* tbl.count() */
 
-		suite.T().Log("About to run line #93: table_test_selection.Count()")
+		suite.T().Log("About to run line #93: tbl.Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -293,28 +293,28 @@ func (suite *SelectionSuite) TestCases() {
 	}
 
 	// selection.yaml line #97
-	// table_test_selection2Name = table_test_selection2.info().get_field('name')
-	suite.T().Log("Possibly executing: var table_test_selection2Name r.Term = table_test_selection2.Info().Field('name')")
+	// tbl2Name = tbl2.info().get_field('name')
+	suite.T().Log("Possibly executing: var tbl2Name r.Term = tbl2.Info().Field('name')")
 
-	table_test_selection2Name := table_test_selection2.Info().Field("name")
-	_ = table_test_selection2Name // Prevent any noused variable errors
+	tbl2Name := tbl2.Info().Field("name")
+	_ = tbl2Name // Prevent any noused variable errors
 
 	// selection.yaml line #98
-	// table_test_selection2DbName = table_test_selection2.info().get_field('db').get_field('name')
-	suite.T().Log("Possibly executing: var table_test_selection2DbName r.Term = table_test_selection2.Info().Field('db').Field('name')")
+	// tbl2DbName = tbl2.info().get_field('db').get_field('name')
+	suite.T().Log("Possibly executing: var tbl2DbName r.Term = tbl2.Info().Field('db').Field('name')")
 
-	table_test_selection2DbName := table_test_selection2.Info().Field("db").Field("name")
-	_ = table_test_selection2DbName // Prevent any noused variable errors
+	tbl2DbName := tbl2.Info().Field("db").Field("name")
+	_ = tbl2DbName // Prevent any noused variable errors
 
 	{
 		// selection.yaml line #101
 		/* 100 */
 		var expected_ int = 100
-		/* r.db(table_test_selection2DbName).table(table_test_selection2Name, read_mode='outdated').count() */
+		/* r.db(tbl2DbName).table(tbl2Name, read_mode='outdated').count() */
 
-		suite.T().Log("About to run line #101: r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: 'outdated', }).Count()")
+		suite.T().Log("About to run line #101: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'outdated', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: "outdated"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: "outdated"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -325,11 +325,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #102
 		/* 100 */
 		var expected_ int = 100
-		/* r.db(table_test_selection2DbName).table(table_test_selection2Name, read_mode='single').count() */
+		/* r.db(tbl2DbName).table(tbl2Name, read_mode='single').count() */
 
-		suite.T().Log("About to run line #102: r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: 'single', }).Count()")
+		suite.T().Log("About to run line #102: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'single', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: "single"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: "single"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -340,11 +340,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #103
 		/* 100 */
 		var expected_ int = 100
-		/* r.db(table_test_selection2DbName).table(table_test_selection2Name, read_mode='majority').count() */
+		/* r.db(tbl2DbName).table(tbl2Name, read_mode='majority').count() */
 
-		suite.T().Log("About to run line #103: r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: 'majority', }).Count()")
+		suite.T().Log("About to run line #103: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'majority', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: "majority"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: "majority"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -355,11 +355,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #120
 		/* err("ReqlQueryLogicError", 'Expected type STRING but found BOOL.') */
 		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found BOOL.")
-		/* r.db(table_test_selection2DbName).table(table_test_selection2Name, read_mode=true).count() */
+		/* r.db(tbl2DbName).table(tbl2Name, read_mode=true).count() */
 
-		suite.T().Log("About to run line #120: r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: true, }).Count()")
+		suite.T().Log("About to run line #120: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: true, }).Count()")
 
-		runAndAssert(suite.Suite, expected_, r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: true}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: true}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -370,11 +370,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #125
 		/* err("ReqlQueryLogicError", 'Read mode `fake` unrecognized (options are "majority", "single", and "outdated").') */
 		var expected_ Err = err("ReqlQueryLogicError", "Read mode `fake` unrecognized (options are \"majority\", \"single\", and \"outdated\").")
-		/* r.db(table_test_selection2DbName).table(table_test_selection2Name, read_mode='fake').count() */
+		/* r.db(tbl2DbName).table(tbl2Name, read_mode='fake').count() */
 
-		suite.T().Log("About to run line #125: r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: 'fake', }).Count()")
+		suite.T().Log("About to run line #125: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'fake', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, r.DB(table_test_selection2DbName).Table(table_test_selection2Name).OptArgs(r.TableOpts{ReadMode: "fake"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: "fake"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -385,11 +385,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #130
 		/* 2 */
 		var expected_ int = 2
-		/* table_test_selection.get(20).count() */
+		/* tbl.get(20).count() */
 
-		suite.T().Log("About to run line #130: table_test_selection.Get(20).Count()")
+		suite.T().Log("About to run line #130: tbl.Get(20).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Get(20).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(20).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -400,11 +400,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #134
 		/* {'id':20,'a':0} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 20, "a": 0}
-		/* table_test_selection.get(20) */
+		/* tbl.get(20) */
 
-		suite.T().Log("About to run line #134: table_test_selection.Get(20)")
+		suite.T().Log("About to run line #134: tbl.Get(20)")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Get(20), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(20), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -415,11 +415,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #138
 		/* null */
 		var expected_ interface{} = nil
-		/* table_test_selection.get(2000) */
+		/* tbl.get(2000) */
 
-		suite.T().Log("About to run line #138: table_test_selection.Get(2000)")
+		suite.T().Log("About to run line #138: tbl.Get(2000)")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Get(2000), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get(2000), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -427,21 +427,21 @@ func (suite *SelectionSuite) TestCases() {
 	}
 
 	// selection.yaml line #153
-	// table_test_selectionpkey = r.db('test').table('testpkey_selection')
-	suite.T().Log("Possibly executing: var table_test_selectionpkey r.Term = r.DB('test').Table('testpkey_selection')")
+	// tblpkey = r.db('test').table('testpkey')
+	suite.T().Log("Possibly executing: var tblpkey r.Term = r.DB('test').Table('testpkey')")
 
-	table_test_selectionpkey := r.DB("db_sele").Table("testpkey_selection")
-	_ = table_test_selectionpkey // Prevent any noused variable errors
+	tblpkey := r.DB("test").Table("testpkey")
+	_ = tblpkey // Prevent any noused variable errors
 
 	{
 		// selection.yaml line #149
 		/* partial({'tables_created':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
-		/* r.db('test').table_create('testpkey_selection', primary_key='foo') */
+		/* r.db('test').table_create('testpkey', primary_key='foo') */
 
-		suite.T().Log("About to run line #149: r.DB('test').TableCreate('testpkey_selection').OptArgs(r.TableCreateOpts{PrimaryKey: 'foo', })")
+		suite.T().Log("About to run line #149: r.DB('test').TableCreate('testpkey').OptArgs(r.TableCreateOpts{PrimaryKey: 'foo', })")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_sele").TableCreate("testpkey_selection").OptArgs(r.TableCreateOpts{PrimaryKey: "foo"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").TableCreate("testpkey").OptArgs(r.TableCreateOpts{PrimaryKey: "foo"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -452,11 +452,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #155
 		/* {'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
-		/* table_test_selectionpkey.insert({'foo':10,'a':10}) */
+		/* tblpkey.insert({'foo':10,'a':10}) */
 
-		suite.T().Log("About to run line #155: table_test_selectionpkey.Insert(map[interface{}]interface{}{'foo': 10, 'a': 10, })")
+		suite.T().Log("About to run line #155: tblpkey.Insert(map[interface{}]interface{}{'foo': 10, 'a': 10, })")
 
-		runAndAssert(suite.Suite, expected_, table_test_selectionpkey.Insert(map[interface{}]interface{}{"foo": 10, "a": 10}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tblpkey.Insert(map[interface{}]interface{}{"foo": 10, "a": 10}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -467,11 +467,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #159
 		/* {'foo':10,'a':10} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"foo": 10, "a": 10}
-		/* table_test_selectionpkey.get(10) */
+		/* tblpkey.get(10) */
 
-		suite.T().Log("About to run line #159: table_test_selectionpkey.Get(10)")
+		suite.T().Log("About to run line #159: tblpkey.Get(10)")
 
-		runAndAssert(suite.Suite, expected_, table_test_selectionpkey.Get(10), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tblpkey.Get(10), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -482,11 +482,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #163
 		/* [] */
 		var expected_ []interface{} = []interface{}{}
-		/* table_test_selection.get_all() */
+		/* tbl.get_all() */
 
-		suite.T().Log("About to run line #163: table_test_selection.GetAll()")
+		suite.T().Log("About to run line #163: tbl.GetAll()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.GetAll(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -497,11 +497,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #165
 		/* [{"id":20,"a":0}] */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 20, "a": 0}}
-		/* table_test_selection.get_all(20) */
+		/* tbl.get_all(20) */
 
-		suite.T().Log("About to run line #165: table_test_selection.GetAll(20)")
+		suite.T().Log("About to run line #165: tbl.GetAll(20)")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.GetAll(20), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(20), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -512,11 +512,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #167
 		/* "SELECTION<STREAM>" */
 		var expected_ string = "SELECTION<STREAM>"
-		/* table_test_selection.get_all().type_of() */
+		/* tbl.get_all().type_of() */
 
-		suite.T().Log("About to run line #167: table_test_selection.GetAll().TypeOf()")
+		suite.T().Log("About to run line #167: tbl.GetAll().TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.GetAll().TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll().TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -527,11 +527,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #169
 		/* "SELECTION<STREAM>" */
 		var expected_ string = "SELECTION<STREAM>"
-		/* table_test_selection.get_all(20).type_of() */
+		/* tbl.get_all(20).type_of() */
 
-		suite.T().Log("About to run line #169: table_test_selection.GetAll(20).TypeOf()")
+		suite.T().Log("About to run line #169: tbl.GetAll(20).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.GetAll(20).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.GetAll(20).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -542,11 +542,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #173
 		/* 'TABLE_SLICE' */
 		var expected_ string = "TABLE_SLICE"
-		/* table_test_selection.between(2, 1).type_of() */
+		/* tbl.between(2, 1).type_of() */
 
-		suite.T().Log("About to run line #173: table_test_selection.Between(2, 1).TypeOf()")
+		suite.T().Log("About to run line #173: tbl.Between(2, 1).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(2, 1).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(2, 1).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -557,11 +557,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #175
 		/* 'TABLE_SLICE' */
 		var expected_ string = "TABLE_SLICE"
-		/* table_test_selection.between(1, 2).type_of() */
+		/* tbl.between(1, 2).type_of() */
 
-		suite.T().Log("About to run line #175: table_test_selection.Between(1, 2).TypeOf()")
+		suite.T().Log("About to run line #175: tbl.Between(1, 2).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(1, 2).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 2).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -572,11 +572,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #177
 		/* 'TABLE_SLICE' */
 		var expected_ string = "TABLE_SLICE"
-		/* table_test_selection.between(1, 2, index='id').type_of() */
+		/* tbl.between(1, 2, index='id').type_of() */
 
-		suite.T().Log("About to run line #177: table_test_selection.Between(1, 2).OptArgs(r.BetweenOpts{Index: 'id', }).TypeOf()")
+		suite.T().Log("About to run line #177: tbl.Between(1, 2).OptArgs(r.BetweenOpts{Index: 'id', }).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(1, 2).OptArgs(r.BetweenOpts{Index: "id"}).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 2).OptArgs(r.BetweenOpts{Index: "id"}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -587,11 +587,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #181
 		/* 'TABLE_SLICE' */
 		var expected_ string = "TABLE_SLICE"
-		/* table_test_selection.between(1, 1, right_bound='closed').type_of() */
+		/* tbl.between(1, 1, right_bound='closed').type_of() */
 
-		suite.T().Log("About to run line #181: table_test_selection.Between(1, 1).OptArgs(r.BetweenOpts{RightBound: 'closed', }).TypeOf()")
+		suite.T().Log("About to run line #181: tbl.Between(1, 1).OptArgs(r.BetweenOpts{RightBound: 'closed', }).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(1, 1).OptArgs(r.BetweenOpts{RightBound: "closed"}).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(1, 1).OptArgs(r.BetweenOpts{RightBound: "closed"}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -602,11 +602,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #185
 		/* 'TABLE_SLICE' */
 		var expected_ string = "TABLE_SLICE"
-		/* table_test_selection.between(2, 1).type_of() */
+		/* tbl.between(2, 1).type_of() */
 
-		suite.T().Log("About to run line #185: table_test_selection.Between(2, 1).TypeOf()")
+		suite.T().Log("About to run line #185: tbl.Between(2, 1).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(2, 1).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(2, 1).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -617,11 +617,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #187
 		/* 'TABLE_SLICE' */
 		var expected_ string = "TABLE_SLICE"
-		/* table_test_selection.between(2, 1, index='id').type_of() */
+		/* tbl.between(2, 1, index='id').type_of() */
 
-		suite.T().Log("About to run line #187: table_test_selection.Between(2, 1).OptArgs(r.BetweenOpts{Index: 'id', }).TypeOf()")
+		suite.T().Log("About to run line #187: tbl.Between(2, 1).OptArgs(r.BetweenOpts{Index: 'id', }).TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(2, 1).OptArgs(r.BetweenOpts{Index: "id"}).TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(2, 1).OptArgs(r.BetweenOpts{Index: "id"}).TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -632,11 +632,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #192
 		/* 0 */
 		var expected_ int = 0
-		/* table_test_selection.between(21, 20).count() */
+		/* tbl.between(21, 20).count() */
 
-		suite.T().Log("About to run line #192: table_test_selection.Between(21, 20).Count()")
+		suite.T().Log("About to run line #192: tbl.Between(21, 20).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(21, 20).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(21, 20).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -647,11 +647,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #194
 		/* 9 */
 		var expected_ int = 9
-		/* table_test_selection.between(20, 29).count() */
+		/* tbl.between(20, 29).count() */
 
-		suite.T().Log("About to run line #194: table_test_selection.Between(20, 29).Count()")
+		suite.T().Log("About to run line #194: tbl.Between(20, 29).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(20, 29).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(20, 29).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -662,11 +662,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #196
 		/* 9 */
 		var expected_ int = 9
-		/* table_test_selection.between(-10, 9).count() */
+		/* tbl.between(-10, 9).count() */
 
-		suite.T().Log("About to run line #196: table_test_selection.Between(-10, 9).Count()")
+		suite.T().Log("About to run line #196: tbl.Between(-10, 9).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(-10, 9).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-10, 9).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -677,11 +677,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #198
 		/* 20 */
 		var expected_ int = 20
-		/* table_test_selection.between(80, 2000).count() */
+		/* tbl.between(80, 2000).count() */
 
-		suite.T().Log("About to run line #198: table_test_selection.Between(80, 2000).Count()")
+		suite.T().Log("About to run line #198: tbl.Between(80, 2000).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(80, 2000).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(80, 2000).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -692,11 +692,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #200
 		/* 100 */
 		var expected_ int = 100
-		/* table_test_selection.between(-2000, 2000).count() */
+		/* tbl.between(-2000, 2000).count() */
 
-		suite.T().Log("About to run line #200: table_test_selection.Between(-2000, 2000).Count()")
+		suite.T().Log("About to run line #200: tbl.Between(-2000, 2000).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(-2000, 2000).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-2000, 2000).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -707,11 +707,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #205
 		/* 10 */
 		var expected_ int = 10
-		/* table_test_selection.between(20, 29, right_bound='closed').count() */
+		/* tbl.between(20, 29, right_bound='closed').count() */
 
-		suite.T().Log("About to run line #205: table_test_selection.Between(20, 29).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
+		suite.T().Log("About to run line #205: tbl.Between(20, 29).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(20, 29).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(20, 29).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -722,11 +722,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #209
 		/* 10 */
 		var expected_ int = 10
-		/* table_test_selection.between(-10, 9, right_bound='closed').count() */
+		/* tbl.between(-10, 9, right_bound='closed').count() */
 
-		suite.T().Log("About to run line #209: table_test_selection.Between(-10, 9).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
+		suite.T().Log("About to run line #209: tbl.Between(-10, 9).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(-10, 9).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-10, 9).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -737,11 +737,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #213
 		/* 20 */
 		var expected_ int = 20
-		/* table_test_selection.between(80, 2000, right_bound='closed').count() */
+		/* tbl.between(80, 2000, right_bound='closed').count() */
 
-		suite.T().Log("About to run line #213: table_test_selection.Between(80, 2000).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
+		suite.T().Log("About to run line #213: tbl.Between(80, 2000).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(80, 2000).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(80, 2000).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -752,11 +752,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #217
 		/* 100 */
 		var expected_ int = 100
-		/* table_test_selection.between(-2000, 2000, right_bound='closed').count() */
+		/* tbl.between(-2000, 2000, right_bound='closed').count() */
 
-		suite.T().Log("About to run line #217: table_test_selection.Between(-2000, 2000).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
+		suite.T().Log("About to run line #217: tbl.Between(-2000, 2000).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(-2000, 2000).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-2000, 2000).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -767,11 +767,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #223
 		/* 8 */
 		var expected_ int = 8
-		/* table_test_selection.between(20, 29, left_bound='open').count() */
+		/* tbl.between(20, 29, left_bound='open').count() */
 
-		suite.T().Log("About to run line #223: table_test_selection.Between(20, 29).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
+		suite.T().Log("About to run line #223: tbl.Between(20, 29).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(20, 29).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(20, 29).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -782,11 +782,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #227
 		/* 9 */
 		var expected_ int = 9
-		/* table_test_selection.between(-10, 9, left_bound='open').count() */
+		/* tbl.between(-10, 9, left_bound='open').count() */
 
-		suite.T().Log("About to run line #227: table_test_selection.Between(-10, 9).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
+		suite.T().Log("About to run line #227: tbl.Between(-10, 9).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(-10, 9).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-10, 9).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -797,11 +797,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #231
 		/* 19 */
 		var expected_ int = 19
-		/* table_test_selection.between(80, 2000, left_bound='open').count() */
+		/* tbl.between(80, 2000, left_bound='open').count() */
 
-		suite.T().Log("About to run line #231: table_test_selection.Between(80, 2000).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
+		suite.T().Log("About to run line #231: tbl.Between(80, 2000).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(80, 2000).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(80, 2000).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -812,11 +812,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #235
 		/* 100 */
 		var expected_ int = 100
-		/* table_test_selection.between(-2000, 2000, left_bound='open').count() */
+		/* tbl.between(-2000, 2000, left_bound='open').count() */
 
-		suite.T().Log("About to run line #235: table_test_selection.Between(-2000, 2000).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
+		suite.T().Log("About to run line #235: tbl.Between(-2000, 2000).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(-2000, 2000).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(-2000, 2000).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -842,11 +842,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #244
 		/* 2 */
 		var expected_ int = 2
-		/* table_test_selection.between(r.minval, 2).count() */
+		/* tbl.between(r.minval, 2).count() */
 
-		suite.T().Log("About to run line #244: table_test_selection.Between(r.MinVal, 2).Count()")
+		suite.T().Log("About to run line #244: tbl.Between(r.MinVal, 2).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(r.MinVal, 2).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -857,11 +857,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #247
 		/* 3 */
 		var expected_ int = 3
-		/* table_test_selection.between(r.minval, 2, right_bound='closed').count() */
+		/* tbl.between(r.minval, 2, right_bound='closed').count() */
 
-		suite.T().Log("About to run line #247: table_test_selection.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
+		suite.T().Log("About to run line #247: tbl.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{RightBound: "closed"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -872,11 +872,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #251
 		/* 2 */
 		var expected_ int = 2
-		/* table_test_selection.between(r.minval, 2, left_bound='open').count() */
+		/* tbl.between(r.minval, 2, left_bound='open').count() */
 
-		suite.T().Log("About to run line #251: table_test_selection.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
+		suite.T().Log("About to run line #251: tbl.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{LeftBound: "open"}).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -887,11 +887,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #255
 		/* 98 */
 		var expected_ int = 98
-		/* table_test_selection.between(2, r.maxval).count() */
+		/* tbl.between(2, r.maxval).count() */
 
-		suite.T().Log("About to run line #255: table_test_selection.Between(2, r.MaxVal).Count()")
+		suite.T().Log("About to run line #255: tbl.Between(2, r.MaxVal).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(2, r.MaxVal).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(2, r.MaxVal).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -902,11 +902,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #265
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
 		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
-		/* table_test_selection.between(null, 2).count() */
+		/* tbl.between(null, 2).count() */
 
-		suite.T().Log("About to run line #265: table_test_selection.Between(nil, 2).Count()")
+		suite.T().Log("About to run line #265: tbl.Between(nil, 2).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(nil, 2).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(nil, 2).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -917,11 +917,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #266
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
 		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
-		/* table_test_selection.between(2, null).count() */
+		/* tbl.between(2, null).count() */
 
-		suite.T().Log("About to run line #266: table_test_selection.Between(2, nil).Count()")
+		suite.T().Log("About to run line #266: tbl.Between(2, nil).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(2, nil).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(2, nil).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -932,11 +932,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #267
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
 		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
-		/* table_test_selection.between(null, null).count() */
+		/* tbl.between(null, null).count() */
 
-		suite.T().Log("About to run line #267: table_test_selection.Between(nil, nil).Count()")
+		suite.T().Log("About to run line #267: tbl.Between(nil, nil).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Between(nil, nil).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Between(nil, nil).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -947,11 +947,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #271
 		/* 1 */
 		var expected_ int = 1
-		/* table_test_selectionpkey.between(9, 11).count() */
+		/* tblpkey.between(9, 11).count() */
 
-		suite.T().Log("About to run line #271: table_test_selectionpkey.Between(9, 11).Count()")
+		suite.T().Log("About to run line #271: tblpkey.Between(9, 11).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selectionpkey.Between(9, 11).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tblpkey.Between(9, 11).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -962,11 +962,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #274
 		/* 0 */
 		var expected_ int = 0
-		/* table_test_selectionpkey.between(11, 12).count() */
+		/* tblpkey.between(11, 12).count() */
 
-		suite.T().Log("About to run line #274: table_test_selectionpkey.Between(11, 12).Count()")
+		suite.T().Log("About to run line #274: tblpkey.Between(11, 12).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selectionpkey.Between(11, 12).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tblpkey.Between(11, 12).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -977,11 +977,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #278
 		/* 25 */
 		var expected_ int = 25
-		/* table_test_selection.filter(lambda row:row['a'] > 2).count() */
+		/* tbl.filter(lambda row:row['a'] > 2).count() */
 
-		suite.T().Log("About to run line #278: table_test_selection.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Gt(2)}).Count()")
+		suite.T().Log("About to run line #278: tbl.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Gt(2)}).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Gt(2) }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Gt(2) }).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -992,11 +992,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #284
 		/* 100 */
 		var expected_ int = 100
-		/* table_test_selection.filter(lambda row: 1).count() */
+		/* tbl.filter(lambda row: 1).count() */
 
-		suite.T().Log("About to run line #284: table_test_selection.Filter(func(row r.Term) interface{} { return 1}).Count()")
+		suite.T().Log("About to run line #284: tbl.Filter(func(row r.Term) interface{} { return 1}).Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Filter(func(row r.Term) interface{} { return 1 }).Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(func(row r.Term) interface{} { return 1 }).Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -1151,11 +1151,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #335
 		/* 25 */
 		var expected_ int = 25
-		/* table_test_selection.count(lambda row: {'a':1}) */
+		/* tbl.count(lambda row: {'a':1}) */
 
-		suite.T().Log("About to run line #335: table_test_selection.Count(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': 1, }})")
+		suite.T().Log("About to run line #335: tbl.Count(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': 1, }})")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.Count(func(row r.Term) interface{} { return map[interface{}]interface{}{"a": 1} }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Count(func(row r.Term) interface{} { return map[interface{}]interface{}{"a": 1} }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -1196,11 +1196,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #348
 		/* err('ReqlQueryLogicError', 'Expected type DATUM but found TABLE:', [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:")
-		/* r.expr(5) + table_test_selection */
+		/* r.expr(5) + tbl */
 
-		suite.T().Log("About to run line #348: r.Expr(5).Add(table_test_selection)")
+		suite.T().Log("About to run line #348: r.Expr(5).Add(tbl)")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(5).Add(table_test_selection), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(5).Add(tbl), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -1211,11 +1211,11 @@ func (suite *SelectionSuite) TestCases() {
 		// selection.yaml line #353
 		/* "SELECTION<STREAM>" */
 		var expected_ string = "SELECTION<STREAM>"
-		/* table_test_selection.has_fields('field').type_of() */
+		/* tbl.has_fields('field').type_of() */
 
-		suite.T().Log("About to run line #353: table_test_selection.HasFields('field').TypeOf()")
+		suite.T().Log("About to run line #353: tbl.HasFields('field').TypeOf()")
 
-		runAndAssert(suite.Suite, expected_, table_test_selection.HasFields("field").TypeOf(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.HasFields("field").TypeOf(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

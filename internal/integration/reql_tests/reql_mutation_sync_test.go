@@ -36,10 +36,10 @@ func (suite *MutationSyncSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_mut_sync").Exec(suite.session)
-	err = r.DBCreate("db_mut_sync").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_mut_sync").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
 }
@@ -49,7 +49,7 @@ func (suite *MutationSyncSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DBDrop("db_mut_sync").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -66,7 +66,7 @@ func (suite *MutationSyncSuite) TestCases() {
 
 		suite.T().Log("About to run line #5: r.DB('test').TableCreate('test1')")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_mut_sync").TableCreate("test1"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").TableCreate("test1"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -81,7 +81,7 @@ func (suite *MutationSyncSuite) TestCases() {
 
 		suite.T().Log("About to run line #7: r.DB('test').TableCreate('test1soft')")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_mut_sync").TableCreate("test1soft"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").TableCreate("test1soft"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -96,7 +96,7 @@ func (suite *MutationSyncSuite) TestCases() {
 
 		suite.T().Log("About to run line #9: r.DB('test').Table('test1soft').Config().Update(map[interface{}]interface{}{'durability': 'soft', })")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_mut_sync").Table("test1soft").Config().Update(map[interface{}]interface{}{"durability": "soft"}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").Table("test1soft").Config().Update(map[interface{}]interface{}{"durability": "soft"}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -107,14 +107,14 @@ func (suite *MutationSyncSuite) TestCases() {
 	// tbl = r.db('test').table('test1')
 	suite.T().Log("Possibly executing: var tbl r.Term = r.DB('test').Table('test1')")
 
-	tbl := r.DB("db_mut_sync").Table("test1")
+	tbl := r.DB("test").Table("test1")
 	_ = tbl // Prevent any noused variable errors
 
 	// mutation/sync.yaml line #12
 	// tbl_soft = r.db('test').table('test1soft')
 	suite.T().Log("Possibly executing: var tbl_soft r.Term = r.DB('test').Table('test1soft')")
 
-	tbl_soft := r.DB("db_mut_sync").Table("test1soft")
+	tbl_soft := r.DB("test").Table("test1soft")
 	_ = tbl_soft // Prevent any noused variable errors
 
 	{
@@ -217,7 +217,7 @@ func (suite *MutationSyncSuite) TestCases() {
 
 		suite.T().Log("About to run line #48: r.DB('test').TableDrop('test1')")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_mut_sync").TableDrop("test1"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").TableDrop("test1"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -232,7 +232,7 @@ func (suite *MutationSyncSuite) TestCases() {
 
 		suite.T().Log("About to run line #50: r.DB('test').TableDrop('test1soft')")
 
-		runAndAssert(suite.Suite, expected_, r.DB("db_mut_sync").TableDrop("test1soft"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.DB("test").TableDrop("test1soft"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

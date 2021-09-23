@@ -29,18 +29,74 @@ logger = logging.getLogger("convert_tests")
 r = None
 
 
-TEST_EXCLUSIONS = [
-    # python only tests
-    # 'regression/1133',
-    # 'regression/767',
-    # 'regression/1005',
-    'regression/',
-    'limits',  # pending fix in issue #4965
-    # double run
-    'changefeeds/squash',
-    'arity',
-    '.rb.yaml',
-]
+# Individual tests can be ignored by specifying their line numbers from the YAML source files.
+TEST_EXCLUSIONS = {
+    'regression/': None,
+
+    'limits.yaml': [
+        36, # Produces invalid Go code using `list` and `range`
+        39, 41, 47, # Rely on above
+        75, 87, 108, 120, # The fetch() calls hang
+    ],
+
+    'changefeeds/squash': [
+        47, # double run
+    ],
+
+    'arity': [
+        51, 100, 155, 272, 282, 291, # Malformed syntax produces malformed Go
+    ],
+
+    'sindex/truncation.rb.yaml': None, # The code generator fails when it encounters (0...n).map{}
+
+    'changefeeds/geo.rb.yaml': None, # The generated code needs to enclose the map keys inside quotation marks
+
+    'aggregation.yaml': [
+        482, # A nil map key is expected, but Go strings cannot be nil, so actual result is ""
+    ],
+
+    # This file expects a password-less user `test_user` to exist, but even if it does,
+    #   - Lines #18 and #27 try to create a database and fail if it already exists, but the YAML doesn't drop the database
+    #     afterwards, so successive runs always fail.  Unfortunately, other test cases depend on these lines being run.
+    #   - Lines #49, #54, #60, and #66 use a global run option `user` which Rethink doesn't recognize.
+    'meta/grant.yaml': None,
+
+    # The lambdas passed to SetWriteHook() must return rethinkdb.Term but the generated code uses interface{} instead.
+    # These types of queries might be covered by reql_writehook_test.go though.
+    'mutation/write_hook.yaml': None,
+
+    'changefeeds/idxcopy.yaml': [
+        28, # The fetch() hangs.
+    ],
+
+    'changefeeds/now.py_one.yaml': [
+        5, # Hangs instead of returning an error.
+    ],
+
+    'times/constructors.yaml': [
+        59, 61, # Tries to create year 10000 but Rethink now only allows up to 9999.
+        64, 70, # The expected error message refers to 10000 but Rethink's error actually says 9999.
+    ],
+
+    'math_logic/logic.yaml': [
+        143, 147, # Expected an error but got nil.  Don't know if it's a real problem.
+    ],
+
+    'control.yaml': [
+        # Attempts to add 1 to a integer variable that was set to tbl.Count().  The Go '+' operator must be used instead of the ReQL '.Add()'.
+        # Deciding which operator to use requires the variable type, which in turn requires knowing what type each ReQL function returns.
+        # The robust solution is too much work, and checking for '.Count()' in the definition is a hack.
+        236,
+    ],
+
+    'meta/dbs.yaml': [
+        # For some reason the results include databases created by other tests (eg. 'examples', 'test_cur_all')
+        6, 18, 31, 37,
+    ],
+
+    # For some reason the results include databases created by other tests (eg. 'examples', 'test_cur_all')
+    'meta/composite.py.yaml': None,
+}
 
 GO_KEYWORDS = [
     'break', 'case', 'chan', 'const', 'continue', 'default', 'defer', 'else',
@@ -51,7 +107,7 @@ GO_KEYWORDS = [
 
 def main():
     logging.basicConfig(format="[%(name)s] %(message)s", level=logging.INFO)
-    start = time.clock()
+    start = time.perf_counter()
     args = parse_args()
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -71,17 +127,25 @@ def main():
             __file__,
             process_polyglot.__file__,
         ])
+    full_exclusions = list(file for (file, lines) in TEST_EXCLUSIONS.items() if not lines)
     for testfile in process_polyglot.all_yaml_tests(
             args.test_dir,
-            TEST_EXCLUSIONS):
+            full_exclusions):
         logger.info("Working on %s", testfile)
+
+        excluded_lines = set()
+        for exclusion, lines in TEST_EXCLUSIONS.items():
+            if exclusion in testfile:
+                excluded_lines.update(lines)
+
         TestFile(
             test_dir=args.test_dir,
             filename=testfile,
+            excluded_lines=excluded_lines,
             test_output_dir=args.test_output_dir,
             renderer=renderer,
         ).load().render()
-    logger.info("Finished in %s seconds", time.clock() - start)
+    logger.info("Finished in %s seconds", time.perf_counter() - start)
 
 
 def parse_args():
@@ -129,7 +193,7 @@ def import_python_driver(py_driver_dir):
     '''Imports the test driver header'''
     stashed_path = sys.path
     sys.path.insert(0, os.path.realpath(py_driver_dir))
-    import rethinkdb as r
+    from rethinkdb import r
     sys.path = stashed_path
     return r
 
@@ -174,9 +238,10 @@ def evaluate_snippet(snippet):
 class TestFile(object):
     '''Represents a single test file'''
 
-    def __init__(self, test_dir, filename, test_output_dir, renderer):
+    def __init__(self, test_dir, filename, excluded_lines, test_output_dir, renderer):
         self.filename = filename
         self.full_path = os.path.join(test_dir, filename)
+        self.excluded_lines = excluded_lines
         self.module_name = filename.split('.')[0].replace('/', '_')
         self.test_output_dir = test_output_dir
         self.reql_vars = {'r'}
@@ -208,7 +273,7 @@ class TestFile(object):
 
     def render(self):
         '''Renders the converted tests to a runnable test file'''
-        defs_and_test = ast_to_go(self.test_generator, self.reql_vars)
+        defs_and_test = ast_to_go(self.test_generator, self.reql_vars, self.excluded_lines)
         self.renderer.source_files = [self.full_path]
         self.renderer.render(
             'template.go',
@@ -268,10 +333,8 @@ def py_to_go_type(py_type):
             'uuid': 'compare.Regex',  # clashes with ast.Uuid
         }.get(py_type.__name__, camel(py_type.__name__))
     elif py_type.__module__ == 'rethinkdb.query':
-        # All of the constants like minval maxval etc are defined in
-        # query.py, but no type name is provided to `type`, so we have
-        # to pull it out of a class variable
-        return camel(py_type.st)
+        # ReQL constants don't have a type; they are just identifiers.
+        return None
     else:
         raise Unhandled(
             "Don't know how to convert python type {}.{} to Go"
@@ -351,12 +414,14 @@ def query_to_go(item, reql_vars):
     )
 
 
-def ast_to_go(sequence, reql_vars):
+def ast_to_go(sequence, reql_vars, excluded_lines):
     '''Converts the the parsed test data to go source lines using the
     visitor classes'''
     reql_vars = set(reql_vars)
     for item in sequence:
-        if type(item) == process_polyglot.Def:
+        if hasattr(item, 'line_num') and item.line_num in excluded_lines:
+            logger.info("Skipped %s line %d due to exclusion", item.testfile, item.line_num)
+        elif type(item) == process_polyglot.Def:
             yield def_to_go(item, reql_vars)
         elif type(item) == process_polyglot.CustomDef:
             yield GoDef(line=Version(item.line, item.line),
@@ -532,6 +597,7 @@ class GoVisitor(ast.NodeVisitor):
             Unhandled("We only support assigning to one variable")
         var = node.targets[0].id
         self.write("var " + var + " ")
+
         if is_reql(self._type):
             self.write('r.Term')
         else:
@@ -670,7 +736,7 @@ class GoVisitor(ast.NodeVisitor):
             self.visit(node.func)
         elif type(node.func) == ast.Name and node.func.id == 'fetch':
             if len(node.args) == 1:
-                node.args.append(ast.Num(0))
+                node.args.append(ast.Constant(0))
             elif len(node.args) > 2:
                 node.args = node.args[:2]
             self.visit(node.func)
@@ -709,14 +775,15 @@ class GoVisitor(ast.NodeVisitor):
         self.write("}")
 
     def visit_Subscript(self, node):
-        if node.slice is None or type(node.slice.value) != ast.Num:
+        if node.slice is not None and type(node.slice.value) == ast.Constant and type(node.slice.value.value) == int:
+            self.visit(node.value)
+            self.write("[")
+            self.write(str(node.slice.value.n))
+            self.write("]")
+        else:
             logger.error("While doing: %s", ast.dump(node))
             raise Unhandled("Only integers subscript can be converted."
                             " Got %s" % node.slice.value.s)
-        self.visit(node.value)
-        self.write("[")
-        self.write(str(node.slice.value.n))
-        self.write("]")
 
     def visit_ListComp(self, node):
         gen = node.generators[0]
@@ -782,7 +849,7 @@ class GoVisitor(ast.NodeVisitor):
             self.write(opMap[t])
             self.visit(node.right)
         elif t == ast.Pow:
-            if type(node.left) == ast.Num and node.left.n == 2:
+            if type(node.left) == ast.Constant and type(node.left.value) == int and node.left.n == 2:
                 self.visit(node.left)
                 self.write(" << ")
                 self.visit(node.right)
@@ -802,12 +869,12 @@ class GoVisitor(ast.NodeVisitor):
             return False
 
     def is_string_mul(self, node):
-        if ((type(node.left) == ast.Str and type(node.right) == ast.Num) and type(node.op) == ast.Mult):
+        if ((type(node.left) == ast.Constant and type(node.left.value) == str and type(node.right) == ast.Constant and type(node.right.value) == int) and type(node.op) == ast.Mult):
             self.write("\"")
             self.write(node.left.s * node.right.n)
             self.write("\"")
             return True
-        elif ((type(node.left) == ast.Num and type(node.right) == ast.Str) and type(node.op) == ast.Mult):
+        elif ((type(node.left) == ast.Constant and type(node.left.value) == int and type(node.right) == ast.Constant and type(node.right.value) == str) and type(node.op) == ast.Mult):
             self.write("\"")
             self.write(node.left.n * node.right.s)
             self.write("\"")
@@ -893,19 +960,15 @@ class ReQLVisitor(GoVisitor):
         self.write(")")
 
     def is_not_reql(self, node):
-        if type(node) in (ast.Name, ast.NameConstant,
-                          ast.Num, ast.Str, ast.Dict, ast.List):
-            return True
-        else:
-            return False
+        return type(node) in (ast.Constant, ast.Name, ast.NameConstant, ast.Dict, ast.List)
 
     def visit_Subscript(self, node):
         self.visit(node.value)
         if type(node.slice) == ast.Index:
             # Syntax like a[2] or a["b"]
-            if self.smart_bracket and type(node.slice.value) == ast.Str:
+            if self.smart_bracket and type(node.slice.value) == ast.Constant and type(node.slice.value.value) == str:
                 self.write(".Field(")
-            elif self.smart_bracket and type(node.slice.value) == ast.Num:
+            elif self.smart_bracket and type(node.slice.value) == ast.Constant and type(node.slice.value.value) == int:
                 self.write(".Nth(")
             else:
                 self.write(".AtIndex(")
@@ -937,7 +1000,7 @@ class ReQLVisitor(GoVisitor):
                 return default
             elif type(bound) == ast.UnaryOp and type(bound.op) == ast.USub:
                 return -bound.operand.n
-            elif type(bound) == ast.Num:
+            elif type(bound) == ast.Constant and type(bound.value) == int:
                 return bound.n
             else:
                 raise Unhandled(

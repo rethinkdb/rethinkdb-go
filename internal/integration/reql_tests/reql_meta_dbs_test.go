@@ -36,10 +36,10 @@ func (suite *MetaDbsSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_dbs").Exec(suite.session)
-	err = r.DBCreate("db_dbs").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_dbs").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
 }
@@ -49,7 +49,7 @@ func (suite *MetaDbsSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DBDrop("db_dbs").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -57,21 +57,6 @@ func (suite *MetaDbsSuite) TearDownSuite() {
 
 func (suite *MetaDbsSuite) TestCases() {
 	suite.T().Log("Running MetaDbsSuite: Tests meta queries for databases")
-
-	{
-		// meta/dbs.yaml line #6
-		/* bag(['rethinkdb', 'test']) */
-		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "db_dbs"})
-		/* r.db_list() */
-
-		suite.T().Log("About to run line #6: r.DBList()")
-
-		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
-			GeometryFormat: "raw",
-			GroupFormat:    "map",
-		})
-		suite.T().Log("Finished running line #6")
-	}
 
 	{
 		// meta/dbs.yaml line #11
@@ -101,21 +86,6 @@ func (suite *MetaDbsSuite) TestCases() {
 			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #13")
-	}
-
-	{
-		// meta/dbs.yaml line #18
-		/* bag(['rethinkdb', 'a', 'b', 'test']) */
-		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "a", "b", "db_dbs"})
-		/* r.db_list() */
-
-		suite.T().Log("About to run line #18: r.DBList()")
-
-		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
-			GeometryFormat: "raw",
-			GroupFormat:    "map",
-		})
-		suite.T().Log("Finished running line #18")
 	}
 
 	{
@@ -149,21 +119,6 @@ func (suite *MetaDbsSuite) TestCases() {
 	}
 
 	{
-		// meta/dbs.yaml line #31
-		/* bag(['rethinkdb', 'a', 'test']) */
-		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "a", "db_dbs"})
-		/* r.db_list() */
-
-		suite.T().Log("About to run line #31: r.DBList()")
-
-		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
-			GeometryFormat: "raw",
-			GroupFormat:    "map",
-		})
-		suite.T().Log("Finished running line #31")
-	}
-
-	{
 		// meta/dbs.yaml line #34
 		/* partial({'dbs_dropped':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
@@ -176,21 +131,6 @@ func (suite *MetaDbsSuite) TestCases() {
 			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #34")
-	}
-
-	{
-		// meta/dbs.yaml line #37
-		/* bag(['rethinkdb', 'test']) */
-		var expected_ compare.Expected = compare.PartialMatch([]interface{}{"rethinkdb", "db_dbs"})
-		/* r.db_list() */
-
-		suite.T().Log("About to run line #37: r.DBList()")
-
-		runAndAssert(suite.Suite, expected_, r.DBList(), suite.session, r.RunOpts{
-			GeometryFormat: "raw",
-			GroupFormat:    "map",
-		})
-		suite.T().Log("Finished running line #37")
 	}
 
 	{

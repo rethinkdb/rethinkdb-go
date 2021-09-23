@@ -36,16 +36,16 @@ func (suite *MatchSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_match").Exec(suite.session)
-	err = r.DBCreate("db_match").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_match").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("db_match").TableDrop("table_test_match").Exec(suite.session)
-	err = r.DB("db_match").TableCreate("table_test_match").Exec(suite.session)
+	r.DB("test").TableDrop("tbl").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_match").Table("table_test_match").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -54,8 +54,8 @@ func (suite *MatchSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("db_match").TableDrop("table_test_match").Exec(suite.session)
-		r.DBDrop("db_match").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -64,8 +64,8 @@ func (suite *MatchSuite) TearDownSuite() {
 func (suite *MatchSuite) TestCases() {
 	suite.T().Log("Running MatchSuite: Tests for match")
 
-	table_test_match := r.DB("db_match").Table("table_test_match")
-	_ = table_test_match // Prevent any noused variable errors
+	tbl := r.DB("test").Table("tbl")
+	_ = tbl // Prevent any noused variable errors
 
 	{
 		// match.yaml line #4
@@ -133,11 +133,11 @@ func (suite *MatchSuite) TestCases() {
 		// match.yaml line #16
 		/* ({'deleted':0,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':3}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 3}
-		/* table_test_match.insert([{'id':0,'a':'abc'},{'id':1,'a':'ab'},{'id':2,'a':'bc'}]) */
+		/* tbl.insert([{'id':0,'a':'abc'},{'id':1,'a':'ab'},{'id':2,'a':'bc'}]) */
 
-		suite.T().Log("About to run line #16: table_test_match.Insert([]interface{}{map[interface{}]interface{}{'id': 0, 'a': 'abc', }, map[interface{}]interface{}{'id': 1, 'a': 'ab', }, map[interface{}]interface{}{'id': 2, 'a': 'bc', }})")
+		suite.T().Log("About to run line #16: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 0, 'a': 'abc', }, map[interface{}]interface{}{'id': 1, 'a': 'ab', }, map[interface{}]interface{}{'id': 2, 'a': 'bc', }})")
 
-		runAndAssert(suite.Suite, expected_, table_test_match.Insert([]interface{}{map[interface{}]interface{}{"id": 0, "a": "abc"}, map[interface{}]interface{}{"id": 1, "a": "ab"}, map[interface{}]interface{}{"id": 2, "a": "bc"}}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Insert([]interface{}{map[interface{}]interface{}{"id": 0, "a": "abc"}, map[interface{}]interface{}{"id": 1, "a": "ab"}, map[interface{}]interface{}{"id": 2, "a": "bc"}}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -148,11 +148,11 @@ func (suite *MatchSuite) TestCases() {
 		// match.yaml line #20
 		/* ([{'id':0,'a':'abc'},{'id':1,'a':'ab'},{'id':2,'a':'bc'}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 0, "a": "abc"}, map[interface{}]interface{}{"id": 1, "a": "ab"}, map[interface{}]interface{}{"id": 2, "a": "bc"}}
-		/* table_test_match.filter(lambda row:row['a'].match('b')).order_by('id') */
+		/* tbl.filter(lambda row:row['a'].match('b')).order_by('id') */
 
-		suite.T().Log("About to run line #20: table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('b')}).OrderBy('id')")
+		suite.T().Log("About to run line #20: tbl.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('b')}).OrderBy('id')")
 
-		runAndAssert(suite.Suite, expected_, table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("b") }).OrderBy("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("b") }).OrderBy("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -163,11 +163,11 @@ func (suite *MatchSuite) TestCases() {
 		// match.yaml line #24
 		/* ([{'id':0,'a':'abc'},{'id':1,'a':'ab'}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 0, "a": "abc"}, map[interface{}]interface{}{"id": 1, "a": "ab"}}
-		/* table_test_match.filter(lambda row:row['a'].match('ab')).order_by('id') */
+		/* tbl.filter(lambda row:row['a'].match('ab')).order_by('id') */
 
-		suite.T().Log("About to run line #24: table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('ab')}).OrderBy('id')")
+		suite.T().Log("About to run line #24: tbl.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('ab')}).OrderBy('id')")
 
-		runAndAssert(suite.Suite, expected_, table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("ab") }).OrderBy("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("ab") }).OrderBy("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -178,11 +178,11 @@ func (suite *MatchSuite) TestCases() {
 		// match.yaml line #28
 		/* ([{'id':1,'a':'ab'}]) */
 		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "a": "ab"}}
-		/* table_test_match.filter(lambda row:row['a'].match('ab$')).order_by('id') */
+		/* tbl.filter(lambda row:row['a'].match('ab$')).order_by('id') */
 
-		suite.T().Log("About to run line #28: table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('ab$')}).OrderBy('id')")
+		suite.T().Log("About to run line #28: tbl.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('ab$')}).OrderBy('id')")
 
-		runAndAssert(suite.Suite, expected_, table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("ab$") }).OrderBy("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("ab$") }).OrderBy("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -193,11 +193,11 @@ func (suite *MatchSuite) TestCases() {
 		// match.yaml line #32
 		/* ([]) */
 		var expected_ []interface{} = []interface{}{}
-		/* table_test_match.filter(lambda row:row['a'].match('^b$')).order_by('id') */
+		/* tbl.filter(lambda row:row['a'].match('^b$')).order_by('id') */
 
-		suite.T().Log("About to run line #32: table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('^b$')}).OrderBy('id')")
+		suite.T().Log("About to run line #32: tbl.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Match('^b$')}).OrderBy('id')")
 
-		runAndAssert(suite.Suite, expected_, table_test_match.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("^b$") }).OrderBy("id"), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Filter(func(row r.Term) interface{} { return row.AtIndex("a").Match("^b$") }).OrderBy("id"), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

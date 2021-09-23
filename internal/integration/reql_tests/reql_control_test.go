@@ -36,21 +36,21 @@ func (suite *ControlSuite) SetupTest() {
 	suite.Require().NoError(err, "Error returned when connecting to server")
 	suite.session = session
 
-	r.DBDrop("db_control").Exec(suite.session)
-	err = r.DBCreate("db_control").Exec(suite.session)
+	r.DBDrop("test").Exec(suite.session)
+	err = r.DBCreate("test").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_control").Wait().Exec(suite.session)
+	err = r.DB("test").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 
-	r.DB("db_control").TableDrop("table_test_control").Exec(suite.session)
-	err = r.DB("db_control").TableCreate("table_test_control").Exec(suite.session)
+	r.DB("test").TableDrop("tbl").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_control").Table("table_test_control").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
-	r.DB("db_control").TableDrop("table_test_control2").Exec(suite.session)
-	err = r.DB("db_control").TableCreate("table_test_control2").Exec(suite.session)
+	r.DB("test").TableDrop("tbl2").Exec(suite.session)
+	err = r.DB("test").TableCreate("tbl2").Exec(suite.session)
 	suite.Require().NoError(err)
-	err = r.DB("db_control").Table("table_test_control2").Wait().Exec(suite.session)
+	err = r.DB("test").Table("tbl2").Wait().Exec(suite.session)
 	suite.Require().NoError(err)
 }
 
@@ -59,9 +59,9 @@ func (suite *ControlSuite) TearDownSuite() {
 
 	if suite.session != nil {
 		r.DB("rethinkdb").Table("_debug_scratch").Delete().Exec(suite.session)
-		r.DB("db_control").TableDrop("table_test_control").Exec(suite.session)
-		r.DB("db_control").TableDrop("table_test_control2").Exec(suite.session)
-		r.DBDrop("db_control").Exec(suite.session)
+		r.DB("test").TableDrop("tbl").Exec(suite.session)
+		r.DB("test").TableDrop("tbl2").Exec(suite.session)
+		r.DBDrop("test").Exec(suite.session)
 
 		suite.session.Close()
 	}
@@ -70,10 +70,10 @@ func (suite *ControlSuite) TearDownSuite() {
 func (suite *ControlSuite) TestCases() {
 	suite.T().Log("Running ControlSuite: Tests RQL control flow structures")
 
-	table_test_control := r.DB("db_control").Table("table_test_control")
-	_ = table_test_control // Prevent any noused variable errors
-	table_test_control2 := r.DB("db_control").Table("table_test_control2")
-	_ = table_test_control2 // Prevent any noused variable errors
+	tbl := r.DB("test").Table("tbl")
+	_ = tbl // Prevent any noused variable errors
+	tbl2 := r.DB("test").Table("tbl2")
+	_ = tbl2 // Prevent any noused variable errors
 
 	{
 		// control.yaml line #7
@@ -278,7 +278,7 @@ func (suite *ControlSuite) TestCases() {
 
 		suite.T().Log("About to run line #93: r.Branch(r.DB('test'), 1, 2)")
 
-		runAndAssert(suite.Suite, expected_, r.Branch(r.DB("db_control"), 1, 2), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Branch(r.DB("test"), 1, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -289,11 +289,11 @@ func (suite *ControlSuite) TestCases() {
 		// control.yaml line #95
 		/* err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:", []) */
 		var expected_ Err = err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:")
-		/* r.branch(table_test_control, 1, 2) */
+		/* r.branch(tbl, 1, 2) */
 
-		suite.T().Log("About to run line #95: r.Branch(table_test_control, 1, 2)")
+		suite.T().Log("About to run line #95: r.Branch(tbl, 1, 2)")
 
-		runAndAssert(suite.Suite, expected_, r.Branch(table_test_control, 1, 2), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Branch(tbl, 1, 2), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -784,11 +784,11 @@ func (suite *ControlSuite) TestCases() {
 		// control.yaml line #205
 		/* 0 */
 		var expected_ int = 0
-		/* table_test_control.count() */
+		/* tbl.count() */
 
-		suite.T().Log("About to run line #205: table_test_control.Count()")
+		suite.T().Log("About to run line #205: tbl.Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_control.Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -799,11 +799,11 @@ func (suite *ControlSuite) TestCases() {
 		// control.yaml line #210
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':3}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
-		/* r.expr([1, 2, 3]).for_each(lambda row:table_test_control.insert({ 'id':row })) */
+		/* r.expr([1, 2, 3]).for_each(lambda row:tbl.insert({ 'id':row })) */
 
-		suite.T().Log("About to run line #210: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return table_test_control.Insert(map[interface{}]interface{}{'id': row, })})")
+		suite.T().Log("About to run line #210: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl.Insert(map[interface{}]interface{}{'id': row, })})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return table_test_control.Insert(map[interface{}]interface{}{"id": row}) }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl.Insert(map[interface{}]interface{}{"id": row}) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -814,11 +814,11 @@ func (suite *ControlSuite) TestCases() {
 		// control.yaml line #214
 		/* 3 */
 		var expected_ int = 3
-		/* table_test_control.count() */
+		/* tbl.count() */
 
-		suite.T().Log("About to run line #214: table_test_control.Count()")
+		suite.T().Log("About to run line #214: tbl.Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_control.Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -829,13 +829,11 @@ func (suite *ControlSuite) TestCases() {
 		// control.yaml line #219
 		/* ({'deleted':0.0,'replaced':9,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 9, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
-		/* r.expr([1,2,3]).for_each(lambda row:table_test_control.update({'foo':row})) */
+		/* r.expr([1,2,3]).for_each(lambda row:tbl.update({'foo':row})) */
 
-		suite.T().Log("About to run line #219: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return table_test_control.Update(map[interface{}]interface{}{'foo': row, })})")
+		suite.T().Log("About to run line #219: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl.Update(map[interface{}]interface{}{'foo': row, })})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} {
-			return table_test_control.Update(map[interface{}]interface{}{"foo": row})
-		}), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl.Update(map[interface{}]interface{}{"foo": row}) }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
@@ -846,12 +844,12 @@ func (suite *ControlSuite) TestCases() {
 		// control.yaml line #225
 		/* {'first_error':"Duplicate primary key `id`:\n{\n\t\"foo\":\t3,\n\t\"id\":\t1\n}\n{\n\t\"id\":\t1\n}",'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':3,'skipped':0.0,'inserted':3} */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Duplicate primary key `id`:\n{\n\t\"foo\":\t3,\n\t\"id\":\t1\n}\n{\n\t\"id\":\t1\n}", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 3, "skipped": 0.0, "inserted": 3}
-		/* r.expr([1,2,3]).for_each(lambda row:[table_test_control.insert({ 'id':row }), table_test_control.insert({ 'id':row*10 })]) */
+		/* r.expr([1,2,3]).for_each(lambda row:[tbl.insert({ 'id':row }), tbl.insert({ 'id':row*10 })]) */
 
-		suite.T().Log("About to run line #225: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return []interface{}{table_test_control.Insert(map[interface{}]interface{}{'id': row, }), table_test_control.Insert(map[interface{}]interface{}{'id': r.Mul(row, 10), })}})")
+		suite.T().Log("About to run line #225: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return []interface{}{tbl.Insert(map[interface{}]interface{}{'id': row, }), tbl.Insert(map[interface{}]interface{}{'id': r.Mul(row, 10), })}})")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} {
-			return []interface{}{table_test_control.Insert(map[interface{}]interface{}{"id": row}), table_test_control.Insert(map[interface{}]interface{}{"id": r.Mul(row, 10)})}
+			return []interface{}{tbl.Insert(map[interface{}]interface{}{"id": row}), tbl.Insert(map[interface{}]interface{}{"id": r.Mul(row, 10)})}
 		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
@@ -863,241 +861,249 @@ func (suite *ControlSuite) TestCases() {
 		// control.yaml line #229
 		/* 6 */
 		var expected_ int = 6
-		/* table_test_control.count() */
+		/* tbl.count() */
 
-		suite.T().Log("About to run line #229: table_test_control.Count()")
+		suite.T().Log("About to run line #229: tbl.Count()")
 
-		runAndAssert(suite.Suite, expected_, table_test_control.Count(), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Count(), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
 		suite.T().Log("Finished running line #229")
 	}
 
+	// control.yaml line #232
+	// tableCount = tbl2.count()
+	suite.T().Log("Possibly executing: var tableCount r.Term = tbl2.Count()")
+
+	tableCount := maybeRun(tbl2.Count(), suite.session, r.RunOpts{})
+	_ = tableCount // Prevent any noused variable errors
+
 	{
-		// control.yaml line #232
+		// control.yaml line #233
 		/* ({'deleted':0.0,'replaced':0.0,'generated_keys':arrlen(3,uuid()),'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':3}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(3, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
-		/* r.expr([1, 2, 3]).for_each( table_test_control2.insert({}) ) */
+		/* r.expr([1, 2, 3]).for_each( tbl2.insert({}) ) */
 
-		suite.T().Log("About to run line #232: r.Expr([]interface{}{1, 2, 3}).ForEach(table_test_control2.Insert(map[interface{}]interface{}{}))")
+		suite.T().Log("About to run line #233: r.Expr([]interface{}{1, 2, 3}).ForEach(tbl2.Insert(map[interface{}]interface{}{}))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(table_test_control2.Insert(map[interface{}]interface{}{})), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(tbl2.Insert(map[interface{}]interface{}{})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #232")
+		suite.T().Log("Finished running line #233")
 	}
 
 	{
-		// control.yaml line #235
-		/* 1 */
-		var expected_ int = 1
-		/* table_test_control2.count() */
-
-		suite.T().Log("About to run line #235: table_test_control2.Count()")
-
-		runAndAssert(suite.Suite, expected_, table_test_control2.Count(), suite.session, r.RunOpts{
-			GeometryFormat: "raw",
-			GroupFormat:    "map",
-		})
-		suite.T().Log("Finished running line #235")
-	}
-
-	{
-		// control.yaml line #240
+		// control.yaml line #241
 		/* ({'deleted':0.0,'replaced':36,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 36, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
-		/* r.expr([1,2,3]).for_each(lambda row:[table_test_control.update({'foo':row}), table_test_control.update({'bar':row})]) */
+		/* r.expr([1,2,3]).for_each(lambda row:[tbl.update({'foo':row}), tbl.update({'bar':row})]) */
 
-		suite.T().Log("About to run line #240: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return []interface{}{table_test_control.Update(map[interface{}]interface{}{'foo': row, }), table_test_control.Update(map[interface{}]interface{}{'bar': row, })}})")
+		suite.T().Log("About to run line #241: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return []interface{}{tbl.Update(map[interface{}]interface{}{'foo': row, }), tbl.Update(map[interface{}]interface{}{'bar': row, })}})")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} {
-			return []interface{}{table_test_control.Update(map[interface{}]interface{}{"foo": row}), table_test_control.Update(map[interface{}]interface{}{"bar": row})}
+			return []interface{}{tbl.Update(map[interface{}]interface{}{"foo": row}), tbl.Update(map[interface{}]interface{}{"bar": row})}
 		}), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #240")
+		suite.T().Log("Finished running line #241")
 	}
 
 	{
-		// control.yaml line #245
+		// control.yaml line #246
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':3}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
-		/* r.expr([1, 2, 3]).for_each( table_test_control2.insert({ 'id':r.row }) ) */
+		/* r.expr([1, 2, 3]).for_each( tbl2.insert({ 'id':r.row }) ) */
 
-		suite.T().Log("About to run line #245: r.Expr([]interface{}{1, 2, 3}).ForEach(table_test_control2.Insert(map[interface{}]interface{}{'id': r.Row, }))")
+		suite.T().Log("About to run line #246: r.Expr([]interface{}{1, 2, 3}).ForEach(tbl2.Insert(map[interface{}]interface{}{'id': r.Row, }))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(table_test_control2.Insert(map[interface{}]interface{}{"id": r.Row})), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(tbl2.Insert(map[interface{}]interface{}{"id": r.Row})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #245")
+		suite.T().Log("Finished running line #246")
 	}
 
 	{
-		// control.yaml line #249
+		// control.yaml line #250
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.", [0]) */
 		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
 		/* r.expr([1, 2, 3]).for_each(1) */
 
-		suite.T().Log("About to run line #249: r.Expr([]interface{}{1, 2, 3}).ForEach(1)")
+		suite.T().Log("About to run line #250: r.Expr([]interface{}{1, 2, 3}).ForEach(1)")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(1), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #249")
+		suite.T().Log("Finished running line #250")
 	}
 
 	{
-		// control.yaml line #252
+		// control.yaml line #253
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.", [1, 1]) */
 		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
 		/* r.expr([1, 2, 3]).for_each(lambda x:x) */
 
-		suite.T().Log("About to run line #252: r.Expr([]interface{}{1, 2, 3}).ForEach(func(x r.Term) interface{} { return x})")
+		suite.T().Log("About to run line #253: r.Expr([]interface{}{1, 2, 3}).ForEach(func(x r.Term) interface{} { return x})")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(x r.Term) interface{} { return x }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #252")
+		suite.T().Log("Finished running line #253")
 	}
 
 	{
-		// control.yaml line #257
+		// control.yaml line #258
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.", [1, 1]) */
 		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
 		/* r.expr([1, 2, 3]).for_each(r.row) */
 
-		suite.T().Log("About to run line #257: r.Expr([]interface{}{1, 2, 3}).ForEach(r.Row)")
+		suite.T().Log("About to run line #258: r.Expr([]interface{}{1, 2, 3}).ForEach(r.Row)")
 
 		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(r.Row), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #257")
+		suite.T().Log("Finished running line #258")
 	}
 
 	{
-		// control.yaml line #262
+		// control.yaml line #263
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.", [1, 1]) */
 		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.")
-		/* r.expr([1, 2, 3]).for_each(lambda row:table_test_control) */
+		/* r.expr([1, 2, 3]).for_each(lambda row:tbl) */
 
-		suite.T().Log("About to run line #262: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return table_test_control})")
+		suite.T().Log("About to run line #263: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl})")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return table_test_control }), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl }), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #262")
+		suite.T().Log("Finished running line #263")
 	}
 
 	{
-		// control.yaml line #271
+		// control.yaml line #272
 		/* ({'deleted':0.0,'replaced':0.0,'generated_keys':arrlen(1,uuid()),'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(1, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
-		/* r.expr(1).do(table_test_control.insert({'foo':r.row})) */
+		/* r.expr(1).do(tbl.insert({'foo':r.row})) */
 
-		suite.T().Log("About to run line #271: r.Expr(1).Do(table_test_control.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
+		suite.T().Log("About to run line #272: r.Expr(1).Do(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(table_test_control.Insert(map[interface{}]interface{}{"foo": r.Row})), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(tbl.Insert(map[interface{}]interface{}{"foo": r.Row})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #271")
+		suite.T().Log("Finished running line #272")
 	}
 
 	{
-		// control.yaml line #275
+		// control.yaml line #276
 		/* ({'deleted':0.0,'replaced':0.0,'generated_keys':arrlen(1,uuid()),'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(1, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
-		/* r.expr([1, 2])[0].do(table_test_control.insert({'foo':r.row})) */
+		/* r.expr([1, 2])[0].do(tbl.insert({'foo':r.row})) */
 
-		suite.T().Log("About to run line #275: r.Expr([]interface{}{1, 2}).AtIndex(0).Do(table_test_control.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
+		suite.T().Log("About to run line #276: r.Expr([]interface{}{1, 2}).AtIndex(0).Do(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).AtIndex(0).Do(table_test_control.Insert(map[interface{}]interface{}{"foo": r.Row})), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).AtIndex(0).Do(tbl.Insert(map[interface{}]interface{}{"foo": r.Row})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #275")
+		suite.T().Log("Finished running line #276")
 	}
 
 	{
-		// control.yaml line #280
+		// control.yaml line #281
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
 		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
-		/* r.expr([1, 2]).map(table_test_control.insert({'foo':r.row})) */
+		/* r.expr([1, 2]).map(tbl.insert({'foo':r.row})) */
 
-		suite.T().Log("About to run line #280: r.Expr([]interface{}{1, 2}).Map(table_test_control.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
+		suite.T().Log("About to run line #281: r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(table_test_control.Insert(map[interface{}]interface{}{"foo": r.Row})), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{"foo": r.Row})), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #280")
+		suite.T().Log("Finished running line #281")
 	}
 
 	{
-		// control.yaml line #284
+		// control.yaml line #285
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
 		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
 		/* r.expr([1, 2]).map(r.db('test').table_create('table_create_failure')) */
 
-		suite.T().Log("About to run line #284: r.Expr([]interface{}{1, 2}).Map(r.DB('test').TableCreate('table_create_failure'))")
+		suite.T().Log("About to run line #285: r.Expr([]interface{}{1, 2}).Map(r.DB('test').TableCreate('table_create_failure'))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(r.DB("db_control").TableCreate("table_create_failure")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(r.DB("test").TableCreate("table_create_failure")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #284")
+		suite.T().Log("Finished running line #285")
 	}
 
 	{
-		// control.yaml line #287
+		// control.yaml line #288
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
 		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
-		/* r.expr([1, 2]).map(table_test_control.insert({'foo':r.row}).get_field('inserted')) */
+		/* r.expr([1, 2]).map(tbl.insert({'foo':r.row}).get_field('inserted')) */
 
-		suite.T().Log("About to run line #287: r.Expr([]interface{}{1, 2}).Map(table_test_control.Insert(map[interface{}]interface{}{'foo': r.Row, }).Field('inserted'))")
+		suite.T().Log("About to run line #288: r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }).Field('inserted'))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(table_test_control.Insert(map[interface{}]interface{}{"foo": r.Row}).Field("inserted")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{"foo": r.Row}).Field("inserted")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #287")
+		suite.T().Log("Finished running line #288")
 	}
 
 	{
-		// control.yaml line #291
+		// control.yaml line #292
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
 		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
-		/* r.expr([1, 2]).map(table_test_control.insert({'foo':r.row}).get_field('inserted').add(5)) */
+		/* r.expr([1, 2]).map(tbl.insert({'foo':r.row}).get_field('inserted').add(5)) */
 
-		suite.T().Log("About to run line #291: r.Expr([]interface{}{1, 2}).Map(table_test_control.Insert(map[interface{}]interface{}{'foo': r.Row, }).Field('inserted').Add(5))")
+		suite.T().Log("About to run line #292: r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }).Field('inserted').Add(5))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(table_test_control.Insert(map[interface{}]interface{}{"foo": r.Row}).Field("inserted").Add(5)), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{"foo": r.Row}).Field("inserted").Add(5)), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #291")
+		suite.T().Log("Finished running line #292")
 	}
 
 	{
-		// control.yaml line #295
+		// control.yaml line #296
 		/* partial({'tables_created':1}) */
 		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* r.expr(1).do(r.db('test').table_create('table_create_success')) */
 
-		suite.T().Log("About to run line #295: r.Expr(1).Do(r.DB('test').TableCreate('table_create_success'))")
+		suite.T().Log("About to run line #296: r.Expr(1).Do(r.DB('test').TableCreate('table_create_success'))")
 
-		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(r.DB("db_control").TableCreate("table_create_success")), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, r.Expr(1).Do(r.DB("test").TableCreate("table_create_success")), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})
-		suite.T().Log("Finished running line #295")
+		suite.T().Log("Finished running line #296")
+	}
+
+	{
+		// control.yaml line #300
+		/* [1, 2] */
+		var expected_ []interface{} = []interface{}{1, 2}
+		/* r.expr([1, 2]) */
+
+		suite.T().Log("About to run line #300: r.Expr([]interface{}{1, 2})")
+
+		runAndAssert(suite.Suite, expected_, r.Expr([]interface{}{1, 2}), suite.session, r.RunOpts{
+			GeometryFormat: "raw",
+			GroupFormat:    "map",
+			ReadMode:       []interface{}{"a", "b"},
+		})
+		suite.T().Log("Finished running line #300")
 	}
 }
