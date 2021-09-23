@@ -10,6 +10,7 @@
 # Folders
 _obj
 _test
+__pycache__
 
 # Architecture specific extensions/prefixes
 *.[568vq]
