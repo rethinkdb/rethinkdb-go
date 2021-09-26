@@ -1,21 +1,21 @@
 package rethinkdb
 
 import (
+	"bytes"
 	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
 	"net"
+	"sync"
 	"sync/atomic"
 	"time"
 
-	"bytes"
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
 	"golang.org/x/net/context"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
-	"sync"
 )
 
 const (
@@ -41,8 +41,7 @@ type Response struct {
 	Profile   interface{}               `json:"p"`
 }
 
-// Connection is a connection to a rethinkdb database. Connection is not thread
-// safe and should only be accessed be a single goroutine
+// Connection is a connection to a RethinkDB database.
 type Connection struct {
 	net.Conn
 

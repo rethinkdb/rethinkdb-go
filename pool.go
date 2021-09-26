@@ -19,7 +19,7 @@ const (
 
 type connFactory func(host string, opts *ConnectOpts) (*Connection, error)
 
-// A Pool is used to store a pool of connections to a single RethinkDB server
+// Pool evenly distributes queries across a set of connections to a RethinkDB server.
 type Pool struct {
 	host Host
 	opts *ConnectOpts
