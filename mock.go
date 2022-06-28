@@ -381,6 +381,10 @@ func (m *Mock) Exec(ctx context.Context, q Query) error {
 	return err
 }
 
+func (m *Mock) Close(optArgs ...CloseOpts) error {
+	return nil
+}
+
 func (m *Mock) newQuery(t Term, opts map[string]interface{}) (Query, error) {
 	return newQuery(t, opts, &m.opts)
 }
