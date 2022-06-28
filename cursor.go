@@ -43,10 +43,8 @@ func newCursor(ctx context.Context, conn *Connection, cursorType string, token i
 	return cursor
 }
 
-// Cursor is the result of a query. Its cursor starts before the first row
-// of the result set. A Cursor is not thread safe and should only be accessed
-// by a single goroutine at any given time. Use Next to advance through the
-// rows:
+// Cursor is the result of a query. It starts before the first row
+// of the result set. Use Next to advance through the rows:
 //
 //     cursor, err := query.Run(session)
 //     ...
