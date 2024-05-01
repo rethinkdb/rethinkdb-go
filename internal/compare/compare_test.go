@@ -24,7 +24,7 @@ func TestCompareArray(t *testing.T) {
 	// out of order
 	AssertFalse(t, []interface{}{1, 2, 3}, []interface{}{1, 3, 2})
 
-	// totally mistmatched lists
+	// totally mismatched lists
 	AssertFalse(t, []interface{}{1, 2, 3}, []interface{}{3, 4, 5})
 
 	// missing items

@@ -20,7 +20,7 @@ func newTypeEncoder(t reflect.Type, allowAddr bool) encoderFunc {
 		}
 	}
 
-	// Check for psuedo-types first
+	// Check for pseudo-types first
 	switch t {
 	case timeType:
 		return timePseudoTypeEncoder

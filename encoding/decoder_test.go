@@ -25,11 +25,7 @@ type V struct {
 	F3 string
 }
 
-type tx struct {
-	x int
-}
-
-var txType = reflect.TypeOf((*tx)(nil)).Elem()
+type tx struct{}
 
 // Test data structures for anonymous fields.
 
@@ -310,7 +306,7 @@ func TestDecode(t *testing.T) {
 			vv := reflect.New(reflect.TypeOf(tt.ptr).Elem())
 
 			if err := Decode(vv.Interface(), enc); err != nil {
-				t.Errorf("#%d: error re-decodeing: %v", i, err)
+				t.Errorf("#%d: error re-decoding: %v", i, err)
 				continue
 			}
 			if !jsonEqual(v.Elem().Interface(), vv.Elem().Interface()) {
@@ -322,8 +318,6 @@ func TestDecode(t *testing.T) {
 }
 
 func TestStringKind(t *testing.T) {
-	type aMap map[string]int
-
 	var m1, m2 map[string]int
 	m1 = map[string]int{
 		"foo": 42,
@@ -348,8 +342,6 @@ func TestStringKind(t *testing.T) {
 // Test handling of unexported fields that should be ignored.
 type unexportedFields struct {
 	Name string
-	m    map[string]interface{} `rethinkdb:"-"`
-	m2   map[string]interface{} `rethinkdb:"abcd"`
 }
 
 func TestDecodeUnexported(t *testing.T) {

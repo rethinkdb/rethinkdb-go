@@ -3,7 +3,8 @@ package rethinkdb
 import (
 	"sync"
 
-	"golang.org/x/net/context"
+	"context"
+
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
@@ -82,7 +83,7 @@ func (n *Node) SetMaxOpenConns(openConns int) {
 // processed by the server. Note that this guarantee only applies to queries
 // run on the given connection
 func (n *Node) NoReplyWait() error {
-	return n.pool.Exec(nil, Query{ // nil = connection opts' timeout
+	return n.pool.Exec(context.TODO(), Query{ // nil = connection opts' timeout
 		Type: p.Query_NOREPLY_WAIT,
 	})
 }

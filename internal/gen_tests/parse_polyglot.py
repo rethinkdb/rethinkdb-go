@@ -59,7 +59,7 @@ def parseYAML(source):
 
             parsedLine = yamlLineRegex.match(line)
             if not parsedLine:
-                raise Exception('Unparseable YAML line %d: %s' % (linenumber, line.rstrip()))
+                raise Exception('Unparsable YAML line %d: %s' % (linenumber, line.rstrip()))
 
             lineIndent = len(parsedLine.group('indent'))
             lineItemMarker = parsedLine.group('itemMarker')

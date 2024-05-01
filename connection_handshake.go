@@ -80,7 +80,6 @@ func (c *connectionHandshakeV0_4) writeHandshakeReq() error {
 
 	// Send the protocol type as a 4-byte little-endian-encoded integer
 	binary.LittleEndian.PutUint32(data[pos:], uint32(p.VersionDummy_JSON))
-	pos += 4
 
 	return c.conn.writeData(data)
 }
@@ -90,7 +89,7 @@ func (c *connectionHandshakeV0_4) readHandshakeSuccess() error {
 	line, err := reader.ReadBytes('\x00')
 	if err != nil {
 		if err == io.EOF {
-			return fmt.Errorf("Unexpected EOF: %s", string(line))
+			return fmt.Errorf("unexpected EOF: %s", string(line))
 		}
 		return err
 	}

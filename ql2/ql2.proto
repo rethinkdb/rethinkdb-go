@@ -25,7 +25,7 @@
 // Next, for each query you want to send, construct a [Query] protobuf
 // and serialize it to a binary blob.  Send the blob's size to the
 // server encoded as a little-endian 32-bit integer, followed by the
-// blob itself.  You will recieve a [Response] protobuf back preceded
+// blob itself.  You will receive a [Response] protobuf back preceded
 // by its own size, once again encoded as a little-endian 32-bit
 // integer.  You can see an example exchange below in **EXAMPLE**.
 
@@ -258,7 +258,7 @@ message Datum {
 // terms).  These are marked with a `!`.
 // Optional arguments are specified within curly braces as argname `:` value
 // type (e.x `{noreply:BOOL}`)
-// Many RQL operations are polymorphic. For these, alterantive type signatures
+// Many RQL operations are polymorphic. For these, alternative type signatures
 // are separated by `|`.
 //
 // The RQL type hierarchy is as follows:

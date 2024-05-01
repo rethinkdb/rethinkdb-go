@@ -13,7 +13,7 @@ import (
 	"gopkg.in/rethinkdb/rethinkdb-go.v6/internal/compare"
 )
 
-// Tests of converstion to and from the RQL string type
+// Tests of conversion to and from the RQL string type
 func TestDatumStringSuite(t *testing.T) {
 	suite.Run(t, new(DatumStringSuite))
 }
@@ -56,7 +56,7 @@ func (suite *DatumStringSuite) TearDownSuite() {
 }
 
 func (suite *DatumStringSuite) TestCases() {
-	suite.T().Log("Running DatumStringSuite: Tests of converstion to and from the RQL string type")
+	suite.T().Log("Running DatumStringSuite: Tests of conversation to and from the RQL string type")
 
 	// datum/string.yaml line #7
 	// japanese_hello = u'こんにちは'

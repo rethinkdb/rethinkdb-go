@@ -110,7 +110,7 @@ Thanks to everybody who got involved with this project over the last ~4 years an
 ### Changed
 
  - Moved project to `gorethink` organisation
- - Fixed behaviour when unmarshaling nil slices
+ - Fixed behaviour when unmarshalling nil slices
 
 ### Fixed
 
@@ -356,7 +356,7 @@ r.Connect(
  - Added more documentation and examples for `GetAll`.
 
 ### Fixed
-- Fixed `RunWrite` not defering its call to `Cursor.Close()`. This could cause issues if an error occurred when decoding the result.
+- Fixed `RunWrite` not deferring its call to `Cursor.Close()`. This could cause issues if an error occurred when decoding the result.
 - Fixed panic when calling `Error()` on a RethinkDB-go `rqlError`.
 
 ## v1.3.0 - 2016-01-11
@@ -557,7 +557,7 @@ For more details checkout the [README](https://github.com/gorethink/gorethink/bl
 ## v0.6.1 - 2015-02-13
 
 - Reduce GC by using buffers when reading and writing
-- Fixed encoding `time.Time` ignoring millseconds
+- Fixed encoding `time.Time` ignoring milliseconds
 - Fixed pointers in structs that implement the `Marshaler`/`Unmarshaler` interfaces being ignored
 
 ## v0.6.0 - 2015-01-01

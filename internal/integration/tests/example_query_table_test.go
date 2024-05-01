@@ -2,6 +2,7 @@ package tests
 
 import (
 	"fmt"
+
 	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
@@ -12,7 +13,7 @@ func ExampleTerm_TableCreate() {
 
 	response, err := r.DB("examples").TableCreate("table").RunWrite(session)
 	if err != nil {
-		r.Log.Fatalf("Error creating table: %s", err)
+		panic(fmt.Errorf("Error creating table: %s", err))
 	}
 
 	fmt.Printf("%d table created", response.TablesCreated)
@@ -29,7 +30,7 @@ func ExampleTerm_IndexCreate() {
 
 	response, err := r.DB("examples").Table("table").IndexCreate("name").RunWrite(session)
 	if err != nil {
-		r.Log.Fatalf("Error creating index: %s", err)
+		panic(fmt.Errorf("Error creating index: %s", err))
 	}
 
 	fmt.Printf("%d index created", response.Created)
@@ -48,7 +49,7 @@ func ExampleTerm_IndexCreate_compound() {
 		return []interface{}{row.Field("first_name"), row.Field("last_name")}
 	}).RunWrite(session)
 	if err != nil {
-		r.Log.Fatalf("Error creating index: %s", err)
+		panic(fmt.Errorf("Error creating index: %s", err))
 	}
 
 	fmt.Printf("%d index created", response.Created)

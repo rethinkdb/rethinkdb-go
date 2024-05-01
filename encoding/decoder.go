@@ -7,8 +7,6 @@ import (
 	"sync"
 )
 
-var byteSliceType = reflect.TypeOf([]byte(nil))
-
 type decoderFunc func(dv reflect.Value, sv reflect.Value) error
 
 // Decode decodes map[string]interface{} into a struct. The first parameter

@@ -96,7 +96,7 @@ func GroupByIndex(index interface{}, fieldOrFunctions ...interface{}) Term {
 func MultiGroupByIndex(index interface{}, fieldOrFunctions ...interface{}) Term {
 	return constructRootTerm("Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{
 		"index": index,
-		"mutli": true,
+		"multi": true,
 	})
 }
 
@@ -141,7 +141,7 @@ func (t Term) GroupByIndex(index interface{}, fieldOrFunctions ...interface{}) T
 func (t Term) MultiGroupByIndex(index interface{}, fieldOrFunctions ...interface{}) Term {
 	return constructMethodTerm(t, "Group", p.Term_GROUP, funcWrapArgs(fieldOrFunctions), map[string]interface{}{
 		"index": index,
-		"mutli": true,
+		"multi": true,
 	})
 }
 

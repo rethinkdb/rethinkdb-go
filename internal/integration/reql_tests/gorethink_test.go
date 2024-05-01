@@ -6,8 +6,6 @@ import (
 	"flag"
 	"os"
 	"runtime"
-
-	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
 var url string
@@ -17,8 +15,6 @@ func init() {
 	if runtime.Version() < "go1.13" {
 		flag.Parse()
 	}
-
-	r.SetVerbose(true)
 
 	// If the test is being run by wercker look for the rethink url
 	url = os.Getenv("RETHINKDB_URL")

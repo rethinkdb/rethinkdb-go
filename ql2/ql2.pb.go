@@ -1774,7 +1774,7 @@ func (m *Datum_AssocPair) GetVal() *Datum {
 // terms).  These are marked with a `!`.
 // Optional arguments are specified within curly braces as argname `:` value
 // type (e.x `{noreply:BOOL}`)
-// Many RQL operations are polymorphic. For these, alterantive type signatures
+// Many RQL operations are polymorphic. For these, alternative type signatures
 // are separated by `|`.
 //
 // The RQL type hierarchy is as follows:

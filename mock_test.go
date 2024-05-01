@@ -195,7 +195,7 @@ func (s *MockSuite) TestMockRunMissingQueryMultiple(c *test.C) {
 	c.Assert(t.Failed(), test.Equals, true)
 }
 
-func (s *MockSuite) TestMockRunMutlipleQueries(c *test.C) {
+func (s *MockSuite) TestMockRunMultipleQueries(c *test.C) {
 	mock := NewMock()
 	mock.On(DB("test").Table("test").Get("mocked1")).Return(map[string]interface{}{
 		"id": "mocked1",
