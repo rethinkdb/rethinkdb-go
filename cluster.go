@@ -244,7 +244,7 @@ func (c *Cluster) listenForNodeChanges() error {
 		c.opts,
 	)
 	if err != nil {
-		return fmt.Errorf("Error building query: %s", err)
+		return fmt.Errorf("Error building query: %w", err)
 	}
 
 	cursor, err := node.Query(context.Background(), q) // no need for timeout due to Changes()

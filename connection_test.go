@@ -158,7 +158,7 @@ func (s *ConnectionSuite) TestConnection_Query_NoReplyOk(c *test.C) {
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
 	done := runConnection(connection)
-	response, cursor, err := connection.Query(nil, q)
+	response, cursor, err := connection.Query(context.TODO(), q)
 	connection.Close()
 	<-done
 
