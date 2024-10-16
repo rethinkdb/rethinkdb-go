@@ -56,7 +56,7 @@ func (suite *DatumStringSuite) TearDownSuite() {
 }
 
 func (suite *DatumStringSuite) TestCases() {
-	suite.T().Log("Running DatumStringSuite: Tests of conversation to and from the RQL string type")
+	suite.T().Log("Running DatumStringSuite: Tests of conversion to and from the RQL string type")
 
 	// datum/string.yaml line #7
 	// japanese_hello = u'こんにちは'

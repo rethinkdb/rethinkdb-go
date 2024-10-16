@@ -24,6 +24,7 @@ func init() {
 		flag.Parse()
 	}
 
+	r.SetVerbose(true)
 	// If the test is being run by wercker look for the rethink url
 	url = os.Getenv("RETHINKDB_URL")
 	if url == "" {
@@ -58,7 +59,7 @@ func testSetup(m *testing.M) {
 		Address: url,
 	})
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("Error connecting to instance: %w", err))
 	}
 
 	setupTestData()

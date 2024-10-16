@@ -164,7 +164,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		c.setBad()
 		return nil, nil, ErrConnectionClosed
 	}
-	if ctx == nil {
+	if ctx == nil || ctx == context.TODO() {
 		ctx = c.contextFromConnectionOpts()
 	}
 

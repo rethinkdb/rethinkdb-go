@@ -1,6 +1,7 @@
 package rethinkdb
 
 import (
+	"log/slog"
 	"reflect"
 
 	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
@@ -35,4 +36,15 @@ func init() {
 // Old-style gorethink tag is also supported but deprecated
 func SetTags(tags ...string) {
 	encoding.Tags = append(tags, encoding.TagName, encoding.OldTagName)
+}
+
+// SetVerbose allows the driver logging level to be set. If true is passed then
+// the log level is set to Debug otherwise it defaults to Info.
+func SetVerbose(verbose bool) {
+	if verbose {
+		slog.SetLogLoggerLevel(slog.LevelDebug)
+		return
+	}
+
+	slog.SetLogLoggerLevel(slog.LevelInfo)
 }
