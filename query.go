@@ -223,7 +223,7 @@ func (t Term) String() string {
 		}
 	case p.Term_BINARY:
 		if len(t.args) == 0 {
-			return fmt.Sprintf("r.binary(<data>)")
+			return "r.binary(<data>)"
 		}
 	}
 
