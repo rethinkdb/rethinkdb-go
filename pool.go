@@ -39,6 +39,12 @@ func NewPool(host Host, opts *ConnectOpts) (*Pool, error) {
 }
 
 func newPool(host Host, opts *ConnectOpts, connFactory connFactory) (*Pool, error) {
+	initialCap := opts.InitialCap
+	if initialCap <= 0 {
+		// Fallback to MaxIdle if InitialCap is zero, this should be removed
+		// when MaxIdle is removed
+		initialCap = opts.MaxIdle
+	}
 	maxOpen := opts.MaxOpen
 	if maxOpen <= 0 {
 		maxOpen = 1
@@ -46,7 +52,7 @@ func newPool(host Host, opts *ConnectOpts, connFactory connFactory) (*Pool, erro
 
 	conns := make([]*Connection, maxOpen)
 	var err error
-	for i := 0; i < opts.InitialCap; i++ {
+	for i := 0; i < initialCap; i++ {
 		conns[i], err = connFactory(host.String(), opts)
 		if err != nil {
 			return nil, err

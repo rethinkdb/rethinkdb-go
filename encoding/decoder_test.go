@@ -342,6 +342,8 @@ func TestStringKind(t *testing.T) {
 // Test handling of unexported fields that should be ignored.
 type unexportedFields struct {
 	Name string
+	m    map[string]interface{} `rethinkdb:"-"`
+	m2   map[string]interface{} `rethinkdb:"abcd"`
 }
 
 func TestDecodeUnexported(t *testing.T) {
