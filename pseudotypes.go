@@ -131,7 +131,7 @@ func reqlTimeToNativeTime(timestamp float64, timezone string) (time.Time, error)
 	// Convert to native time rounding to milliseconds
 	t := time.Unix(int64(sec), int64(math.Floor(ms*1000+0.5))*1000*1000)
 
-	// Caclulate the timezone
+	// Calculate the timezone
 	if timezone != "" {
 		hours, err := strconv.Atoi(timezone[1:3])
 		if err != nil {

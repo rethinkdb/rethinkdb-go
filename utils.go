@@ -137,7 +137,7 @@ func funcWrapArgs(args []interface{}) []interface{} {
 	return args
 }
 
-// implVarScan recursivly checks a value to see if it contains an
+// implVarScan recursively checks a value to see if it contains an
 // IMPLICIT_VAR term. If it does it returns true
 func implVarScan(value Term) bool {
 	if value.termType == p.Term_IMPLICIT_VAR {

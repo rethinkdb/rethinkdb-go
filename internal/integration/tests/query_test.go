@@ -517,7 +517,7 @@ func (s *RethinkSuite) TestTableChangesExit(c *test.C) {
 
 	// Listen for changes
 	res.Listen(change)
-	for _ = range change {
+	for range change {
 		n++
 	}
 
@@ -547,7 +547,7 @@ func (s *RethinkSuite) TestTableChangesExitNoResults(c *test.C) {
 
 	// Listen for changes
 	res.Listen(change)
-	for _ = range change {
+	for range change {
 		n++
 	}
 

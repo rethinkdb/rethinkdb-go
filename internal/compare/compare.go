@@ -337,11 +337,3 @@ func reflectMapKeys(keys []reflect.Value) []interface{} {
 	}
 	return s
 }
-
-func reflectInterfaces(vals []reflect.Value) []interface{} {
-	ret := []interface{}{}
-	for _, val := range vals {
-		ret = append(ret, val.Interface())
-	}
-	return ret
-}

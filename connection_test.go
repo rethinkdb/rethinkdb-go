@@ -1,17 +1,18 @@
 package rethinkdb
 
 import (
+	"context"
 	"encoding/binary"
 	"encoding/json"
-	"github.com/opentracing/opentracing-go"
-	"github.com/opentracing/opentracing-go/mocktracer"
-	"github.com/stretchr/testify/mock"
-	"golang.org/x/net/context"
-	test "gopkg.in/check.v1"
-	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 	"io"
 	"sync"
 	"time"
+
+	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go/mocktracer"
+	"github.com/stretchr/testify/mock"
+	test "gopkg.in/check.v1"
+	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
 func runConnection(c *Connection) <-chan struct{} {
@@ -109,7 +110,7 @@ func (s *ConnectionSuite) TestConnection_Query_DefaultDBOk(c *test.C) {
 }
 
 func (s *ConnectionSuite) TestConnection_Query_Nil(c *test.C) {
-	response, cursor, err := (*Connection)(nil).Query(nil, Query{})
+	response, cursor, err := (*Connection)(nil).Query(context.TODO(), Query{})
 	c.Assert(err, test.Equals, ErrConnectionClosed)
 	c.Assert(response, test.IsNil)
 	c.Assert(cursor, test.IsNil)
@@ -117,7 +118,7 @@ func (s *ConnectionSuite) TestConnection_Query_Nil(c *test.C) {
 
 func (s *ConnectionSuite) TestConnection_Query_NilConn(c *test.C) {
 	connection := newConnection(nil, "addr", &ConnectOpts{Database: "db"})
-	response, cursor, err := connection.Query(nil, Query{})
+	response, cursor, err := connection.Query(context.TODO(), Query{})
 	c.Assert(err, test.Equals, ErrConnectionClosed)
 	c.Assert(response, test.IsNil)
 	c.Assert(cursor, test.IsNil)
@@ -157,7 +158,7 @@ func (s *ConnectionSuite) TestConnection_Query_NoReplyOk(c *test.C) {
 
 	connection := newConnection(conn, "addr", &ConnectOpts{})
 	done := runConnection(connection)
-	response, cursor, err := connection.Query(nil, q)
+	response, cursor, err := connection.Query(context.TODO(), q)
 	connection.Close()
 	<-done
 

@@ -1,7 +1,7 @@
 package rethinkdb
 
 import (
-	"golang.org/x/net/context"
+	"context"
 	"io"
 )
 

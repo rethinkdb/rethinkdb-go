@@ -25,7 +25,6 @@ func init() {
 	}
 
 	r.SetVerbose(true)
-
 	// If the test is being run by wercker look for the rethink url
 	url = os.Getenv("RETHINKDB_URL")
 	if url == "" {
@@ -53,16 +52,14 @@ func init() {
 	}
 }
 
-//
 // Begin TestMain(), Setup, Teardown
-//
 func testSetup(m *testing.M) {
 	var err error
 	session, err = r.Connect(r.ConnectOpts{
 		Address: url,
 	})
 	if err != nil {
-		r.Log.Fatalln(err.Error())
+		panic(fmt.Errorf("Error connecting to instance: %w", err))
 	}
 
 	setupTestData()
@@ -84,9 +81,6 @@ func testBenchmarkTeardown() {
 }
 
 func TestMain(m *testing.M) {
-	// seed randomness for use with tests
-	rand.Seed(time.Now().UTC().UnixNano())
-
 	testSetup(m)
 	testBenchmarkSetup()
 	res := m.Run()

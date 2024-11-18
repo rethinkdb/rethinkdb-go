@@ -6,7 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"golang.org/x/net/context"
+	"context"
+
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
@@ -328,15 +329,15 @@ func (o RunOpts) toMap() map[string]interface{} {
 
 // Run runs a query using the given connection.
 //
-//	rows, err := query.Run(sess)
-//	if err != nil {
-//		// error
-//	}
+//		rows, err := query.Run(sess)
+//		if err != nil {
+//			// error
+//		}
 //
-//  var doc MyDocumentType
-//	for rows.Next(&doc) {
-//      // Do something with document
-//	}
+//	 var doc MyDocumentType
+//		for rows.Next(&doc) {
+//	     // Do something with document
+//		}
 func (t Term) Run(s QueryExecutor, optArgs ...RunOpts) (*Cursor, error) {
 	opts := map[string]interface{}{}
 	var ctx context.Context = nil // if it's nil connection will form context from connection opts

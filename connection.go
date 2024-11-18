@@ -10,12 +10,13 @@ import (
 	"time"
 
 	"bytes"
+	"context"
+	"sync"
+
 	"github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
 	"github.com/opentracing/opentracing-go/log"
-	"golang.org/x/net/context"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
-	"sync"
 )
 
 const (
@@ -163,7 +164,7 @@ func (c *Connection) Query(ctx context.Context, q Query) (*Response, *Cursor, er
 		c.setBad()
 		return nil, nil, ErrConnectionClosed
 	}
-	if ctx == nil {
+	if ctx == nil || ctx == context.TODO() {
 		ctx = c.contextFromConnectionOpts()
 	}
 
@@ -280,7 +281,7 @@ func (c *Connection) processResponses() {
 		var ok bool
 
 		select {
-		case respPair, openned := <-c.responseChan:
+		case respPair, opened := <-c.responseChan:
 			if respPair.err != nil {
 				// Transport socket error, can't continue to work
 				// Don't know return to who (no token) - return to all
@@ -289,7 +290,7 @@ func (c *Connection) processResponses() {
 				_ = c.Close() // next `if` will be called indirect cascade by closing chans
 				continue
 			}
-			if !openned { // responseChan is connClosed (stopReadChan is closed too)
+			if !opened { // responseChan is connClosed (stopReadChan is closed too)
 				close(c.stopProcessingChan)
 				broadcastError(readRequests, ErrConnectionClosed)
 				c.cursors = nil

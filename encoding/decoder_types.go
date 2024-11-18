@@ -9,7 +9,7 @@ import (
 
 // newTypeDecoder constructs an decoderFunc for a type.
 func newTypeDecoder(dt, st reflect.Type, blank bool) decoderFunc {
-	if reflect.PtrTo(dt).Implements(unmarshalerType) ||
+	if reflect.PointerTo(dt).Implements(unmarshalerType) ||
 		dt.Implements(unmarshalerType) {
 		return unmarshalerDecoder
 	}

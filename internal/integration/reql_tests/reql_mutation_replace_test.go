@@ -337,11 +337,11 @@ func (suite *MutationReplaceSuite) TestCases() {
 		// mutation/replace.yaml line #111
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':1,'inserted':0.0}) */
 		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 1, "inserted": 0.0}
-		/* tbl.get('non-existant').replace(null) */
+		/* tbl.get('non-existent').replace(null) */
 
-		suite.T().Log("About to run line #111: tbl.Get('non-existant').Replace(nil)")
+		suite.T().Log("About to run line #111: tbl.Get('non-existent').Replace(nil)")
 
-		runAndAssert(suite.Suite, expected_, tbl.Get("non-existant").Replace(nil), suite.session, r.RunOpts{
+		runAndAssert(suite.Suite, expected_, tbl.Get("non-existent").Replace(nil), suite.session, r.RunOpts{
 			GeometryFormat: "raw",
 			GroupFormat:    "map",
 		})

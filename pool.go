@@ -5,7 +5,7 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"golang.org/x/net/context"
+	"context"
 )
 
 var (
@@ -45,7 +45,6 @@ func newPool(host Host, opts *ConnectOpts, connFactory connFactory) (*Pool, erro
 		// when MaxIdle is removed
 		initialCap = opts.MaxIdle
 	}
-
 	maxOpen := opts.MaxOpen
 	if maxOpen <= 0 {
 		maxOpen = 1
@@ -53,7 +52,7 @@ func newPool(host Host, opts *ConnectOpts, connFactory connFactory) (*Pool, erro
 
 	conns := make([]*Connection, maxOpen)
 	var err error
-	for i := 0; i < opts.InitialCap; i++ {
+	for i := 0; i < initialCap; i++ {
 		conns[i], err = connFactory(host.String(), opts)
 		if err != nil {
 			return nil, err

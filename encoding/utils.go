@@ -2,21 +2,6 @@ package encoding
 
 import "reflect"
 
-func getTypeKind(t reflect.Type) reflect.Kind {
-	kind := t.Kind()
-
-	switch {
-	case kind >= reflect.Int && kind <= reflect.Int64:
-		return reflect.Int
-	case kind >= reflect.Uint && kind <= reflect.Uint64:
-		return reflect.Uint
-	case kind >= reflect.Float32 && kind <= reflect.Float64:
-		return reflect.Float32
-	default:
-		return kind
-	}
-}
-
 func isEmptyValue(v reflect.Value) bool {
 	switch v.Kind() {
 	case reflect.Array, reflect.Map, reflect.Slice, reflect.String:
@@ -57,16 +42,4 @@ func typeByIndex(t reflect.Type, index []int) reflect.Type {
 		t = t.Field(i).Type
 	}
 	return t
-}
-
-// valueByString sorts reflect.Value by the string value, this is useful for
-// sorting the result of MapKeys
-type valueByString []reflect.Value
-
-func (x valueByString) Len() int { return len(x) }
-
-func (x valueByString) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
-
-func (x valueByString) Less(i, j int) bool {
-	return x[i].String() < x[j].String()
 }

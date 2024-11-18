@@ -7,8 +7,7 @@ import (
 
 var (
 	// type constants
-	stringType = reflect.TypeOf("")
-	timeType   = reflect.TypeOf(new(time.Time)).Elem()
+	timeType = reflect.TypeOf(new(time.Time)).Elem()
 
 	marshalerType   = reflect.TypeOf(new(Marshaler)).Elem()
 	unmarshalerType = reflect.TypeOf(new(Unmarshaler)).Elem()

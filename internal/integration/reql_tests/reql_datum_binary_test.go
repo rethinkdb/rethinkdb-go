@@ -56,7 +56,7 @@ func (suite *DatumBinarySuite) TearDownSuite() {
 }
 
 func (suite *DatumBinarySuite) TestCases() {
-	suite.T().Log("Running DatumBinarySuite: Tests of converstion to and from the RQL binary type")
+	suite.T().Log("Running DatumBinarySuite: Tests of conversion to and from the RQL binary type")
 
 	// datum/binary.yaml line #8
 	// s = b''

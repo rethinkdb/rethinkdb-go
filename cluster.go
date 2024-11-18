@@ -3,16 +3,16 @@ package rethinkdb
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"sort"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
+	"context"
+
+	"github.com/cenkalti/backoff/v4"
 	"github.com/hailocab/go-hostpool"
-	"github.com/sirupsen/logrus"
-	"golang.org/x/net/context"
-	"gopkg.in/cenkalti/backoff.v2"
 )
 
 var errClusterClosed = errors.New("rethinkdb: cluster is closed")
@@ -31,6 +31,7 @@ const (
 // This should hopefully soon be replaced by a backoff system.
 type Cluster struct {
 	opts *ConnectOpts
+	log  *slog.Logger
 
 	mu     sync.RWMutex
 	seeds  []Host // Initial host nodes specified by user.
@@ -45,12 +46,18 @@ type Cluster struct {
 
 // NewCluster creates a new cluster by connecting to the given hosts.
 func NewCluster(hosts []Host, opts *ConnectOpts) (*Cluster, error) {
+	log := slog.Default()
+	if opts != nil && opts.Log != nil {
+		log = opts.Log
+	}
+
 	c := &Cluster{
 		hp:          newHostPool(opts),
 		seeds:       hosts,
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: NewConnection,
+		log:         log,
 	}
 
 	err := c.run()
@@ -217,7 +224,7 @@ func (c *Cluster) discover() {
 
 			return c.listenForNodeChanges()
 		}, b, func(err error, wait time.Duration) {
-			Log.Debugf("Error discovering hosts %s, waiting: %s", err, wait)
+			c.log.Debug("Error discovering hosts", "waiting", wait, "error", err)
 		})
 	}
 }
@@ -237,7 +244,7 @@ func (c *Cluster) listenForNodeChanges() error {
 		c.opts,
 	)
 	if err != nil {
-		return fmt.Errorf("Error building query: %s", err)
+		return fmt.Errorf("Error building query: %w", err)
 	}
 
 	cursor, err := node.Query(context.Background(), q) // no need for timeout due to Changes()
@@ -253,9 +260,6 @@ func (c *Cluster) listenForNodeChanges() error {
 		OldVal *nodeStatus `rethinkdb:"old_val"`
 	}
 	for cursor.Next(&result) {
-		addr := fmt.Sprintf("%s:%d", result.NewVal.Network.Hostname, result.NewVal.Network.ReqlPort)
-		addr = strings.ToLower(addr)
-
 		if result.NewVal != nil && result.OldVal == nil {
 			// added new node
 			if !c.nodeExists(result.NewVal.ID) {
@@ -268,11 +272,7 @@ func (c *Cluster) listenForNodeChanges() error {
 					node, err := c.connectNodeWithStatus(result.NewVal)
 					if err == nil {
 						c.addNode(node)
-
-						Log.WithFields(logrus.Fields{
-							"id":   node.ID,
-							"host": node.Host.String(),
-						}).Debug("Connected to node")
+						c.log.Debug("Connected to node", "id", node.ID, "host", node.Host.String())
 					}
 					return err
 				}, b)
@@ -306,14 +306,14 @@ func (c *Cluster) connectCluster() error {
 		conn, err := c.connFactory(host.String(), c.opts)
 		if err != nil {
 			attemptErr = err
-			Log.Warnf("Error creating connection: %s", err.Error())
+			c.log.Warn("Error creating connection", "error", err)
 			continue
 		}
 
 		svrRsp, err := conn.Server()
 		if err != nil {
 			attemptErr = err
-			Log.Warnf("Error fetching server ID: %s", err)
+			c.log.Warn("Error fetching server ID", "error", err)
 			_ = conn.Close()
 
 			continue
@@ -323,19 +323,15 @@ func (c *Cluster) connectCluster() error {
 		node, err := c.connectNode(svrRsp.ID, []Host{host})
 		if err != nil {
 			attemptErr = err
-			Log.Warnf("Error connecting to node: %s", err)
+			c.log.Warn("Error connecting to node", "error", err)
 			continue
 		}
 
 		if _, ok := nodeSet[node.ID]; !ok {
-			Log.WithFields(logrus.Fields{
-				"id":   node.ID,
-				"host": node.Host.String(),
-			}).Debug("Connected to node")
-
+			c.log.Debug("Connected to node", "id", node.ID, "host", node.Host.String())
 			nodeSet[node.ID] = node
 		} else {
-			// dublicate node
+			// duplicate node
 			_ = node.Close()
 		}
 	}

@@ -90,12 +90,3 @@ func (e *Error) Error() string {
 		"%d error(s) decoding:\n\n%s",
 		len(e.Errors), strings.Join(points, "\n"))
 }
-
-func appendErrors(errors []string, err error) []string {
-	switch e := err.(type) {
-	case *Error:
-		return append(errors, e.Errors...)
-	default:
-		return append(errors, e.Error())
-	}
-}

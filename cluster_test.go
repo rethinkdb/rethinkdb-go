@@ -5,13 +5,15 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"io"
+	"log/slog"
+	"net"
+	"time"
+
 	"github.com/stretchr/testify/mock"
 	test "gopkg.in/check.v1"
 	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
-	"io"
-	"net"
-	"time"
 )
 
 type ClusterSuite struct{}
@@ -40,6 +42,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_Ok(c *test.C) {
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: mockedConnectionFactory(dialMock),
+		log:         slog.Default(),
 	}
 
 	err := cluster.run()
@@ -84,6 +87,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_Ok(c *test.C) {
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: mockedConnectionFactory(dialMock),
+		log:         slog.Default(),
 	}
 
 	err := cluster.run()
@@ -115,6 +119,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_DialFail(c *test.C) {
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: mockedConnectionFactory(dialMock),
+		log:         slog.Default(),
 	}
 
 	err := cluster.run()
@@ -146,6 +151,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialHalfFail(c *test.C
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: mockedConnectionFactory(dialMock),
+		log:         slog.Default(),
 	}
 
 	err := cluster.run()
@@ -175,6 +181,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_NoDiscover_DialFail(c *test.C) {
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: mockedConnectionFactory(dialMock),
+		log:         slog.Default(),
 	}
 
 	err := cluster.run()
@@ -200,6 +207,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_ServerFail(c *test.C) {
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: mockedConnectionFactory(dialMock),
+		log:         slog.Default(),
 	}
 
 	err := cluster.run()
@@ -233,6 +241,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_NoDiscover_PingFail(c *test.C) {
 		opts:        opts,
 		closed:      clusterWorking,
 		connFactory: mockedConnectionFactory(dialMock),
+		log:         slog.Default(),
 	}
 
 	err := cluster.run()
@@ -275,6 +284,7 @@ func (s *ClusterSuite) TestCluster_NewSingle_Discover_Ok(c *test.C) {
 		closed:           clusterWorking,
 		connFactory:      mockedConnectionFactory(dialMock),
 		discoverInterval: 10 * time.Second,
+		log:              slog.Default(),
 	}
 
 	err := cluster.run()
@@ -333,6 +343,7 @@ func (s *ClusterSuite) TestCluster_NewMultiple_Discover_Ok(c *test.C) {
 		closed:           clusterWorking,
 		connFactory:      mockedConnectionFactory(dialMock),
 		discoverInterval: 10 * time.Second,
+		log:              slog.Default(),
 	}
 
 	err := cluster.run()
@@ -487,7 +498,7 @@ func expectServerStatus(conn *connMock, token int64, nodeIDs []string, hosts []H
 	})
 
 	rawQ2 := makeContinueQueryRaw(token)
-	// maybe - connection may be closed until cursor fetchs next batch
+	// maybe - connection may be closed until cursor fetches next batch
 	conn.On("Write", rawQ2).Return(0, nil, nil).Maybe().Run(func(args mock.Arguments) {
 		<-readRChan
 	})

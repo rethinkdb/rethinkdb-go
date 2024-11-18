@@ -2,10 +2,12 @@ package rethinkdb
 
 import (
 	"crypto/tls"
+	"log/slog"
 	"sync"
 	"time"
 
-	"golang.org/x/net/context"
+	"context"
+
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
@@ -64,7 +66,7 @@ type ConnectOpts struct {
 	// version to 0.4
 	HandshakeVersion HandshakeVersion `rethinkdb:"handshake_version,omitempty" json:"handshake_version,omitempty"`
 	// UseJSONNumber indicates whether the cursors running in this session should
-	// use json.Number instead of float64 while unmarshaling documents with
+	// use json.Number instead of float64 while unmarshalling documents with
 	// interface{}. The default is `false`.
 	UseJSONNumber bool `json:"use_json_number,omitempty"`
 	// NumRetries is the number of times a query is retried if a connection
@@ -104,6 +106,8 @@ type ConnectOpts struct {
 	NodeRefreshInterval time.Duration `rethinkdb:"node_refresh_interval,omitempty" json:"node_refresh_interval,omitempty"`
 	// Deprecated: Use InitialCap instead
 	MaxIdle int `rethinkdb:"max_idle,omitempty" json:"max_idle,omitempty"`
+
+	Log *slog.Logger
 }
 
 func (o ConnectOpts) toMap() map[string]interface{} {
@@ -119,19 +123,19 @@ func (o ConnectOpts) toMap() map[string]interface{} {
 //
 // Basic connection example:
 //
-// 	session, err := r.Connect(r.ConnectOpts{
-// 		Address: "localhost:28015",
-// 		Database: "test",
-// 		AuthKey:  "14daak1cad13dj",
-// 	})
+//	session, err := r.Connect(r.ConnectOpts{
+//		Address: "localhost:28015",
+//		Database: "test",
+//		AuthKey:  "14daak1cad13dj",
+//	})
 //
 // Cluster connection example:
 //
-// 	session, err := r.Connect(r.ConnectOpts{
-// 		Addresses: []string{"localhost:28015", "localhost:28016"},
-// 		Database: "test",
-// 		AuthKey:  "14daak1cad13dj",
-// 	})
+//	session, err := r.Connect(r.ConnectOpts{
+//		Addresses: []string{"localhost:28015", "localhost:28016"},
+//		Database: "test",
+//		AuthKey:  "14daak1cad13dj",
+//	})
 func Connect(opts ConnectOpts) (*Session, error) {
 	var addresses = opts.Addresses
 	if len(addresses) == 0 {
@@ -272,7 +276,7 @@ func (s *Session) NoReplyWait() error {
 		return ErrConnectionClosed
 	}
 
-	return s.cluster.Exec(nil, Query{ // nil = connection opts' defaults
+	return s.cluster.Exec(context.TODO(), Query{ // nil = connection opts' defaults
 		Type: p.Query_NOREPLY_WAIT,
 	})
 }

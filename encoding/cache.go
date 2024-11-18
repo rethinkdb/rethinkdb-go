@@ -19,7 +19,6 @@ type field struct {
 	index         []int
 	typ           reflect.Type
 	omitEmpty     bool
-	quoted        bool
 	reference     bool
 	refName       string
 	compound      bool
@@ -83,7 +82,7 @@ func typeFields(t reflect.Type) []field {
 	next := []field{{typ: t}}
 
 	// Count of queued names for current level and the next.
-	count := map[reflect.Type]int{}
+	var count map[reflect.Type]int
 	nextCount := map[reflect.Type]int{}
 
 	// Types already visited at an earlier level.

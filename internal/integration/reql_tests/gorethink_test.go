@@ -19,7 +19,6 @@ func init() {
 	}
 
 	r.SetVerbose(true)
-
 	// If the test is being run by wercker look for the rethink url
 	url = os.Getenv("RETHINKDB_URL")
 	if url == "" {

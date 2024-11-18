@@ -4,13 +4,15 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
 	"net"
 	"reflect"
 	"sync"
 	"time"
 
-	"golang.org/x/net/context"
+	"gopkg.in/rethinkdb/rethinkdb-go.v6/encoding"
+
+	"context"
+
 	p "gopkg.in/rethinkdb/rethinkdb-go.v6/ql2"
 )
 
@@ -105,20 +107,20 @@ func (mq *MockQuery) unlock() {
 
 // Return specifies the return arguments for the expectation.
 //
-//    mock.On(r.Table("test")).Return(nil, errors.New("failed"))
+//	mock.On(r.Table("test")).Return(nil, errors.New("failed"))
 //
 // values of `chan []interface{}` type will turn to delayed data that produce data
 // when there is an elements available on the channel. These elements are chunk of responses.
 // Values of `func() []interface{}` type will produce data by calling the function. E.g.
 // Closing channel or returning nil from func means end of data.
 //
-//    f := func() []interface{} { return []interface{}{1, 2} }
-//    mock.On(r.Table("test1")).Return(f)
+//	f := func() []interface{} { return []interface{}{1, 2} }
+//	mock.On(r.Table("test1")).Return(f)
 //
-//    ch := make(chan []interface{})
-//    mock.On(r.Table("test1")).Return(ch)
+//	ch := make(chan []interface{})
+//	mock.On(r.Table("test1")).Return(ch)
 //
-//    Running the query above will block until a value is pushed onto ch.
+//	Running the query above will block until a value is pushed onto ch.
 func (mq *MockQuery) Return(response interface{}, err error) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -131,14 +133,14 @@ func (mq *MockQuery) Return(response interface{}, err error) *MockQuery {
 
 // Once indicates that that the mock should only return the value once.
 //
-//    mock.On(r.Table("test")).Return(result, nil).Once()
+//	mock.On(r.Table("test")).Return(result, nil).Once()
 func (mq *MockQuery) Once() *MockQuery {
 	return mq.Times(1)
 }
 
 // Twice indicates that that the mock should only return the value twice.
 //
-//    mock.On(r.Table("test")).Return(result, nil).Twice()
+//	mock.On(r.Table("test")).Return(result, nil).Twice()
 func (mq *MockQuery) Twice() *MockQuery {
 	return mq.Times(2)
 }
@@ -146,7 +148,7 @@ func (mq *MockQuery) Twice() *MockQuery {
 // Times indicates that that the mock should only return the indicated number
 // of times.
 //
-//    mock.On(r.Table("test")).Return(result, nil).Times(5)
+//	mock.On(r.Table("test")).Return(result, nil).Times(5)
 func (mq *MockQuery) Times(i int) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -157,7 +159,7 @@ func (mq *MockQuery) Times(i int) *MockQuery {
 // WaitUntil sets the channel that will block the mock's return until its connClosed
 // or a message is received.
 //
-//    mock.On(r.Table("test")).WaitUntil(time.After(time.Second))
+//	mock.On(r.Table("test")).WaitUntil(time.After(time.Second))
 func (mq *MockQuery) WaitUntil(w <-chan time.Time) *MockQuery {
 	mq.lock()
 	defer mq.unlock()
@@ -167,7 +169,7 @@ func (mq *MockQuery) WaitUntil(w <-chan time.Time) *MockQuery {
 
 // After sets how long to block until the query returns
 //
-//    mock.On(r.Table("test")).After(time.Second)
+//	mock.On(r.Table("test")).After(time.Second)
 func (mq *MockQuery) After(d time.Duration) *MockQuery {
 	return mq.WaitUntil(time.After(d))
 }
@@ -175,9 +177,9 @@ func (mq *MockQuery) After(d time.Duration) *MockQuery {
 // On chains a new expectation description onto the mocked interface. This
 // allows syntax like.
 //
-//    Mock.
-//       On(r.Table("test")).Return(result, nil).
-//       On(r.Table("test2")).Return(nil, errors.New("Some Error"))
+//	Mock.
+//	   On(r.Table("test")).Return(result, nil).
+//	   On(r.Table("test2")).Return(nil, errors.New("Some Error"))
 func (mq *MockQuery) On(t Term) *MockQuery {
 	return mq.parent.On(t)
 }
@@ -186,12 +188,12 @@ func (mq *MockQuery) On(t Term) *MockQuery {
 // being executed. Mocks are used by creating an instance using NewMock and then
 // passing this when running your queries instead of a session. For example:
 //
-//     mock := r.NewMock()
-//     mock.On(r.Table("test")).Return([]interface{}{data}, nil)
+//	mock := r.NewMock()
+//	mock.On(r.Table("test")).Return([]interface{}{data}, nil)
 //
-//     cursor, err := r.Table("test").Run(mock)
+//	cursor, err := r.Table("test").Run(mock)
 //
-//     mock.AssertExpectations(t)
+//	mock.AssertExpectations(t)
 type Mock struct {
 	mu   sync.Mutex
 	opts ConnectOpts
@@ -219,7 +221,7 @@ func NewMock(opts ...ConnectOpts) *Mock {
 // On starts a description of an expectation of the specified query
 // being executed.
 //
-//     mock.On(r.Table("test"))
+//	mock.On(r.Table("test"))
 func (m *Mock) On(t Term, opts ...map[string]interface{}) *MockQuery {
 	var qopts map[string]interface{}
 	if len(opts) > 0 {
