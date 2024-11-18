@@ -106,6 +106,9 @@ func (p *Pool) Close() error {
 }
 
 func (p *Pool) conn() (*Connection, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if atomic.LoadInt32(&p.closed) == poolIsClosed {
 		return nil, errPoolClosed
 	}
@@ -119,9 +122,6 @@ func (p *Pool) conn() (*Connection, error) {
 	var err error
 
 	if p.conns[pos] == nil {
-		p.mu.Lock()
-		defer p.mu.Unlock()
-
 		if p.conns[pos] == nil {
 			p.conns[pos], err = p.connFactory(p.host.String(), p.opts)
 			if err != nil {
@@ -130,9 +130,6 @@ func (p *Pool) conn() (*Connection, error) {
 		}
 	} else if p.conns[pos].isBad() {
 		// connBad connection needs to be reconnected
-		p.mu.Lock()
-		defer p.mu.Unlock()
-
 		p.conns[pos], err = p.connFactory(p.host.String(), p.opts)
 		if err != nil {
 			return nil, err
