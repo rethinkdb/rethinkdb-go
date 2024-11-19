@@ -1,0 +1,56 @@
+---
+name: Test
+on:
+  pull_request:
+    branches:
+      - master
+  release:
+    types:
+      - published
+  push:
+    branches:
+      - master
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    name: Docker Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: 'go.mod'
+        cache: false
+
+    # - name: Lint
+    #   uses: golangci/golangci-lint-action@v6
+    #   with:
+    #     args: --build-tags integration -p bugs -p unused -D protogetter --timeout=5m
+
+    - name: Run unit tests
+      run: |
+        make test
+  
+
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: 'go.mod'
+
+    - name: Run integration tests
+      run: |
+        make integration
