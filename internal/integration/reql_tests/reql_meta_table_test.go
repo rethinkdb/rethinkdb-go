@@ -68,7 +68,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #6
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* db.table_list() */
 
 		suite.T().Log("About to run line #6: db.TableList()")
@@ -83,7 +83,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #9
 		/* ({'type':'DB','name':'rethinkdb','id':uuid()}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": compare.IsUUID()}
+		var expected_ = map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": compare.IsUUID()}
 		/* r.db('rethinkdb').info() */
 
 		suite.T().Log("About to run line #9: r.DB('rethinkdb').Info()")
@@ -100,7 +100,7 @@ func (suite *MetaTableSuite) TestCases() {
 		/* partial({'db':{'type':'DB','name':'rethinkdb','id':uuid()},
 		'type':'TABLE','id':uuid(),'name':'stats',
 		'indexes':[],'primary_key':'id'}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"db": map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": compare.IsUUID()}, "type": "TABLE", "id": compare.IsUUID(), "name": "stats", "indexes": []interface{}{}, "primary_key": "id"})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"db": map[interface{}]interface{}{"type": "DB", "name": "rethinkdb", "id": compare.IsUUID()}, "type": "TABLE", "id": compare.IsUUID(), "name": "stats", "indexes": []interface{}{}, "primary_key": "id"})
 		/* r.db('rethinkdb').table('stats').info() */
 
 		suite.T().Log("About to run line #12: r.DB('rethinkdb').Table('stats').Info()")
@@ -115,7 +115,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #18
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('a') */
 
 		suite.T().Log("About to run line #18: db.TableCreate('a')")
@@ -130,7 +130,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #21
 		/* ['a'] */
-		var expected_ []interface{} = []interface{}{"a"}
+		var expected_ = []interface{}{"a"}
 		/* db.table_list() */
 
 		suite.T().Log("About to run line #21: db.TableList()")
@@ -145,7 +145,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #24
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('b') */
 
 		suite.T().Log("About to run line #24: db.TableCreate('b')")
@@ -160,7 +160,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #27
 		/* bag(['a', 'b']) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{"a", "b"})
+		var expected_ = compare.UnorderedMatch([]interface{}{"a", "b"})
 		/* db.table_list() */
 
 		suite.T().Log("About to run line #27: db.TableList()")
@@ -175,7 +175,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #31
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #31: db.TableDrop('a')")
@@ -190,7 +190,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #34
 		/* ['b'] */
-		var expected_ []interface{} = []interface{}{"b"}
+		var expected_ = []interface{}{"b"}
 		/* db.table_list() */
 
 		suite.T().Log("About to run line #34: db.TableList()")
@@ -205,7 +205,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #37
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('b') */
 
 		suite.T().Log("About to run line #37: db.TableDrop('b')")
@@ -220,7 +220,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #40
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* db.table_list() */
 
 		suite.T().Log("About to run line #40: db.TableList()")
@@ -235,7 +235,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #44
 		/* partial({'tables_created':1,'config_changes':[partial({'new_val':partial({'durability':'soft'})})]}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "soft"})})}})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "soft"})})}})
 		/* db.table_create('ab', durability='soft') */
 
 		suite.T().Log("About to run line #44: db.TableCreate('ab').OptArgs(r.TableCreateOpts{Durability: 'soft', })")
@@ -250,7 +250,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #49
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #49: db.TableDrop('ab')")
@@ -265,7 +265,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #52
 		/* partial({'tables_created':1,'config_changes':[partial({'new_val':partial({'durability':'hard'})})]}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "hard"})})}})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1, "config_changes": []interface{}{compare.PartialMatch(map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"durability": "hard"})})}})
 		/* db.table_create('ab', durability='hard') */
 
 		suite.T().Log("About to run line #52: db.TableCreate('ab').OptArgs(r.TableCreateOpts{Durability: 'hard', })")
@@ -280,7 +280,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #57
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #57: db.TableDrop('ab')")
@@ -295,7 +295,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #60
 		/* err('ReqlQueryLogicError', 'Durability option `fake` unrecognized (options are "hard" and "soft").') */
-		var expected_ Err = err("ReqlQueryLogicError", "Durability option `fake` unrecognized (options are \"hard\" and \"soft\").")
+		var expected_ = err("ReqlQueryLogicError", "Durability option `fake` unrecognized (options are \"hard\" and \"soft\").")
 		/* db.table_create('ab', durability='fake') */
 
 		suite.T().Log("About to run line #60: db.TableCreate('ab').OptArgs(r.TableCreateOpts{Durability: 'fake', })")
@@ -310,7 +310,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #65
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('ab', primary_key='bar', shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #65: db.TableCreate('ab').OptArgs(r.TableCreateOpts{PrimaryKey: 'bar', Shards: 2, Replicas: 1, })")
@@ -325,7 +325,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #70
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #70: db.TableDrop('ab')")
@@ -340,7 +340,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #73
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('ab', primary_key='bar', primary_replica_tag='default') */
 
 		suite.T().Log("About to run line #73: db.TableCreate('ab').OptArgs(r.TableCreateOpts{PrimaryKey: 'bar', PrimaryReplicaTag: 'default', })")
@@ -355,7 +355,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #78
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #78: db.TableDrop('ab')")
@@ -370,7 +370,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #81
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('ab', nonvoting_replica_tags=['default']) */
 
 		suite.T().Log("About to run line #81: db.TableCreate('ab').OptArgs(r.TableCreateOpts{NonVotingReplicaTags: []interface{}{'default'}, })")
@@ -385,7 +385,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #86
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('ab') */
 
 		suite.T().Log("About to run line #86: db.TableDrop('ab')")
@@ -400,7 +400,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #90
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('a') */
 
 		suite.T().Log("About to run line #90: db.TableCreate('a')")
@@ -415,7 +415,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #93
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=1, replicas=1) */
 
 		suite.T().Log("About to run line #93: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1, })")
@@ -430,7 +430,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #98
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=1, replicas={"default":1}, nonvoting_replica_tags=['default'], primary_replica_tag='default') */
 
 		suite.T().Log("About to run line #98: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 1, }, NonVotingReplicaTags: []interface{}{'default'}, PrimaryReplicaTag: 'default', })")
@@ -445,7 +445,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #103
 		/* partial({'reconfigured':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0})
 		/* db.table('a').reconfigure(shards=1, replicas=1, dry_run=True) */
 
 		suite.T().Log("About to run line #103: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 1, DryRun: true, })")
@@ -460,7 +460,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #108
 		/* err('ReqlOpFailedError', 'This table doesn\'t need to be repaired.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "This table doesn't need to be repaired.")
+		var expected_ = err("ReqlOpFailedError", "This table doesn't need to be repaired.")
 		/* db.table('a').reconfigure(emergency_repair="unsafe_rollback") */
 
 		suite.T().Log("About to run line #108: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', })")
@@ -475,7 +475,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #113
 		/* err('ReqlOpFailedError', 'This table doesn\'t need to be repaired.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "This table doesn't need to be repaired.")
+		var expected_ = err("ReqlOpFailedError", "This table doesn't need to be repaired.")
 		/* db.table('a').reconfigure(emergency_repair="unsafe_rollback", dry_run=True) */
 
 		suite.T().Log("About to run line #113: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', DryRun: true, })")
@@ -490,7 +490,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #118
 		/* err('ReqlOpFailedError', 'This table doesn\'t need to be repaired.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "This table doesn't need to be repaired.")
+		var expected_ = err("ReqlOpFailedError", "This table doesn't need to be repaired.")
 		/* db.table('a').reconfigure(emergency_repair="unsafe_rollback_or_erase") */
 
 		suite.T().Log("About to run line #118: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback_or_erase', })")
@@ -505,7 +505,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #123
 		/* partial({'reconfigured':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 0})
 		/* db.table('a').reconfigure(emergency_repair=None, shards=1, replicas=1, dry_run=True) */
 
 		suite.T().Log("About to run line #123: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: nil, Shards: 1, Replicas: 1, DryRun: true, })")
@@ -520,7 +520,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #128
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #128: db.TableDrop('a')")
@@ -535,7 +535,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #132
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('foo') */
 
 		suite.T().Log("About to run line #132: db.TableCreate('foo')")
@@ -550,7 +550,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #135
 		/* err('ReqlOpFailedError', 'Table `test.foo` already exists.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.foo` already exists.")
+		var expected_ = err("ReqlOpFailedError", "Table `test.foo` already exists.")
 		/* db.table_create('foo') */
 
 		suite.T().Log("About to run line #135: db.TableCreate('foo')")
@@ -565,7 +565,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #138
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('foo') */
 
 		suite.T().Log("About to run line #138: db.TableDrop('foo')")
@@ -580,7 +580,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #141
 		/* err('ReqlOpFailedError', 'Table `test.foo` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.foo` does not exist.")
+		var expected_ = err("ReqlOpFailedError", "Table `test.foo` does not exist.")
 		/* db.table_drop('foo') */
 
 		suite.T().Log("About to run line #141: db.TableDrop('foo')")
@@ -595,7 +595,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #158
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create('a') */
 
 		suite.T().Log("About to run line #158: db.TableCreate('a')")
@@ -610,7 +610,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #161
 		/* err('ReqlQueryLogicError', 'Every table must have at least one shard.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Every table must have at least one shard.")
+		var expected_ = err("ReqlQueryLogicError", "Every table must have at least one shard.")
 		/* db.table('a').reconfigure(shards=0, replicas=1) */
 
 		suite.T().Log("About to run line #161: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1, })")
@@ -625,7 +625,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #166
 		/* err('ReqlOpFailedError', 'Can\'t use server tag `foo` for primary replicas because you specified no replicas in server tag `foo`.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "Can't use server tag `foo` for primary replicas because you specified no replicas in server tag `foo`.")
+		var expected_ = err("ReqlOpFailedError", "Can't use server tag `foo` for primary replicas because you specified no replicas in server tag `foo`.")
 		/* db.table('a').reconfigure(shards=1, replicas={"default":1}, primary_replica_tag="foo") */
 
 		suite.T().Log("About to run line #166: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 1, }, PrimaryReplicaTag: 'foo', })")
@@ -640,7 +640,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #171
 		/* err('ReqlOpFailedError', 'You specified that the replicas in server tag `foo` should be non-voting, but you didn\'t specify a number of replicas in server tag `foo`.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "You specified that the replicas in server tag `foo` should be non-voting, but you didn't specify a number of replicas in server tag `foo`.")
+		var expected_ = err("ReqlOpFailedError", "You specified that the replicas in server tag `foo` should be non-voting, but you didn't specify a number of replicas in server tag `foo`.")
 		/* db.table('a').reconfigure(shards=1, replicas={"default":1}, primary_replica_tag="default", nonvoting_replica_tags=["foo"]) */
 
 		suite.T().Log("About to run line #171: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 1, }, PrimaryReplicaTag: 'default', NonVotingReplicaTags: []interface{}{'foo'}, })")
@@ -655,7 +655,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #176
 		/* err('ReqlOpFailedError', 'You must set `replicas` to at least one. `replicas` includes the primary replica; if there are zero replicas, there is nowhere to put the data.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "You must set `replicas` to at least one. `replicas` includes the primary replica; if there are zero replicas, there is nowhere to put the data.")
+		var expected_ = err("ReqlOpFailedError", "You must set `replicas` to at least one. `replicas` includes the primary replica; if there are zero replicas, there is nowhere to put the data.")
 		/* db.table('a').reconfigure(shards=1, replicas={"foo":0}, primary_replica_tag="foo") */
 
 		suite.T().Log("About to run line #176: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'foo': 0, }, PrimaryReplicaTag: 'foo', })")
@@ -670,7 +670,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #181
 		/* err('ReqlQueryLogicError', '`primary_replica_tag` must be specified when `replicas` is an OBJECT.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "`primary_replica_tag` must be specified when `replicas` is an OBJECT.")
+		var expected_ = err("ReqlQueryLogicError", "`primary_replica_tag` must be specified when `replicas` is an OBJECT.")
 		/* db.table('a').reconfigure(shards=1, replicas={"default":0}) */
 
 		suite.T().Log("About to run line #181: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 0, }, })")
@@ -685,7 +685,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #186
 		/* err('ReqlQueryLogicError', 'Can\'t have a negative number of replicas', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Can't have a negative number of replicas")
+		var expected_ = err("ReqlQueryLogicError", "Can't have a negative number of replicas")
 		/* db.table('a').reconfigure(shards=1, replicas={"default":-3}, primary_replica_tag='default') */
 
 		suite.T().Log("About to run line #186: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': -3, }, PrimaryReplicaTag: 'default', })")
@@ -700,7 +700,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #191
 		/* err('ReqlQueryLogicError', '`replicas` must be an OBJECT if `primary_replica_tag` is specified.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "`replicas` must be an OBJECT if `primary_replica_tag` is specified.")
+		var expected_ = err("ReqlQueryLogicError", "`replicas` must be an OBJECT if `primary_replica_tag` is specified.")
 		/* db.table('a').reconfigure(shards=1, replicas=3, primary_replica_tag='foo') */
 
 		suite.T().Log("About to run line #191: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: 'foo', })")
@@ -715,7 +715,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #196
 		/* err('ReqlQueryLogicError', '`replicas` must be an OBJECT if `nonvoting_replica_tags` is specified.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "`replicas` must be an OBJECT if `nonvoting_replica_tags` is specified.")
+		var expected_ = err("ReqlQueryLogicError", "`replicas` must be an OBJECT if `nonvoting_replica_tags` is specified.")
 		/* db.table('a').reconfigure(shards=1, replicas=3, nonvoting_replica_tags=['foo']) */
 
 		suite.T().Log("About to run line #196: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, NonVotingReplicaTags: []interface{}{'foo'}, })")
@@ -730,7 +730,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #201
 		/* err('ReqlQueryLogicError', 'Can\'t emergency repair an entire database at once; instead you should run `reconfigure()` on each table individually.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Can't emergency repair an entire database at once; instead you should run `reconfigure()` on each table individually.")
+		var expected_ = err("ReqlQueryLogicError", "Can't emergency repair an entire database at once; instead you should run `reconfigure()` on each table individually.")
 		/* db.reconfigure(emergency_repair="unsafe_rollback") */
 
 		suite.T().Log("About to run line #201: db.Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', })")
@@ -745,7 +745,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #206
 		/* err('ReqlQueryLogicError', '`emergency_repair` should be "unsafe_rollback" or "unsafe_rollback_or_erase"', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "`emergency_repair` should be \"unsafe_rollback\" or \"unsafe_rollback_or_erase\"")
+		var expected_ = err("ReqlQueryLogicError", "`emergency_repair` should be \"unsafe_rollback\" or \"unsafe_rollback_or_erase\"")
 		/* db.table('a').reconfigure(emergency_repair="foo") */
 
 		suite.T().Log("About to run line #206: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'foo', })")
@@ -760,7 +760,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #211
 		/* err('ReqlQueryLogicError', 'In emergency repair mode, you can\'t specify shards, replicas, etc.') */
-		var expected_ Err = err("ReqlQueryLogicError", "In emergency repair mode, you can't specify shards, replicas, etc.")
+		var expected_ = err("ReqlQueryLogicError", "In emergency repair mode, you can't specify shards, replicas, etc.")
 		/* db.table('a').reconfigure(emergency_repair="unsafe_rollback", shards=1, replicas=1) */
 
 		suite.T().Log("About to run line #211: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{EmergencyRepair: 'unsafe_rollback', Shards: 1, Replicas: 1, })")
@@ -775,7 +775,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #217
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #217: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, })")
@@ -790,7 +790,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #222
 		/* {"ready":1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1}
+		var expected_ = map[interface{}]interface{}{"ready": 1}
 		/* db.table('a').wait(wait_for="all_replicas_ready") */
 
 		suite.T().Log("About to run line #222: db.Table('a').Wait().OptArgs(r.WaitOpts{WaitFor: 'all_replicas_ready', })")
@@ -805,7 +805,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #228
 		/* partial({"inserted":4}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 4})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"inserted": 4})
 		/* db.table('a').insert([{"id":1}, {"id":2}, {"id":3}, {"id":4}]) */
 
 		suite.T().Log("About to run line #228: db.Table('a').Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }, map[interface{}]interface{}{'id': 3, }, map[interface{}]interface{}{'id': 4, }})")
@@ -820,7 +820,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #233
 		/* partial({'reconfigured':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 1})
 		/* db.table('a').reconfigure(shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #233: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, })")
@@ -835,7 +835,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #238
 		/* err('ReqlOpFailedError', 'Can\'t put 2 replicas on servers with the tag `default` because there are only 1 servers with the tag `default`. It\'s impossible to have more replicas of the data than there are servers.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "Can't put 2 replicas on servers with the tag `default` because there are only 1 servers with the tag `default`. It's impossible to have more replicas of the data than there are servers.")
+		var expected_ = err("ReqlOpFailedError", "Can't put 2 replicas on servers with the tag `default` because there are only 1 servers with the tag `default`. It's impossible to have more replicas of the data than there are servers.")
 		/* db.table('a').reconfigure(shards=1, replicas=2) */
 
 		suite.T().Log("About to run line #238: db.Table('a').Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 2, })")
@@ -850,7 +850,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #244
 		/* {"ready":1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1}
+		var expected_ = map[interface{}]interface{}{"ready": 1}
 		/* db.table('a').wait(wait_for="all_replicas_ready") */
 
 		suite.T().Log("About to run line #244: db.Table('a').Wait().OptArgs(r.WaitOpts{WaitFor: 'all_replicas_ready', })")
@@ -865,7 +865,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #248
 		/* partial({'rebalanced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1})
 		/* db.table('a').rebalance() */
 
 		suite.T().Log("About to run line #248: db.Table('a').Rebalance()")
@@ -880,7 +880,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #251
 		/* {"ready":1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"ready": 1}
+		var expected_ = map[interface{}]interface{}{"ready": 1}
 		/* db.wait(wait_for="all_replicas_ready") */
 
 		suite.T().Log("About to run line #251: db.Wait().OptArgs(r.WaitOpts{WaitFor: 'all_replicas_ready', })")
@@ -895,7 +895,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #255
 		/* partial({'rebalanced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"rebalanced": 1})
 		/* db.rebalance() */
 
 		suite.T().Log("About to run line #255: db.Rebalance()")
@@ -910,7 +910,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #271
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #271: db.TableDrop('a')")
@@ -925,7 +925,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #275
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* db.table_create('a') */
 
 		suite.T().Log("About to run line #275: db.TableCreate('a')")
@@ -940,7 +940,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #276
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* db.table_create('b') */
 
 		suite.T().Log("About to run line #276: db.TableCreate('b')")
@@ -955,7 +955,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #277
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* db.table_create('c') */
 
 		suite.T().Log("About to run line #277: db.TableCreate('c')")
@@ -970,7 +970,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #279
 		/* err('ReqlQueryLogicError', 'Every table must have at least one shard.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Every table must have at least one shard.")
+		var expected_ = err("ReqlQueryLogicError", "Every table must have at least one shard.")
 		/* db.reconfigure(shards=0, replicas=1) */
 
 		suite.T().Log("About to run line #279: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 0, Replicas: 1, })")
@@ -985,7 +985,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #284
 		/* err('ReqlQueryLogicError', '`primary_replica_tag` must be specified when `replicas` is an OBJECT.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "`primary_replica_tag` must be specified when `replicas` is an OBJECT.")
+		var expected_ = err("ReqlQueryLogicError", "`primary_replica_tag` must be specified when `replicas` is an OBJECT.")
 		/* db.reconfigure(shards=1, replicas={"default":0}) */
 
 		suite.T().Log("About to run line #284: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': 0, }, })")
@@ -1000,7 +1000,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #289
 		/* err('ReqlQueryLogicError', 'Can\'t have a negative number of replicas', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Can't have a negative number of replicas")
+		var expected_ = err("ReqlQueryLogicError", "Can't have a negative number of replicas")
 		/* db.reconfigure(shards=1, replicas={"default":-3}, primary_replica_tag='default') */
 
 		suite.T().Log("About to run line #289: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: map[interface{}]interface{}{'default': -3, }, PrimaryReplicaTag: 'default', })")
@@ -1015,7 +1015,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #294
 		/* err('ReqlQueryLogicError', '`replicas` must be an OBJECT if `primary_replica_tag` is specified.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "`replicas` must be an OBJECT if `primary_replica_tag` is specified.")
+		var expected_ = err("ReqlQueryLogicError", "`replicas` must be an OBJECT if `primary_replica_tag` is specified.")
 		/* db.reconfigure(shards=1, replicas=3, primary_replica_tag='foo') */
 
 		suite.T().Log("About to run line #294: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 1, Replicas: 3, PrimaryReplicaTag: 'foo', })")
@@ -1030,7 +1030,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #299
 		/* partial({'reconfigured':3}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 3})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"reconfigured": 3})
 		/* db.reconfigure(shards=2, replicas=1) */
 
 		suite.T().Log("About to run line #299: db.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 2, Replicas: 1, })")
@@ -1045,7 +1045,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #304
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('a') */
 
 		suite.T().Log("About to run line #304: db.TableDrop('a')")
@@ -1060,7 +1060,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #306
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('b') */
 
 		suite.T().Log("About to run line #306: db.TableDrop('b')")
@@ -1075,7 +1075,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #308
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('c') */
 
 		suite.T().Log("About to run line #308: db.TableDrop('c')")
@@ -1090,7 +1090,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #312
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create("test2") */
 
 		suite.T().Log("About to run line #312: r.DBCreate('test2')")
@@ -1112,7 +1112,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #317
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create("testA") */
 
 		suite.T().Log("About to run line #317: db.TableCreate('testA')")
@@ -1127,7 +1127,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #319
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db.table_create("testB") */
 
 		suite.T().Log("About to run line #319: db.TableCreate('testB')")
@@ -1142,7 +1142,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #321
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* db2.table_create("test2B") */
 
 		suite.T().Log("About to run line #321: db2.TableCreate('test2B')")
@@ -1157,7 +1157,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #324
 		/* {'db':'test','name':'testA'} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"db": "test", "name": "testA"}
+		var expected_ = map[interface{}]interface{}{"db": "test", "name": "testA"}
 		/* r.table('testA').config().pluck('db','name') */
 
 		suite.T().Log("About to run line #324: r.Table('testA').Config().Pluck('db', 'name')")
@@ -1172,7 +1172,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #327
 		/* err('ReqlOpFailedError', 'Table `test.doesntexist` does not exist.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.doesntexist` does not exist.")
+		var expected_ = err("ReqlOpFailedError", "Table `test.doesntexist` does not exist.")
 		/* r.table('doesntexist').config() */
 
 		suite.T().Log("About to run line #327: r.Table('doesntexist').Config()")
@@ -1187,7 +1187,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #330
 		/* err('ReqlOpFailedError', 'Table `test.test2B` does not exist.', []) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.test2B` does not exist.")
+		var expected_ = err("ReqlOpFailedError", "Table `test.test2B` does not exist.")
 		/* r.table('test2B').config() */
 
 		suite.T().Log("About to run line #330: r.Table('test2B').Config()")
@@ -1202,7 +1202,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #333
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.db('rethinkdb').table('table_config').filter({'name':'testA'}).nth(0).eq(r.table('testA').config()) */
 
 		suite.T().Log("About to run line #333: r.DB('rethinkdb').Table('table_config').Filter(map[interface{}]interface{}{'name': 'testA', }).Nth(0).Eq(r.Table('testA').Config())")
@@ -1217,7 +1217,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #336
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.db('rethinkdb').table('table_status').filter({'name':'testA'}).nth(0).eq(r.table('testA').status()) */
 
 		suite.T().Log("About to run line #336: r.DB('rethinkdb').Table('table_status').Filter(map[interface{}]interface{}{'name': 'testA', }).Nth(0).Eq(r.Table('testA').Status())")
@@ -1247,7 +1247,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #344
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.table('testA', identifier_format='uuid').count() */
 
 		suite.T().Log("About to run line #344: r.Table('testA').OptArgs(r.TableOpts{IdentifierFormat: 'uuid', }).Count()")
@@ -1262,7 +1262,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #358
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('testA') */
 
 		suite.T().Log("About to run line #358: db.TableDrop('testA')")
@@ -1277,7 +1277,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #361
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* db.table_drop('testB') */
 
 		suite.T().Log("About to run line #361: db.TableDrop('testB')")
@@ -1292,7 +1292,7 @@ func (suite *MetaTableSuite) TestCases() {
 	{
 		// meta/table.yaml line #364
 		/* partial({'dbs_dropped':1,'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1, "tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1, "tables_dropped": 1})
 		/* r.db_drop('test2') */
 
 		suite.T().Log("About to run line #364: r.DBDrop('test2')")

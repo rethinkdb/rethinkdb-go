@@ -76,7 +76,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #11
 		/* {'stuff':datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00')), 'more':[datetime.fromtimestamp(996571240, r.ast.RqlTzinfo('00:00'))]} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), "more": []interface{}{Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00"))}}
+		var expected_ = map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), "more": []interface{}{Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00"))}}
 		/* r.expr({'stuff':r.epoch_time(896571240), 'more':[r.epoch_time(996571240)]}) */
 
 		suite.T().Log("About to run line #11: r.Expr(map[interface{}]interface{}{'stuff': r.EpochTime(896571240), 'more': []interface{}{r.EpochTime(996571240)}, })")
@@ -91,7 +91,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #17
 		/* [datetime.fromtimestamp(796571240, r.ast.RqlTzinfo('00:00')), datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00')), {'stuff':datetime.fromtimestamp(996571240, r.ast.RqlTzinfo('00:00'))}] */
-		var expected_ []interface{} = []interface{}{Ast.Fromtimestamp(796571240, Ast.RqlTzinfo("00:00")), Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00"))}}
+		var expected_ = []interface{}{Ast.Fromtimestamp(796571240, Ast.RqlTzinfo("00:00")), Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), map[interface{}]interface{}{"stuff": Ast.Fromtimestamp(996571240, Ast.RqlTzinfo("00:00"))}}
 		/* r.expr([r.epoch_time(796571240), r.epoch_time(896571240), {'stuff':r.epoch_time(996571240)}]) */
 
 		suite.T().Log("About to run line #17: r.Expr([]interface{}{r.EpochTime(796571240), r.EpochTime(896571240), map[interface{}]interface{}{'stuff': r.EpochTime(996571240), }})")
@@ -106,7 +106,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #23
 		/* {'nested':{'time':datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00'))}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"nested": map[interface{}]interface{}{"time": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00"))}}
+		var expected_ = map[interface{}]interface{}{"nested": map[interface{}]interface{}{"time": Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00"))}}
 		/* r.expr({'nested':{'time':r.epoch_time(896571240)}}) */
 
 		suite.T().Log("About to run line #23: r.Expr(map[interface{}]interface{}{'nested': map[interface{}]interface{}{'time': r.EpochTime(896571240), }, })")
@@ -121,7 +121,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #29
 		/* [1, "two", ["a", datetime.fromtimestamp(896571240, r.ast.RqlTzinfo('00:00')), 3]] */
-		var expected_ []interface{} = []interface{}{1, "two", []interface{}{"a", Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), 3}}
+		var expected_ = []interface{}{1, "two", []interface{}{"a", Ast.Fromtimestamp(896571240, Ast.RqlTzinfo("00:00")), 3}}
 		/* r.expr([1, "two", ["a", r.epoch_time(896571240), 3]]) */
 
 		suite.T().Log("About to run line #29: r.Expr([]interface{}{1, 'two', []interface{}{'a', r.EpochTime(896571240), 3}})")
@@ -136,7 +136,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #35
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.epoch_time(1).to_epoch_time() */
 
 		suite.T().Log("About to run line #35: r.EpochTime(1).ToEpochTime()")
@@ -151,7 +151,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #37
 		/* -1 */
-		var expected_ int = -1
+		var expected_ = -1
 		/* r.epoch_time(-1).to_epoch_time() */
 
 		suite.T().Log("About to run line #37: r.EpochTime(-1).ToEpochTime()")
@@ -181,7 +181,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #42
 		/* "1970-01-01T00:00:01.444+00:00" */
-		var expected_ string = "1970-01-01T00:00:01.444+00:00"
+		var expected_ = "1970-01-01T00:00:01.444+00:00"
 		/* r.epoch_time(1.4444445).to_iso8601() */
 
 		suite.T().Log("About to run line #42: r.EpochTime(1.4444445).ToISO8601()")
@@ -211,7 +211,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #49
 		/* "1970-01-01T00:00:01.444+00:00" */
-		var expected_ string = "1970-01-01T00:00:01.444+00:00"
+		var expected_ = "1970-01-01T00:00:01.444+00:00"
 		/* r.epoch_time(1.444).to_iso8601() */
 
 		suite.T().Log("About to run line #49: r.EpochTime(1.444).ToISO8601()")
@@ -226,7 +226,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #52
 		/* "1970-01-01T00:00:01.001+00:00" */
-		var expected_ string = "1970-01-01T00:00:01.001+00:00"
+		var expected_ = "1970-01-01T00:00:01.001+00:00"
 		/* r.epoch_time(1.001).to_iso8601() */
 
 		suite.T().Log("About to run line #52: r.EpochTime(1.001).ToISO8601()")
@@ -241,7 +241,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #55
 		/* "1970-01-01T00:00:02.058+00:00" */
-		var expected_ string = "1970-01-01T00:00:02.058+00:00"
+		var expected_ = "1970-01-01T00:00:02.058+00:00"
 		/* r.epoch_time(2.058).to_iso8601() */
 
 		suite.T().Log("About to run line #55: r.EpochTime(2.058).ToISO8601()")
@@ -256,7 +256,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #66
 		/* 253440000000 */
-		var expected_ int = 253440000000
+		var expected_ = 253440000000
 		/* r.epoch_time(253440000000).to_epoch_time() */
 
 		suite.T().Log("About to run line #66: r.EpochTime(253440000000).ToEpochTime()")
@@ -271,7 +271,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #68
 		/* 1400 */
-		var expected_ int = 1400
+		var expected_ = 1400
 		/* r.epoch_time(-17980000000).year() */
 
 		suite.T().Log("About to run line #68: r.EpochTime(-17980000000).Year()")
@@ -286,7 +286,7 @@ func (suite *TimesConstructorsSuite) TestCases() {
 	{
 		// times/constructors.yaml line #72
 		/* -17990000000 */
-		var expected_ int = -17990000000
+		var expected_ = -17990000000
 		/* r.epoch_time(-17990000000).to_epoch_time() */
 
 		suite.T().Log("About to run line #72: r.EpochTime(-17990000000).ToEpochTime()")

@@ -70,7 +70,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #7
 		/* ({'created':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl2.index_create("a") */
 
 		suite.T().Log("About to run line #7: tbl2.IndexCreate('a')")
@@ -85,7 +85,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #9
 		/* ({'created':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl2.index_create("b") */
 
 		suite.T().Log("About to run line #9: tbl2.IndexCreate('b')")
@@ -100,7 +100,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #12
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* tbl2.index_status().count() */
 
 		suite.T().Log("About to run line #12: tbl2.IndexStatus().Count()")
@@ -115,7 +115,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #14
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl2.index_status("a").count() */
 
 		suite.T().Log("About to run line #14: tbl2.IndexStatus('a').Count()")
@@ -130,7 +130,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #16
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl2.index_status("b").count() */
 
 		suite.T().Log("About to run line #16: tbl2.IndexStatus('b').Count()")
@@ -145,7 +145,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #18
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* tbl2.index_status("a", "b").count() */
 
 		suite.T().Log("About to run line #18: tbl2.IndexStatus('a', 'b').Count()")
@@ -160,7 +160,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #21
 		/* ({'dropped':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
+		var expected_ = map[interface{}]interface{}{"dropped": 1}
 		/* tbl2.index_drop("a") */
 
 		suite.T().Log("About to run line #21: tbl2.IndexDrop('a')")
@@ -175,7 +175,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #23
 		/* ({'dropped':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
+		var expected_ = map[interface{}]interface{}{"dropped": 1}
 		/* tbl2.index_drop("b") */
 
 		suite.T().Log("About to run line #23: tbl2.IndexDrop('b')")
@@ -190,7 +190,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #28
 		/* partial({'inserted':5000}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 5000})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"inserted": 5000})
 		/* tbl2.insert(r.range(0, 5000).map({'a':r.row})) */
 
 		suite.T().Log("About to run line #28: tbl2.Insert(r.Range(0, 5000).Map(map[interface{}]interface{}{'a': r.Row, }))")
@@ -205,7 +205,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #33
 		/* ({'created':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl2.index_create("foo") */
 
 		suite.T().Log("About to run line #33: tbl2.IndexCreate('foo')")
@@ -220,7 +220,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #36
 		/* ({'created':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl2.index_create("bar", multi=True) */
 
 		suite.T().Log("About to run line #36: tbl2.IndexCreate('bar').OptArgs(r.IndexCreateOpts{Multi: true, })")
@@ -235,7 +235,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #44
 		/* [true, true] */
-		var expected_ []interface{} = []interface{}{true, true}
+		var expected_ = []interface{}{true, true}
 		/* tbl2.index_status().map(lambda x:x["progress"] < 1) */
 
 		suite.T().Log("About to run line #44: tbl2.IndexStatus().Map(func(x r.Term) interface{} { return x.AtIndex('progress').Lt(1)})")
@@ -250,7 +250,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #49
 		/* ([true, true]) */
-		var expected_ []interface{} = []interface{}{true, true}
+		var expected_ = []interface{}{true, true}
 		/* tbl2.index_wait()['ready'] */
 
 		suite.T().Log("About to run line #49: tbl2.IndexWait().AtIndex('ready')")
@@ -265,7 +265,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #54
 		/* bag([false, false]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{false, false})
+		var expected_ = compare.UnorderedMatch([]interface{}{false, false})
 		/* tbl2.index_wait()['geo'] */
 
 		suite.T().Log("About to run line #54: tbl2.IndexWait().AtIndex('geo')")
@@ -280,7 +280,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #57
 		/* bag([false, true]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{false, true})
+		var expected_ = compare.UnorderedMatch([]interface{}{false, true})
 		/* tbl2.index_wait()['multi'] */
 
 		suite.T().Log("About to run line #57: tbl2.IndexWait().AtIndex('multi')")
@@ -295,7 +295,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #60
 		/* ([false, false]) */
-		var expected_ []interface{} = []interface{}{false, false}
+		var expected_ = []interface{}{false, false}
 		/* tbl2.index_wait()['outdated'] */
 
 		suite.T().Log("About to run line #60: tbl2.IndexWait().AtIndex('outdated')")
@@ -310,7 +310,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #63
 		/* ({'created':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl2.index_create("quux") */
 
 		suite.T().Log("About to run line #63: tbl2.IndexCreate('quux')")
@@ -325,7 +325,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #66
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* tbl2.index_status("quux").do(lambda x:(x[0]["index"] == "quux") & (x[0]["progress"] < 1)) */
 
 		suite.T().Log("About to run line #66: tbl2.IndexStatus('quux').Do(func(x r.Term) interface{} { return x.AtIndex(0).AtIndex('index').Eq('quux').And(x.AtIndex(0).AtIndex('progress').Lt(1))})")
@@ -342,7 +342,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #71
 		/* ([{'index':'quux', 'ready':true}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"index": "quux", "ready": true}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"index": "quux", "ready": true}}
 		/* tbl2.index_wait("quux").pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #71: tbl2.IndexWait('quux').Pluck('index', 'ready')")
@@ -357,7 +357,7 @@ func (suite *SindexStatusSuite) TestCases() {
 	{
 		// sindex/status.yaml line #74
 		/* ("PTYPE<BINARY>") */
-		var expected_ string = "PTYPE<BINARY>"
+		var expected_ = "PTYPE<BINARY>"
 		/* tbl2.index_wait("quux").nth(0).get_field('function').type_of() */
 
 		suite.T().Log("About to run line #74: tbl2.IndexWait('quux').Nth(0).Field('function').TypeOf()")

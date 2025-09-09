@@ -70,7 +70,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #7
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
 		/* tbl.insert([{'id':i} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #7: tbl.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, })\n    }\n    return res\n}()))")
@@ -92,7 +92,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #19
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.count() */
 
 		suite.T().Log("About to run line #19: tbl.Count()")
@@ -107,7 +107,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #24
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':1,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 1, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 1, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(12).replace(lambda row:{'id':row['id']}) */
 
 		suite.T().Log("About to run line #24: tbl.Get(12).Replace(func(row r.Term) interface{} { return map[interface{}]interface{}{'id': row.AtIndex('id'), }})")
@@ -122,7 +122,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #31
 		/* ({'deleted':0.0,'replaced':1,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 1, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 1, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(12).replace(lambda row:{'id':row['id'], 'a':row['id']}) */
 
 		suite.T().Log("About to run line #31: tbl.Get(12).Replace(func(row r.Term) interface{} { return map[interface{}]interface{}{'id': row.AtIndex('id'), 'a': row.AtIndex('id'), }})")
@@ -139,7 +139,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #36
 		/* ({'deleted':1,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 1, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 1, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(13).replace(lambda row:null) */
 
 		suite.T().Log("About to run line #36: tbl.Get(13).Replace(func(row r.Term) interface{} { return nil})")
@@ -154,7 +154,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #43
 		/* ({'first_error':'Inserted object must have primary key `id`:\n{\n\t\"a\":\t1\n}','deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':10,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Inserted object must have primary key `id`:\n{\n\t\"a\":\t1\n}", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 10, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"first_error": "Inserted object must have primary key `id`:\n{\n\t\"a\":\t1\n}", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 10, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.between(10, 20, right_bound='closed').replace(lambda row:{'a':1}) */
 
 		suite.T().Log("About to run line #43: tbl.Between(10, 20).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Replace(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': 1, }})")
@@ -169,7 +169,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #47
 		/* ({'deleted':0.0,'replaced':8,'unchanged':1,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 8, "unchanged": 1, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 8, "unchanged": 1, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.filter(lambda row:(row['id'] >= 10) & (row['id'] < 20)).replace(lambda row:{'id':row['id'], 'a':row['id']}) */
 
 		suite.T().Log("About to run line #47: tbl.Filter(func(row r.Term) interface{} { return row.AtIndex('id').Ge(10).And(row.AtIndex('id').Lt(20))}).Replace(func(row r.Term) interface{} { return map[interface{}]interface{}{'id': row.AtIndex('id'), 'a': row.AtIndex('id'), }})")
@@ -186,7 +186,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #56
 		/* ({'first_error':"Primary key `id` cannot be changed (`{\n\t\"id\":\t1\n}` -> `{\n\t\"a\":\t1,\n\t\"id\":\t2\n}`).",'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':1,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Primary key `id` cannot be changed (`{\n\t\"id\":\t1\n}` -> `{\n\t\"a\":\t1,\n\t\"id\":\t2\n}`).", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 1, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"first_error": "Primary key `id` cannot be changed (`{\n\t\"id\":\t1\n}` -> `{\n\t\"a\":\t1,\n\t\"id\":\t2\n}`).", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 1, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(1).replace({'id':2,'a':1}) */
 
 		suite.T().Log("About to run line #56: tbl.Get(1).Replace(map[interface{}]interface{}{'id': 2, 'a': 1, })")
@@ -201,7 +201,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #61
 		/* ({'first_error':"Inserted object must have primary key `id`:\n{\n\t\"a\":\t1\n}",'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':1,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Inserted object must have primary key `id`:\n{\n\t\"a\":\t1\n}", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 1, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"first_error": "Inserted object must have primary key `id`:\n{\n\t\"a\":\t1\n}", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 1, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(1).replace({'a':1}) */
 
 		suite.T().Log("About to run line #61: tbl.Get(1).Replace(map[interface{}]interface{}{'a': 1, })")
@@ -216,7 +216,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #65
 		/* ({'deleted':0.0,'replaced':1,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 1, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 1, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(1).replace({'id':r.row['id'],'a':'b'}) */
 
 		suite.T().Log("About to run line #65: tbl.Get(1).Replace(map[interface{}]interface{}{'id': r.Row.AtIndex('id'), 'a': 'b', })")
@@ -231,7 +231,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #70
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':1,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 1, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 1, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(1).replace(r.row.merge({'a':'b'})) */
 
 		suite.T().Log("About to run line #70: tbl.Get(1).Replace(r.Row.Merge(map[interface{}]interface{}{'a': 'b', }))")
@@ -246,7 +246,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #75
 		/* err('ReqlQueryLogicError', 'Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?")
+		var expected_ = err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?")
 		/* tbl.get(1).replace(r.row.merge({'c':r.js('5')})) */
 
 		suite.T().Log("About to run line #75: tbl.Get(1).Replace(r.Row.Merge(map[interface{}]interface{}{'c': r.JS('5'), }))")
@@ -261,7 +261,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #79
 		/* err('ReqlQueryLogicError', 'Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?")
+		var expected_ = err("ReqlQueryLogicError", "Could not prove argument deterministic.  Maybe you want to use the non_atomic flag?")
 		/* tbl.get(1).replace(r.row.merge({'c':tbl.nth(0)})) */
 
 		suite.T().Log("About to run line #79: tbl.Get(1).Replace(r.Row.Merge(map[interface{}]interface{}{'c': tbl.Nth(0), }))")
@@ -276,7 +276,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #83
 		/* ({'deleted':0.0,'replaced':1,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 1, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 1, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.get(1).replace(r.row.merge({'c':r.js('5')}), non_atomic=True) */
 
 		suite.T().Log("About to run line #83: tbl.Get(1).Replace(r.Row.Merge(map[interface{}]interface{}{'c': r.JS('5'), })).OptArgs(r.ReplaceOpts{NonAtomic: true, })")
@@ -291,7 +291,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #99
 		/* ({'deleted':99,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 99, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 99, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* tbl.replace(lambda row:null) */
 
 		suite.T().Log("About to run line #99: tbl.Replace(func(row r.Term) interface{} { return nil})")
@@ -306,7 +306,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #104
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get('sdfjk').replace({'id':'sdfjk'})['inserted'] */
 
 		suite.T().Log("About to run line #104: tbl.Get('sdfjk').Replace(map[interface{}]interface{}{'id': 'sdfjk', }).AtIndex('inserted')")
@@ -321,7 +321,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #107
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get('sdfjki').replace({'id':'sdfjk'})['errors'] */
 
 		suite.T().Log("About to run line #107: tbl.Get('sdfjki').Replace(map[interface{}]interface{}{'id': 'sdfjk', }).AtIndex('errors')")
@@ -336,7 +336,7 @@ func (suite *MutationReplaceSuite) TestCases() {
 	{
 		// mutation/replace.yaml line #111
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':1,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 1, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 1, "inserted": 0.0}
 		/* tbl.get('non-existent').replace(null) */
 
 		suite.T().Log("About to run line #111: tbl.Get('non-existent').Replace(nil)")

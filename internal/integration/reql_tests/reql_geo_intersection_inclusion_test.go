@@ -61,7 +61,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #4
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.point(1.5,1.5)) */
 
 		suite.T().Log("About to run line #4: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Point(1.5, 1.5))")
@@ -76,7 +76,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #6
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.point(2.5,2.5)) */
 
 		suite.T().Log("About to run line #6: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Point(2.5, 2.5))")
@@ -91,7 +91,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #8
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).intersects(r.point(1.5,1.5)) */
 
 		suite.T().Log("About to run line #8: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Intersects(r.Point(1.5, 1.5))")
@@ -106,7 +106,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #10
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).intersects(r.point(1.05,1.05)) */
 
 		suite.T().Log("About to run line #10: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Intersects(r.Point(1.05, 1.05))")
@@ -121,7 +121,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #13
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.point(2,2)) */
 
 		suite.T().Log("About to run line #13: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Point(2, 2))")
@@ -136,7 +136,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #15
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.point(2,1.5)) */
 
 		suite.T().Log("About to run line #15: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Point(2, 1.5))")
@@ -151,7 +151,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #17
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.line([1.5,1.5], [2,2])) */
 
 		suite.T().Log("About to run line #17: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Line([]interface{}{1.5, 1.5}, []interface{}{2, 2}))")
@@ -166,7 +166,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #19
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.line([1.5,1.5], [2,1.5])) */
 
 		suite.T().Log("About to run line #19: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Line([]interface{}{1.5, 1.5}, []interface{}{2, 1.5}))")
@@ -181,7 +181,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #22
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).intersects(r.point(1.1,1.1)) */
 
 		suite.T().Log("About to run line #22: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Intersects(r.Point(1.1, 1.1))")
@@ -196,7 +196,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #24
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).intersects(r.point(1.5,1.1)) */
 
 		suite.T().Log("About to run line #24: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Intersects(r.Point(1.5, 1.1))")
@@ -211,7 +211,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #27
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.line([2,2], [3,3])) */
 
 		suite.T().Log("About to run line #27: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Line([]interface{}{2, 2}, []interface{}{3, 3}))")
@@ -226,7 +226,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #29
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.line([2,1.5], [3,3])) */
 
 		suite.T().Log("About to run line #29: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Line([]interface{}{2, 1.5}, []interface{}{3, 3}))")
@@ -241,7 +241,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #31
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.line([1.5,1.5], [3,3])) */
 
 		suite.T().Log("About to run line #31: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Line([]interface{}{1.5, 1.5}, []interface{}{3, 3}))")
@@ -256,7 +256,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #33
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.polygon([1.2,1.2], [1.8,1.2], [1.8,1.8], [1.2,1.8])) */
 
 		suite.T().Log("About to run line #33: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Polygon([]interface{}{1.2, 1.2}, []interface{}{1.8, 1.2}, []interface{}{1.8, 1.8}, []interface{}{1.2, 1.8}))")
@@ -271,7 +271,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #35
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.polygon([1.5,1.5], [2.5,1.5], [2.5,2.5], [1.5,2.5])) */
 
 		suite.T().Log("About to run line #35: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Polygon([]interface{}{1.5, 1.5}, []interface{}{2.5, 1.5}, []interface{}{2.5, 2.5}, []interface{}{1.5, 2.5}))")
@@ -286,7 +286,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #37
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).intersects(r.polygon([1.2,1.2], [1.8,1.2], [1.8,1.8], [1.2,1.8])) */
 
 		suite.T().Log("About to run line #37: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Intersects(r.Polygon([]interface{}{1.2, 1.2}, []interface{}{1.8, 1.2}, []interface{}{1.8, 1.8}, []interface{}{1.2, 1.8}))")
@@ -301,7 +301,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #39
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).intersects(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])) */
 
 		suite.T().Log("About to run line #39: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Intersects(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9}))")
@@ -316,7 +316,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #42
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.polygon([2,1.1], [3,1.1], [3,1.9], [2,1.9])) */
 
 		suite.T().Log("About to run line #42: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Polygon([]interface{}{2, 1.1}, []interface{}{3, 1.1}, []interface{}{3, 1.9}, []interface{}{2, 1.9}))")
@@ -331,7 +331,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #44
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).intersects(r.polygon([2,2], [3,2], [3,3], [2,3])) */
 
 		suite.T().Log("About to run line #44: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Intersects(r.Polygon([]interface{}{2, 2}, []interface{}{3, 2}, []interface{}{3, 3}, []interface{}{2, 3}))")
@@ -346,7 +346,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #46
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.point(1,1).intersects(r.point(1.5,1.5)) */
 
 		suite.T().Log("About to run line #46: r.Point(1, 1).Intersects(r.Point(1.5, 1.5))")
@@ -361,7 +361,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #48
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.point(1,1).intersects(r.point(1,1)) */
 
 		suite.T().Log("About to run line #48: r.Point(1, 1).Intersects(r.Point(1, 1))")
@@ -376,7 +376,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #50
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.line([1,1], [2,1]).intersects(r.point(1,1)) */
 
 		suite.T().Log("About to run line #50: r.Line([]interface{}{1, 1}, []interface{}{2, 1}).Intersects(r.Point(1, 1))")
@@ -391,7 +391,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #55
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.line([1,1], [1,2]).intersects(r.point(1,1.8)) */
 
 		suite.T().Log("About to run line #55: r.Line([]interface{}{1, 1}, []interface{}{1, 2}).Intersects(r.Point(1, 1.8))")
@@ -406,7 +406,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #57
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.line([1,0], [2,0]).intersects(r.point(1.8,0)) */
 
 		suite.T().Log("About to run line #57: r.Line([]interface{}{1, 0}, []interface{}{2, 0}).Intersects(r.Point(1.8, 0))")
@@ -421,7 +421,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #59
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.line([1,1], [2,1]).intersects(r.point(1.5,1.5)) */
 
 		suite.T().Log("About to run line #59: r.Line([]interface{}{1, 1}, []interface{}{2, 1}).Intersects(r.Point(1.5, 1.5))")
@@ -436,7 +436,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #61
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.line([1,1], [2,1]).intersects(r.line([2,1], [3,1])) */
 
 		suite.T().Log("About to run line #61: r.Line([]interface{}{1, 1}, []interface{}{2, 1}).Intersects(r.Line([]interface{}{2, 1}, []interface{}{3, 1}))")
@@ -451,7 +451,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #64
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr([r.point(1, 0), r.point(3,0), r.point(2, 0)]).intersects(r.line([0,0], [2, 0])).count() */
 
 		suite.T().Log("About to run line #64: r.Expr([]interface{}{r.Point(1, 0), r.Point(3, 0), r.Point(2, 0)}).Intersects(r.Line([]interface{}{0, 0}, []interface{}{2, 0})).Count()")
@@ -466,7 +466,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #68
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.point(1.5,1.5)) */
 
 		suite.T().Log("About to run line #68: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Point(1.5, 1.5))")
@@ -481,7 +481,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #70
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.point(2.5,2.5)) */
 
 		suite.T().Log("About to run line #70: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Point(2.5, 2.5))")
@@ -496,7 +496,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #72
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).includes(r.point(1.5,1.5)) */
 
 		suite.T().Log("About to run line #72: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Includes(r.Point(1.5, 1.5))")
@@ -511,7 +511,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #74
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).includes(r.point(1.05,1.05)) */
 
 		suite.T().Log("About to run line #74: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Includes(r.Point(1.05, 1.05))")
@@ -526,7 +526,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #76
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.point(2,2)) */
 
 		suite.T().Log("About to run line #76: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Point(2, 2))")
@@ -541,7 +541,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #78
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.point(2,1.5)) */
 
 		suite.T().Log("About to run line #78: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Point(2, 1.5))")
@@ -556,7 +556,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #80
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.line([1.5,1.5], [2,2])) */
 
 		suite.T().Log("About to run line #80: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Line([]interface{}{1.5, 1.5}, []interface{}{2, 2}))")
@@ -571,7 +571,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #82
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.line([1.5,1.5], [2,1.5])) */
 
 		suite.T().Log("About to run line #82: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Line([]interface{}{1.5, 1.5}, []interface{}{2, 1.5}))")
@@ -586,7 +586,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #84
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).includes(r.point(1.1,1.1)) */
 
 		suite.T().Log("About to run line #84: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Includes(r.Point(1.1, 1.1))")
@@ -601,7 +601,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #86
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).includes(r.point(1.5,1.1)) */
 
 		suite.T().Log("About to run line #86: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Includes(r.Point(1.5, 1.1))")
@@ -616,7 +616,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #88
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.line([2,2], [3,3])) */
 
 		suite.T().Log("About to run line #88: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Line([]interface{}{2, 2}, []interface{}{3, 3}))")
@@ -631,7 +631,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #90
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.line([2,1.5], [2,2])) */
 
 		suite.T().Log("About to run line #90: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Line([]interface{}{2, 1.5}, []interface{}{2, 2}))")
@@ -646,7 +646,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #92
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.line([2,1], [2,2])) */
 
 		suite.T().Log("About to run line #92: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Line([]interface{}{2, 1}, []interface{}{2, 2}))")
@@ -661,7 +661,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #94
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.line([1.5,1.5], [3,3])) */
 
 		suite.T().Log("About to run line #94: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Line([]interface{}{1.5, 1.5}, []interface{}{3, 3}))")
@@ -676,7 +676,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #96
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.polygon([1,1], [2,1], [2,2], [1,2])) */
 
 		suite.T().Log("About to run line #96: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}))")
@@ -691,7 +691,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #98
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.polygon([1.2,1.2], [1.8,1.2], [1.8,1.8], [1.2,1.8])) */
 
 		suite.T().Log("About to run line #98: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Polygon([]interface{}{1.2, 1.2}, []interface{}{1.8, 1.2}, []interface{}{1.8, 1.8}, []interface{}{1.2, 1.8}))")
@@ -706,7 +706,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #100
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.polygon([1.5,1.5], [2,1.5], [2,2], [1.5,2])) */
 
 		suite.T().Log("About to run line #100: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Polygon([]interface{}{1.5, 1.5}, []interface{}{2, 1.5}, []interface{}{2, 2}, []interface{}{1.5, 2}))")
@@ -721,7 +721,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #102
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.polygon([1.5,1.5], [2.5,1.5], [2.5,2.5], [1.5,2.5])) */
 
 		suite.T().Log("About to run line #102: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Polygon([]interface{}{1.5, 1.5}, []interface{}{2.5, 1.5}, []interface{}{2.5, 2.5}, []interface{}{1.5, 2.5}))")
@@ -736,7 +736,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #104
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).includes(r.polygon([1.2,1.2], [1.8,1.2], [1.8,1.8], [1.2,1.8])) */
 
 		suite.T().Log("About to run line #104: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Includes(r.Polygon([]interface{}{1.2, 1.2}, []interface{}{1.8, 1.2}, []interface{}{1.8, 1.8}, []interface{}{1.2, 1.8}))")
@@ -751,7 +751,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #106
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).polygon_sub(r.polygon([1.1,1.1], [1.9,1.1], [1.9,1.9], [1.1,1.9])).includes(r.polygon([1.1,1.1], [2,1.1], [2,2], [1.1,2])) */
 
 		suite.T().Log("About to run line #106: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).PolygonSub(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{1.9, 1.1}, []interface{}{1.9, 1.9}, []interface{}{1.1, 1.9})).Includes(r.Polygon([]interface{}{1.1, 1.1}, []interface{}{2, 1.1}, []interface{}{2, 2}, []interface{}{1.1, 2}))")
@@ -766,7 +766,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #108
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.polygon([2,1.1], [3,1.1], [3,1.9], [2,1.9])) */
 
 		suite.T().Log("About to run line #108: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Polygon([]interface{}{2, 1.1}, []interface{}{3, 1.1}, []interface{}{3, 1.9}, []interface{}{2, 1.9}))")
@@ -781,7 +781,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #110
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.polygon([1,1], [2,1], [2,2], [1,2]).includes(r.polygon([2,2], [3,2], [3,3], [2,3])) */
 
 		suite.T().Log("About to run line #110: r.Polygon([]interface{}{1, 1}, []interface{}{2, 1}, []interface{}{2, 2}, []interface{}{1, 2}).Includes(r.Polygon([]interface{}{2, 2}, []interface{}{3, 2}, []interface{}{3, 3}, []interface{}{2, 3}))")
@@ -796,7 +796,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #113
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr([r.polygon([0,0], [1,1], [1,0]), r.polygon([0,1], [1,2], [1,1])]).includes(r.point(0,0)).count() */
 
 		suite.T().Log("About to run line #113: r.Expr([]interface{}{r.Polygon([]interface{}{0, 0}, []interface{}{1, 1}, []interface{}{1, 0}), r.Polygon([]interface{}{0, 1}, []interface{}{1, 2}, []interface{}{1, 1})}).Includes(r.Point(0, 0)).Count()")
@@ -811,7 +811,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #116
 		/* err('ReqlQueryLogicError', 'Expected geometry of type `Polygon` but found `Point`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `Point`.")
+		var expected_ = err("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `Point`.")
 		/* r.point(0,0).includes(r.point(0,0)) */
 
 		suite.T().Log("About to run line #116: r.Point(0, 0).Includes(r.Point(0, 0))")
@@ -826,7 +826,7 @@ func (suite *GeoIntersectionInclusionSuite) TestCases() {
 	{
 		// geo/intersection_inclusion.yaml line #118
 		/* err('ReqlQueryLogicError', 'Expected geometry of type `Polygon` but found `LineString`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `LineString`.")
+		var expected_ = err("ReqlQueryLogicError", "Expected geometry of type `Polygon` but found `LineString`.")
 		/* r.line([0,0], [0,1]).includes(r.point(0,0)) */
 
 		suite.T().Log("About to run line #118: r.Line([]interface{}{0, 0}, []interface{}{0, 1}).Includes(r.Point(0, 0))")

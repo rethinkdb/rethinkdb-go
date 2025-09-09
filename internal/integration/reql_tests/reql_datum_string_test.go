@@ -68,7 +68,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #16
 		/* "str" */
-		var expected_ string = "str"
+		var expected_ = "str"
 		/* r.expr('str') */
 
 		suite.T().Log("About to run line #16: r.Expr('str')")
@@ -83,7 +83,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #21
 		/* "str" */
-		var expected_ string = "str"
+		var expected_ = "str"
 		/* r.expr("str") */
 
 		suite.T().Log("About to run line #21: r.Expr('str')")
@@ -98,7 +98,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #28
 		/* 'str' */
-		var expected_ string = "str"
+		var expected_ = "str"
 		/* r.expr(u'str') */
 
 		suite.T().Log("About to run line #28: r.Expr('str')")
@@ -113,7 +113,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #35
 		/* u'こんにちは' */
-		var expected_ string = "こんにちは"
+		var expected_ = "こんにちは"
 		/* r.expr(japanese_hello) */
 
 		suite.T().Log("About to run line #35: r.Expr(japanese_hello)")
@@ -128,7 +128,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #43
 		/* 'STRING' */
-		var expected_ string = "STRING"
+		var expected_ = "STRING"
 		/* r.expr('foo').type_of() */
 
 		suite.T().Log("About to run line #43: r.Expr('foo').TypeOf()")
@@ -143,7 +143,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #47
 		/* 'foo' */
-		var expected_ string = "foo"
+		var expected_ = "foo"
 		/* r.expr('foo').coerce_to('string') */
 
 		suite.T().Log("About to run line #47: r.Expr('foo').CoerceTo('string')")
@@ -173,7 +173,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #51
 		/* err("ReqlQueryLogicError", "Could not coerce `--1.2` to NUMBER.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Could not coerce `--1.2` to NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Could not coerce `--1.2` to NUMBER.")
 		/* r.expr('--1.2').coerce_to('NUMBER') */
 
 		suite.T().Log("About to run line #51: r.Expr('--1.2').CoerceTo('NUMBER')")
@@ -188,7 +188,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #53
 		/* err("ReqlQueryLogicError", "Could not coerce `-1.2-` to NUMBER.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Could not coerce `-1.2-` to NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Could not coerce `-1.2-` to NUMBER.")
 		/* r.expr('-1.2-').coerce_to('NUMBER') */
 
 		suite.T().Log("About to run line #53: r.Expr('-1.2-').CoerceTo('NUMBER')")
@@ -203,7 +203,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #55
 		/* 10 */
-		var expected_ int = 10
+		var expected_ = 10
 		/* r.expr('0xa').coerce_to('NUMBER') */
 
 		suite.T().Log("About to run line #55: r.Expr('0xa').CoerceTo('NUMBER')")
@@ -218,7 +218,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #57
 		/* err("ReqlQueryLogicError", "Non-finite number: inf", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Non-finite number: inf")
+		var expected_ = err("ReqlQueryLogicError", "Non-finite number: inf")
 		/* r.expr('inf').coerce_to('NUMBER') */
 
 		suite.T().Log("About to run line #57: r.Expr('inf').CoerceTo('NUMBER')")
@@ -233,7 +233,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #61
 		/* 13 */
-		var expected_ int = 13
+		var expected_ = 13
 		/* r.expr('hello, world!').count() */
 
 		suite.T().Log("About to run line #61: r.Expr('hello, world!').Count()")
@@ -248,7 +248,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #63
 		/* 5 */
-		var expected_ int = 5
+		var expected_ = 5
 		/* r.expr(japanese_hello).count() */
 
 		suite.T().Log("About to run line #63: r.Expr(japanese_hello).Count()")
@@ -263,7 +263,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #67
 		/* 'ello' */
-		var expected_ string = "ello"
+		var expected_ = "ello"
 		/* r.expr('hello').slice(1) */
 
 		suite.T().Log("About to run line #67: r.Expr('hello').Slice(1)")
@@ -278,7 +278,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #69
 		/* 'o' */
-		var expected_ string = "o"
+		var expected_ = "o"
 		/* r.expr('hello').slice(-1) */
 
 		suite.T().Log("About to run line #69: r.Expr('hello').Slice(-1)")
@@ -293,7 +293,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #71
 		/* 'el' */
-		var expected_ string = "el"
+		var expected_ = "el"
 		/* r.expr('hello').slice(-4,3) */
 
 		suite.T().Log("About to run line #71: r.Expr('hello').Slice(-4, 3)")
@@ -308,7 +308,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #73
 		/* 'hello' */
-		var expected_ string = "hello"
+		var expected_ = "hello"
 		/* r.expr('hello').slice(-99) */
 
 		suite.T().Log("About to run line #73: r.Expr('hello').Slice(-99)")
@@ -323,7 +323,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #75
 		/* 'hello' */
-		var expected_ string = "hello"
+		var expected_ = "hello"
 		/* r.expr('hello').slice(0) */
 
 		suite.T().Log("About to run line #75: r.Expr('hello').Slice(0)")
@@ -338,7 +338,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #77
 		/* u'んにちは' */
-		var expected_ string = "んにちは"
+		var expected_ = "んにちは"
 		/* r.expr(japanese_hello).slice(1) */
 
 		suite.T().Log("About to run line #77: r.Expr(japanese_hello).Slice(1)")
@@ -353,7 +353,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #84
 		/* u'ん' */
-		var expected_ string = "ん"
+		var expected_ = "ん"
 		/* r.expr(japanese_hello).slice(1,2) */
 
 		suite.T().Log("About to run line #84: r.Expr(japanese_hello).Slice(1, 2)")
@@ -368,7 +368,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #91
 		/* u'にちは' */
-		var expected_ string = "にちは"
+		var expected_ = "にちは"
 		/* r.expr(japanese_hello).slice(-3) */
 
 		suite.T().Log("About to run line #91: r.Expr(japanese_hello).Slice(-3)")
@@ -383,7 +383,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #100
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('').split() */
 
 		suite.T().Log("About to run line #100: r.Expr('').Split()")
@@ -398,7 +398,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #102
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('').split(null) */
 
 		suite.T().Log("About to run line #102: r.Expr('').Split(nil)")
@@ -413,7 +413,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #104
 		/* [''] */
-		var expected_ []interface{} = []interface{}{""}
+		var expected_ = []interface{}{""}
 		/* r.expr('').split(' ') */
 
 		suite.T().Log("About to run line #104: r.Expr('').Split(' ')")
@@ -428,7 +428,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #106
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('').split('') */
 
 		suite.T().Log("About to run line #106: r.Expr('').Split('')")
@@ -443,7 +443,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #108
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('').split(null, 5) */
 
 		suite.T().Log("About to run line #108: r.Expr('').Split(nil, 5)")
@@ -458,7 +458,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #110
 		/* [''] */
-		var expected_ []interface{} = []interface{}{""}
+		var expected_ = []interface{}{""}
 		/* r.expr('').split(' ', 5) */
 
 		suite.T().Log("About to run line #110: r.Expr('').Split(' ', 5)")
@@ -473,7 +473,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #112
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('').split('', 5) */
 
 		suite.T().Log("About to run line #112: r.Expr('').Split('', 5)")
@@ -488,7 +488,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #115
 		/* ['aaaa', 'bbbb', 'cccc'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc"}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc"}
 		/* r.expr('aaaa bbbb  cccc ').split() */
 
 		suite.T().Log("About to run line #115: r.Expr('aaaa bbbb  cccc ').Split()")
@@ -503,7 +503,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #117
 		/* ['aaaa', 'bbbb', 'cccc'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc"}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc"}
 		/* r.expr('aaaa bbbb  cccc ').split(null) */
 
 		suite.T().Log("About to run line #117: r.Expr('aaaa bbbb  cccc ').Split(nil)")
@@ -518,7 +518,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #119
 		/* ['aaaa', 'bbbb', '', 'cccc', ''] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "", "cccc", ""}
+		var expected_ = []interface{}{"aaaa", "bbbb", "", "cccc", ""}
 		/* r.expr('aaaa bbbb  cccc ').split(' ') */
 
 		suite.T().Log("About to run line #119: r.Expr('aaaa bbbb  cccc ').Split(' ')")
@@ -533,7 +533,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #121
 		/* ['a', 'a', 'a', 'a', ' ', 'b', 'b', 'b', 'b', ' ', ' ', 'c', 'c', 'c', 'c', ' '] */
-		var expected_ []interface{} = []interface{}{"a", "a", "a", "a", " ", "b", "b", "b", "b", " ", " ", "c", "c", "c", "c", " "}
+		var expected_ = []interface{}{"a", "a", "a", "a", " ", "b", "b", "b", "b", " ", " ", "c", "c", "c", "c", " "}
 		/* r.expr('aaaa bbbb  cccc ').split('') */
 
 		suite.T().Log("About to run line #121: r.Expr('aaaa bbbb  cccc ').Split('')")
@@ -548,7 +548,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #123
 		/* ['aaaa ', '', '', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "", "", "  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "", "", "  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('b') */
 
 		suite.T().Log("About to run line #123: r.Expr('aaaa bbbb  cccc ').Split('b')")
@@ -563,7 +563,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #125
 		/* ['aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('bb') */
 
 		suite.T().Log("About to run line #125: r.Expr('aaaa bbbb  cccc ').Split('bb')")
@@ -578,7 +578,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #127
 		/* ['aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc "}
+		var expected_ = []interface{}{"aaaa", "cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split(' bbbb  ') */
 
 		suite.T().Log("About to run line #127: r.Expr('aaaa bbbb  cccc ').Split(' bbbb  ')")
@@ -593,7 +593,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #129
 		/* ['aaaa ', '', '  cccc b d ', ' e ', '', ' f'] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc b d ", " e ", "", " f"}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc b d ", " e ", "", " f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split('bb') */
 
 		suite.T().Log("About to run line #129: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split('bb')")
@@ -608,7 +608,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #131
 		/* ['aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ') */
 
 		suite.T().Log("About to run line #131: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ')")
@@ -623,7 +623,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #133
 		/* ['aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e", "f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ') */
 
 		suite.T().Log("About to run line #133: r.Expr('aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ')")
@@ -638,7 +638,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #136
 		/* ['aaaa', 'bbbb', 'cccc'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc"}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc"}
 		/* r.expr('aaaa bbbb  cccc ').split(null, 3) */
 
 		suite.T().Log("About to run line #136: r.Expr('aaaa bbbb  cccc ').Split(nil, 3)")
@@ -653,7 +653,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #138
 		/* ['aaaa', 'bbbb', '', 'cccc', ''] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "", "cccc", ""}
+		var expected_ = []interface{}{"aaaa", "bbbb", "", "cccc", ""}
 		/* r.expr('aaaa bbbb  cccc ').split(' ', 5) */
 
 		suite.T().Log("About to run line #138: r.Expr('aaaa bbbb  cccc ').Split(' ', 5)")
@@ -668,7 +668,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #140
 		/* ['a', 'a', 'a', 'a', ' ', 'bbbb  cccc '] */
-		var expected_ []interface{} = []interface{}{"a", "a", "a", "a", " ", "bbbb  cccc "}
+		var expected_ = []interface{}{"a", "a", "a", "a", " ", "bbbb  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('', 5) */
 
 		suite.T().Log("About to run line #140: r.Expr('aaaa bbbb  cccc ').Split('', 5)")
@@ -683,7 +683,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #142
 		/* ['aaaa ', '', '', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "", "", "  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "", "", "  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('b', 5) */
 
 		suite.T().Log("About to run line #142: r.Expr('aaaa bbbb  cccc ').Split('b', 5)")
@@ -698,7 +698,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #144
 		/* ['aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('bb', 3) */
 
 		suite.T().Log("About to run line #144: r.Expr('aaaa bbbb  cccc ').Split('bb', 3)")
@@ -713,7 +713,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #146
 		/* ['aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc "}
+		var expected_ = []interface{}{"aaaa", "cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #146: r.Expr('aaaa bbbb  cccc ').Split(' bbbb  ', 2)")
@@ -728,7 +728,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #148
 		/* ['aaaa ', '', '  cccc b d ', ' e ', '', ' f'] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc b d ", " e ", "", " f"}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc b d ", " e ", "", " f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split('bb', 6) */
 
 		suite.T().Log("About to run line #148: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split('bb', 6)")
@@ -743,7 +743,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #150
 		/* ['aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #150: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ', 2)")
@@ -758,7 +758,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #152
 		/* ['aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e", "f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ', 3) */
 
 		suite.T().Log("About to run line #152: r.Expr('aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ', 3)")
@@ -773,7 +773,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #155
 		/* ['aaaa', 'bbbb', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc "}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split(null, 2) */
 
 		suite.T().Log("About to run line #155: r.Expr('aaaa bbbb  cccc ').Split(nil, 2)")
@@ -788,7 +788,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #157
 		/* ["a", "b"] */
-		var expected_ []interface{} = []interface{}{"a", "b"}
+		var expected_ = []interface{}{"a", "b"}
 		/* r.expr("a  b  ").split(null, 2) */
 
 		suite.T().Log("About to run line #157: r.Expr('a  b  ').Split(nil, 2)")
@@ -803,7 +803,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #159
 		/* ['aaaa', 'bbbb', '', 'cccc', ''] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "", "cccc", ""}
+		var expected_ = []interface{}{"aaaa", "bbbb", "", "cccc", ""}
 		/* r.expr('aaaa bbbb  cccc ').split(' ', 4) */
 
 		suite.T().Log("About to run line #159: r.Expr('aaaa bbbb  cccc ').Split(' ', 4)")
@@ -818,7 +818,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #161
 		/* ['a', 'a', 'a', 'a', ' bbbb  cccc '] */
-		var expected_ []interface{} = []interface{}{"a", "a", "a", "a", " bbbb  cccc "}
+		var expected_ = []interface{}{"a", "a", "a", "a", " bbbb  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('', 4) */
 
 		suite.T().Log("About to run line #161: r.Expr('aaaa bbbb  cccc ').Split('', 4)")
@@ -833,7 +833,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #163
 		/* ['aaaa ', '', '', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "", "", "  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "", "", "  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('b', 4) */
 
 		suite.T().Log("About to run line #163: r.Expr('aaaa bbbb  cccc ').Split('b', 4)")
@@ -848,7 +848,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #165
 		/* ['aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('bb', 2) */
 
 		suite.T().Log("About to run line #165: r.Expr('aaaa bbbb  cccc ').Split('bb', 2)")
@@ -863,7 +863,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #167
 		/* ['aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc "}
+		var expected_ = []interface{}{"aaaa", "cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split(' bbbb  ', 1) */
 
 		suite.T().Log("About to run line #167: r.Expr('aaaa bbbb  cccc ').Split(' bbbb  ', 1)")
@@ -878,7 +878,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #169
 		/* ['aaaa ', '', '  cccc b d ', ' e ', '', ' f'] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc b d ", " e ", "", " f"}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc b d ", " e ", "", " f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split('bb', 5) */
 
 		suite.T().Log("About to run line #169: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split('bb', 5)")
@@ -893,7 +893,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #171
 		/* ['aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ', 1) */
 
 		suite.T().Log("About to run line #171: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ', 1)")
@@ -908,7 +908,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #173
 		/* ['aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e", "f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #173: r.Expr('aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ', 2)")
@@ -923,7 +923,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #176
 		/* ['aaaa', 'bbbb  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb  cccc "}
+		var expected_ = []interface{}{"aaaa", "bbbb  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split(null, 1) */
 
 		suite.T().Log("About to run line #176: r.Expr('aaaa bbbb  cccc ').Split(nil, 1)")
@@ -938,7 +938,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #178
 		/* ['aaaa', 'bbbb', ' cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", " cccc "}
+		var expected_ = []interface{}{"aaaa", "bbbb", " cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split(' ', 2) */
 
 		suite.T().Log("About to run line #178: r.Expr('aaaa bbbb  cccc ').Split(' ', 2)")
@@ -953,7 +953,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #180
 		/* ['a', 'a', 'aa bbbb  cccc '] */
-		var expected_ []interface{} = []interface{}{"a", "a", "aa bbbb  cccc "}
+		var expected_ = []interface{}{"a", "a", "aa bbbb  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('', 2) */
 
 		suite.T().Log("About to run line #180: r.Expr('aaaa bbbb  cccc ').Split('', 2)")
@@ -968,7 +968,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #182
 		/* ['aaaa ', '', 'bb  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "bb  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "bb  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('b', 2) */
 
 		suite.T().Log("About to run line #182: r.Expr('aaaa bbbb  cccc ').Split('b', 2)")
@@ -983,7 +983,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #184
 		/* ['aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split('bb', 2) */
 
 		suite.T().Log("About to run line #184: r.Expr('aaaa bbbb  cccc ').Split('bb', 2)")
@@ -998,7 +998,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #186
 		/* ['aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc "}
+		var expected_ = []interface{}{"aaaa", "cccc "}
 		/* r.expr('aaaa bbbb  cccc ').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #186: r.Expr('aaaa bbbb  cccc ').Split(' bbbb  ', 2)")
@@ -1013,7 +1013,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #188
 		/* ['aaaa ', '', '  cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"aaaa ", "", "  cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"aaaa ", "", "  cccc b d bb e bbbb f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split('bb', 2) */
 
 		suite.T().Log("About to run line #188: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split('bb', 2)")
@@ -1028,7 +1028,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #190
 		/* ['aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #190: r.Expr('aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ', 2)")
@@ -1043,7 +1043,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #192
 		/* ['aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"aaaa", "cccc b d bb e", "f"}
 		/* r.expr('aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #192: r.Expr('aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ', 2)")
@@ -1058,7 +1058,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #195
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('  ').split() */
 
 		suite.T().Log("About to run line #195: r.Expr('  ').Split()")
@@ -1073,7 +1073,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #197
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('  ').split(null) */
 
 		suite.T().Log("About to run line #197: r.Expr('  ').Split(nil)")
@@ -1088,7 +1088,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #199
 		/* ['', '', ''] */
-		var expected_ []interface{} = []interface{}{"", "", ""}
+		var expected_ = []interface{}{"", "", ""}
 		/* r.expr('  ').split(' ') */
 
 		suite.T().Log("About to run line #199: r.Expr('  ').Split(' ')")
@@ -1103,7 +1103,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #201
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr('  ').split(null, 5) */
 
 		suite.T().Log("About to run line #201: r.Expr('  ').Split(nil, 5)")
@@ -1118,7 +1118,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #203
 		/* ['', '', ''] */
-		var expected_ []interface{} = []interface{}{"", "", ""}
+		var expected_ = []interface{}{"", "", ""}
 		/* r.expr('  ').split(' ', 5) */
 
 		suite.T().Log("About to run line #203: r.Expr('  ').Split(' ', 5)")
@@ -1133,7 +1133,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #206
 		/* ['aaaa', 'bbbb', 'cccc'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc"}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc"}
 		/* r.expr('  aaaa bbbb  cccc ').split() */
 
 		suite.T().Log("About to run line #206: r.Expr('  aaaa bbbb  cccc ').Split()")
@@ -1148,7 +1148,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #208
 		/* ['aaaa', 'bbbb', 'cccc'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc"}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc"}
 		/* r.expr('  aaaa bbbb  cccc ').split(null) */
 
 		suite.T().Log("About to run line #208: r.Expr('  aaaa bbbb  cccc ').Split(nil)")
@@ -1163,7 +1163,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #210
 		/* ['', '', 'aaaa', 'bbbb', '', 'cccc', ''] */
-		var expected_ []interface{} = []interface{}{"", "", "aaaa", "bbbb", "", "cccc", ""}
+		var expected_ = []interface{}{"", "", "aaaa", "bbbb", "", "cccc", ""}
 		/* r.expr('  aaaa bbbb  cccc ').split(' ') */
 
 		suite.T().Log("About to run line #210: r.Expr('  aaaa bbbb  cccc ').Split(' ')")
@@ -1178,7 +1178,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #212
 		/* ['  aaaa ', '', '', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "", "", "  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "", "", "  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('b') */
 
 		suite.T().Log("About to run line #212: r.Expr('  aaaa bbbb  cccc ').Split('b')")
@@ -1193,7 +1193,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #214
 		/* ['  aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('bb') */
 
 		suite.T().Log("About to run line #214: r.Expr('  aaaa bbbb  cccc ').Split('bb')")
@@ -1208,7 +1208,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #216
 		/* ['  aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc "}
+		var expected_ = []interface{}{"  aaaa", "cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(' bbbb  ') */
 
 		suite.T().Log("About to run line #216: r.Expr('  aaaa bbbb  cccc ').Split(' bbbb  ')")
@@ -1223,7 +1223,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #218
 		/* ['  aaaa ', '', '  cccc b d ', ' e ', '', ' f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc b d ", " e ", "", " f"}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc b d ", " e ", "", " f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split('bb') */
 
 		suite.T().Log("About to run line #218: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split('bb')")
@@ -1238,7 +1238,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #220
 		/* ['  aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ') */
 
 		suite.T().Log("About to run line #220: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ')")
@@ -1253,7 +1253,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #222
 		/* ['  aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e", "f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ') */
 
 		suite.T().Log("About to run line #222: r.Expr('  aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ')")
@@ -1268,7 +1268,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #225
 		/* ['aaaa', 'bbbb', 'cccc'] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc"}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc"}
 		/* r.expr('  aaaa bbbb  cccc ').split(null, 3) */
 
 		suite.T().Log("About to run line #225: r.Expr('  aaaa bbbb  cccc ').Split(nil, 3)")
@@ -1283,7 +1283,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #227
 		/* ['', '', 'aaaa', 'bbbb', '', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"", "", "aaaa", "bbbb", "", "cccc "}
+		var expected_ = []interface{}{"", "", "aaaa", "bbbb", "", "cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(' ', 5) */
 
 		suite.T().Log("About to run line #227: r.Expr('  aaaa bbbb  cccc ').Split(' ', 5)")
@@ -1298,7 +1298,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #229
 		/* ['  aaaa ', '', '', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "", "", "  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "", "", "  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('b', 5) */
 
 		suite.T().Log("About to run line #229: r.Expr('  aaaa bbbb  cccc ').Split('b', 5)")
@@ -1313,7 +1313,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #231
 		/* ['  aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('bb', 3) */
 
 		suite.T().Log("About to run line #231: r.Expr('  aaaa bbbb  cccc ').Split('bb', 3)")
@@ -1328,7 +1328,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #233
 		/* ['  aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc "}
+		var expected_ = []interface{}{"  aaaa", "cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #233: r.Expr('  aaaa bbbb  cccc ').Split(' bbbb  ', 2)")
@@ -1343,7 +1343,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #235
 		/* ['  aaaa ', '', '  cccc b d ', ' e ', '', ' f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc b d ", " e ", "", " f"}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc b d ", " e ", "", " f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split('bb', 6) */
 
 		suite.T().Log("About to run line #235: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split('bb', 6)")
@@ -1358,7 +1358,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #237
 		/* ['  aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #237: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ', 2)")
@@ -1373,7 +1373,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #239
 		/* ['  aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e", "f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ', 3) */
 
 		suite.T().Log("About to run line #239: r.Expr('  aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ', 3)")
@@ -1388,7 +1388,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #242
 		/* ['aaaa', 'bbbb', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb", "cccc "}
+		var expected_ = []interface{}{"aaaa", "bbbb", "cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(null, 2) */
 
 		suite.T().Log("About to run line #242: r.Expr('  aaaa bbbb  cccc ').Split(nil, 2)")
@@ -1403,7 +1403,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #244
 		/* ["a", "b"] */
-		var expected_ []interface{} = []interface{}{"a", "b"}
+		var expected_ = []interface{}{"a", "b"}
 		/* r.expr("a  b  ").split(null, 2) */
 
 		suite.T().Log("About to run line #244: r.Expr('a  b  ').Split(nil, 2)")
@@ -1418,7 +1418,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #246
 		/* ['', '', 'aaaa', 'bbbb', ' cccc '] */
-		var expected_ []interface{} = []interface{}{"", "", "aaaa", "bbbb", " cccc "}
+		var expected_ = []interface{}{"", "", "aaaa", "bbbb", " cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(' ', 4) */
 
 		suite.T().Log("About to run line #246: r.Expr('  aaaa bbbb  cccc ').Split(' ', 4)")
@@ -1433,7 +1433,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #248
 		/* ['  aaaa ', '', '', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "", "", "  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "", "", "  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('b', 4) */
 
 		suite.T().Log("About to run line #248: r.Expr('  aaaa bbbb  cccc ').Split('b', 4)")
@@ -1448,7 +1448,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #250
 		/* ['  aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('bb', 2) */
 
 		suite.T().Log("About to run line #250: r.Expr('  aaaa bbbb  cccc ').Split('bb', 2)")
@@ -1463,7 +1463,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #252
 		/* ['  aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc "}
+		var expected_ = []interface{}{"  aaaa", "cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(' bbbb  ', 1) */
 
 		suite.T().Log("About to run line #252: r.Expr('  aaaa bbbb  cccc ').Split(' bbbb  ', 1)")
@@ -1478,7 +1478,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #254
 		/* ['  aaaa ', '', '  cccc b d ', ' e ', '', ' f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc b d ", " e ", "", " f"}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc b d ", " e ", "", " f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split('bb', 5) */
 
 		suite.T().Log("About to run line #254: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split('bb', 5)")
@@ -1493,7 +1493,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #256
 		/* ['  aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ', 1) */
 
 		suite.T().Log("About to run line #256: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ', 1)")
@@ -1508,7 +1508,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #258
 		/* ['  aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e", "f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #258: r.Expr('  aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ', 2)")
@@ -1523,7 +1523,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #261
 		/* ['aaaa', 'bbbb  cccc '] */
-		var expected_ []interface{} = []interface{}{"aaaa", "bbbb  cccc "}
+		var expected_ = []interface{}{"aaaa", "bbbb  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(null, 1) */
 
 		suite.T().Log("About to run line #261: r.Expr('  aaaa bbbb  cccc ').Split(nil, 1)")
@@ -1538,7 +1538,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #263
 		/* ['', '', 'aaaa bbbb  cccc '] */
-		var expected_ []interface{} = []interface{}{"", "", "aaaa bbbb  cccc "}
+		var expected_ = []interface{}{"", "", "aaaa bbbb  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(' ', 2) */
 
 		suite.T().Log("About to run line #263: r.Expr('  aaaa bbbb  cccc ').Split(' ', 2)")
@@ -1553,7 +1553,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #265
 		/* ['  aaaa ', '', 'bb  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "bb  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "bb  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('b', 2) */
 
 		suite.T().Log("About to run line #265: r.Expr('  aaaa bbbb  cccc ').Split('b', 2)")
@@ -1568,7 +1568,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #267
 		/* ['  aaaa ', '', '  cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc "}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split('bb', 2) */
 
 		suite.T().Log("About to run line #267: r.Expr('  aaaa bbbb  cccc ').Split('bb', 2)")
@@ -1583,7 +1583,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #269
 		/* ['  aaaa', 'cccc '] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc "}
+		var expected_ = []interface{}{"  aaaa", "cccc "}
 		/* r.expr('  aaaa bbbb  cccc ').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #269: r.Expr('  aaaa bbbb  cccc ').Split(' bbbb  ', 2)")
@@ -1598,7 +1598,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #271
 		/* ['  aaaa ', '', '  cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa ", "", "  cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"  aaaa ", "", "  cccc b d bb e bbbb f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split('bb', 2) */
 
 		suite.T().Log("About to run line #271: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split('bb', 2)")
@@ -1613,7 +1613,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #273
 		/* ['  aaaa', 'cccc b d bb e bbbb f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e bbbb f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #273: r.Expr('  aaaa bbbb  cccc b d bb e bbbb f').Split(' bbbb  ', 2)")
@@ -1628,7 +1628,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #275
 		/* ['  aaaa', 'cccc b d bb e', 'f'] */
-		var expected_ []interface{} = []interface{}{"  aaaa", "cccc b d bb e", "f"}
+		var expected_ = []interface{}{"  aaaa", "cccc b d bb e", "f"}
 		/* r.expr('  aaaa bbbb  cccc b d bb e bbbb  f').split(' bbbb  ', 2) */
 
 		suite.T().Log("About to run line #275: r.Expr('  aaaa bbbb  cccc b d bb e bbbb  f').Split(' bbbb  ', 2)")
@@ -1643,7 +1643,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #278
 		/* "ABC-DEF-GHJ" */
-		var expected_ string = "ABC-DEF-GHJ"
+		var expected_ = "ABC-DEF-GHJ"
 		/* r.expr("abc-dEf-GHJ").upcase() */
 
 		suite.T().Log("About to run line #278: r.Expr('abc-dEf-GHJ').Upcase()")
@@ -1658,7 +1658,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #280
 		/* "abc-def-ghj" */
-		var expected_ string = "abc-def-ghj"
+		var expected_ = "abc-def-ghj"
 		/* r.expr("abc-dEf-GHJ").downcase() */
 
 		suite.T().Log("About to run line #280: r.Expr('abc-dEf-GHJ').Downcase()")
@@ -1673,7 +1673,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #285
 		/* ["f", "\u00e9", "o", "o"] */
-		var expected_ []interface{} = []interface{}{"f", "é", "o", "o"}
+		var expected_ = []interface{}{"f", "é", "o", "o"}
 		/* r.expr(u"f\u00e9oo").split("") */
 
 		suite.T().Log("About to run line #285: r.Expr('féoo').Split('')")
@@ -1688,7 +1688,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #294
 		/* ["f", "e\u0301", "o", "o"] */
-		var expected_ []interface{} = []interface{}{"f", "é", "o", "o"}
+		var expected_ = []interface{}{"f", "é", "o", "o"}
 		/* r.expr(u"fe\u0301oo").split("") */
 
 		suite.T().Log("About to run line #294: r.Expr('féoo').Split('')")
@@ -1703,7 +1703,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #307
 		/* ["foo", "bar", "baz", "quux", "fred", "barney", "wilma"] */
-		var expected_ []interface{} = []interface{}{"foo", "bar", "baz", "quux", "fred", "barney", "wilma"}
+		var expected_ = []interface{}{"foo", "bar", "baz", "quux", "fred", "barney", "wilma"}
 		/* r.expr(u"foo bar\tbaz\nquux\rfred\u000bbarney\u000cwilma").split() */
 
 		suite.T().Log("About to run line #307: r.Expr('foo bar\\tbaz\\nquux\\rfred\\u000bbarney\\u000cwilma').Split()")
@@ -1718,7 +1718,7 @@ func (suite *DatumStringSuite) TestCases() {
 	{
 		// datum/string.yaml line #323
 		/* ["foo", "bar", "baz\u2060quux", "fred", "barney", "wilma", "betty\u200b"] */
-		var expected_ []interface{} = []interface{}{"foo", "bar", "baz\u2060quux", "fred", "barney", "wilma", "betty\u200b"}
+		var expected_ = []interface{}{"foo", "bar", "baz\u2060quux", "fred", "barney", "wilma", "betty\u200b"}
 		/* r.expr(u"foo\u00a0bar\u2001baz\u2060quux\u2028fred\u2028barney\u2029wilma\u0085betty\u200b").split() */
 
 		suite.T().Log("About to run line #323: r.Expr('foo\\u00a0bar\\u2001baz\\u2060quux\\u2028fred\\u2028barney\\u2029wilma\\u0085betty\\u200b').Split()")

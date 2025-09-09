@@ -61,7 +61,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #6
 		/* {} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{}
+		var expected_ = map[interface{}]interface{}{}
 		/* r.expr({}) */
 
 		suite.T().Log("About to run line #6: r.Expr(map[interface{}]interface{}{})")
@@ -76,7 +76,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #11
 		/* {'a':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1}
+		var expected_ = map[interface{}]interface{}{"a": 1}
 		/* r.expr({'a':1}) */
 
 		suite.T().Log("About to run line #11: r.Expr(map[interface{}]interface{}{'a': 1, })")
@@ -91,7 +91,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #16
 		/* {'a':1, 'b':'two', 'c':True} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": "two", "c": true}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": "two", "c": true}
 		/* r.expr({'a':1, 'b':'two', 'c':True}) */
 
 		suite.T().Log("About to run line #16: r.Expr(map[interface{}]interface{}{'a': 1, 'b': 'two', 'c': true, })")
@@ -106,7 +106,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #20
 		/* {'a':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1}
+		var expected_ = map[interface{}]interface{}{"a": 1}
 		/* r.expr({'a':r.expr(1)}) */
 
 		suite.T().Log("About to run line #20: r.Expr(map[interface{}]interface{}{'a': r.Expr(1), })")
@@ -121,7 +121,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #23
 		/* {'a':{'b':[{'c':2}, 'a', 4]}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": []interface{}{map[interface{}]interface{}{"c": 2}, "a", 4}}}
+		var expected_ = map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": []interface{}{map[interface{}]interface{}{"c": 2}, "a", 4}}}
 		/* r.expr({'a':{'b':[{'c':2}, 'a', 4]}}) */
 
 		suite.T().Log("About to run line #23: r.Expr(map[interface{}]interface{}{'a': map[interface{}]interface{}{'b': []interface{}{map[interface{}]interface{}{'c': 2, }, 'a', 4}, }, })")
@@ -136,7 +136,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #26
 		/* 'OBJECT' */
-		var expected_ string = "OBJECT"
+		var expected_ = "OBJECT"
 		/* r.expr({'a':1}).type_of() */
 
 		suite.T().Log("About to run line #26: r.Expr(map[interface{}]interface{}{'a': 1, }).TypeOf()")
@@ -151,7 +151,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #30
 		/* '{"a":1}' */
-		var expected_ string = "{\"a\":1}"
+		var expected_ = "{\"a\":1}"
 		/* r.expr({'a':1}).coerce_to('string') */
 
 		suite.T().Log("About to run line #30: r.Expr(map[interface{}]interface{}{'a': 1, }).CoerceTo('string')")
@@ -166,7 +166,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #34
 		/* {'a':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1}
+		var expected_ = map[interface{}]interface{}{"a": 1}
 		/* r.expr({'a':1}).coerce_to('object') */
 
 		suite.T().Log("About to run line #34: r.Expr(map[interface{}]interface{}{'a': 1, }).CoerceTo('object')")
@@ -181,7 +181,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #37
 		/* [['a',1]] */
-		var expected_ []interface{} = []interface{}{[]interface{}{"a", 1}}
+		var expected_ = []interface{}{[]interface{}{"a", 1}}
 		/* r.expr({'a':1}).coerce_to('array') */
 
 		suite.T().Log("About to run line #37: r.Expr(map[interface{}]interface{}{'a': 1, }).CoerceTo('array')")
@@ -196,7 +196,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #66
 		/* {} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{}
+		var expected_ = map[interface{}]interface{}{}
 		/* r.object() */
 
 		suite.T().Log("About to run line #66: r.Object()")
@@ -211,7 +211,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #69
 		/* {'a':1,'b':2} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2}
 		/* r.object('a', 1, 'b', 2) */
 
 		suite.T().Log("About to run line #69: r.Object('a', 1, 'b', 2)")
@@ -226,7 +226,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #72
 		/* {'cd':3} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"cd": 3}
+		var expected_ = map[interface{}]interface{}{"cd": 3}
 		/* r.object('c'+'d', 3) */
 
 		suite.T().Log("About to run line #72: r.Object(r.Add('c', 'd'), 3)")
@@ -241,7 +241,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #75
 		/* err("ReqlQueryLogicError", "OBJECT expects an even number of arguments (but found 3).", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "OBJECT expects an even number of arguments (but found 3).")
+		var expected_ = err("ReqlQueryLogicError", "OBJECT expects an even number of arguments (but found 3).")
 		/* r.object('o','d','d') */
 
 		suite.T().Log("About to run line #75: r.Object('o', 'd', 'd')")
@@ -256,7 +256,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #78
 		/* err("ReqlQueryLogicError","Expected type STRING but found NUMBER.",[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
 		/* r.object(1, 1) */
 
 		suite.T().Log("About to run line #78: r.Object(1, 1)")
@@ -271,7 +271,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #81
 		/* err("ReqlQueryLogicError","Duplicate key \"e\" in object.  (got 4 and 5 as values)",[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Duplicate key \"e\" in object.  (got 4 and 5 as values)")
+		var expected_ = err("ReqlQueryLogicError", "Duplicate key \"e\" in object.  (got 4 and 5 as values)")
 		/* r.object('e', 4, 'e', 5) */
 
 		suite.T().Log("About to run line #81: r.Object('e', 4, 'e', 5)")
@@ -286,7 +286,7 @@ func (suite *DatumObjectSuite) TestCases() {
 	{
 		// datum/object.yaml line #84
 		/* err("ReqlQueryLogicError","Expected type DATUM but found DATABASE:",[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:")
 		/* r.object('g', r.db('test')) */
 
 		suite.T().Log("About to run line #84: r.Object('g', r.DB('test'))")

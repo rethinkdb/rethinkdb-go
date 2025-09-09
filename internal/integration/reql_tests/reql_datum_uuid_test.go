@@ -91,7 +91,7 @@ func (suite *DatumUuidSuite) TestCases() {
 	{
 		// datum/uuid.yaml line #7
 		/* 'STRING' */
-		var expected_ string = "STRING"
+		var expected_ = "STRING"
 		/* r.type_of(r.uuid()) */
 
 		suite.T().Log("About to run line #7: r.TypeOf(r.UUID())")
@@ -106,7 +106,7 @@ func (suite *DatumUuidSuite) TestCases() {
 	{
 		// datum/uuid.yaml line #9
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.uuid().ne(r.uuid()) */
 
 		suite.T().Log("About to run line #9: r.UUID().Ne(r.UUID())")
@@ -121,7 +121,7 @@ func (suite *DatumUuidSuite) TestCases() {
 	{
 		// datum/uuid.yaml line #11
 		/* ('97dd10a5-4fc4-554f-86c5-0d2c2e3d5330') */
-		var expected_ string = "97dd10a5-4fc4-554f-86c5-0d2c2e3d5330"
+		var expected_ = "97dd10a5-4fc4-554f-86c5-0d2c2e3d5330"
 		/* r.uuid('magic') */
 
 		suite.T().Log("About to run line #11: r.UUID('magic')")
@@ -136,7 +136,7 @@ func (suite *DatumUuidSuite) TestCases() {
 	{
 		// datum/uuid.yaml line #13
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.uuid('magic').eq(r.uuid('magic')) */
 
 		suite.T().Log("About to run line #13: r.UUID('magic').Eq(r.UUID('magic'))")
@@ -151,7 +151,7 @@ func (suite *DatumUuidSuite) TestCases() {
 	{
 		// datum/uuid.yaml line #15
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.uuid('magic').ne(r.uuid('beans')) */
 
 		suite.T().Log("About to run line #15: r.UUID('magic').Ne(r.UUID('beans'))")
@@ -166,7 +166,7 @@ func (suite *DatumUuidSuite) TestCases() {
 	{
 		// datum/uuid.yaml line #17
 		/* 10 */
-		var expected_ int = 10
+		var expected_ = 10
 		/* r.expr([1,2,3,4,5,6,7,8,9,10]).map(lambda u:r.uuid()).distinct().count() */
 
 		suite.T().Log("About to run line #17: r.Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}).Map(func(u r.Term) interface{} { return r.UUID()}).Distinct().Count()")

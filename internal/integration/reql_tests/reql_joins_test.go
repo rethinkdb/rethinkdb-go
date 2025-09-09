@@ -118,7 +118,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #7
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* r.db('test').table_create('test3', primary_key='foo') */
 
 		suite.T().Log("About to run line #7: r.DB('test').TableCreate('test3').OptArgs(r.TableCreateOpts{PrimaryKey: 'foo', })")
@@ -140,7 +140,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #13
 		/* partial({'errors':0, 'inserted':100}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 100})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 100})
 		/* tbl.insert(r.range(0, 100).map({'id':r.row, 'a':r.row % 4})) */
 
 		suite.T().Log("About to run line #13: tbl.Insert(r.Range(0, 100).Map(map[interface{}]interface{}{'id': r.Row, 'a': r.Row.Mod(4), }))")
@@ -155,7 +155,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #18
 		/* partial({'errors':0, 'inserted':100}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 100})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 100})
 		/* tbl2.insert(r.range(0, 100).map({'id':r.row, 'b':r.row % 4})) */
 
 		suite.T().Log("About to run line #18: tbl2.Insert(r.Range(0, 100).Map(map[interface{}]interface{}{'id': r.Row, 'b': r.Row.Mod(4), }))")
@@ -170,7 +170,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #23
 		/* partial({'errors':0, 'inserted':100}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 100})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 100})
 		/* tbl3.insert(r.range(0, 100).map({'foo':r.row, 'b':r.row % 4})) */
 
 		suite.T().Log("About to run line #23: tbl3.Insert(r.Range(0, 100).Map(map[interface{}]interface{}{'foo': r.Row, 'b': r.Row.Mod(4), }))")
@@ -185,7 +185,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #28
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* otbl.insert(r.range(1,100).map({'id': r.row, 'a': r.row})) */
 
 		suite.T().Log("About to run line #28: otbl.Insert(r.Range(1, 100).Map(map[interface{}]interface{}{'id': r.Row, 'a': r.Row, }))")
@@ -200,7 +200,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #29
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* otbl2.insert(r.range(1,100).map({'id': r.row, 'b': 2 * r.row})) */
 
 		suite.T().Log("About to run line #29: otbl2.Insert(r.Range(1, 100).Map(map[interface{}]interface{}{'id': r.Row, 'b': r.Mul(2, r.Row), }))")
@@ -222,7 +222,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #37
 		/* 2500 */
-		var expected_ int = 2500
+		var expected_ = 2500
 		/* ij.count() */
 
 		suite.T().Log("About to run line #37: ij.Count()")
@@ -237,7 +237,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #39
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* ij.filter(lambda row:row['a'] != row['b']).count() */
 
 		suite.T().Log("About to run line #39: ij.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Ne(row.AtIndex('b'))}).Count()")
@@ -259,7 +259,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #49
 		/* 2500 */
-		var expected_ int = 2500
+		var expected_ = 2500
 		/* oj.count() */
 
 		suite.T().Log("About to run line #49: oj.Count()")
@@ -274,7 +274,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #51
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* oj.filter(lambda row:row['a'] != row['b']).count() */
 
 		suite.T().Log("About to run line #51: oj.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Ne(row.AtIndex('b'))}).Count()")
@@ -308,7 +308,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #65
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.eq_join('a', tbl2).zip().count() */
 
 		suite.T().Log("About to run line #65: tbl.EqJoin('a', tbl2).Zip().Count()")
@@ -323,7 +323,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #68
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.eq_join('fake', tbl2).zip().count() */
 
 		suite.T().Log("About to run line #68: tbl.EqJoin('fake', tbl2).Zip().Count()")
@@ -338,7 +338,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #71
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.eq_join(lambda x:x['a'], tbl2).zip().count() */
 
 		suite.T().Log("About to run line #71: tbl.EqJoin(func(x r.Term) interface{} { return x.AtIndex('a')}, tbl2).Zip().Count()")
@@ -353,7 +353,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #76
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.eq_join(lambda x:x['fake'], tbl2).zip().count() */
 
 		suite.T().Log("About to run line #76: tbl.EqJoin(func(x r.Term) interface{} { return x.AtIndex('fake')}, tbl2).Zip().Count()")
@@ -368,7 +368,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #81
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.eq_join(lambda x:null, tbl2).zip().count() */
 
 		suite.T().Log("About to run line #81: tbl.EqJoin(func(x r.Term) interface{} { return nil}, tbl2).Zip().Count()")
@@ -383,7 +383,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #86
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.eq_join(lambda x:x['a'], tbl2).count() */
 
 		suite.T().Log("About to run line #86: tbl.EqJoin(func(x r.Term) interface{} { return x.AtIndex('a')}, tbl2).Count()")
@@ -398,7 +398,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #92
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.eq_join('a', tbl3).zip().count() */
 
 		suite.T().Log("About to run line #92: tbl.EqJoin('a', tbl3).Zip().Count()")
@@ -413,7 +413,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #95
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.eq_join(lambda x:x['a'], tbl3).count() */
 
 		suite.T().Log("About to run line #95: tbl.EqJoin(func(x r.Term) interface{} { return x.AtIndex('a')}, tbl3).Count()")
@@ -428,7 +428,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #101
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.eq_join(r.row['a'], tbl2).count() */
 
 		suite.T().Log("About to run line #101: tbl.EqJoin(r.Row.AtIndex('a'), tbl2).Count()")
@@ -457,7 +457,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #109
 		/* [{'a':2,'b':2},{'a':3,'b':3}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 2, "b": 2}, map[interface{}]interface{}{"a": 3, "b": 3}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 2, "b": 2}, map[interface{}]interface{}{"a": 3, "b": 3}}
 		/* left.inner_join(right, lambda l, r:l['a'] == r['b']).zip() */
 
 		suite.T().Log("About to run line #109: left.InnerJoin(right, func(l r.Term, r r.Term) interface{} { return l.AtIndex('a').Eq(r.AtIndex('b'))}).Zip()")
@@ -472,7 +472,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #115
 		/* [{'a':1},{'a':2,'b':2},{'a':3,'b':3}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2, "b": 2}, map[interface{}]interface{}{"a": 3, "b": 3}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2, "b": 2}, map[interface{}]interface{}{"a": 3, "b": 3}}
 		/* left.outer_join(right, lambda l, r:l['a'] == r['b']).zip() */
 
 		suite.T().Log("About to run line #115: left.OuterJoin(right, func(l r.Term, r r.Term) interface{} { return l.AtIndex('a').Eq(r.AtIndex('b'))}).Zip()")
@@ -487,7 +487,7 @@ func (suite *JoinsSuite) TestCases() {
 	{
 		// joins.yaml line #132
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* r.db('test').table_drop('test3') */
 
 		suite.T().Log("About to run line #132: r.DB('test').TableDrop('test3')")

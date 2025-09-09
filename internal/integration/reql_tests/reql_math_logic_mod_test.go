@@ -61,7 +61,7 @@ func (suite *MathLogicModSuite) TestCases() {
 	{
 		// math_logic/mod.yaml line #6
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(10) % 3 */
 
 		suite.T().Log("About to run line #6: r.Expr(10).Mod(3)")
@@ -76,7 +76,7 @@ func (suite *MathLogicModSuite) TestCases() {
 	{
 		// math_logic/mod.yaml line #7
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* 10 % r.expr(3) */
 
 		suite.T().Log("About to run line #7: r.Mod(10, r.Expr(3))")
@@ -91,7 +91,7 @@ func (suite *MathLogicModSuite) TestCases() {
 	{
 		// math_logic/mod.yaml line #8
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(10).mod(3) */
 
 		suite.T().Log("About to run line #8: r.Expr(10).Mod(3)")
@@ -106,7 +106,7 @@ func (suite *MathLogicModSuite) TestCases() {
 	{
 		// math_logic/mod.yaml line #16
 		/* -1 */
-		var expected_ int = -1
+		var expected_ = -1
 		/* r.expr(-10) % -3 */
 
 		suite.T().Log("About to run line #16: r.Expr(-10).Mod(-3)")
@@ -121,7 +121,7 @@ func (suite *MathLogicModSuite) TestCases() {
 	{
 		// math_logic/mod.yaml line #22
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr(4) % 'a' */
 
 		suite.T().Log("About to run line #22: r.Expr(4).Mod('a')")
@@ -136,7 +136,7 @@ func (suite *MathLogicModSuite) TestCases() {
 	{
 		// math_logic/mod.yaml line #27
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('a') % 1 */
 
 		suite.T().Log("About to run line #27: r.Expr('a').Mod(1)")
@@ -151,7 +151,7 @@ func (suite *MathLogicModSuite) TestCases() {
 	{
 		// math_logic/mod.yaml line #32
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('a') % 'b' */
 
 		suite.T().Log("About to run line #32: r.Expr('a').Mod('b')")

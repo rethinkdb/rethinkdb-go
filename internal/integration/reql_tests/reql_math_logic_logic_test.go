@@ -61,7 +61,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #8
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(true) & true */
 
 		suite.T().Log("About to run line #8: r.Expr(true).And(true)")
@@ -76,7 +76,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #9
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* true & r.expr(true) */
 
 		suite.T().Log("About to run line #9: r.And(true, r.Expr(true))")
@@ -91,7 +91,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #10
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.and_(true,true) */
 
 		suite.T().Log("About to run line #10: r.And(true, true)")
@@ -106,7 +106,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #11
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(true).and_(true) */
 
 		suite.T().Log("About to run line #11: r.Expr(true).And(true)")
@@ -121,7 +121,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #22
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(true) & false */
 
 		suite.T().Log("About to run line #22: r.Expr(true).And(false)")
@@ -136,7 +136,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #23
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(false) & false */
 
 		suite.T().Log("About to run line #23: r.Expr(false).And(false)")
@@ -151,7 +151,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #24
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* true & r.expr(false) */
 
 		suite.T().Log("About to run line #24: r.And(true, r.Expr(false))")
@@ -166,7 +166,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #25
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* false & r.expr(false) */
 
 		suite.T().Log("About to run line #25: r.And(false, r.Expr(false))")
@@ -181,7 +181,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #26
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.and_(true,false) */
 
 		suite.T().Log("About to run line #26: r.And(true, false)")
@@ -196,7 +196,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #27
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.and_(false,false) */
 
 		suite.T().Log("About to run line #27: r.And(false, false)")
@@ -211,7 +211,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #28
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(true).and_(false) */
 
 		suite.T().Log("About to run line #28: r.Expr(true).And(false)")
@@ -226,7 +226,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #29
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(false).and_(false) */
 
 		suite.T().Log("About to run line #29: r.Expr(false).And(false)")
@@ -241,7 +241,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #48
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(true) | true */
 
 		suite.T().Log("About to run line #48: r.Expr(true).Or(true)")
@@ -256,7 +256,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #49
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(true) | false */
 
 		suite.T().Log("About to run line #49: r.Expr(true).Or(false)")
@@ -271,7 +271,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #50
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* true | r.expr(true) */
 
 		suite.T().Log("About to run line #50: r.Or(true, r.Expr(true))")
@@ -286,7 +286,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #51
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* true | r.expr(false) */
 
 		suite.T().Log("About to run line #51: r.Or(true, r.Expr(false))")
@@ -301,7 +301,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #52
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.or_(true,true) */
 
 		suite.T().Log("About to run line #52: r.Or(true, true)")
@@ -316,7 +316,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #53
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.or_(true,false) */
 
 		suite.T().Log("About to run line #53: r.Or(true, false)")
@@ -331,7 +331,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #54
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(true).or_(true) */
 
 		suite.T().Log("About to run line #54: r.Expr(true).Or(true)")
@@ -346,7 +346,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #55
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(true).or_(false) */
 
 		suite.T().Log("About to run line #55: r.Expr(true).Or(false)")
@@ -361,7 +361,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #72
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(false) | false */
 
 		suite.T().Log("About to run line #72: r.Expr(false).Or(false)")
@@ -376,7 +376,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #73
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* false | r.expr(false) */
 
 		suite.T().Log("About to run line #73: r.Or(false, r.Expr(false))")
@@ -391,7 +391,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #74
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.and_(false,false) */
 
 		suite.T().Log("About to run line #74: r.And(false, false)")
@@ -406,7 +406,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #75
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(false).and_(false) */
 
 		suite.T().Log("About to run line #75: r.Expr(false).And(false)")
@@ -421,7 +421,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #88
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* ~r.expr(True) */
 
 		suite.T().Log("About to run line #88: r.Expr(true).Not()")
@@ -436,7 +436,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #89
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.not_(True) */
 
 		suite.T().Log("About to run line #89: r.Not(true)")
@@ -451,7 +451,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #93
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ~r.expr(False) */
 
 		suite.T().Log("About to run line #93: r.Expr(false).Not()")
@@ -466,7 +466,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #94
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.not_(False) */
 
 		suite.T().Log("About to run line #94: r.Not(false)")
@@ -481,7 +481,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #97
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(True).not_() */
 
 		suite.T().Log("About to run line #97: r.Expr(true).Not()")
@@ -496,7 +496,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #100
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(False).not_() */
 
 		suite.T().Log("About to run line #100: r.Expr(false).Not()")
@@ -511,7 +511,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #107
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ~r.and_(True, True) == r.or_(~r.expr(True), ~r.expr(True)) */
 
 		suite.T().Log("About to run line #107: r.And(true, true).Not().Eq(r.Or(r.Expr(true).Not(), r.Expr(true).Not()))")
@@ -526,7 +526,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #108
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ~r.and_(True, False) == r.or_(~r.expr(True), ~r.expr(False)) */
 
 		suite.T().Log("About to run line #108: r.And(true, false).Not().Eq(r.Or(r.Expr(true).Not(), r.Expr(false).Not()))")
@@ -541,7 +541,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #109
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ~r.and_(False, False) == r.or_(~r.expr(False), ~r.expr(False)) */
 
 		suite.T().Log("About to run line #109: r.And(false, false).Not().Eq(r.Or(r.Expr(false).Not(), r.Expr(false).Not()))")
@@ -556,7 +556,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #110
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ~r.and_(False, True) == r.or_(~r.expr(False), ~r.expr(True)) */
 
 		suite.T().Log("About to run line #110: r.And(false, true).Not().Eq(r.Or(r.Expr(false).Not(), r.Expr(true).Not()))")
@@ -571,7 +571,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #120
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.and_(True, True, True, True, True) */
 
 		suite.T().Log("About to run line #120: r.And(true, true, true, true, true)")
@@ -586,7 +586,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #123
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.and_(True, True, True, False, True) */
 
 		suite.T().Log("About to run line #123: r.And(true, true, true, false, true)")
@@ -601,7 +601,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #126
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.and_(True, False, True, False, True) */
 
 		suite.T().Log("About to run line #126: r.And(true, false, true, false, true)")
@@ -616,7 +616,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #129
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.or_(False, False, False, False, False) */
 
 		suite.T().Log("About to run line #129: r.Or(false, false, false, false, false)")
@@ -631,7 +631,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #132
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.or_(False, False, False, True, False) */
 
 		suite.T().Log("About to run line #132: r.Or(false, false, false, true, false)")
@@ -646,7 +646,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #135
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.or_(False, True, False, True, False) */
 
 		suite.T().Log("About to run line #135: r.Or(false, true, false, true, false)")
@@ -661,7 +661,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #140
 		/* err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.")
 		/* r.expr(r.expr('a')['b']).default(2) */
 
 		suite.T().Log("About to run line #140: r.Expr(r.Expr('a').AtIndex('b')).Default(2)")
@@ -676,7 +676,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #145
 		/* False */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(r.and_(True, False) == r.or_(False, True)) */
 
 		suite.T().Log("About to run line #145: r.Expr(r.And(true, false).Eq(r.Or(false, true)))")
@@ -691,7 +691,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #151
 		/* False */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(r.and_(True, False) >= r.or_(False, True)) */
 
 		suite.T().Log("About to run line #151: r.Expr(r.And(true, false).Ge(r.Or(false, true)))")
@@ -706,7 +706,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #156
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1) & True */
 
 		suite.T().Log("About to run line #156: r.Expr(1).And(true)")
@@ -721,7 +721,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #160
 		/* ("str") */
-		var expected_ string = "str"
+		var expected_ = "str"
 		/* r.expr(False) | 'str' */
 
 		suite.T().Log("About to run line #160: r.Expr(false).Or('str')")
@@ -736,7 +736,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #164
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* ~r.expr(1) */
 
 		suite.T().Log("About to run line #164: r.Expr(1).Not()")
@@ -751,7 +751,7 @@ func (suite *MathLogicLogicSuite) TestCases() {
 	{
 		// math_logic/logic.yaml line #168
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ~r.expr(null) */
 
 		suite.T().Log("About to run line #168: r.Expr(nil).Not()")

@@ -61,7 +61,7 @@ func (suite *DatumTypeofSuite) TestCases() {
 	{
 		// datum/typeof.yaml line #5
 		/* 'NULL' */
-		var expected_ string = "NULL"
+		var expected_ = "NULL"
 		/* r.expr(null).type_of() */
 
 		suite.T().Log("About to run line #5: r.Expr(nil).TypeOf()")
@@ -76,7 +76,7 @@ func (suite *DatumTypeofSuite) TestCases() {
 	{
 		// datum/typeof.yaml line #9
 		/* 'NULL' */
-		var expected_ string = "NULL"
+		var expected_ = "NULL"
 		/* r.type_of(null) */
 
 		suite.T().Log("About to run line #9: r.TypeOf(nil)")

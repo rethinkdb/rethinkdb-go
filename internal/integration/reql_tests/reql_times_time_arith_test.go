@@ -131,7 +131,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #17
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ((t2 - t1) * 1000).do(lambda x:(x > 0.99) & (x < 1.01)) */
 
 		suite.T().Log("About to run line #17: r.Sub(t2, t1).Mul(1000).Do(func(x r.Term) interface{} { return r.Gt(x, 0.99).And(r.Lt(x, 1.01))})")
@@ -146,7 +146,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #20
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* t3 - t1 */
 
 		suite.T().Log("About to run line #20: r.Sub(t3, t1)")
@@ -161,7 +161,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #23
 		/* 1000000000 */
-		var expected_ int = 1000000000
+		var expected_ = 1000000000
 		/* t4 - t1 */
 
 		suite.T().Log("About to run line #23: r.Sub(t4, t1)")
@@ -176,7 +176,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #28
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* ((t1 - t2) * 1000).do(lambda x:(x < -0.99) & (x > -1.01)) */
 
 		suite.T().Log("About to run line #28: r.Sub(t1, t2).Mul(1000).Do(func(x r.Term) interface{} { return r.Lt(x, -0.99).And(r.Gt(x, -1.01))})")
@@ -191,7 +191,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #31
 		/* -1 */
-		var expected_ int = -1
+		var expected_ = -1
 		/* t1 - t3 */
 
 		suite.T().Log("About to run line #31: r.Sub(t1, t3)")
@@ -206,7 +206,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #34
 		/* -1000000000 */
-		var expected_ int = -1000000000
+		var expected_ = -1000000000
 		/* t1 - t4 */
 
 		suite.T().Log("About to run line #34: r.Sub(t1, t4)")
@@ -221,7 +221,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #39
 		/* ([rt1, rt2, rt3, rt4]) */
-		var expected_ []interface{} = []interface{}{rt1, rt2, rt3, rt4}
+		var expected_ = []interface{}{rt1, rt2, rt3, rt4}
 		/* ts.map(lambda x:t1 + (x - t1)).map(lambda x:x.to_epoch_time()) */
 
 		suite.T().Log("About to run line #39: ts.Map(func(x r.Term) interface{} { return r.Add(t1, r.Sub(x, t1))}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
@@ -236,7 +236,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #43
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found PTYPE<TIME>.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found PTYPE<TIME>.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found PTYPE<TIME>.")
 		/* ts.map(lambda x:(t1 + x) - t1).map(lambda x:x.to_epoch_time()) */
 
 		suite.T().Log("About to run line #43: ts.Map(func(x r.Term) interface{} { return r.Add(t1, x).Sub(t1)}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
@@ -251,7 +251,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #47
 		/* ([rt1, rt2, rt3, rt4]) */
-		var expected_ []interface{} = []interface{}{rt1, rt2, rt3, rt4}
+		var expected_ = []interface{}{rt1, rt2, rt3, rt4}
 		/* ts.map(lambda x:t1 - (t1 - x)).map(lambda x:x.to_epoch_time()) */
 
 		suite.T().Log("About to run line #47: ts.Map(func(x r.Term) interface{} { return r.Sub(t1, r.Sub(t1, x))}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
@@ -281,7 +281,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 		[false, false, false, true,  true,  true],
 		[false, false, false, true,  true,  true],
 		[false, true,  true,  false, true,  false]]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{[]interface{}{false, true, true, false, true, false}, []interface{}{true, true, false, true, false, false}, []interface{}{true, true, false, true, false, false}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{false, true, true, false, true, false}, []interface{}{true, true, false, true, false, false}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{false, false, false, true, true, true}, []interface{}{false, true, true, false, true, false}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{false, false, false, true, true, true}, []interface{}{false, false, false, true, true, true}, []interface{}{false, true, true, false, true, false}}}
+		var expected_ = []interface{}{[]interface{}{[]interface{}{false, true, true, false, true, false}, []interface{}{true, true, false, true, false, false}, []interface{}{true, true, false, true, false, false}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{false, true, true, false, true, false}, []interface{}{true, true, false, true, false, false}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{false, false, false, true, true, true}, []interface{}{false, true, true, false, true, false}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{false, false, false, true, true, true}, []interface{}{false, false, false, true, true, true}, []interface{}{false, true, true, false, true, false}}}
 		/* ts.map(lambda x:ts.map(lambda y:[x < y, x <= y, x == y, x != y, x >= y, x > y])) */
 
 		suite.T().Log("About to run line #52: ts.Map(func(x r.Term) interface{} { return ts.Map(func(y r.Term) interface{} { return []interface{}{r.Lt(x, y), r.Le(x, y), r.Eq(x, y), r.Ne(x, y), r.Ge(x, y), r.Gt(x, y)}})})")
@@ -322,7 +322,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 		[false, false, false, true,  true,  true]],
 		[[true,  true,  false, true,  false, false],
 		[false, false, false, true,  true,  true]]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}}
+		var expected_ = []interface{}{[]interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{false, false, false, true, true, true}, []interface{}{true, true, false, true, false, false}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}, []interface{}{[]interface{}{true, true, false, true, false, false}, []interface{}{false, false, false, true, true, true}}}
 		/* datum_types.map(lambda x:r.expr([[x, t1], [t1, x]]).map(lambda xy:xy[0].do(lambda x2:xy[1].do(lambda y:[x2 < y, x2 <= y, x2 == y, x2 != y, x2 >= y, x2 > y])))) */
 
 		suite.T().Log("About to run line #79: datum_types.Map(func(x r.Term) interface{} { return r.Expr([]interface{}{[]interface{}{x, t1}, []interface{}{t1, x}}).Map(func(xy r.Term) interface{} { return xy.AtIndex(0).Do(func(x2 r.Term) interface{} { return xy.AtIndex(1).Do(func(y r.Term) interface{} { return []interface{}{r.Lt(x2, y), r.Le(x2, y), r.Eq(x2, y), r.Ne(x2, y), r.Ge(x2, y), r.Gt(x2, y)}})})})})")
@@ -360,7 +360,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 		[false, false, false, false],
 		[false, false, false, false],
 		[false, false, false, false]]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{[]interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}}
+		var expected_ = []interface{}{[]interface{}{[]interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}}
 		/* ts.map(lambda a:ts.map(lambda b:ts.map(lambda c:b.during(a, c)))) */
 
 		suite.T().Log("About to run line #99: ts.Map(func(a r.Term) interface{} { return ts.Map(func(b r.Term) interface{} { return ts.Map(func(c r.Term) interface{} { return b.During(a, c)})})})")
@@ -392,7 +392,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 		[false, false, false, false],
 		[false, false, false, false],
 		[false, false, false, false]]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}}
+		var expected_ = []interface{}{[]interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}}
 		/* ts.map(lambda a:ts.map(lambda b:ts.map(lambda c:b.during(a, c, left_bound='open')))) */
 
 		suite.T().Log("About to run line #119: ts.Map(func(a r.Term) interface{} { return ts.Map(func(b r.Term) interface{} { return ts.Map(func(c r.Term) interface{} { return b.During(a, c).OptArgs(r.DuringOpts{LeftBound: 'open', })})})})")
@@ -426,7 +426,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 		[false, false, false, false],
 		[false, false, false, false],
 		[false, false, false, true]]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{[]interface{}{true, true, true, true}, []interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}}}
+		var expected_ = []interface{}{[]interface{}{[]interface{}{true, true, true, true}, []interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}}}
 		/* ts.map(lambda a:ts.map(lambda b:ts.map(lambda c:b.during(a, c, right_bound='closed')))) */
 
 		suite.T().Log("About to run line #139: ts.Map(func(a r.Term) interface{} { return ts.Map(func(b r.Term) interface{} { return ts.Map(func(c r.Term) interface{} { return b.During(a, c).OptArgs(r.DuringOpts{RightBound: 'closed', })})})})")
@@ -460,7 +460,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 		[false, false, false, false],
 		[false, false, false, false],
 		[false, false, false, false]]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{[]interface{}{false, false, false, false}, []interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}}
+		var expected_ = []interface{}{[]interface{}{[]interface{}{false, false, false, false}, []interface{}{false, true, true, true}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, true, true}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, true}}, []interface{}{[]interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}, []interface{}{false, false, false, false}}}
 		/* ts.map(lambda a:ts.map(lambda b:ts.map(lambda c:b.during(a, c, left_bound='open', right_bound='closed')))) */
 
 		suite.T().Log("About to run line #159: ts.Map(func(a r.Term) interface{} { return ts.Map(func(b r.Term) interface{} { return ts.Map(func(c r.Term) interface{} { return b.During(a, c).OptArgs(r.DuringOpts{LeftBound: 'open', RightBound: 'closed', })})})})")
@@ -481,7 +481,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #179
 		/* rts */
-		var expected_ []interface{} = rts
+		var expected_ = rts
 		/* ts.map(lambda x:x.date() + x.time_of_day()).map(lambda x:x.to_epoch_time()) */
 
 		suite.T().Log("About to run line #179: ts.Map(func(x r.Term) interface{} { return x.Date().Add(x.TimeOfDay())}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
@@ -511,7 +511,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #190
 		/* ("2012-08-01T00:00:00+00:00") */
-		var expected_ string = "2012-08-01T00:00:00+00:00"
+		var expected_ = "2012-08-01T00:00:00+00:00"
 		/* r.do(r.js("new Date('2012-08-01')")).to_iso8601() */
 
 		suite.T().Log("About to run line #190: r.Do(r.JS('new Date('2012-08-01')')).ToISO8601()")
@@ -526,7 +526,7 @@ func (suite *TimesTimeArithSuite) TestCases() {
 	{
 		// times/time_arith.yaml line #195
 		/* ("2012-08-01T00:00:00+00:00") */
-		var expected_ string = "2012-08-01T00:00:00+00:00"
+		var expected_ = "2012-08-01T00:00:00+00:00"
 		/* r.do(r.js("(function(x){doc = new Object(); doc.date = new Date('2012-08-01'); return doc;})"))["date"].to_iso8601() */
 
 		suite.T().Log("About to run line #195: r.Do(r.JS('(function(x){doc = new Object(); doc.date = new Date('2012-08-01'); return doc;})')).AtIndex('date').ToISO8601()")

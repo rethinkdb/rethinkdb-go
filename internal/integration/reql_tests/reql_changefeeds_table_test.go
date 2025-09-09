@@ -77,7 +77,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #15
 		/* partial({'errors':0, 'inserted':2}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 2})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 2})
 		/* tbl.insert([{'id':1}, {'id':2}]) */
 
 		suite.T().Log("About to run line #15: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }})")
@@ -92,7 +92,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #17
 		/* bag([{'old_val':null, 'new_val':{'id':1}}, {'old_val':null, 'new_val':{'id':2}}]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 2}}})
+		var expected_ = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 2}}})
 		/* fetch(all, 2) */
 
 		suite.T().Log("About to run line #17: fetch(all, 2)")
@@ -104,7 +104,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #22
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* tbl.get(1).update({'version':1}) */
 
 		suite.T().Log("About to run line #22: tbl.Get(1).Update(map[interface{}]interface{}{'version': 1, })")
@@ -119,7 +119,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #24
 		/* [{'old_val':{'id':1}, 'new_val':{'id':1, 'version':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "version": 1}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "version": 1}}}
 		/* fetch(all, 1) */
 
 		suite.T().Log("About to run line #24: fetch(all, 1)")
@@ -131,7 +131,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #29
 		/* partial({'errors':0, 'deleted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
 		/* tbl.get(1).delete() */
 
 		suite.T().Log("About to run line #29: tbl.Get(1).Delete()")
@@ -146,7 +146,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #31
 		/* [{'old_val':{'id':1, 'version':1}, 'new_val':null}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "version": 1}, "new_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "version": 1}, "new_val": nil}}
 		/* fetch(all, 1) */
 
 		suite.T().Log("About to run line #31: fetch(all, 1)")
@@ -165,7 +165,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #37
 		/* partial({'errors':0, 'inserted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
 		/* tbl.insert([{'id':5, 'version':5}]) */
 
 		suite.T().Log("About to run line #37: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 5, 'version': 5, }})")
@@ -180,7 +180,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #39
 		/* [{'new_val':{'version':5}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"version": 5}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"version": 5}}}
 		/* fetch(pluck, 1) */
 
 		suite.T().Log("About to run line #39: fetch(pluck, 1)")
@@ -192,7 +192,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #44
 		/* err('ReqlQueryLogicError', "Cannot call a terminal (`reduce`, `count`, etc.) on an infinite stream (such as a changefeed).") */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot call a terminal (`reduce`, `count`, etc.) on an infinite stream (such as a changefeed).")
+		var expected_ = err("ReqlQueryLogicError", "Cannot call a terminal (`reduce`, `count`, etc.) on an infinite stream (such as a changefeed).")
 		/* tbl.changes().order_by('id') */
 
 		suite.T().Log("About to run line #44: tbl.Changes().OrderBy('id')")
@@ -216,7 +216,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #64
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.insert(r.range(200).map(lambda x: {})) */
 
 		suite.T().Log("About to run line #64: tbl.Insert(r.Range(200).Map(func(x r.Term) interface{} { return map[interface{}]interface{}{}}))")
@@ -231,7 +231,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #66
 		/* partial([{'error': regex('Changefeed cache over array size limit, skipped \d+ elements.')}]) */
-		var expected_ compare.Expected = compare.PartialMatch([]interface{}{map[interface{}]interface{}{"error": compare.MatchesRegexp("Changefeed cache over array size limit, skipped \\d+ elements.")}})
+		var expected_ = compare.PartialMatch([]interface{}{map[interface{}]interface{}{"error": compare.MatchesRegexp("Changefeed cache over array size limit, skipped \\d+ elements.")}})
 		/* fetch(overflow, 90) */
 
 		suite.T().Log("About to run line #66: fetch(overflow, 90)")
@@ -257,7 +257,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #76
 		/* partial({'errors':0, 'inserted':2}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 2})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 2})
 		/* vtbl.insert([{'id':1}, {'id':2}]) */
 
 		suite.T().Log("About to run line #76: vtbl.Insert([]interface{}{map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }})")
@@ -272,7 +272,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #78
 		/* bag([{'old_val':null, 'new_val':{'id':1}}, {'old_val':null, 'new_val':{'id':2}}]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 2}}})
+		var expected_ = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 2}}})
 		/* fetch(allVirtual, 2) */
 
 		suite.T().Log("About to run line #78: fetch(allVirtual, 2)")
@@ -284,7 +284,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #83
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* vtbl.get(1).update({'version':1}) */
 
 		suite.T().Log("About to run line #83: vtbl.Get(1).Update(map[interface{}]interface{}{'version': 1, })")
@@ -299,7 +299,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #85
 		/* [{'old_val':{'id':1}, 'new_val':{'id':1, 'version':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "version": 1}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "version": 1}}}
 		/* fetch(allVirtual, 1) */
 
 		suite.T().Log("About to run line #85: fetch(allVirtual, 1)")
@@ -311,7 +311,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #90
 		/* partial({'errors':0, 'deleted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
 		/* vtbl.get(1).delete() */
 
 		suite.T().Log("About to run line #90: vtbl.Get(1).Delete()")
@@ -326,7 +326,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #92
 		/* [{'old_val':{'id':1, 'version':1}, 'new_val':null}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "version": 1}, "new_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "version": 1}, "new_val": nil}}
 		/* fetch(allVirtual, 1) */
 
 		suite.T().Log("About to run line #92: fetch(allVirtual, 1)")
@@ -345,7 +345,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #98
 		/* partial({'errors':0, 'inserted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
 		/* vtbl.insert([{'id':5, 'version':5}]) */
 
 		suite.T().Log("About to run line #98: vtbl.Insert([]interface{}{map[interface{}]interface{}{'id': 5, 'version': 5, }})")
@@ -360,7 +360,7 @@ func (suite *ChangefeedsTableSuite) TestCases() {
 	{
 		// changefeeds/table.yaml line #100
 		/* [{'new_val':{'version':5}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"version": 5}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"version": 5}}}
 		/* fetch(vpluck, 1) */
 
 		suite.T().Log("About to run line #100: fetch(vpluck, 1)")

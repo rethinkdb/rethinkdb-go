@@ -61,7 +61,7 @@ func (suite *MathLogicMathSuite) TestCases() {
 	{
 		// math_logic/math.yaml line #4
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* (((4 + 2 * (r.expr(26) % 18)) / 5) - 3) */
 
 		suite.T().Log("About to run line #4: r.Add(4, r.Mul(2, r.Expr(26).Mod(18))).Div(5).Sub(3)")

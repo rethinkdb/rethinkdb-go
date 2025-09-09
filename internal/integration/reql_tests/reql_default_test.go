@@ -61,7 +61,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #3
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1).default(2) */
 
 		suite.T().Log("About to run line #3: r.Expr(1).Default(2)")
@@ -76,7 +76,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #5
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(null).default(2) */
 
 		suite.T().Log("About to run line #5: r.Expr(nil).Default(2)")
@@ -91,7 +91,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #7
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr({})['b'].default(2) */
 
 		suite.T().Log("About to run line #7: r.Expr(map[interface{}]interface{}{}).AtIndex('b').Default(2)")
@@ -106,7 +106,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #10
 		/* err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.")
 		/* r.expr(r.expr('a')['b']).default(2) */
 
 		suite.T().Log("About to run line #10: r.Expr(r.Expr('a').AtIndex('b')).Default(2)")
@@ -121,7 +121,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #14
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr([]).reduce(lambda a,b:a+b).default(2) */
 
 		suite.T().Log("About to run line #14: r.Expr([]interface{}{}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}).Default(2)")
@@ -136,7 +136,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #18
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr([]).union([]).reduce(lambda a,b:a+b).default(2) */
 
 		suite.T().Log("About to run line #18: r.Expr([]interface{}{}).Union([]interface{}{}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}).Default(2)")
@@ -151,7 +151,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #22
 		/* err("ReqlQueryLogicError", "Cannot convert STRING to SEQUENCE", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot convert STRING to SEQUENCE")
+		var expected_ = err("ReqlQueryLogicError", "Cannot convert STRING to SEQUENCE")
 		/* r.expr('a').reduce(lambda a,b:a+b).default(2) */
 
 		suite.T().Log("About to run line #22: r.Expr('a').Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}).Default(2)")
@@ -166,7 +166,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #25
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* (r.expr(null) + 5).default(2) */
 
 		suite.T().Log("About to run line #25: r.Expr(nil).Add(5).Default(2)")
@@ -181,7 +181,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #28
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* (5 + r.expr(null)).default(2) */
 
 		suite.T().Log("About to run line #28: r.Add(5, r.Expr(nil)).Default(2)")
@@ -196,7 +196,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #31
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* (5 - r.expr(null)).default(2) */
 
 		suite.T().Log("About to run line #31: r.Sub(5, r.Expr(nil)).Default(2)")
@@ -211,7 +211,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #34
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* (r.expr(null) - 5).default(2) */
 
 		suite.T().Log("About to run line #34: r.Expr(nil).Sub(5).Default(2)")
@@ -226,7 +226,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #37
 		/* err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
 		/* (r.expr('a') + 5).default(2) */
 
 		suite.T().Log("About to run line #37: r.Expr('a').Add(5).Default(2)")
@@ -241,7 +241,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #40
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* (5 + r.expr('a')).default(2) */
 
 		suite.T().Log("About to run line #40: r.Add(5, r.Expr('a')).Default(2)")
@@ -256,7 +256,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #43
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* (r.expr('a') - 5).default(2) */
 
 		suite.T().Log("About to run line #43: r.Expr('a').Sub(5).Default(2)")
@@ -271,7 +271,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #46
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* (5 - r.expr('a')).default(2) */
 
 		suite.T().Log("About to run line #46: r.Sub(5, r.Expr('a')).Default(2)")
@@ -286,7 +286,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #50
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1).default(r.error()) */
 
 		suite.T().Log("About to run line #50: r.Expr(1).Default(r.Error())")
@@ -316,7 +316,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #54
 		/* err("ReqlNonExistenceError", "No attribute `b` in object:", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `b` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `b` in object:")
 		/* r.expr({})['b'].default(r.error()) */
 
 		suite.T().Log("About to run line #54: r.Expr(map[interface{}]interface{}{}).AtIndex('b').Default(r.Error())")
@@ -331,7 +331,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #58
 		/* err("ReqlNonExistenceError", "Cannot reduce over an empty stream.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Cannot reduce over an empty stream.")
+		var expected_ = err("ReqlNonExistenceError", "Cannot reduce over an empty stream.")
 		/* r.expr([]).reduce(lambda a,b:a+b).default(r.error) */
 
 		suite.T().Log("About to run line #58: r.Expr([]interface{}{}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}).Default(r.Error())")
@@ -346,7 +346,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #62
 		/* err("ReqlNonExistenceError", "Cannot reduce over an empty stream.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Cannot reduce over an empty stream.")
+		var expected_ = err("ReqlNonExistenceError", "Cannot reduce over an empty stream.")
 		/* r.expr([]).union([]).reduce(lambda a,b:a+b).default(r.error) */
 
 		suite.T().Log("About to run line #62: r.Expr([]interface{}{}).Union([]interface{}{}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}).Default(r.Error())")
@@ -361,7 +361,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #65
 		/* err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
+		var expected_ = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
 		/* (r.expr(null) + 5).default(r.error) */
 
 		suite.T().Log("About to run line #65: r.Expr(nil).Add(5).Default(r.Error())")
@@ -376,7 +376,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #68
 		/* err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
+		var expected_ = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
 		/* (5 + r.expr(null)).default(r.error) */
 
 		suite.T().Log("About to run line #68: r.Add(5, r.Expr(nil)).Default(r.Error())")
@@ -391,7 +391,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #71
 		/* err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
+		var expected_ = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
 		/* (5 - r.expr(null)).default(r.error) */
 
 		suite.T().Log("About to run line #71: r.Sub(5, r.Expr(nil)).Default(r.Error())")
@@ -406,7 +406,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #74
 		/* err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
+		var expected_ = err("ReqlNonExistenceError", "Expected type NUMBER but found NULL.")
 		/* (r.expr(null) - 5).default(r.error) */
 
 		suite.T().Log("About to run line #74: r.Expr(nil).Sub(5).Default(r.Error())")
@@ -421,7 +421,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #79
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1).default(lambda e:e) */
 
 		suite.T().Log("About to run line #79: r.Expr(1).Default(func(e r.Term) interface{} { return e})")
@@ -451,7 +451,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #87
 		/* "No attribute `b` in object:\n{}" */
-		var expected_ string = "No attribute `b` in object:\n{}"
+		var expected_ = "No attribute `b` in object:\n{}"
 		/* r.expr({})['b'].default(lambda e:e) */
 
 		suite.T().Log("About to run line #87: r.Expr(map[interface{}]interface{}{}).AtIndex('b').Default(func(e r.Term) interface{} { return e})")
@@ -466,7 +466,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #91
 		/* ("Cannot reduce over an empty stream.") */
-		var expected_ string = "Cannot reduce over an empty stream."
+		var expected_ = "Cannot reduce over an empty stream."
 		/* r.expr([]).reduce(lambda a,b:a+b).default(lambda e:e) */
 
 		suite.T().Log("About to run line #91: r.Expr([]interface{}{}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}).Default(func(e r.Term) interface{} { return e})")
@@ -481,7 +481,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #95
 		/* ("Cannot reduce over an empty stream.") */
-		var expected_ string = "Cannot reduce over an empty stream."
+		var expected_ = "Cannot reduce over an empty stream."
 		/* r.expr([]).union([]).reduce(lambda a,b:a+b).default(lambda e:e) */
 
 		suite.T().Log("About to run line #95: r.Expr([]interface{}{}).Union([]interface{}{}).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)}).Default(func(e r.Term) interface{} { return e})")
@@ -496,7 +496,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #99
 		/* ("Expected type NUMBER but found NULL.") */
-		var expected_ string = "Expected type NUMBER but found NULL."
+		var expected_ = "Expected type NUMBER but found NULL."
 		/* (r.expr(null) + 5).default(lambda e:e) */
 
 		suite.T().Log("About to run line #99: r.Expr(nil).Add(5).Default(func(e r.Term) interface{} { return e})")
@@ -511,7 +511,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #103
 		/* ("Expected type NUMBER but found NULL.") */
-		var expected_ string = "Expected type NUMBER but found NULL."
+		var expected_ = "Expected type NUMBER but found NULL."
 		/* (5 + r.expr(null)).default(lambda e:e) */
 
 		suite.T().Log("About to run line #103: r.Add(5, r.Expr(nil)).Default(func(e r.Term) interface{} { return e})")
@@ -526,7 +526,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #107
 		/* ("Expected type NUMBER but found NULL.") */
-		var expected_ string = "Expected type NUMBER but found NULL."
+		var expected_ = "Expected type NUMBER but found NULL."
 		/* (5 - r.expr(null)).default(lambda e:e) */
 
 		suite.T().Log("About to run line #107: r.Sub(5, r.Expr(nil)).Default(func(e r.Term) interface{} { return e})")
@@ -541,7 +541,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #111
 		/* ("Expected type NUMBER but found NULL.") */
-		var expected_ string = "Expected type NUMBER but found NULL."
+		var expected_ = "Expected type NUMBER but found NULL."
 		/* (r.expr(null) - 5).default(lambda e:e) */
 
 		suite.T().Log("About to run line #111: r.Expr(nil).Sub(5).Default(func(e r.Term) interface{} { return e})")
@@ -563,7 +563,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #118
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].eq(1)) */
 
 		suite.T().Log("About to run line #118: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)})")
@@ -578,7 +578,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #122
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].eq(1), default=False) */
 
 		suite.T().Log("About to run line #122: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: false, })")
@@ -593,7 +593,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #126
 		/* [{}, {'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].eq(1), default=True) */
 
 		suite.T().Log("About to run line #126: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: true, })")
@@ -608,7 +608,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #131
 		/* [{}, {'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].eq(1), default=r.js('true')) */
 
 		suite.T().Log("About to run line #131: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: r.JS('true'), })")
@@ -623,7 +623,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #135
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].eq(1), default=r.js('false')) */
 
 		suite.T().Log("About to run line #135: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: r.JS('false'), })")
@@ -638,7 +638,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #139
 		/* err("ReqlNonExistenceError", "No attribute `a` in object:", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `a` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `a` in object:")
 		/* arr.filter(lambda x:x['a'].eq(1), default=r.error()) */
 
 		suite.T().Log("About to run line #139: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: r.Error(), })")
@@ -653,7 +653,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #144
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* r.expr(False).do(lambda d:arr.filter(lambda x:x['a'].eq(1), default=d)) */
 
 		suite.T().Log("About to run line #144: r.Expr(false).Do(func(d r.Term) interface{} { return arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: d, })})")
@@ -670,7 +670,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #148
 		/* [{}, {'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
 		/* r.expr(True).do(lambda d:arr.filter(lambda x:x['a'].eq(1), default=d)).order_by('a') */
 
 		suite.T().Log("About to run line #148: r.Expr(true).Do(func(d r.Term) interface{} { return arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: d, })}).OrderBy('a')")
@@ -687,7 +687,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #154
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].default(0).eq(1)) */
 
 		suite.T().Log("About to run line #154: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(0).Eq(1)})")
@@ -702,7 +702,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #158
 		/* ([{}, {'a':null}, {'a':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].default(1).eq(1)).order_by('a') */
 
 		suite.T().Log("About to run line #158: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(1).Eq(1)}).OrderBy('a')")
@@ -717,7 +717,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #162
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:x['a'].default(r.error()).eq(1)) */
 
 		suite.T().Log("About to run line #162: arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(r.Error()).Eq(1)})")
@@ -732,7 +732,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #168
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* r.expr(0).do(lambda i:arr.filter(lambda x:x['a'].default(i).eq(1))) */
 
 		suite.T().Log("About to run line #168: r.Expr(0).Do(func(i r.Term) interface{} { return arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(i).Eq(1)})})")
@@ -749,7 +749,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #172
 		/* ([{},{'a':null},{'a':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
 		/* r.expr(1).do(lambda i:arr.filter(lambda x:x['a'].default(i).eq(1))).order_by('a') */
 
 		suite.T().Log("About to run line #172: r.Expr(1).Do(func(i r.Term) interface{} { return arr.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(i).Eq(1)})}).OrderBy('a')")
@@ -766,7 +766,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #177
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2))) */
 
 		suite.T().Log("About to run line #177: arr.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))})")
@@ -781,7 +781,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #181
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2)), default=False) */
 
 		suite.T().Log("About to run line #181: arr.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))}).OptArgs(r.FilterOpts{Default: false, })")
@@ -796,7 +796,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #185
 		/* ([{}, {'a':null}, {'a':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
 		/* arr.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2)), default=True).order_by('a') */
 
 		suite.T().Log("About to run line #185: arr.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))}).OptArgs(r.FilterOpts{Default: true, }).OrderBy('a')")
@@ -811,7 +811,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #189
 		/* err("ReqlNonExistenceError", "No attribute `a` in object:", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `a` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `a` in object:")
 		/* arr.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2)), default=r.error()) */
 
 		suite.T().Log("About to run line #189: arr.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))}).OptArgs(r.FilterOpts{Default: r.Error(), })")
@@ -826,7 +826,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #193
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* r.table_create('default_test') */
 
 		suite.T().Log("About to run line #193: r.TableCreate('default_test')")
@@ -841,7 +841,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #196
 		/* ({'deleted':0,'replaced':0,'generated_keys':arrlen(3,uuid()),'unchanged':0,'errors':0,'skipped':0,'inserted':3}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "generated_keys": arrlen(3, compare.IsUUID()), "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 3}
+		var expected_ = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "generated_keys": arrlen(3, compare.IsUUID()), "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 3}
 		/* r.table('default_test').insert(arr) */
 
 		suite.T().Log("About to run line #196: r.Table('default_test').Insert(arr)")
@@ -863,7 +863,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #202
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:x['a'].eq(1)) */
 
 		suite.T().Log("About to run line #202: tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)})")
@@ -878,7 +878,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #206
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:x['a'].eq(1), default=False) */
 
 		suite.T().Log("About to run line #206: tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: false, })")
@@ -893,7 +893,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #210
 		/* [{}, {'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:x['a'].eq(1), default=True) */
 
 		suite.T().Log("About to run line #210: tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: true, })")
@@ -908,7 +908,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #215
 		/* err("ReqlNonExistenceError", "No attribute `a` in object:", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `a` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `a` in object:")
 		/* tbl.filter(lambda x:x['a'].eq(1), default=r.error()) */
 
 		suite.T().Log("About to run line #215: tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: r.Error(), })")
@@ -923,7 +923,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #220
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* r.expr(False).do(lambda d:tbl.filter(lambda x:x['a'].eq(1), default=d)) */
 
 		suite.T().Log("About to run line #220: r.Expr(false).Do(func(d r.Term) interface{} { return tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: d, })})")
@@ -940,7 +940,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #224
 		/* [{}, {'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": 1}}
 		/* r.expr(True).do(lambda d:tbl.filter(lambda x:x['a'].eq(1), default=d)).order_by('a') */
 
 		suite.T().Log("About to run line #224: r.Expr(true).Do(func(d r.Term) interface{} { return tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Eq(1)}).OptArgs(r.FilterOpts{Default: d, })}).OrderBy('a')")
@@ -957,7 +957,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #230
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:x['a'].default(0).eq(1)) */
 
 		suite.T().Log("About to run line #230: tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(0).Eq(1)})")
@@ -972,7 +972,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #234
 		/* ([{}, {'a':null}, {'a':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:x['a'].default(1).eq(1)).order_by('a') */
 
 		suite.T().Log("About to run line #234: tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(1).Eq(1)}).OrderBy('a')")
@@ -987,7 +987,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #238
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:x['a'].default(r.error()).eq(1)) */
 
 		suite.T().Log("About to run line #238: tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(r.Error()).Eq(1)})")
@@ -1002,7 +1002,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #244
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* r.expr(0).do(lambda i:tbl.filter(lambda x:x['a'].default(i).eq(1))) */
 
 		suite.T().Log("About to run line #244: r.Expr(0).Do(func(i r.Term) interface{} { return tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(i).Eq(1)})})")
@@ -1019,7 +1019,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #248
 		/* ([{},{'a':null},{'a':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
 		/* r.expr(1).do(lambda i:tbl.filter(lambda x:x['a'].default(i).eq(1))).order_by('a') */
 
 		suite.T().Log("About to run line #248: r.Expr(1).Do(func(i r.Term) interface{} { return tbl.Filter(func(x r.Term) interface{} { return x.AtIndex('a').Default(i).Eq(1)})}).OrderBy('a')")
@@ -1036,7 +1036,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #253
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2))) */
 
 		suite.T().Log("About to run line #253: tbl.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))})")
@@ -1051,7 +1051,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #257
 		/* [{'a':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2)), default=False) */
 
 		suite.T().Log("About to run line #257: tbl.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))}).OptArgs(r.FilterOpts{Default: false, })")
@@ -1066,7 +1066,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #261
 		/* ([{}, {'a':null}, {'a':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{"a": nil}, map[interface{}]interface{}{"a": 1}}
 		/* tbl.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2)), default=True).order_by('a') */
 
 		suite.T().Log("About to run line #261: tbl.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))}).OptArgs(r.FilterOpts{Default: true, }).OrderBy('a')")
@@ -1081,7 +1081,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #265
 		/* err("ReqlNonExistenceError", "No attribute `a` in object:", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `a` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `a` in object:")
 		/* tbl.filter(lambda x:r.or_(x['a'].eq(1), x['a']['b'].eq(2)), default=r.error()) */
 
 		suite.T().Log("About to run line #265: tbl.Filter(func(x r.Term) interface{} { return r.Or(x.AtIndex('a').Eq(1), x.AtIndex('a').AtIndex('b').Eq(2))}).OptArgs(r.FilterOpts{Default: r.Error(), })")
@@ -1096,7 +1096,7 @@ func (suite *DefaultSuite) TestCases() {
 	{
 		// default.yaml line #269
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* r.table_drop('default_test') */
 
 		suite.T().Log("About to run line #269: r.TableDrop('default_test')")

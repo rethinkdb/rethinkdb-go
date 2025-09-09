@@ -61,7 +61,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #11
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create('a') */
 
 		suite.T().Log("About to run line #11: r.DBCreate('a')")
@@ -76,7 +76,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #13
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create('b') */
 
 		suite.T().Log("About to run line #13: r.DBCreate('b')")
@@ -91,7 +91,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #23
 		/* {'name':'a','id':uuid()} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"name": "a", "id": compare.IsUUID()}
+		var expected_ = map[interface{}]interface{}{"name": "a", "id": compare.IsUUID()}
 		/* r.db('a').config() */
 
 		suite.T().Log("About to run line #23: r.DB('a').Config()")
@@ -106,7 +106,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #28
 		/* partial({'dbs_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
 		/* r.db_drop('b') */
 
 		suite.T().Log("About to run line #28: r.DBDrop('b')")
@@ -121,7 +121,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #34
 		/* partial({'dbs_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
 		/* r.db_drop('a') */
 
 		suite.T().Log("About to run line #34: r.DBDrop('a')")
@@ -136,7 +136,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #41
 		/* partial({'dbs_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_created": 1})
 		/* r.db_create('bar') */
 
 		suite.T().Log("About to run line #41: r.DBCreate('bar')")
@@ -151,7 +151,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #44
 		/* err('ReqlOpFailedError', 'Database `bar` already exists.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Database `bar` already exists.")
+		var expected_ = err("ReqlOpFailedError", "Database `bar` already exists.")
 		/* r.db_create('bar') */
 
 		suite.T().Log("About to run line #44: r.DBCreate('bar')")
@@ -166,7 +166,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #47
 		/* partial({'dbs_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"dbs_dropped": 1})
 		/* r.db_drop('bar') */
 
 		suite.T().Log("About to run line #47: r.DBDrop('bar')")
@@ -181,7 +181,7 @@ func (suite *MetaDbsSuite) TestCases() {
 	{
 		// meta/dbs.yaml line #50
 		/* err('ReqlOpFailedError', 'Database `bar` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Database `bar` does not exist.")
+		var expected_ = err("ReqlOpFailedError", "Database `bar` does not exist.")
 		/* r.db_drop('bar') */
 
 		suite.T().Log("About to run line #50: r.DBDrop('bar')")

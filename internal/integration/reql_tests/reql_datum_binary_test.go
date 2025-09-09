@@ -68,7 +68,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #10
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #10: r.Binary(s)")
@@ -83,7 +83,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #12
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #12: r.Binary(s).Count()")
@@ -104,7 +104,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #19
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #19: r.Binary(s)")
@@ -119,7 +119,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #21
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #21: r.Binary(s).Count()")
@@ -140,7 +140,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #28
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #28: r.Binary(s)")
@@ -155,7 +155,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #30
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #30: r.Binary(s).Count()")
@@ -176,7 +176,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #37
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #37: r.Binary(s)")
@@ -191,7 +191,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #39
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #39: r.Binary(s).Count()")
@@ -212,7 +212,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #46
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #46: r.Binary(s)")
@@ -227,7 +227,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #48
 		/* 4 */
-		var expected_ int = 4
+		var expected_ = 4
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #48: r.Binary(s).Count()")
@@ -248,7 +248,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #55
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #55: r.Binary(s)")
@@ -263,7 +263,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #57
 		/* 5 */
-		var expected_ int = 5
+		var expected_ = 5
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #57: r.Binary(s).Count()")
@@ -284,7 +284,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #64
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #64: r.Binary(s)")
@@ -299,7 +299,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #66
 		/* 6 */
-		var expected_ int = 6
+		var expected_ = 6
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #66: r.Binary(s).Count()")
@@ -320,7 +320,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #73
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #73: r.Binary(s)")
@@ -335,7 +335,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #75
 		/* 7 */
-		var expected_ int = 7
+		var expected_ = 7
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #75: r.Binary(s).Count()")
@@ -356,7 +356,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #82
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #82: r.Binary(s)")
@@ -371,7 +371,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #84
 		/* 8 */
-		var expected_ int = 8
+		var expected_ = 8
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #84: r.Binary(s).Count()")
@@ -392,7 +392,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #91
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #91: r.Binary(s)")
@@ -407,7 +407,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #93
 		/* 9 */
-		var expected_ int = 9
+		var expected_ = 9
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #93: r.Binary(s).Count()")
@@ -428,7 +428,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #100
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #100: r.Binary(s)")
@@ -443,7 +443,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #102
 		/* 10 */
-		var expected_ int = 10
+		var expected_ = 10
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #102: r.Binary(s).Count()")
@@ -464,7 +464,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #109
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #109: r.Binary(s)")
@@ -479,7 +479,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #111
 		/* 11 */
-		var expected_ int = 11
+		var expected_ = 11
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #111: r.Binary(s).Count()")
@@ -500,7 +500,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #118
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #118: r.Binary(s)")
@@ -515,7 +515,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #120
 		/* 12 */
-		var expected_ int = 12
+		var expected_ = 12
 		/* r.binary(s).count() */
 
 		suite.T().Log("About to run line #120: r.Binary(s).Count()")
@@ -572,7 +572,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #151
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(a).eq(r.binary(a)) */
 
 		suite.T().Log("About to run line #151: r.Binary(a).Eq(r.Binary(a))")
@@ -587,7 +587,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #153
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(a).le(r.binary(a)) */
 
 		suite.T().Log("About to run line #153: r.Binary(a).Le(r.Binary(a))")
@@ -602,7 +602,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #155
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(a).ge(r.binary(a)) */
 
 		suite.T().Log("About to run line #155: r.Binary(a).Ge(r.Binary(a))")
@@ -617,7 +617,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #157
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(a).ne(r.binary(a)) */
 
 		suite.T().Log("About to run line #157: r.Binary(a).Ne(r.Binary(a))")
@@ -632,7 +632,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #159
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(a).lt(r.binary(a)) */
 
 		suite.T().Log("About to run line #159: r.Binary(a).Lt(r.Binary(a))")
@@ -647,7 +647,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #161
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(a).gt(r.binary(a)) */
 
 		suite.T().Log("About to run line #161: r.Binary(a).Gt(r.Binary(a))")
@@ -662,7 +662,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #165
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(a).ne(r.binary(b)) */
 
 		suite.T().Log("About to run line #165: r.Binary(a).Ne(r.Binary(b))")
@@ -677,7 +677,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #167
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(a).lt(r.binary(b)) */
 
 		suite.T().Log("About to run line #167: r.Binary(a).Lt(r.Binary(b))")
@@ -692,7 +692,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #169
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(a).le(r.binary(b)) */
 
 		suite.T().Log("About to run line #169: r.Binary(a).Le(r.Binary(b))")
@@ -707,7 +707,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #171
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(a).ge(r.binary(b)) */
 
 		suite.T().Log("About to run line #171: r.Binary(a).Ge(r.Binary(b))")
@@ -722,7 +722,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #173
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(a).gt(r.binary(b)) */
 
 		suite.T().Log("About to run line #173: r.Binary(a).Gt(r.Binary(b))")
@@ -737,7 +737,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #175
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(a).eq(r.binary(b)) */
 
 		suite.T().Log("About to run line #175: r.Binary(a).Eq(r.Binary(b))")
@@ -752,7 +752,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #179
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(b).ne(r.binary(c)) */
 
 		suite.T().Log("About to run line #179: r.Binary(b).Ne(r.Binary(c))")
@@ -767,7 +767,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #181
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(b).lt(r.binary(c)) */
 
 		suite.T().Log("About to run line #181: r.Binary(b).Lt(r.Binary(c))")
@@ -782,7 +782,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #183
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(b).le(r.binary(c)) */
 
 		suite.T().Log("About to run line #183: r.Binary(b).Le(r.Binary(c))")
@@ -797,7 +797,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #185
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(b).ge(r.binary(c)) */
 
 		suite.T().Log("About to run line #185: r.Binary(b).Ge(r.Binary(c))")
@@ -812,7 +812,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #187
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(b).gt(r.binary(c)) */
 
 		suite.T().Log("About to run line #187: r.Binary(b).Gt(r.Binary(c))")
@@ -827,7 +827,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #189
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(b).eq(r.binary(c)) */
 
 		suite.T().Log("About to run line #189: r.Binary(b).Eq(r.Binary(c))")
@@ -842,7 +842,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #193
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(c).ne(r.binary(d)) */
 
 		suite.T().Log("About to run line #193: r.Binary(c).Ne(r.Binary(d))")
@@ -857,7 +857,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #195
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(c).lt(r.binary(d)) */
 
 		suite.T().Log("About to run line #195: r.Binary(c).Lt(r.Binary(d))")
@@ -872,7 +872,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #197
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(c).le(r.binary(d)) */
 
 		suite.T().Log("About to run line #197: r.Binary(c).Le(r.Binary(d))")
@@ -887,7 +887,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #199
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(c).ge(r.binary(d)) */
 
 		suite.T().Log("About to run line #199: r.Binary(c).Ge(r.Binary(d))")
@@ -902,7 +902,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #201
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(c).gt(r.binary(d)) */
 
 		suite.T().Log("About to run line #201: r.Binary(c).Gt(r.Binary(d))")
@@ -917,7 +917,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #203
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(c).eq(r.binary(d)) */
 
 		suite.T().Log("About to run line #203: r.Binary(c).Eq(r.Binary(d))")
@@ -932,7 +932,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #207
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(d).ne(r.binary(e)) */
 
 		suite.T().Log("About to run line #207: r.Binary(d).Ne(r.Binary(e))")
@@ -947,7 +947,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #209
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(d).lt(r.binary(e)) */
 
 		suite.T().Log("About to run line #209: r.Binary(d).Lt(r.Binary(e))")
@@ -962,7 +962,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #211
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(d).le(r.binary(e)) */
 
 		suite.T().Log("About to run line #211: r.Binary(d).Le(r.Binary(e))")
@@ -977,7 +977,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #213
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(d).ge(r.binary(e)) */
 
 		suite.T().Log("About to run line #213: r.Binary(d).Ge(r.Binary(e))")
@@ -992,7 +992,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #215
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(d).gt(r.binary(e)) */
 
 		suite.T().Log("About to run line #215: r.Binary(d).Gt(r.Binary(e))")
@@ -1007,7 +1007,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #217
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(d).eq(r.binary(e)) */
 
 		suite.T().Log("About to run line #217: r.Binary(d).Eq(r.Binary(e))")
@@ -1022,7 +1022,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #221
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(e).ne(r.binary(f)) */
 
 		suite.T().Log("About to run line #221: r.Binary(e).Ne(r.Binary(f))")
@@ -1037,7 +1037,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #223
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(e).lt(r.binary(f)) */
 
 		suite.T().Log("About to run line #223: r.Binary(e).Lt(r.Binary(f))")
@@ -1052,7 +1052,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #225
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(e).le(r.binary(f)) */
 
 		suite.T().Log("About to run line #225: r.Binary(e).Le(r.Binary(f))")
@@ -1067,7 +1067,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #227
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(e).ge(r.binary(f)) */
 
 		suite.T().Log("About to run line #227: r.Binary(e).Ge(r.Binary(f))")
@@ -1082,7 +1082,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #229
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(e).gt(r.binary(f)) */
 
 		suite.T().Log("About to run line #229: r.Binary(e).Gt(r.Binary(f))")
@@ -1097,7 +1097,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #231
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(e).eq(r.binary(f)) */
 
 		suite.T().Log("About to run line #231: r.Binary(e).Eq(r.Binary(f))")
@@ -1112,7 +1112,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #235
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(f).eq(r.binary(f)) */
 
 		suite.T().Log("About to run line #235: r.Binary(f).Eq(r.Binary(f))")
@@ -1127,7 +1127,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #237
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(f).le(r.binary(f)) */
 
 		suite.T().Log("About to run line #237: r.Binary(f).Le(r.Binary(f))")
@@ -1142,7 +1142,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #239
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(f).ge(r.binary(f)) */
 
 		suite.T().Log("About to run line #239: r.Binary(f).Ge(r.Binary(f))")
@@ -1157,7 +1157,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #241
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(f).ne(r.binary(f)) */
 
 		suite.T().Log("About to run line #241: r.Binary(f).Ne(r.Binary(f))")
@@ -1172,7 +1172,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #243
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(f).lt(r.binary(f)) */
 
 		suite.T().Log("About to run line #243: r.Binary(f).Lt(r.Binary(f))")
@@ -1187,7 +1187,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #245
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(f).gt(r.binary(f)) */
 
 		suite.T().Log("About to run line #245: r.Binary(f).Gt(r.Binary(f))")
@@ -1202,7 +1202,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #269
 		/* 'foo' */
-		var expected_ string = "foo"
+		var expected_ = "foo"
 		/* r.binary(b'foo').coerce_to('string') */
 
 		suite.T().Log("About to run line #269: r.Binary([]byte{102,111,111}).CoerceTo('string')")
@@ -1217,7 +1217,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #284
 		/* b'foo' */
-		var expected_ []byte = []byte{102, 111, 111}
+		var expected_ = []byte{102, 111, 111}
 		/* r.expr('foo').coerce_to('binary') */
 
 		suite.T().Log("About to run line #284: r.Expr('foo').CoerceTo('binary')")
@@ -1232,7 +1232,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #287
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(a).coerce_to('bool') */
 
 		suite.T().Log("About to run line #287: r.Binary(a).CoerceTo('bool')")
@@ -1247,7 +1247,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #290
 		/* b'foo' */
-		var expected_ []byte = []byte{102, 111, 111}
+		var expected_ = []byte{102, 111, 111}
 		/* r.binary(b'foo').coerce_to('binary') */
 
 		suite.T().Log("About to run line #290: r.Binary([]byte{102,111,111}).CoerceTo('binary')")
@@ -1262,7 +1262,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #294
 		/* b'ef' */
-		var expected_ []byte = []byte{101, 102}
+		var expected_ = []byte{101, 102}
 		/* r.binary(b'abcdefg').slice(-3,-1) */
 
 		suite.T().Log("About to run line #294: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-3, -1)")
@@ -1277,7 +1277,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #296
 		/* b'ab' */
-		var expected_ []byte = []byte{97, 98}
+		var expected_ = []byte{97, 98}
 		/* r.binary(b'abcdefg').slice(0, 2) */
 
 		suite.T().Log("About to run line #296: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(0, 2)")
@@ -1292,7 +1292,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #298
 		/* b'def' */
-		var expected_ []byte = []byte{100, 101, 102}
+		var expected_ = []byte{100, 101, 102}
 		/* r.binary(b'abcdefg').slice(3, -1) */
 
 		suite.T().Log("About to run line #298: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(3, -1)")
@@ -1307,7 +1307,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #300
 		/* b'cde' */
-		var expected_ []byte = []byte{99, 100, 101}
+		var expected_ = []byte{99, 100, 101}
 		/* r.binary(b'abcdefg').slice(-5, 5) */
 
 		suite.T().Log("About to run line #300: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-5, 5)")
@@ -1322,7 +1322,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #302
 		/* b'ab' */
-		var expected_ []byte = []byte{97, 98}
+		var expected_ = []byte{97, 98}
 		/* r.binary(b'abcdefg').slice(-8, 2) */
 
 		suite.T().Log("About to run line #302: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-8, 2)")
@@ -1337,7 +1337,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #304
 		/* b'fg' */
-		var expected_ []byte = []byte{102, 103}
+		var expected_ = []byte{102, 103}
 		/* r.binary(b'abcdefg').slice(5, 7) */
 
 		suite.T().Log("About to run line #304: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(5, 7)")
@@ -1352,7 +1352,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #308
 		/* b'ab' */
-		var expected_ []byte = []byte{97, 98}
+		var expected_ = []byte{97, 98}
 		/* r.binary(b'abcdefg').slice(-9, 2) */
 
 		suite.T().Log("About to run line #308: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(-9, 2)")
@@ -1367,7 +1367,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #312
 		/* b'fg' */
-		var expected_ []byte = []byte{102, 103}
+		var expected_ = []byte{102, 103}
 		/* r.binary(b'abcdefg').slice(5, 9) */
 
 		suite.T().Log("About to run line #312: r.Binary([]byte{97,98,99,100,101,102,103}).Slice(5, 9)")
@@ -1382,7 +1382,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #316
 		/* b */
-		var expected_ []byte = b
+		var expected_ = b
 		/* r.binary(b) */
 
 		suite.T().Log("About to run line #316: r.Binary(b)")
@@ -1398,7 +1398,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #320
 		/* {'$reql_type$':'BINARY','data':'AAE='} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "AAE="}
+		var expected_ = map[interface{}]interface{}{"$reql_type$": "BINARY", "data": "AAE="}
 		/* r.binary(b) */
 
 		suite.T().Log("About to run line #320: r.Binary(b)")
@@ -1414,7 +1414,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #326
 		/* b"data" */
-		var expected_ []byte = []byte{100, 97, 116, 97}
+		var expected_ = []byte{100, 97, 116, 97}
 		/* r.binary(r.expr("data")) */
 
 		suite.T().Log("About to run line #326: r.Binary(r.Expr('data'))")
@@ -1429,7 +1429,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #332
 		/* err('ReqlQueryLogicError', 'Expected type STRING but found OBJECT.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found OBJECT.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found OBJECT.")
 		/* r.binary(r.expr({})) */
 
 		suite.T().Log("About to run line #332: r.Binary(r.Expr(map[interface{}]interface{}{}))")
@@ -1444,7 +1444,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #335
 		/* err('ReqlQueryLogicError', 'Expected type STRING but found ARRAY.', []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found ARRAY.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found ARRAY.")
 		/* r.binary(r.expr([])) */
 
 		suite.T().Log("About to run line #335: r.Binary(r.Expr([]interface{}{}))")
@@ -1459,7 +1459,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #341
 		/* err('ReqlQueryLogicError','Invalid binary pseudotype:'+' lacking `data` key.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid binary pseudotype:"+" lacking `data` key.")
+		var expected_ = err("ReqlQueryLogicError", "Invalid binary pseudotype:"+" lacking `data` key.")
 		/* r.expr({'$reql_type$':'BINARY'}) */
 
 		suite.T().Log("About to run line #341: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', })")
@@ -1474,7 +1474,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #346
 		/* err('ReqlQueryLogicError','Invalid base64 format, data found after padding character \'=\'.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 format, data found after padding character '='.")
+		var expected_ = err("ReqlQueryLogicError", "Invalid base64 format, data found after padding character '='.")
 		/* r.expr({'$reql_type$':'BINARY','data':'ABCDEFGH==AA'}) */
 
 		suite.T().Log("About to run line #346: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'ABCDEFGH==AA', })")
@@ -1489,7 +1489,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #348
 		/* err('ReqlQueryLogicError','Invalid base64 format, data found after padding character \'=\'.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 format, data found after padding character '='.")
+		var expected_ = err("ReqlQueryLogicError", "Invalid base64 format, data found after padding character '='.")
 		/* r.expr({'$reql_type$':'BINARY','data':'ABCDEF==$'}) */
 
 		suite.T().Log("About to run line #348: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'ABCDEF==$', })")
@@ -1504,7 +1504,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #350
 		/* err('ReqlQueryLogicError','Invalid base64 character found:'+' \'^\'.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 character found:"+" '^'.")
+		var expected_ = err("ReqlQueryLogicError", "Invalid base64 character found:"+" '^'.")
 		/* r.expr({'$reql_type$':'BINARY','data':'A^CDEFGH'}) */
 
 		suite.T().Log("About to run line #350: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'A^CDEFGH', })")
@@ -1519,7 +1519,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #352
 		/* err('ReqlQueryLogicError','Invalid base64 length:'+' 1 character remaining, cannot decode a full byte.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid base64 length:"+" 1 character remaining, cannot decode a full byte.")
+		var expected_ = err("ReqlQueryLogicError", "Invalid base64 length:"+" 1 character remaining, cannot decode a full byte.")
 		/* r.expr({'$reql_type$':'BINARY','data':'ABCDE'}) */
 
 		suite.T().Log("About to run line #352: r.Expr(map[interface{}]interface{}{'$reql_type$': 'BINARY', 'data': 'ABCDE', })")
@@ -1534,7 +1534,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #356
 		/* err('ReqlQueryLogicError','Cannot coerce BINARY to ARRAY.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot coerce BINARY to ARRAY.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot coerce BINARY to ARRAY.")
 		/* r.binary(a).coerce_to('array') */
 
 		suite.T().Log("About to run line #356: r.Binary(a).CoerceTo('array')")
@@ -1549,7 +1549,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #358
 		/* err('ReqlQueryLogicError','Cannot coerce BINARY to OBJECT.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot coerce BINARY to OBJECT.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot coerce BINARY to OBJECT.")
 		/* r.binary(a).coerce_to('object') */
 
 		suite.T().Log("About to run line #358: r.Binary(a).CoerceTo('object')")
@@ -1564,7 +1564,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #360
 		/* err('ReqlQueryLogicError','Cannot coerce BINARY to NUMBER.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot coerce BINARY to NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot coerce BINARY to NUMBER.")
 		/* r.binary(a).coerce_to('number') */
 
 		suite.T().Log("About to run line #360: r.Binary(a).CoerceTo('number')")
@@ -1579,7 +1579,7 @@ func (suite *DatumBinarySuite) TestCases() {
 	{
 		// datum/binary.yaml line #362
 		/* err('ReqlQueryLogicError','Cannot coerce BINARY to NULL.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot coerce BINARY to NULL.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot coerce BINARY to NULL.")
 		/* r.binary(a).coerce_to('nu'+'ll') */
 
 		suite.T().Log("About to run line #362: r.Binary(a).CoerceTo(r.Add('nu', 'll'))")

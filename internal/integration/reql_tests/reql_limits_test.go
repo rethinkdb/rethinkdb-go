@@ -70,7 +70,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #6
 		/* [1,1,1,1,1,1,1,1] */
-		var expected_ []interface{} = []interface{}{1, 1, 1, 1, 1, 1, 1, 1}
+		var expected_ = []interface{}{1, 1, 1, 1, 1, 1, 1, 1}
 		/* r.expr([1,1,1,1]).union([1, 1, 1, 1]) */
 
 		suite.T().Log("About to run line #6: r.Expr([]interface{}{1, 1, 1, 1}).Union([]interface{}{1, 1, 1, 1})")
@@ -86,7 +86,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #10
 		/* err("ReqlResourceLimitError", "Array over size limit `4`.  To raise the number of allowed elements, modify the `array_limit` option to `.run` (not available in the Data Explorer), or use an index.", [0]) */
-		var expected_ Err = err("ReqlResourceLimitError", "Array over size limit `4`.  To raise the number of allowed elements, modify the `array_limit` option to `.run` (not available in the Data Explorer), or use an index.")
+		var expected_ = err("ReqlResourceLimitError", "Array over size limit `4`.  To raise the number of allowed elements, modify the `array_limit` option to `.run` (not available in the Data Explorer), or use an index.")
 		/* r.expr([1,2,3,4]).union([5, 6, 7, 8]) */
 
 		suite.T().Log("About to run line #10: r.Expr([]interface{}{1, 2, 3, 4}).Union([]interface{}{5, 6, 7, 8})")
@@ -102,7 +102,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #16
 		/* err("ReqlResourceLimitError", "Array over size limit `4`.  To raise the number of allowed elements, modify the `array_limit` option to `.run` (not available in the Data Explorer), or use an index.", [0]) */
-		var expected_ Err = err("ReqlResourceLimitError", "Array over size limit `4`.  To raise the number of allowed elements, modify the `array_limit` option to `.run` (not available in the Data Explorer), or use an index.")
+		var expected_ = err("ReqlResourceLimitError", "Array over size limit `4`.  To raise the number of allowed elements, modify the `array_limit` option to `.run` (not available in the Data Explorer), or use an index.")
 		/* r.expr([1,2,3,4,5,6,7,8]) */
 
 		suite.T().Log("About to run line #16: r.Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8})")
@@ -118,7 +118,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #22
 		/* err("ReqlQueryLogicError", "Illegal array size limit `-1`.  (Must be >= 1.)", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Illegal array size limit `-1`.  (Must be >= 1.)")
+		var expected_ = err("ReqlQueryLogicError", "Illegal array size limit `-1`.  (Must be >= 1.)")
 		/* r.expr([1,2,3,4,5,6,7,8]) */
 
 		suite.T().Log("About to run line #22: r.Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8})")
@@ -134,7 +134,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #27
 		/* err("ReqlQueryLogicError", "Illegal array size limit `0`.  (Must be >= 1.)", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Illegal array size limit `0`.  (Must be >= 1.)")
+		var expected_ = err("ReqlQueryLogicError", "Illegal array size limit `0`.  (Must be >= 1.)")
 		/* r.expr([1,2,3,4,5,6,7,8]) */
 
 		suite.T().Log("About to run line #27: r.Expr([]interface{}{1, 2, 3, 4, 5, 6, 7, 8})")
@@ -173,7 +173,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #58
 		/* ({'deleted':0,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 1}
+		var expected_ = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 1}
 		/* tbl.insert({'id':1, 'array':ten_l}) */
 
 		suite.T().Log("About to run line #58: tbl.Insert(map[interface{}]interface{}{'id': 1, 'array': ten_l, })")
@@ -188,7 +188,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #60
 		/* ({'array':[1,2,3,4,5,6,7,8,9,10],'id':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"array": []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, "id": 1}
+		var expected_ = map[interface{}]interface{}{"array": []interface{}{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, "id": 1}
 		/* tbl.get(1) */
 
 		suite.T().Log("About to run line #60: tbl.Get(1)")
@@ -204,7 +204,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #67
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.delete().get_field('deleted') */
 
 		suite.T().Log("About to run line #67: tbl.Delete().Field('deleted')")
@@ -226,7 +226,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #73
 		/* 7 */
-		var expected_ int = 7
+		var expected_ = 7
 		/* tbl.insert([{'id':0}, {'id':1}, {'id':2}, {'id':3}, {'id':4}, {'id':5}, {'id':6}]).get_field('inserted') */
 
 		suite.T().Log("About to run line #73: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 0, }, map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }, map[interface{}]interface{}{'id': 3, }, map[interface{}]interface{}{'id': 4, }, map[interface{}]interface{}{'id': 5, }, map[interface{}]interface{}{'id': 6, }}).Field('inserted')")
@@ -241,7 +241,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #85
 		/* 7 */
-		var expected_ int = 7
+		var expected_ = 7
 		/* tbl.insert([{'id':7}, {'id':8}, {'id':9}, {'id':10}, {'id':11}, {'id':12}, {'id':13}]).get_field('inserted') */
 
 		suite.T().Log("About to run line #85: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 7, }, map[interface{}]interface{}{'id': 8, }, map[interface{}]interface{}{'id': 9, }, map[interface{}]interface{}{'id': 10, }, map[interface{}]interface{}{'id': 11, }, map[interface{}]interface{}{'id': 12, }, map[interface{}]interface{}{'id': 13, }}).Field('inserted')")
@@ -256,7 +256,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #97
 		/* 14 */
-		var expected_ int = 14
+		var expected_ = 14
 		/* tbl.delete().get_field('deleted') */
 
 		suite.T().Log("About to run line #97: tbl.Delete().Field('deleted')")
@@ -280,7 +280,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #106
 		/* 7 */
-		var expected_ int = 7
+		var expected_ = 7
 		/* tbl.insert([{'id':0}, {'id':1}, {'id':2}, {'id':3}, {'id':4}, {'id':5}, {'id':6}]).get_field('inserted') */
 
 		suite.T().Log("About to run line #106: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 0, }, map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }, map[interface{}]interface{}{'id': 3, }, map[interface{}]interface{}{'id': 4, }, map[interface{}]interface{}{'id': 5, }, map[interface{}]interface{}{'id': 6, }}).Field('inserted')")
@@ -295,7 +295,7 @@ func (suite *LimitsSuite) TestCases() {
 	{
 		// limits.yaml line #118
 		/* 7 */
-		var expected_ int = 7
+		var expected_ = 7
 		/* tbl.insert([{'id':7}, {'id':8}, {'id':9}, {'id':10}, {'id':11}, {'id':12}, {'id':13}]).get_field('inserted') */
 
 		suite.T().Log("About to run line #118: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 7, }, map[interface{}]interface{}{'id': 8, }, map[interface{}]interface{}{'id': 9, }, map[interface{}]interface{}{'id': 10, }, map[interface{}]interface{}{'id': 11, }, map[interface{}]interface{}{'id': 12, }, map[interface{}]interface{}{'id': 13, }}).Field('inserted')")

@@ -76,7 +76,7 @@ func (suite *DatumNullSuite) TestCases() {
 	{
 		// datum/null.yaml line #9
 		/* 'NULL' */
-		var expected_ string = "NULL"
+		var expected_ = "NULL"
 		/* r.expr(null).type_of() */
 
 		suite.T().Log("About to run line #9: r.Expr(nil).TypeOf()")
@@ -91,7 +91,7 @@ func (suite *DatumNullSuite) TestCases() {
 	{
 		// datum/null.yaml line #14
 		/* 'null' */
-		var expected_ string = "null"
+		var expected_ = "null"
 		/* r.expr(null).coerce_to('string') */
 
 		suite.T().Log("About to run line #14: r.Expr(nil).CoerceTo('string')")

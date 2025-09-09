@@ -77,7 +77,7 @@ func (suite *PolymorphismSuite) TestCases() {
 	{
 		// polymorphism.yaml line #7
 		/* ({'deleted':0,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':3}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 3}
+		var expected_ = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 3}
 		/* tbl.insert([{'id':i, 'a':i} for i in xrange(3)]) */
 
 		suite.T().Log("About to run line #7: tbl.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 3; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'a': i, })\n    }\n    return res\n}()))")
@@ -99,7 +99,7 @@ func (suite *PolymorphismSuite) TestCases() {
 	{
 		// polymorphism.yaml line #21
 		/* ({'id':0,'c':1,'a':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "c": 1, "a": 0}
+		var expected_ = map[interface{}]interface{}{"id": 0, "c": 1, "a": 0}
 		/* tbl.merge({'c':1}).nth(0) */
 
 		suite.T().Log("About to run line #21: tbl.Merge(map[interface{}]interface{}{'c': 1, }).Nth(0)")
@@ -114,7 +114,7 @@ func (suite *PolymorphismSuite) TestCases() {
 	{
 		// polymorphism.yaml line #22
 		/* ({'id':0,'c':1,'a':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0, "c": 1, "a": 0}
+		var expected_ = map[interface{}]interface{}{"id": 0, "c": 1, "a": 0}
 		/* obj.merge({'c':1}) */
 
 		suite.T().Log("About to run line #22: obj.Merge(map[interface{}]interface{}{'c': 1, })")
@@ -129,7 +129,7 @@ func (suite *PolymorphismSuite) TestCases() {
 	{
 		// polymorphism.yaml line #26
 		/* ({'id':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
+		var expected_ = map[interface{}]interface{}{"id": 0}
 		/* tbl.without('a').nth(0) */
 
 		suite.T().Log("About to run line #26: tbl.Without('a').Nth(0)")
@@ -144,7 +144,7 @@ func (suite *PolymorphismSuite) TestCases() {
 	{
 		// polymorphism.yaml line #27
 		/* ({'id':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 0}
+		var expected_ = map[interface{}]interface{}{"id": 0}
 		/* obj.without('a') */
 
 		suite.T().Log("About to run line #27: obj.Without('a')")
@@ -159,7 +159,7 @@ func (suite *PolymorphismSuite) TestCases() {
 	{
 		// polymorphism.yaml line #31
 		/* ({'a':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 0}
+		var expected_ = map[interface{}]interface{}{"a": 0}
 		/* tbl.pluck('a').nth(0) */
 
 		suite.T().Log("About to run line #31: tbl.Pluck('a').Nth(0)")
@@ -174,7 +174,7 @@ func (suite *PolymorphismSuite) TestCases() {
 	{
 		// polymorphism.yaml line #32
 		/* ({'a':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 0}
+		var expected_ = map[interface{}]interface{}{"a": 0}
 		/* obj.pluck('a') */
 
 		suite.T().Log("About to run line #32: obj.Pluck('a')")

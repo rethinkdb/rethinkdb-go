@@ -61,7 +61,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #4
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(3).bit_and(2) */
 
 		suite.T().Log("About to run line #4: r.Expr(3).BitAnd(2)")
@@ -76,7 +76,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #7
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(-2).bit_and(3) */
 
 		suite.T().Log("About to run line #7: r.Expr(-2).BitAnd(3)")
@@ -91,7 +91,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #10
 		/* err('ReqlQueryLogicError', 'Integer too large: 9007199254740992') */
-		var expected_ Err = err("ReqlQueryLogicError", "Integer too large: 9007199254740992")
+		var expected_ = err("ReqlQueryLogicError", "Integer too large: 9007199254740992")
 		/* r.expr(9007199254740992).bit_and(0) */
 
 		suite.T().Log("About to run line #10: r.Expr(9007199254740992).BitAnd(0)")
@@ -106,7 +106,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #13
 		/* err('ReqlQueryLogicError', 'Number not an integer (>2^53): 9007199254740994') */
-		var expected_ Err = err("ReqlQueryLogicError", "Number not an integer (>2^53): 9007199254740994")
+		var expected_ = err("ReqlQueryLogicError", "Number not an integer (>2^53): 9007199254740994")
 		/* r.expr(9007199254740994).bit_and(0) */
 
 		suite.T().Log("About to run line #13: r.Expr(9007199254740994).BitAnd(0)")
@@ -121,7 +121,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #16
 		/* 23 */
-		var expected_ int = 23
+		var expected_ = 23
 		/* r.expr(9007199254740991).bit_and(23) */
 
 		suite.T().Log("About to run line #16: r.Expr(9007199254740991).BitAnd(23)")
@@ -136,7 +136,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #19
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(-9007199254740992).bit_and(12345) */
 
 		suite.T().Log("About to run line #19: r.Expr(-9007199254740992).BitAnd(12345)")
@@ -151,7 +151,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #22
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* r.expr(1).bit_or(2) */
 
 		suite.T().Log("About to run line #22: r.Expr(1).BitOr(2)")
@@ -166,7 +166,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #25
 		/* err('ReqlQueryLogicError', 'Integer too large: 9007199254740992') */
-		var expected_ Err = err("ReqlQueryLogicError", "Integer too large: 9007199254740992")
+		var expected_ = err("ReqlQueryLogicError", "Integer too large: 9007199254740992")
 		/* r.expr(9007199254740992).bit_or(0) */
 
 		suite.T().Log("About to run line #25: r.Expr(9007199254740992).BitOr(0)")
@@ -181,7 +181,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #28
 		/* 9007199254740991 */
-		var expected_ int = 9007199254740991
+		var expected_ = 9007199254740991
 		/* r.expr(9007199254740991).bit_or(0) */
 
 		suite.T().Log("About to run line #28: r.Expr(9007199254740991).BitOr(0)")
@@ -196,7 +196,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #31
 		/* -1 */
-		var expected_ int = -1
+		var expected_ = -1
 		/* r.expr(9007199254740991).bit_or(-1) */
 
 		suite.T().Log("About to run line #31: r.Expr(9007199254740991).BitOr(-1)")
@@ -211,7 +211,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #34
 		/* 5 */
-		var expected_ int = 5
+		var expected_ = 5
 		/* r.expr(3).bit_xor(6) */
 
 		suite.T().Log("About to run line #34: r.Expr(3).BitXor(6)")
@@ -226,7 +226,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #37
 		/* -3 */
-		var expected_ int = -3
+		var expected_ = -3
 		/* r.expr(2).bit_not() */
 
 		suite.T().Log("About to run line #37: r.Expr(2).BitNot()")
@@ -241,7 +241,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #40
 		/* -9007199254740992 */
-		var expected_ int = -9007199254740992
+		var expected_ = -9007199254740992
 		/* r.expr(9007199254740991).bit_not() */
 
 		suite.T().Log("About to run line #40: r.Expr(9007199254740991).BitNot()")
@@ -256,7 +256,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #43
 		/* 9007199254740991 */
-		var expected_ int = 9007199254740991
+		var expected_ = 9007199254740991
 		/* r.expr(9007199254740991).bit_not().bit_not() */
 
 		suite.T().Log("About to run line #43: r.Expr(9007199254740991).BitNot().BitNot()")
@@ -271,7 +271,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #47
 		/* err('ReqlQueryLogicError', 'Integer too large: 9007199254740992') */
-		var expected_ Err = err("ReqlQueryLogicError", "Integer too large: 9007199254740992")
+		var expected_ = err("ReqlQueryLogicError", "Integer too large: 9007199254740992")
 		/* r.expr(9007199254740992).bit_sar(0) */
 
 		suite.T().Log("About to run line #47: r.Expr(9007199254740992).BitSar(0)")
@@ -286,7 +286,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #50
 		/* -9007199254740992 */
-		var expected_ int = -9007199254740992
+		var expected_ = -9007199254740992
 		/* r.expr(-9007199254740992).bit_sar(0) */
 
 		suite.T().Log("About to run line #50: r.Expr(-9007199254740992).BitSar(0)")
@@ -301,7 +301,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #53
 		/* -4503599627370496 */
-		var expected_ int = -4503599627370496
+		var expected_ = -4503599627370496
 		/* r.expr(-9007199254740992).bit_sar(1) */
 
 		suite.T().Log("About to run line #53: r.Expr(-9007199254740992).BitSar(1)")
@@ -316,7 +316,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #56
 		/* -2 */
-		var expected_ int = -2
+		var expected_ = -2
 		/* r.expr(-9007199254740992).bit_sar(52) */
 
 		suite.T().Log("About to run line #56: r.Expr(-9007199254740992).BitSar(52)")
@@ -331,7 +331,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #59
 		/* -1 */
-		var expected_ int = -1
+		var expected_ = -1
 		/* r.expr(-9007199254740992).bit_sar(53) */
 
 		suite.T().Log("About to run line #59: r.Expr(-9007199254740992).BitSar(53)")
@@ -346,7 +346,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #62
 		/* -1 */
-		var expected_ int = -1
+		var expected_ = -1
 		/* r.expr(-9007199254740992).bit_sar(54) */
 
 		suite.T().Log("About to run line #62: r.Expr(-9007199254740992).BitSar(54)")
@@ -361,7 +361,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #65
 		/* 9007199254740991 */
-		var expected_ int = 9007199254740991
+		var expected_ = 9007199254740991
 		/* r.expr(9007199254740991).bit_sar(0) */
 
 		suite.T().Log("About to run line #65: r.Expr(9007199254740991).BitSar(0)")
@@ -376,7 +376,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #68
 		/* 4503599627370495 */
-		var expected_ int = 4503599627370495
+		var expected_ = 4503599627370495
 		/* r.expr(9007199254740991).bit_sar(1) */
 
 		suite.T().Log("About to run line #68: r.Expr(9007199254740991).BitSar(1)")
@@ -391,7 +391,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #71
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(9007199254740991).bit_sar(52) */
 
 		suite.T().Log("About to run line #71: r.Expr(9007199254740991).BitSar(52)")
@@ -406,7 +406,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #74
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(9007199254740991).bit_sar(53) */
 
 		suite.T().Log("About to run line #74: r.Expr(9007199254740991).BitSar(53)")
@@ -421,7 +421,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #78
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(0).bit_sal(999999) */
 
 		suite.T().Log("About to run line #78: r.Expr(0).BitSal(999999)")
@@ -436,7 +436,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #81
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(0).bit_sal(3000) */
 
 		suite.T().Log("About to run line #81: r.Expr(0).BitSal(3000)")
@@ -451,7 +451,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #84
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(0).bit_sal(500) */
 
 		suite.T().Log("About to run line #84: r.Expr(0).BitSal(500)")
@@ -466,7 +466,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #87
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(0).bit_sal(0) */
 
 		suite.T().Log("About to run line #87: r.Expr(0).BitSal(0)")
@@ -481,7 +481,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #90
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1).bit_sal(0) */
 
 		suite.T().Log("About to run line #90: r.Expr(1).BitSal(0)")
@@ -496,7 +496,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #93
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(1).bit_sal(1) */
 
 		suite.T().Log("About to run line #93: r.Expr(1).BitSal(1)")
@@ -511,7 +511,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #96
 		/* 8 */
-		var expected_ int = 8
+		var expected_ = 8
 		/* r.expr(1).bit_sal(3) */
 
 		suite.T().Log("About to run line #96: r.Expr(1).BitSal(3)")
@@ -526,7 +526,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #99
 		/* -8 */
-		var expected_ int = -8
+		var expected_ = -8
 		/* r.expr(-1).bit_sal(3) */
 
 		suite.T().Log("About to run line #99: r.Expr(-1).BitSal(3)")
@@ -541,7 +541,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #102
 		/* -18014398509481984 */
-		var expected_ int = -18014398509481984
+		var expected_ = -18014398509481984
 		/* r.expr(-1).bit_sal(54) */
 
 		suite.T().Log("About to run line #102: r.Expr(-1).BitSal(54)")
@@ -556,7 +556,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #105
 		/* 18014398509481984 */
-		var expected_ int = 18014398509481984
+		var expected_ = 18014398509481984
 		/* r.expr(1).bit_sal(54) */
 
 		suite.T().Log("About to run line #105: r.Expr(1).BitSal(54)")
@@ -571,7 +571,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #108
 		/* -18014398509481984 */
-		var expected_ int = -18014398509481984
+		var expected_ = -18014398509481984
 		/* r.expr(-2).bit_sal(53) */
 
 		suite.T().Log("About to run line #108: r.Expr(-2).BitSal(53)")
@@ -586,7 +586,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #111
 		/* 18014398509481984 */
-		var expected_ int = 18014398509481984
+		var expected_ = 18014398509481984
 		/* r.expr(2).bit_sal(53) */
 
 		suite.T().Log("About to run line #111: r.Expr(2).BitSal(53)")
@@ -601,7 +601,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #114
 		/* err('ReqlQueryLogicError', 'Cannot bit-shift by a negative value') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot bit-shift by a negative value")
+		var expected_ = err("ReqlQueryLogicError", "Cannot bit-shift by a negative value")
 		/* r.expr(5).bit_sal(-1) */
 
 		suite.T().Log("About to run line #114: r.Expr(5).BitSal(-1)")
@@ -616,7 +616,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #117
 		/* err('ReqlQueryLogicError', 'Cannot bit-shift by a negative value') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot bit-shift by a negative value")
+		var expected_ = err("ReqlQueryLogicError", "Cannot bit-shift by a negative value")
 		/* r.expr(5).bit_sar(-1) */
 
 		suite.T().Log("About to run line #117: r.Expr(5).BitSar(-1)")
@@ -631,7 +631,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #121
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('a').bit_and(12) */
 
 		suite.T().Log("About to run line #121: r.Expr('a').BitAnd(12)")
@@ -646,7 +646,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #124
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr(12).bit_and('a') */
 
 		suite.T().Log("About to run line #124: r.Expr(12).BitAnd('a')")
@@ -661,7 +661,7 @@ func (suite *MathLogicBitSuite) TestCases() {
 	{
 		// math_logic/bit.yaml line #127
 		/* err('ReqlQueryLogicError', 'Number not an integer: 1.5') */
-		var expected_ Err = err("ReqlQueryLogicError", "Number not an integer: 1.5")
+		var expected_ = err("ReqlQueryLogicError", "Number not an integer: 1.5")
 		/* r.expr(1.5).bit_and(3) */
 
 		suite.T().Log("About to run line #127: r.Expr(1.5).BitAnd(3)")

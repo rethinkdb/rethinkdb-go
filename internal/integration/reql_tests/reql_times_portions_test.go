@@ -131,7 +131,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 	{
 		// times/portions.yaml line #16
 		/* ([1375142400, 1375142400, 1375142400, 2375136000]) */
-		var expected_ []interface{} = []interface{}{1375142400, 1375142400, 1375142400, 2375136000}
+		var expected_ = []interface{}{1375142400, 1375142400, 1375142400, 2375136000}
 		/* ts.map(lambda x:x.date()).map(lambda x:x.to_epoch_time()) */
 
 		suite.T().Log("About to run line #16: ts.Map(func(x r.Term) interface{} { return x.Date()}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
@@ -146,7 +146,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 	{
 		// times/portions.yaml line #20
 		/* ([0, 0, 0, 0]) */
-		var expected_ []interface{} = []interface{}{0, 0, 0, 0}
+		var expected_ = []interface{}{0, 0, 0, 0}
 		/* ts.map(lambda x:x.date().time_of_day()) */
 
 		suite.T().Log("About to run line #20: ts.Map(func(x r.Term) interface{} { return x.Date().TimeOfDay()})")
@@ -161,7 +161,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 	{
 		// times/portions.yaml line #24
 		/* ([4896.681, 4896.682, 4897.681, 11296.681]) */
-		var expected_ []interface{} = []interface{}{4896.681, 4896.682, 4897.681, 11296.681}
+		var expected_ = []interface{}{4896.681, 4896.682, 4897.681, 11296.681}
 		/* ts.map(lambda x:x.time_of_day()) */
 
 		suite.T().Log("About to run line #24: ts.Map(func(x r.Term) interface{} { return x.TimeOfDay()})")
@@ -179,7 +179,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 		[2013, 7, 30, 1, 21, 36.682],
 		[2013, 7, 30, 1, 21, 37.681],
 		[2045, 4, 7, 3, 8, 16.681]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{2013, 7, 30, 1, 21, 36.681}, []interface{}{2013, 7, 30, 1, 21, 36.682}, []interface{}{2013, 7, 30, 1, 21, 37.681}, []interface{}{2045, 4, 7, 3, 8, 16.681}}
+		var expected_ = []interface{}{[]interface{}{2013, 7, 30, 1, 21, 36.681}, []interface{}{2013, 7, 30, 1, 21, 36.682}, []interface{}{2013, 7, 30, 1, 21, 37.681}, []interface{}{2045, 4, 7, 3, 8, 16.681}}
 		/* ts.map(lambda x:[x.year(), x.month(), x.day(), x.hours(), x.minutes(), x.seconds()]) */
 
 		suite.T().Log("About to run line #29: ts.Map(func(x r.Term) interface{} { return []interface{}{x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds()}})")
@@ -196,7 +196,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 	{
 		// times/portions.yaml line #36
 		/* rts */
-		var expected_ []interface{} = rts
+		var expected_ = rts
 		/* ts.map(lambda x:r.time(x.year(), x.month(), x.day(), x.hours(), x.minutes(), x.seconds(), x.timezone())).map(lambda x:x.to_epoch_time()) */
 
 		suite.T().Log("About to run line #36: ts.Map(func(x r.Term) interface{} { return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())}).Map(func(x r.Term) interface{} { return x.ToEpochTime()})")
@@ -213,7 +213,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 	{
 		// times/portions.yaml line #40
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* ts.map(lambda x:r.time(x.year(), x.month(), x.day(), x.hours(), x.minutes(), x.seconds(), x.timezone())).union(ts).map(lambda x:x.to_iso8601()).distinct().count().sub(ts.count()) */
 
 		suite.T().Log("About to run line #40: ts.Map(func(x r.Term) interface{} { return r.Time(x.Year(), x.Month(), x.Day(), x.Hours(), x.Minutes(), x.Seconds(), x.Timezone())}).Union(ts).Map(func(x r.Term) interface{} { return x.ToISO8601()}).Distinct().Count().Sub(ts.Count())")
@@ -230,7 +230,7 @@ func (suite *TimesPortionsSuite) TestCases() {
 	{
 		// times/portions.yaml line #44
 		/* [[2, 211], [2, 211], [2, 211], [5, 97]] */
-		var expected_ []interface{} = []interface{}{[]interface{}{2, 211}, []interface{}{2, 211}, []interface{}{2, 211}, []interface{}{5, 97}}
+		var expected_ = []interface{}{[]interface{}{2, 211}, []interface{}{2, 211}, []interface{}{2, 211}, []interface{}{5, 97}}
 		/* ts.map([r.row.day_of_week(), r.row.day_of_year()]) */
 
 		suite.T().Log("About to run line #44: ts.Map([]interface{}{r.Row.DayOfWeek(), r.Row.DayOfYear()})")

@@ -61,7 +61,7 @@ func (suite *MathLogicFloorCeilRoundSuite) TestCases() {
 	{
 		// math_logic/floor_ceil_round.yaml line #3
 		/* "NUMBER" */
-		var expected_ string = "NUMBER"
+		var expected_ = "NUMBER"
 		/* r.floor(1.0).type_of() */
 
 		suite.T().Log("About to run line #3: r.Floor(1.0).TypeOf()")
@@ -196,7 +196,7 @@ func (suite *MathLogicFloorCeilRoundSuite) TestCases() {
 	{
 		// math_logic/floor_ceil_round.yaml line #23
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('X').floor() */
 
 		suite.T().Log("About to run line #23: r.Expr('X').Floor()")
@@ -211,7 +211,7 @@ func (suite *MathLogicFloorCeilRoundSuite) TestCases() {
 	{
 		// math_logic/floor_ceil_round.yaml line #27
 		/* "NUMBER" */
-		var expected_ string = "NUMBER"
+		var expected_ = "NUMBER"
 		/* r.ceil(1.0).type_of() */
 
 		suite.T().Log("About to run line #27: r.Ceil(1.0).TypeOf()")
@@ -346,7 +346,7 @@ func (suite *MathLogicFloorCeilRoundSuite) TestCases() {
 	{
 		// math_logic/floor_ceil_round.yaml line #47
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('X').ceil() */
 
 		suite.T().Log("About to run line #47: r.Expr('X').Ceil()")
@@ -361,7 +361,7 @@ func (suite *MathLogicFloorCeilRoundSuite) TestCases() {
 	{
 		// math_logic/floor_ceil_round.yaml line #51
 		/* "NUMBER" */
-		var expected_ string = "NUMBER"
+		var expected_ = "NUMBER"
 		/* r.round(1.0).type_of() */
 
 		suite.T().Log("About to run line #51: r.Round(1.0).TypeOf()")
@@ -766,7 +766,7 @@ func (suite *MathLogicFloorCeilRoundSuite) TestCases() {
 	{
 		// math_logic/floor_ceil_round.yaml line #113
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('X').round() */
 
 		suite.T().Log("About to run line #113: r.Expr('X').Round()")

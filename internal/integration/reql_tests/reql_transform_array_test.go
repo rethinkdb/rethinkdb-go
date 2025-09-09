@@ -89,7 +89,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #12
 		/* [1,2,3,4] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, 4}
+		var expected_ = []interface{}{1, 2, 3, 4}
 		/* arr.append(4) */
 
 		suite.T().Log("About to run line #12: arr.Append(4)")
@@ -104,7 +104,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #14
 		/* [1,2,3,'a'] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, "a"}
+		var expected_ = []interface{}{1, 2, 3, "a"}
 		/* arr.append('a') */
 
 		suite.T().Log("About to run line #14: arr.Append('a')")
@@ -119,7 +119,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #19
 		/* [0,1,2,3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* arr.prepend(0) */
 
 		suite.T().Log("About to run line #19: arr.Prepend(0)")
@@ -134,7 +134,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #21
 		/* ['a',1,2,3] */
-		var expected_ []interface{} = []interface{}{"a", 1, 2, 3}
+		var expected_ = []interface{}{"a", 1, 2, 3}
 		/* arr.prepend('a') */
 
 		suite.T().Log("About to run line #21: arr.Prepend('a')")
@@ -149,7 +149,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #26
 		/* [3] */
-		var expected_ []interface{} = []interface{}{3}
+		var expected_ = []interface{}{3}
 		/* arr.difference([1,2,2]) */
 
 		suite.T().Log("About to run line #26: arr.Difference([]interface{}{1, 2, 2})")
@@ -164,7 +164,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #28
 		/* [1,2,3] */
-		var expected_ []interface{} = []interface{}{1, 2, 3}
+		var expected_ = []interface{}{1, 2, 3}
 		/* arr.difference([]) */
 
 		suite.T().Log("About to run line #28: arr.Difference([]interface{}{})")
@@ -179,7 +179,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #30
 		/* [1,2,3] */
-		var expected_ []interface{} = []interface{}{1, 2, 3}
+		var expected_ = []interface{}{1, 2, 3}
 		/* arr.difference(["foo", "bar"]) */
 
 		suite.T().Log("About to run line #30: arr.Difference([]interface{}{'foo', 'bar'})")
@@ -194,7 +194,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #34
 		/* [1,2,3] */
-		var expected_ []interface{} = []interface{}{1, 2, 3}
+		var expected_ = []interface{}{1, 2, 3}
 		/* dupe_arr.set_insert(1) */
 
 		suite.T().Log("About to run line #34: dupe_arr.SetInsert(1)")
@@ -209,7 +209,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #36
 		/* [1,2,3,4] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, 4}
+		var expected_ = []interface{}{1, 2, 3, 4}
 		/* dupe_arr.set_insert(4) */
 
 		suite.T().Log("About to run line #36: dupe_arr.SetInsert(4)")
@@ -224,7 +224,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #39
 		/* [1,2,3,4,5] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, 4, 5}
+		var expected_ = []interface{}{1, 2, 3, 4, 5}
 		/* dupe_arr.set_union([3,4,5,5]) */
 
 		suite.T().Log("About to run line #39: dupe_arr.SetUnion([]interface{}{3, 4, 5, 5})")
@@ -239,7 +239,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #41
 		/* [1,2,3,5,6] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, 5, 6}
+		var expected_ = []interface{}{1, 2, 3, 5, 6}
 		/* dupe_arr.set_union([5,6]) */
 
 		suite.T().Log("About to run line #41: dupe_arr.SetUnion([]interface{}{5, 6})")
@@ -254,7 +254,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #44
 		/* [1,2] */
-		var expected_ []interface{} = []interface{}{1, 2}
+		var expected_ = []interface{}{1, 2}
 		/* dupe_arr.set_intersection([1,1,1,2,2]) */
 
 		suite.T().Log("About to run line #44: dupe_arr.SetIntersection([]interface{}{1, 1, 1, 2, 2})")
@@ -269,7 +269,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #46
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* dupe_arr.set_intersection(["foo"]) */
 
 		suite.T().Log("About to run line #46: dupe_arr.SetIntersection([]interface{}{'foo'})")
@@ -284,7 +284,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #49
 		/* [2,3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* dupe_arr.set_difference([1,1,1,10]) */
 
 		suite.T().Log("About to run line #49: dupe_arr.SetDifference([]interface{}{1, 1, 1, 10})")
@@ -299,7 +299,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #51
 		/* [1,3] */
-		var expected_ []interface{} = []interface{}{1, 3}
+		var expected_ = []interface{}{1, 3}
 		/* dupe_arr.set_difference([2]) */
 
 		suite.T().Log("About to run line #51: dupe_arr.SetDifference([]interface{}{2})")
@@ -314,7 +314,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #58
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* arr[1:3] */
 
 		suite.T().Log("About to run line #58: arr.Slice(1, 3)")
@@ -329,7 +329,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #59
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* arr.slice(1, 3) */
 
 		suite.T().Log("About to run line #59: arr.Slice(1, 3)")
@@ -344,7 +344,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #60
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* arr.slice(1, 2, right_bound='closed') */
 
 		suite.T().Log("About to run line #60: arr.Slice(1, 2).OptArgs(r.SliceOpts{RightBound: 'closed', })")
@@ -359,7 +359,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #72
 		/* [1,2] */
-		var expected_ []interface{} = []interface{}{1, 2}
+		var expected_ = []interface{}{1, 2}
 		/* arr[:2] */
 
 		suite.T().Log("About to run line #72: arr.Slice(0, 2)")
@@ -374,7 +374,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #73
 		/* [1,2] */
-		var expected_ []interface{} = []interface{}{1, 2}
+		var expected_ = []interface{}{1, 2}
 		/* arr.slice(0,2) */
 
 		suite.T().Log("About to run line #73: arr.Slice(0, 2)")
@@ -389,7 +389,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #81
 		/* [2,3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* arr[1:] */
 
 		suite.T().Log("About to run line #81: arr.Slice(1, -1, r.SliceOpts{RightBound: 'closed'})")
@@ -404,7 +404,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #82
 		/* [2,3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* arr.slice(1) */
 
 		suite.T().Log("About to run line #82: arr.Slice(1)")
@@ -419,7 +419,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #89
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* arr.slice(-2, -1) */
 
 		suite.T().Log("About to run line #89: arr.Slice(-2, -1)")
@@ -434,7 +434,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #95
 		/* [2,3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* arr.skip(1) */
 
 		suite.T().Log("About to run line #95: arr.Skip(1)")
@@ -449,7 +449,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #97
 		/* [3] */
-		var expected_ []interface{} = []interface{}{3}
+		var expected_ = []interface{}{3}
 		/* arr.skip(2) */
 
 		suite.T().Log("About to run line #97: arr.Skip(2)")
@@ -464,7 +464,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #99
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* arr.skip(12) */
 
 		suite.T().Log("About to run line #99: arr.Skip(12)")
@@ -479,7 +479,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #104
 		/* [1,2] */
-		var expected_ []interface{} = []interface{}{1, 2}
+		var expected_ = []interface{}{1, 2}
 		/* arr.limit(2) */
 
 		suite.T().Log("About to run line #104: arr.Limit(2)")
@@ -494,7 +494,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #106
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* arr.limit(0) */
 
 		suite.T().Log("About to run line #106: arr.Limit(0)")
@@ -509,7 +509,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #108
 		/* [1,2,3] */
-		var expected_ []interface{} = []interface{}{1, 2, 3}
+		var expected_ = []interface{}{1, 2, 3}
 		/* arr.limit(12) */
 
 		suite.T().Log("About to run line #108: arr.Limit(12)")
@@ -524,7 +524,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #113
 		/* [{'a':1, 'b':'a'}, {'a':2, 'b':'b'}, {'a':3, 'b':'c'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
 		/* objArr.pluck('a', 'b') */
 
 		suite.T().Log("About to run line #113: objArr.Pluck('a', 'b')")
@@ -539,7 +539,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #115
 		/* [{'a':1}, {'a':2}, {'a':3}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2}, map[interface{}]interface{}{"a": 3}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2}, map[interface{}]interface{}{"a": 3}}
 		/* objArr.pluck('a') */
 
 		suite.T().Log("About to run line #115: objArr.Pluck('a')")
@@ -554,7 +554,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #117
 		/* [{}, {}, {}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}}
 		/* objArr.pluck() */
 
 		suite.T().Log("About to run line #117: objArr.Pluck()")
@@ -576,7 +576,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #122
 		/* ([{'a':1},{'a':2},{'a':3},{'a':1},{'a':2},{'a':3}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2}, map[interface{}]interface{}{"a": 3}, map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2}, map[interface{}]interface{}{"a": 3}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2}, map[interface{}]interface{}{"a": 3}, map[interface{}]interface{}{"a": 1}, map[interface{}]interface{}{"a": 2}, map[interface{}]interface{}{"a": 3}}
 		/* wftst.with_fields('a') */
 
 		suite.T().Log("About to run line #122: wftst.WithFields('a')")
@@ -591,7 +591,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #124
 		/* ([{'b':'a'},{'b':'b'},{'b':'c'},{'b':'a'},{'b':'b'},{'b':'c'}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"b": "a"}, map[interface{}]interface{}{"b": "b"}, map[interface{}]interface{}{"b": "c"}, map[interface{}]interface{}{"b": "a"}, map[interface{}]interface{}{"b": "b"}, map[interface{}]interface{}{"b": "c"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"b": "a"}, map[interface{}]interface{}{"b": "b"}, map[interface{}]interface{}{"b": "c"}, map[interface{}]interface{}{"b": "a"}, map[interface{}]interface{}{"b": "b"}, map[interface{}]interface{}{"b": "c"}}
 		/* wftst.with_fields('b') */
 
 		suite.T().Log("About to run line #124: wftst.WithFields('b')")
@@ -606,7 +606,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #126
 		/* ([{'a':1,'b':'a'},{'a':2,'b':'b'},{'a':3,'b':'c'}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
 		/* wftst.with_fields('a', 'b') */
 
 		suite.T().Log("About to run line #126: wftst.WithFields('a', 'b')")
@@ -621,7 +621,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #128
 		/* [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}}
 		/* wftst.with_fields() */
 
 		suite.T().Log("About to run line #128: wftst.WithFields()")
@@ -643,7 +643,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #132
 		/* ([{'b':{'c':1}}, {'b':{'c':2}}, {'b':{'c':3}}, {'b':{'c':1}}, {'b':{'c':2}}, {'b':{'c':3}}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 1}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 2}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 3}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 1}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 2}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 3}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 1}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 2}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 3}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 1}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 2}}, map[interface{}]interface{}{"b": map[interface{}]interface{}{"c": 3}}}
 		/* wftst2.with_fields({'b':'c'}) */
 
 		suite.T().Log("About to run line #132: wftst2.WithFields(map[interface{}]interface{}{'b': 'c', })")
@@ -658,7 +658,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #135
 		/* err("ReqlQueryLogicError", "Invalid path argument `1`.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Invalid path argument `1`.")
+		var expected_ = err("ReqlQueryLogicError", "Invalid path argument `1`.")
 		/* wftst.with_fields(1) */
 
 		suite.T().Log("About to run line #135: wftst.WithFields(1)")
@@ -673,7 +673,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #137
 		/* err("ReqlQueryLogicError", "Cannot perform has_fields on a non-object non-sequence `1`.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot perform has_fields on a non-object non-sequence `1`.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot perform has_fields on a non-object non-sequence `1`.")
 		/* r.expr(1).with_fields() */
 
 		suite.T().Log("About to run line #137: r.Expr(1).WithFields()")
@@ -688,7 +688,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #142
 		/* [{}, {}, {}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}}
+		var expected_ = []interface{}{map[interface{}]interface{}{}, map[interface{}]interface{}{}, map[interface{}]interface{}{}}
 		/* objArr.without('a', 'b') */
 
 		suite.T().Log("About to run line #142: objArr.Without('a', 'b')")
@@ -703,7 +703,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #144
 		/* [{'b':'a'}, {'b':'b'}, {'b':'c'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"b": "a"}, map[interface{}]interface{}{"b": "b"}, map[interface{}]interface{}{"b": "c"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"b": "a"}, map[interface{}]interface{}{"b": "b"}, map[interface{}]interface{}{"b": "c"}}
 		/* objArr.without('a') */
 
 		suite.T().Log("About to run line #144: objArr.Without('a')")
@@ -718,7 +718,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #146
 		/* [{'a':1, 'b':'a'}, {'a':2, 'b':'b'}, {'a':3, 'b':'c'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
 		/* objArr.without() */
 
 		suite.T().Log("About to run line #146: objArr.Without()")
@@ -733,7 +733,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #151
 		/* [2,3,4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* arr.map(lambda v: v + 1) */
 
 		suite.T().Log("About to run line #151: arr.Map(func(v r.Term) interface{} { return r.Add(v, 1)})")
@@ -748,7 +748,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #161
 		/* 6 */
-		var expected_ int = 6
+		var expected_ = 6
 		/* arr.reduce(lambda a, b: a + b) */
 
 		suite.T().Log("About to run line #161: arr.Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
@@ -763,7 +763,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #166
 		/* 6 */
-		var expected_ int = 6
+		var expected_ = 6
 		/* arr.reduce(lambda a, b:a + b) */
 
 		suite.T().Log("About to run line #166: arr.Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
@@ -778,7 +778,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #171
 		/* 12 */
-		var expected_ int = 12
+		var expected_ = 12
 		/* arr.union(arr).reduce(lambda a, b: a + b) */
 
 		suite.T().Log("About to run line #171: arr.Union(arr).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
@@ -793,7 +793,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #176
 		/* 12 */
-		var expected_ int = 12
+		var expected_ = 12
 		/* arr.union(arr).reduce(lambda a, b:a + b) */
 
 		suite.T().Log("About to run line #176: arr.Union(arr).Reduce(func(a r.Term, b r.Term) interface{} { return r.Add(a, b)})")
@@ -808,7 +808,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #183
 		/* [{'a':2, 'b':'b'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 2, "b": "b"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 2, "b": "b"}}
 		/* objArr.filter(lambda row: row['b'] == 'b') */
 
 		suite.T().Log("About to run line #183: objArr.Filter(func(row r.Term) interface{} { return row.AtIndex('b').Eq('b')})")
@@ -823,7 +823,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #190
 		/* [1,2,1,2,1,2] */
-		var expected_ []interface{} = []interface{}{1, 2, 1, 2, 1, 2}
+		var expected_ = []interface{}{1, 2, 1, 2, 1, 2}
 		/* arr.concat_map(lambda v: [1,2]) */
 
 		suite.T().Log("About to run line #190: arr.ConcatMap(func(v r.Term) interface{} { return []interface{}{1, 2}})")
@@ -838,7 +838,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #194
 		/* [{'v':1}, {'v2':2}, {'v':2}, {'v2':3}, {'v':3}, {'v2':4}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"v": 1}, map[interface{}]interface{}{"v2": 2}, map[interface{}]interface{}{"v": 2}, map[interface{}]interface{}{"v2": 3}, map[interface{}]interface{}{"v": 3}, map[interface{}]interface{}{"v2": 4}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"v": 1}, map[interface{}]interface{}{"v2": 2}, map[interface{}]interface{}{"v": 2}, map[interface{}]interface{}{"v2": 3}, map[interface{}]interface{}{"v": 3}, map[interface{}]interface{}{"v2": 4}}
 		/* arr.concat_map(lambda v: [{'v':v}, {'v2':v + 1}]) */
 
 		suite.T().Log("About to run line #194: arr.ConcatMap(func(v r.Term) interface{} { return []interface{}{map[interface{}]interface{}{'v': v, }, map[interface{}]interface{}{'v2': r.Add(v, 1), }}})")
@@ -855,7 +855,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #201
 		/* [{'a':1, 'b':'a'}, {'a':2, 'b':'b'}, {'a':3, 'b':'c'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
 		/* objArr.order_by('b') */
 
 		suite.T().Log("About to run line #201: objArr.OrderBy('b')")
@@ -870,7 +870,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #205
 		/* [{'a':3, 'b':'c'}, {'a':2, 'b':'b'}, {'a':1, 'b':'a'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 3, "b": "c"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 1, "b": "a"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 3, "b": "c"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 1, "b": "a"}}
 		/* objArr.order_by(r.desc('b')) */
 
 		suite.T().Log("About to run line #205: objArr.OrderBy(r.Desc('b'))")
@@ -885,7 +885,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #208
 		/* [{'-a':1},{'-a':2}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"-a": 1}, map[interface{}]interface{}{"-a": 2}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"-a": 1}, map[interface{}]interface{}{"-a": 2}}
 		/* r.expr([{'-a':1},{'-a':2}]).order_by('-a') */
 
 		suite.T().Log("About to run line #208: r.Expr([]interface{}{map[interface{}]interface{}{'-a': 1, }, map[interface{}]interface{}{'-a': 2, }}).OrderBy('-a')")
@@ -900,7 +900,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #216
 		/* [1,2,3,4] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, 4}
+		var expected_ = []interface{}{1, 2, 3, 4}
 		/* r.expr([1,1,2,2,2,3,4]).distinct() */
 
 		suite.T().Log("About to run line #216: r.Expr([]interface{}{1, 1, 2, 2, 2, 3, 4}).Distinct()")
@@ -915,7 +915,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #223
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* objArr.count() */
 
 		suite.T().Log("About to run line #223: objArr.Count()")
@@ -930,7 +930,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #228
 		/* [1, 2, 3, {'a':1, 'b':'a'}, {'a':2, 'b':'b'}, {'a':3, 'b':'c'}] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
+		var expected_ = []interface{}{1, 2, 3, map[interface{}]interface{}{"a": 1, "b": "a"}, map[interface{}]interface{}{"a": 2, "b": "b"}, map[interface{}]interface{}{"a": 3, "b": "c"}}
 		/* arr.union(objArr) */
 
 		suite.T().Log("About to run line #228: arr.Union(objArr)")
@@ -945,7 +945,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #234
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* arr[1] */
 
 		suite.T().Log("About to run line #234: arr.AtIndex(1)")
@@ -960,7 +960,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #235
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* arr.nth(1) */
 
 		suite.T().Log("About to run line #235: arr.Nth(1)")
@@ -975,7 +975,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #238
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* arr[0] */
 
 		suite.T().Log("About to run line #238: arr.AtIndex(0)")
@@ -990,7 +990,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #245
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([]).is_empty() */
 
 		suite.T().Log("About to run line #245: r.Expr([]interface{}{}).IsEmpty()")
@@ -1005,7 +1005,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #247
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* arr.is_empty() */
 
 		suite.T().Log("About to run line #247: arr.IsEmpty()")
@@ -1020,7 +1020,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #251
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* arr.contains(2) */
 
 		suite.T().Log("About to run line #251: arr.Contains(2)")
@@ -1035,7 +1035,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #253
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* arr.contains(2, 3) */
 
 		suite.T().Log("About to run line #253: arr.Contains(2, 3)")
@@ -1050,7 +1050,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #255
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* arr.contains(4) */
 
 		suite.T().Log("About to run line #255: arr.Contains(4)")
@@ -1065,7 +1065,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #257
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* arr.contains(2, 4) */
 
 		suite.T().Log("About to run line #257: arr.Contains(2, 4)")
@@ -1080,7 +1080,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #259
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* arr.contains(2, 2) */
 
 		suite.T().Log("About to run line #259: arr.Contains(2, 2)")
@@ -1095,7 +1095,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #261
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* arr.union(arr).contains(2, 2) */
 
 		suite.T().Log("About to run line #261: arr.Union(arr).Contains(2, 2)")
@@ -1110,7 +1110,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #265
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* arr.contains(lambda x:x == 2) */
 
 		suite.T().Log("About to run line #265: arr.Contains(func(x r.Term) interface{} { return r.Eq(x, 2)})")
@@ -1125,7 +1125,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #269
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* arr.contains(lambda x:x == 2, lambda x:x==3) */
 
 		suite.T().Log("About to run line #269: arr.Contains(func(x r.Term) interface{} { return r.Eq(x, 2)}, func(x r.Term) interface{} { return r.Eq(x, 3)})")
@@ -1140,7 +1140,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #273
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* arr.contains(lambda x:x == 4) */
 
 		suite.T().Log("About to run line #273: arr.Contains(func(x r.Term) interface{} { return r.Eq(x, 4)})")
@@ -1155,7 +1155,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #277
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* arr.contains(lambda x:x == 2, lambda x:x==4) */
 
 		suite.T().Log("About to run line #277: arr.Contains(func(x r.Term) interface{} { return r.Eq(x, 2)}, func(x r.Term) interface{} { return r.Eq(x, 4)})")
@@ -1170,7 +1170,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #281
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* arr.contains(lambda x:x == 2, lambda x:x==2) */
 
 		suite.T().Log("About to run line #281: arr.Contains(func(x r.Term) interface{} { return r.Eq(x, 2)}, func(x r.Term) interface{} { return r.Eq(x, 2)})")
@@ -1185,7 +1185,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #285
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* arr.union(arr).contains(lambda x:x == 2, lambda x:x==2) */
 
 		suite.T().Log("About to run line #285: arr.Union(arr).Contains(func(x r.Term) interface{} { return r.Eq(x, 2)}, func(x r.Term) interface{} { return r.Eq(x, 2)})")
@@ -1200,7 +1200,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #290
 		/* [1, 3] */
-		var expected_ []interface{} = []interface{}{1, 3}
+		var expected_ = []interface{}{1, 3}
 		/* r.expr([{'a':1},{'b':2},{'a':3,'c':4}])['a'] */
 
 		suite.T().Log("About to run line #290: r.Expr([]interface{}{map[interface{}]interface{}{'a': 1, }, map[interface{}]interface{}{'b': 2, }, map[interface{}]interface{}{'a': 3, 'c': 4, }}).AtIndex('a')")
@@ -1215,7 +1215,7 @@ func (suite *TransformArraySuite) TestCases() {
 	{
 		// transform/array.yaml line #293
 		/* err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot perform bracket on a non-object non-sequence `\"a\"`.")
 		/* r.expr([{'a':1},'a',{'b':2},{'a':3,'c':4}])['a'] */
 
 		suite.T().Log("About to run line #293: r.Expr([]interface{}{map[interface{}]interface{}{'a': 1, }, 'a', map[interface{}]interface{}{'b': 2, }, map[interface{}]interface{}{'a': 3, 'c': 4, }}).AtIndex('a')")

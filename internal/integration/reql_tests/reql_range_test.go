@@ -61,7 +61,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #3
 		/* 'STREAM' */
-		var expected_ string = "STREAM"
+		var expected_ = "STREAM"
 		/* r.range().type_of() */
 
 		suite.T().Log("About to run line #3: r.Range().TypeOf()")
@@ -76,7 +76,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #6
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* r.range().limit(4) */
 
 		suite.T().Log("About to run line #6: r.Range().Limit(4)")
@@ -91,7 +91,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #9
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* r.range(4) */
 
 		suite.T().Log("About to run line #9: r.Range(4)")
@@ -106,7 +106,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #12
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* r.range(2, 5) */
 
 		suite.T().Log("About to run line #12: r.Range(2, 5)")
@@ -121,7 +121,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #15
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.range(0) */
 
 		suite.T().Log("About to run line #15: r.Range(0)")
@@ -136,7 +136,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #18
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.range(5, 2) */
 
 		suite.T().Log("About to run line #18: r.Range(5, 2)")
@@ -151,7 +151,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #21
 		/* [-5, -4, -3] */
-		var expected_ []interface{} = []interface{}{-5, -4, -3}
+		var expected_ = []interface{}{-5, -4, -3}
 		/* r.range(-5, -2) */
 
 		suite.T().Log("About to run line #21: r.Range(-5, -2)")
@@ -166,7 +166,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #24
 		/* [-5, -4, -3, -2, -1, 0, 1] */
-		var expected_ []interface{} = []interface{}{-5, -4, -3, -2, -1, 0, 1}
+		var expected_ = []interface{}{-5, -4, -3, -2, -1, 0, 1}
 		/* r.range(-5, 2) */
 
 		suite.T().Log("About to run line #24: r.Range(-5, 2)")
@@ -181,7 +181,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #30
 		/* err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.range("foo") */
 
 		suite.T().Log("About to run line #30: r.Range('foo')")
@@ -196,7 +196,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #34
 		/* err_regex("ReqlQueryLogicError", "Number not an integer \\(>2\\^53\\). 9007199254740994", []) */
-		var expected_ Err = err_regex("ReqlQueryLogicError", "Number not an integer \\(>2\\^53\\). 9007199254740994")
+		var expected_ = err_regex("ReqlQueryLogicError", "Number not an integer \\(>2\\^53\\). 9007199254740994")
 		/* r.range(9007199254740994) */
 
 		suite.T().Log("About to run line #34: r.Range(9007199254740994)")
@@ -211,7 +211,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #37
 		/* err_regex("ReqlQueryLogicError", "Number not an integer \\(<-2\\^53\\). -9007199254740994", []) */
-		var expected_ Err = err_regex("ReqlQueryLogicError", "Number not an integer \\(<-2\\^53\\). -9007199254740994")
+		var expected_ = err_regex("ReqlQueryLogicError", "Number not an integer \\(<-2\\^53\\). -9007199254740994")
 		/* r.range(-9007199254740994) */
 
 		suite.T().Log("About to run line #37: r.Range(-9007199254740994)")
@@ -226,7 +226,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #40
 		/* err_regex("ReqlQueryLogicError", "Number not an integer. 0\\.5", []) */
-		var expected_ Err = err_regex("ReqlQueryLogicError", "Number not an integer. 0\\.5")
+		var expected_ = err_regex("ReqlQueryLogicError", "Number not an integer. 0\\.5")
 		/* r.range(0.5) */
 
 		suite.T().Log("About to run line #40: r.Range(0.5)")
@@ -241,7 +241,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #43
 		/* err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.")
 		/* r.range().count() */
 
 		suite.T().Log("About to run line #43: r.Range().Count()")
@@ -256,7 +256,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #46
 		/* err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.")
 		/* r.range().coerce_to("ARRAY") */
 
 		suite.T().Log("About to run line #46: r.Range().CoerceTo('ARRAY')")
@@ -271,7 +271,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #49
 		/* err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use an infinite stream with an aggregation function (`reduce`, `count`, etc.) or coerce it to an array.")
 		/* r.range().coerce_to("OBJECT") */
 
 		suite.T().Log("About to run line #49: r.Range().CoerceTo('OBJECT')")
@@ -286,7 +286,7 @@ func (suite *RangeSuite) TestCases() {
 	{
 		// range.yaml line #52
 		/* 4 */
-		var expected_ int = 4
+		var expected_ = 4
 		/* r.range(4).count() */
 
 		suite.T().Log("About to run line #52: r.Range(4).Count()")

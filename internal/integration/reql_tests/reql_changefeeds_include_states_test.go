@@ -70,7 +70,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #4
 		/* [{'state':'ready'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "ready"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "ready"}}
 		/* tbl.changes(squash=true, include_states=true).limit(1) */
 
 		suite.T().Log("About to run line #4: tbl.Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, }).Limit(1)")
@@ -85,7 +85,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #9
 		/* [{'state':'initializing'}, {'new_val':null}, {'state':'ready'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": nil}, map[interface{}]interface{}{"state": "ready"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": nil}, map[interface{}]interface{}{"state": "ready"}}
 		/* tbl.get(0).changes(squash=true, include_states=true, include_initial=true).limit(3) */
 
 		suite.T().Log("About to run line #9: tbl.Get(0).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(3)")
@@ -100,7 +100,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #14
 		/* [{'state':'initializing'}, {'state':'ready'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"state": "ready"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"state": "ready"}}
 		/* tbl.order_by(index='id').limit(10).changes(squash=true, include_states=true, include_initial=true).limit(2) */
 
 		suite.T().Log("About to run line #14: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(2)")
@@ -115,7 +115,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #19
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.insert({'id':1}) */
 
 		suite.T().Log("About to run line #19: tbl.Insert(map[interface{}]interface{}{'id': 1, })")
@@ -130,7 +130,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #21
 		/* [{'state':'initializing'}, {'new_val':{'id':1}}, {'state':'ready'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"state": "ready"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"state": "ready"}}
 		/* tbl.order_by(index='id').limit(10).changes(squash=true, include_states=true, include_initial=true).limit(3) */
 
 		suite.T().Log("About to run line #21: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Limit(10).Changes().OptArgs(r.ChangesOpts{Squash: true, IncludeStates: true, IncludeInitial: true, }).Limit(3)")
@@ -152,7 +152,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #30
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.insert({'id':2}) */
 
 		suite.T().Log("About to run line #30: tbl.Insert(map[interface{}]interface{}{'id': 2, })")
@@ -167,7 +167,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #32
 		/* [{'state':'ready'},{'new_val':{'id':2},'old_val':null}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 2}, "old_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 2}, "old_val": nil}}
 		/* fetch(tblchanges, 2) */
 
 		suite.T().Log("About to run line #32: fetch(tblchanges, 2)")
@@ -186,7 +186,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #39
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get(2).update({'a':1}) */
 
 		suite.T().Log("About to run line #39: tbl.Get(2).Update(map[interface{}]interface{}{'a': 1, })")
@@ -201,7 +201,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #41
 		/* [{'state':'initializing'}, {'new_val':{'id':2}}, {'state':'ready'}, {'old_val':{'id':2},'new_val':{'id':2,'a':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 2}}, map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 2}, "new_val": map[interface{}]interface{}{"id": 2, "a": 1}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 2}}, map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 2}, "new_val": map[interface{}]interface{}{"id": 2, "a": 1}}}
 		/* fetch(getchanges, 4) */
 
 		suite.T().Log("About to run line #41: fetch(getchanges, 4)")
@@ -227,7 +227,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #52
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.insert({'id':3}) */
 
 		suite.T().Log("About to run line #52: tbl.Insert(map[interface{}]interface{}{'id': 3, })")
@@ -242,7 +242,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #54
 		/* [{'state':'initializing'}, {'new_val':{'id':1}}, {'new_val':{'a':1, 'id':2}}, {'state':'ready'}, {'old_val':null, 'new_val':{'id':3}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 2}}, map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 3}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 2}}, map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 3}}}
 		/* fetch(limitchanges, 5) */
 
 		suite.T().Log("About to run line #54: fetch(limitchanges, 5)")
@@ -254,7 +254,7 @@ func (suite *ChangefeedsIncludeStatesSuite) TestCases() {
 	{
 		// changefeeds/include_states.yaml line #57
 		/* [{'state':'initializing'}, {'new_val':{'a':1, 'id':2}}, {'new_val':{'id':1}}, {'state':'ready'}, {'old_val':null, 'new_val':{'id':3}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 2}}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 3}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"state": "initializing"}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 2}}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 1}}, map[interface{}]interface{}{"state": "ready"}, map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 3}}}
 		/* fetch(limitchangesdesc, 5) */
 
 		suite.T().Log("About to run line #57: fetch(limitchangesdesc, 5)")

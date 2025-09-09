@@ -61,7 +61,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #6
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(4) / 2 */
 
 		suite.T().Log("About to run line #6: r.Expr(4).Div(2)")
@@ -76,7 +76,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #7
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* 4 / r.expr(2) */
 
 		suite.T().Log("About to run line #7: r.Div(4, r.Expr(2))")
@@ -91,7 +91,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #8
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(4).div(2) */
 
 		suite.T().Log("About to run line #8: r.Expr(4).Div(2)")
@@ -151,7 +151,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #37
 		/* err('ReqlQueryLogicError', 'Cannot divide by zero.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot divide by zero.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot divide by zero.")
 		/* r.expr(1) / 0 */
 
 		suite.T().Log("About to run line #37: r.Expr(1).Div(0)")
@@ -166,7 +166,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #38
 		/* err('ReqlQueryLogicError', 'Cannot divide by zero.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot divide by zero.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot divide by zero.")
 		/* r.expr(2.0) / 0 */
 
 		suite.T().Log("About to run line #38: r.Expr(2.0).Div(0)")
@@ -181,7 +181,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #39
 		/* err('ReqlQueryLogicError', 'Cannot divide by zero.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot divide by zero.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot divide by zero.")
 		/* r.expr(3) / 0.0 */
 
 		suite.T().Log("About to run line #39: r.Expr(3).Div(0.0)")
@@ -196,7 +196,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #40
 		/* err('ReqlQueryLogicError', 'Cannot divide by zero.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot divide by zero.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot divide by zero.")
 		/* r.expr(4.0) / 0.0 */
 
 		suite.T().Log("About to run line #40: r.Expr(4.0).Div(0.0)")
@@ -211,7 +211,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #41
 		/* err('ReqlQueryLogicError', 'Cannot divide by zero.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot divide by zero.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot divide by zero.")
 		/* r.expr(0) / 0 */
 
 		suite.T().Log("About to run line #41: r.Expr(0).Div(0)")
@@ -226,7 +226,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #42
 		/* err('ReqlQueryLogicError', 'Cannot divide by zero.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot divide by zero.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot divide by zero.")
 		/* r.expr(0.0) / 0.0 */
 
 		suite.T().Log("About to run line #42: r.Expr(0.0).Div(0.0)")
@@ -241,7 +241,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #46
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('a') / 0.8 */
 
 		suite.T().Log("About to run line #46: r.Expr('a').Div(0.8)")
@@ -256,7 +256,7 @@ func (suite *MathLogicDivSuite) TestCases() {
 	{
 		// math_logic/div.yaml line #50
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr(1) / 'a' */
 
 		suite.T().Log("About to run line #50: r.Expr(1).Div('a')")

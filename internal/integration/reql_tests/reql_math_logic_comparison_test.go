@@ -61,7 +61,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #10
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1) < 2 */
 
 		suite.T().Log("About to run line #10: r.Expr(1).Lt(2)")
@@ -76,7 +76,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #11
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* 1 < r.expr(2) */
 
 		suite.T().Log("About to run line #11: r.Lt(1, r.Expr(2))")
@@ -91,7 +91,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #12
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).lt(2) */
 
 		suite.T().Log("About to run line #12: r.Expr(1).Lt(2)")
@@ -106,7 +106,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #19
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(3) < 2 */
 
 		suite.T().Log("About to run line #19: r.Expr(3).Lt(2)")
@@ -121,7 +121,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #22
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(2) < 2 */
 
 		suite.T().Log("About to run line #22: r.Expr(2).Lt(2)")
@@ -136,7 +136,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #38
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(1) > 2 */
 
 		suite.T().Log("About to run line #38: r.Expr(1).Gt(2)")
@@ -151,7 +151,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #39
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* 1 > r.expr(2) */
 
 		suite.T().Log("About to run line #39: r.Gt(1, r.Expr(2))")
@@ -166,7 +166,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #40
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(1).gt(2) */
 
 		suite.T().Log("About to run line #40: r.Expr(1).Gt(2)")
@@ -181,7 +181,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #45
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(3) > 2 */
 
 		suite.T().Log("About to run line #45: r.Expr(3).Gt(2)")
@@ -196,7 +196,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #49
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(2) > 2 */
 
 		suite.T().Log("About to run line #49: r.Expr(2).Gt(2)")
@@ -211,7 +211,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #63
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(1) == 2 */
 
 		suite.T().Log("About to run line #63: r.Expr(1).Eq(2)")
@@ -226,7 +226,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #64
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* 1 == r.expr(2) */
 
 		suite.T().Log("About to run line #64: r.Eq(1, r.Expr(2))")
@@ -241,7 +241,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #65
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(1).eq(2) */
 
 		suite.T().Log("About to run line #65: r.Expr(1).Eq(2)")
@@ -256,7 +256,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #68
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(3) == 2 */
 
 		suite.T().Log("About to run line #68: r.Expr(3).Eq(2)")
@@ -271,7 +271,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #72
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(2) == 2 */
 
 		suite.T().Log("About to run line #72: r.Expr(2).Eq(2)")
@@ -286,7 +286,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #86
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1) != 2 */
 
 		suite.T().Log("About to run line #86: r.Expr(1).Ne(2)")
@@ -301,7 +301,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #87
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* 1 != r.expr(2) */
 
 		suite.T().Log("About to run line #87: r.Ne(1, r.Expr(2))")
@@ -316,7 +316,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #88
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).ne(2) */
 
 		suite.T().Log("About to run line #88: r.Expr(1).Ne(2)")
@@ -331,7 +331,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #91
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(3) != 2 */
 
 		suite.T().Log("About to run line #91: r.Expr(3).Ne(2)")
@@ -346,7 +346,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #95
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(2) != 2 */
 
 		suite.T().Log("About to run line #95: r.Expr(2).Ne(2)")
@@ -361,7 +361,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #109
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1) <= 2 */
 
 		suite.T().Log("About to run line #109: r.Expr(1).Le(2)")
@@ -376,7 +376,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #110
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* 1 <= r.expr(2) */
 
 		suite.T().Log("About to run line #110: r.Le(1, r.Expr(2))")
@@ -391,7 +391,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #111
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).le(2) */
 
 		suite.T().Log("About to run line #111: r.Expr(1).Le(2)")
@@ -406,7 +406,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #116
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(3) <= 2 */
 
 		suite.T().Log("About to run line #116: r.Expr(3).Le(2)")
@@ -421,7 +421,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #120
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(2) <= 2 */
 
 		suite.T().Log("About to run line #120: r.Expr(2).Le(2)")
@@ -436,7 +436,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #134
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(1) >= 2 */
 
 		suite.T().Log("About to run line #134: r.Expr(1).Ge(2)")
@@ -451,7 +451,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #135
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* 1 >= r.expr(2) */
 
 		suite.T().Log("About to run line #135: r.Ge(1, r.Expr(2))")
@@ -466,7 +466,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #136
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(1).ge(2) */
 
 		suite.T().Log("About to run line #136: r.Expr(1).Ge(2)")
@@ -481,7 +481,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #141
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(3) >= 2 */
 
 		suite.T().Log("About to run line #141: r.Expr(3).Ge(2)")
@@ -496,7 +496,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #145
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(2) >= 2 */
 
 		suite.T().Log("About to run line #145: r.Expr(2).Ge(2)")
@@ -511,7 +511,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #158
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(null) == null */
 
 		suite.T().Log("About to run line #158: r.Expr(nil).Eq(nil)")
@@ -526,7 +526,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #159
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* null == r.expr(null) */
 
 		suite.T().Log("About to run line #159: r.Eq(nil, r.Expr(nil))")
@@ -541,7 +541,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #164
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(null) < null */
 
 		suite.T().Log("About to run line #164: r.Expr(nil).Lt(nil)")
@@ -556,7 +556,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #165
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* null < r.expr(null) */
 
 		suite.T().Log("About to run line #165: r.Lt(nil, r.Expr(nil))")
@@ -571,7 +571,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #166
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(null).lt(null) */
 
 		suite.T().Log("About to run line #166: r.Expr(nil).Lt(nil)")
@@ -586,7 +586,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #172
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(null) > null */
 
 		suite.T().Log("About to run line #172: r.Expr(nil).Gt(nil)")
@@ -601,7 +601,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #173
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* null > r.expr(null) */
 
 		suite.T().Log("About to run line #173: r.Gt(nil, r.Expr(nil))")
@@ -616,7 +616,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #174
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(null).gt(null) */
 
 		suite.T().Log("About to run line #174: r.Expr(nil).Gt(nil)")
@@ -631,7 +631,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #180
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('a') == 'a' */
 
 		suite.T().Log("About to run line #180: r.Expr('a').Eq('a')")
@@ -646,7 +646,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #184
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr('a') == 'aa' */
 
 		suite.T().Log("About to run line #184: r.Expr('a').Eq('aa')")
@@ -661,7 +661,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #188
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('a') < 'aa' */
 
 		suite.T().Log("About to run line #188: r.Expr('a').Lt('aa')")
@@ -676,7 +676,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #192
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('a') < 'bb' */
 
 		suite.T().Log("About to run line #192: r.Expr('a').Lt('bb')")
@@ -691,7 +691,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #196
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('bb') > 'a' */
 
 		suite.T().Log("About to run line #196: r.Expr('bb').Gt('a')")
@@ -706,7 +706,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #200
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('abcdef') < 'abcdeg' */
 
 		suite.T().Log("About to run line #200: r.Expr('abcdef').Lt('abcdeg')")
@@ -721,7 +721,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #204
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr('abcdefg') > 'abcdeg' */
 
 		suite.T().Log("About to run line #204: r.Expr('abcdefg').Gt('abcdeg')")
@@ -736,7 +736,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #208
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('A quick brown fox') > 'A quick brawn fox' */
 
 		suite.T().Log("About to run line #208: r.Expr('A quick brown fox').Gt('A quick brawn fox')")
@@ -751,7 +751,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #216
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([1]) < [2] */
 
 		suite.T().Log("About to run line #216: r.Expr([]interface{}{1}).Lt([]interface{}{2})")
@@ -766,7 +766,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #221
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr([1]) > [2] */
 
 		suite.T().Log("About to run line #221: r.Expr([]interface{}{1}).Gt([]interface{}{2})")
@@ -781,7 +781,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #226
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([1, 0]) < [2] */
 
 		suite.T().Log("About to run line #226: r.Expr([]interface{}{1, 0}).Lt([]interface{}{2})")
@@ -796,7 +796,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #231
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr([1, 0]) < [1] */
 
 		suite.T().Log("About to run line #231: r.Expr([]interface{}{1, 0}).Lt([]interface{}{1})")
@@ -811,7 +811,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #236
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([1, 0]) > [0] */
 
 		suite.T().Log("About to run line #236: r.Expr([]interface{}{1, 0}).Gt([]interface{}{0})")
@@ -826,7 +826,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #241
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([1, 'a']) < [1, 'b'] */
 
 		suite.T().Log("About to run line #241: r.Expr([]interface{}{1, 'a'}).Lt([]interface{}{1, 'b'})")
@@ -841,7 +841,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #246
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([0, 'z']) < [1, 'b'] */
 
 		suite.T().Log("About to run line #246: r.Expr([]interface{}{0, 'z'}).Lt([]interface{}{1, 'b'})")
@@ -856,7 +856,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #251
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr([1, 1, 1]) < [1, 0, 2] */
 
 		suite.T().Log("About to run line #251: r.Expr([]interface{}{1, 1, 1}).Lt([]interface{}{1, 0, 2})")
@@ -871,7 +871,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #256
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([1, 0, 2]) < [1, 1, 1] */
 
 		suite.T().Log("About to run line #256: r.Expr([]interface{}{1, 0, 2}).Lt([]interface{}{1, 1, 1})")
@@ -886,7 +886,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #263
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr({'a':0}) == {'a':0} */
 
 		suite.T().Log("About to run line #263: r.Expr(map[interface{}]interface{}{'a': 0, }).Eq(map[interface{}]interface{}{'a': 0, })")
@@ -901,7 +901,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #267
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr({'a':0, 'b':1}) == {'b':1, 'a':0} */
 
 		suite.T().Log("About to run line #267: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, })")
@@ -916,7 +916,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #271
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'a':0, 'b':1, 'c':2}) == {'b':1, 'a':0} */
 
 		suite.T().Log("About to run line #271: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, })")
@@ -931,7 +931,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #275
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'a':0, 'b':1}) == {'b':1, 'a':0, 'c':2} */
 
 		suite.T().Log("About to run line #275: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, 'c': 2, })")
@@ -946,7 +946,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #279
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'a':0, 'b':1, 'd':2}) == {'b':1, 'a':0, 'c':2} */
 
 		suite.T().Log("About to run line #279: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'd': 2, }).Eq(map[interface{}]interface{}{'b': 1, 'a': 0, 'c': 2, })")
@@ -961,7 +961,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #283
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr({'a':0}) < {'b':0} */
 
 		suite.T().Log("About to run line #283: r.Expr(map[interface{}]interface{}{'a': 0, }).Lt(map[interface{}]interface{}{'b': 0, })")
@@ -976,7 +976,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #287
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr({'a':1}) < {'b':0} */
 
 		suite.T().Log("About to run line #287: r.Expr(map[interface{}]interface{}{'a': 1, }).Lt(map[interface{}]interface{}{'b': 0, })")
@@ -991,7 +991,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #291
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'b':1}) < {'b':0} */
 
 		suite.T().Log("About to run line #291: r.Expr(map[interface{}]interface{}{'b': 1, }).Lt(map[interface{}]interface{}{'b': 0, })")
@@ -1006,7 +1006,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #295
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'b':1}) < {'a':0} */
 
 		suite.T().Log("About to run line #295: r.Expr(map[interface{}]interface{}{'b': 1, }).Lt(map[interface{}]interface{}{'a': 0, })")
@@ -1021,7 +1021,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #299
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'a':0, 'b':1, 'c':2}) < {'a':0, 'b':1, 'c':2} */
 
 		suite.T().Log("About to run line #299: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
@@ -1036,7 +1036,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #303
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'a':0, 'b':1, 'c':2, 'd':3}) < {'a':0, 'b':1, 'c':2} */
 
 		suite.T().Log("About to run line #303: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, 'd': 3, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
@@ -1051,7 +1051,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #307
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr({'a':0, 'b':1, 'c':2}) < {'a':0, 'b':1, 'c':2, 'd':3} */
 
 		suite.T().Log("About to run line #307: r.Expr(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, 'd': 3, })")
@@ -1066,7 +1066,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #311
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr({'a':0, 'c':2}) < {'a':0, 'b':1, 'c':2} */
 
 		suite.T().Log("About to run line #311: r.Expr(map[interface{}]interface{}{'a': 0, 'c': 2, }).Lt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
@@ -1081,7 +1081,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #315
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr({'a':0, 'c':2}) > {'a':0, 'b':1, 'c':2} */
 
 		suite.T().Log("About to run line #315: r.Expr(map[interface{}]interface{}{'a': 0, 'c': 2, }).Gt(map[interface{}]interface{}{'a': 0, 'b': 1, 'c': 2, })")
@@ -1103,7 +1103,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #336
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.and_(r.args(everything.map(r.lt(r.minval, r.row)))) */
 
 		suite.T().Log("About to run line #336: r.And(r.Args(everything.Map(r.Lt(r.MinVal, r.Row))))")
@@ -1118,7 +1118,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #341
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.or_(r.args(everything.map(r.gt(r.minval, r.row)))) */
 
 		suite.T().Log("About to run line #341: r.Or(r.Args(everything.Map(r.Gt(r.MinVal, r.Row))))")
@@ -1133,7 +1133,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #345
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.eq(r.minval, r.minval) */
 
 		suite.T().Log("About to run line #345: r.Eq(r.MinVal, r.MinVal)")
@@ -1148,7 +1148,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #348
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([]) < True */
 
 		suite.T().Log("About to run line #348: r.Expr([]interface{}{}).Lt(true)")
@@ -1163,7 +1163,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #353
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([1,2]) < False */
 
 		suite.T().Log("About to run line #353: r.Expr([]interface{}{1, 2}).Lt(false)")
@@ -1178,7 +1178,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #358
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(False) < [] */
 
 		suite.T().Log("About to run line #358: r.Expr(false).Lt([]interface{}{})")
@@ -1193,7 +1193,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #363
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([]) < r.binary(b"\xAE") */
 
 		suite.T().Log("About to run line #363: r.Expr([]interface{}{}).Lt(r.Binary([]byte{174}))")
@@ -1208,7 +1208,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #368
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([1,2]) < r.binary(b"\xAE") */
 
 		suite.T().Log("About to run line #368: r.Expr([]interface{}{1, 2}).Lt(r.Binary([]byte{174}))")
@@ -1223,7 +1223,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #373
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* True < r.expr(null) */
 
 		suite.T().Log("About to run line #373: r.Lt(true, r.Expr(nil))")
@@ -1238,7 +1238,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #378
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(null) > [] */
 
 		suite.T().Log("About to run line #378: r.Expr(nil).Gt([]interface{}{})")
@@ -1253,7 +1253,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #383
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(null) < 12 */
 
 		suite.T().Log("About to run line #383: r.Expr(nil).Lt(12)")
@@ -1268,7 +1268,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #388
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(null) < -2 */
 
 		suite.T().Log("About to run line #388: r.Expr(nil).Lt(-2)")
@@ -1283,7 +1283,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #393
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(-12) < {} */
 
 		suite.T().Log("About to run line #393: r.Expr(-12).Lt(map[interface{}]interface{}{})")
@@ -1298,7 +1298,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #398
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(100) < {'a':-12} */
 
 		suite.T().Log("About to run line #398: r.Expr(100).Lt(map[interface{}]interface{}{'a': -12, })")
@@ -1313,7 +1313,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #403
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(r.binary(b"\xAE")) < 12 */
 
 		suite.T().Log("About to run line #403: r.Expr(r.Binary([]byte{174})).Lt(12)")
@@ -1328,7 +1328,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #408
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.binary(b"0xAE") < 'abc' */
 
 		suite.T().Log("About to run line #408: r.Binary([]byte{48,120,65,69}).Lt('abc')")
@@ -1343,7 +1343,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #413
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.binary(b"0xAE") > r.now() */
 
 		suite.T().Log("About to run line #413: r.Binary([]byte{48,120,65,69}).Gt(r.Now())")
@@ -1358,7 +1358,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #418
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.now() > 12 */
 
 		suite.T().Log("About to run line #418: r.Now().Gt(12)")
@@ -1373,7 +1373,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #422
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.now() > 'abc' */
 
 		suite.T().Log("About to run line #422: r.Now().Gt('abc')")
@@ -1388,7 +1388,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #426
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr("abc") > {'a':-12} */
 
 		suite.T().Log("About to run line #426: r.Expr('abc').Gt(map[interface{}]interface{}{'a': -12, })")
@@ -1403,7 +1403,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #431
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr("abc") > {'abc':'abc'} */
 
 		suite.T().Log("About to run line #431: r.Expr('abc').Gt(map[interface{}]interface{}{'abc': 'abc', })")
@@ -1418,7 +1418,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #436
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('zzz') > 128 */
 
 		suite.T().Log("About to run line #436: r.Expr('zzz').Gt(128)")
@@ -1433,7 +1433,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #441
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('zzz') > {} */
 
 		suite.T().Log("About to run line #441: r.Expr('zzz').Gt(map[interface{}]interface{}{})")
@@ -1448,7 +1448,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #446
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* 'zzz' > r.expr(-152) */
 
 		suite.T().Log("About to run line #446: r.Gt('zzz', r.Expr(-152))")
@@ -1463,7 +1463,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #451
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* 'zzz' > r.expr(null) */
 
 		suite.T().Log("About to run line #451: r.Gt('zzz', r.Expr(nil))")
@@ -1478,7 +1478,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #456
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* 'zzz' > r.expr([]) */
 
 		suite.T().Log("About to run line #456: r.Gt('zzz', r.Expr([]interface{}{}))")
@@ -1500,7 +1500,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #467
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.and_(r.args(everything2.map(r.gt(r.maxval, r.row)))) */
 
 		suite.T().Log("About to run line #467: r.And(r.Args(everything2.Map(r.Gt(r.MaxVal, r.Row))))")
@@ -1515,7 +1515,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #472
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.or_(r.args(everything2.map(r.lt(r.maxval, r.row)))) */
 
 		suite.T().Log("About to run line #472: r.Or(r.Args(everything2.Map(r.Lt(r.MaxVal, r.Row))))")
@@ -1530,7 +1530,7 @@ func (suite *MathLogicComparisonSuite) TestCases() {
 	{
 		// math_logic/comparison.yaml line #476
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.eq(r.maxval, r.maxval) */
 
 		suite.T().Log("About to run line #476: r.Eq(r.MaxVal, r.MaxVal)")

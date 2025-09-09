@@ -70,7 +70,7 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	{
 		// changefeeds/idxcopy.yaml line #4
 		/* partial({'created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"created": 1})
 		/* tbl.index_create('a') */
 
 		suite.T().Log("About to run line #4: tbl.IndexCreate('a')")
@@ -85,7 +85,7 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	{
 		// changefeeds/idxcopy.yaml line #6
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.index_wait('a') */
 
 		suite.T().Log("About to run line #6: tbl.IndexWait('a')")
@@ -109,7 +109,7 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	{
 		// changefeeds/idxcopy.yaml line #15
 		/* partial({'inserted':12, 'errors':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"inserted": 12, "errors": 0})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"inserted": 12, "errors": 0})
 		/* tbl.insert(r.range(0, 12).map({'id':r.row, 'a':5})) */
 
 		suite.T().Log("About to run line #15: tbl.Insert(r.Range(0, 12).Map(map[interface{}]interface{}{'id': r.Row, 'a': 5, }))")
@@ -124,7 +124,7 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	{
 		// changefeeds/idxcopy.yaml line #20
 		/* partial({'deleted':3, 'errors':0}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"deleted": 3, "errors": 0})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"deleted": 3, "errors": 0})
 		/* tbl.get_all(1, 8, 9, index='id').delete() */
 
 		suite.T().Log("About to run line #20: tbl.GetAll(1, 8, 9).OptArgs(r.GetAllOpts{Index: 'id', }).Delete()")
@@ -139,7 +139,7 @@ func (suite *ChangefeedsIdxcopySuite) TestCases() {
 	{
 		// changefeeds/idxcopy.yaml line #26
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* wait(2) */
 
 		suite.T().Log("About to run line #26: wait(2)")

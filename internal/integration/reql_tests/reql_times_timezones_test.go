@@ -159,7 +159,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #23
 		/* ([["+00:00", 29], ["+00:00", 29], ["+00:00", 29]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{"+00:00", 29}, []interface{}{"+00:00", 29}, []interface{}{"+00:00", 29}}
+		var expected_ = []interface{}{[]interface{}{"+00:00", 29}, []interface{}{"+00:00", 29}, []interface{}{"+00:00", 29}}
 		/* tutcs.map(lambda x:[x.timezone(), x.day()]) */
 
 		suite.T().Log("About to run line #23: tutcs.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}})")
@@ -174,7 +174,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #27
 		/* ([["-00:59", 29], ["-01:00", 29], ["-01:01", 29]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{"-00:59", 29}, []interface{}{"-01:00", 29}, []interface{}{"-01:01", 29}}
+		var expected_ = []interface{}{[]interface{}{"-00:59", 29}, []interface{}{"-01:00", 29}, []interface{}{"-01:01", 29}}
 		/* tms.map(lambda x:[x.timezone(), x.day()]) */
 
 		suite.T().Log("About to run line #27: tms.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}})")
@@ -189,7 +189,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #31
 		/* ([["+00:59", 30], ["+01:00", 30], ["+01:01", 30]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{"+00:59", 30}, []interface{}{"+01:00", 30}, []interface{}{"+01:01", 30}}
+		var expected_ = []interface{}{[]interface{}{"+00:59", 30}, []interface{}{"+01:00", 30}, []interface{}{"+01:01", 30}}
 		/* tps.map(lambda x:[x.timezone(), x.day()]) */
 
 		suite.T().Log("About to run line #31: tps.Map(func(x r.Term) interface{} { return []interface{}{x.Timezone(), x.Day()}})")
@@ -204,7 +204,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #38
 		/* ([0]) */
-		var expected_ []interface{} = []interface{}{0}
+		var expected_ = []interface{}{0}
 		/* ts.concat_map(lambda x:ts.map(lambda y:x - y)).distinct() */
 
 		suite.T().Log("About to run line #38: ts.ConcatMap(func(x r.Term) interface{} { return ts.Map(func(y r.Term) interface{} { return r.Sub(x, y)})}).Distinct()")
@@ -219,7 +219,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #44
 		/* err('ReqlQueryLogicError', 'Timezone `` does not start with `-` or `+`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Timezone `` does not start with `-` or `+`.")
+		var expected_ = err("ReqlQueryLogicError", "Timezone `` does not start with `-` or `+`.")
 		/* r.now().in_timezone("") */
 
 		suite.T().Log("About to run line #44: r.Now().InTimezone('')")
@@ -234,7 +234,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #47
 		/* err('ReqlQueryLogicError', '`-00` is not a valid time offset.') */
-		var expected_ Err = err("ReqlQueryLogicError", "`-00` is not a valid time offset.")
+		var expected_ = err("ReqlQueryLogicError", "`-00` is not a valid time offset.")
 		/* r.now().in_timezone("-00") */
 
 		suite.T().Log("About to run line #47: r.Now().InTimezone('-00')")
@@ -249,7 +249,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #50
 		/* err('ReqlQueryLogicError', '`-00:00` is not a valid time offset.') */
-		var expected_ Err = err("ReqlQueryLogicError", "`-00:00` is not a valid time offset.")
+		var expected_ = err("ReqlQueryLogicError", "`-00:00` is not a valid time offset.")
 		/* r.now().in_timezone("-00:00") */
 
 		suite.T().Log("About to run line #50: r.Now().InTimezone('-00:00')")
@@ -264,7 +264,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #53
 		/* err('ReqlQueryLogicError', 'Timezone `UTC+00` does not start with `-` or `+`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Timezone `UTC+00` does not start with `-` or `+`.")
+		var expected_ = err("ReqlQueryLogicError", "Timezone `UTC+00` does not start with `-` or `+`.")
 		/* r.now().in_timezone("UTC+00") */
 
 		suite.T().Log("About to run line #53: r.Now().InTimezone('UTC+00')")
@@ -279,7 +279,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #56
 		/* err('ReqlQueryLogicError', 'Minutes out of range in `+00:60`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Minutes out of range in `+00:60`.")
+		var expected_ = err("ReqlQueryLogicError", "Minutes out of range in `+00:60`.")
 		/* r.now().in_timezone("+00:60") */
 
 		suite.T().Log("About to run line #56: r.Now().InTimezone('+00:60')")
@@ -294,7 +294,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #59
 		/* err('ReqlQueryLogicError', 'Hours out of range in `+25:00`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Hours out of range in `+25:00`.")
+		var expected_ = err("ReqlQueryLogicError", "Hours out of range in `+25:00`.")
 		/* r.now().in_timezone("+25:00") */
 
 		suite.T().Log("About to run line #59: r.Now().InTimezone('+25:00')")
@@ -309,7 +309,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #63
 		/* err('ReqlQueryLogicError', 'Timezone `` does not start with `-` or `+`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Timezone `` does not start with `-` or `+`.")
+		var expected_ = err("ReqlQueryLogicError", "Timezone `` does not start with `-` or `+`.")
 		/* r.time(2013, 1, 1, "") */
 
 		suite.T().Log("About to run line #63: r.Time(2013, 1, 1, '')")
@@ -324,7 +324,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #66
 		/* err('ReqlQueryLogicError', '`-00` is not a valid time offset.') */
-		var expected_ Err = err("ReqlQueryLogicError", "`-00` is not a valid time offset.")
+		var expected_ = err("ReqlQueryLogicError", "`-00` is not a valid time offset.")
 		/* r.time(2013, 1, 1, "-00") */
 
 		suite.T().Log("About to run line #66: r.Time(2013, 1, 1, '-00')")
@@ -339,7 +339,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #69
 		/* err('ReqlQueryLogicError', '`-00:00` is not a valid time offset.') */
-		var expected_ Err = err("ReqlQueryLogicError", "`-00:00` is not a valid time offset.")
+		var expected_ = err("ReqlQueryLogicError", "`-00:00` is not a valid time offset.")
 		/* r.time(2013, 1, 1, "-00:00") */
 
 		suite.T().Log("About to run line #69: r.Time(2013, 1, 1, '-00:00')")
@@ -354,7 +354,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #72
 		/* err('ReqlQueryLogicError', 'Timezone `UTC+00` does not start with `-` or `+`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Timezone `UTC+00` does not start with `-` or `+`.")
+		var expected_ = err("ReqlQueryLogicError", "Timezone `UTC+00` does not start with `-` or `+`.")
 		/* r.time(2013, 1, 1, "UTC+00") */
 
 		suite.T().Log("About to run line #72: r.Time(2013, 1, 1, 'UTC+00')")
@@ -369,7 +369,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #75
 		/* err('ReqlQueryLogicError', 'Minutes out of range in `+00:60`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Minutes out of range in `+00:60`.")
+		var expected_ = err("ReqlQueryLogicError", "Minutes out of range in `+00:60`.")
 		/* r.time(2013, 1, 1, "+00:60") */
 
 		suite.T().Log("About to run line #75: r.Time(2013, 1, 1, '+00:60')")
@@ -384,7 +384,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #78
 		/* err('ReqlQueryLogicError', 'Hours out of range in `+25:00`.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Hours out of range in `+25:00`.")
+		var expected_ = err("ReqlQueryLogicError", "Hours out of range in `+25:00`.")
 		/* r.time(2013, 1, 1, "+25:00") */
 
 		suite.T().Log("About to run line #78: r.Time(2013, 1, 1, '+25:00')")
@@ -399,7 +399,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #81
 		/* ("2015-07-08T00:00:00-08:00") */
-		var expected_ string = "2015-07-08T00:00:00-08:00"
+		var expected_ = "2015-07-08T00:00:00-08:00"
 		/* r.epoch_time(1436428422.339).in_timezone('-08:00').date().to_iso8601() */
 
 		suite.T().Log("About to run line #81: r.EpochTime(1436428422.339).InTimezone('-08:00').Date().ToISO8601()")
@@ -414,7 +414,7 @@ func (suite *TimesTimezonesSuite) TestCases() {
 	{
 		// times/timezones.yaml line #85
 		/* ("2015-07-09T00:00:00-07:00") */
-		var expected_ string = "2015-07-09T00:00:00-07:00"
+		var expected_ = "2015-07-09T00:00:00-07:00"
 		/* r.epoch_time(1436428422.339).in_timezone('-07:00').date().to_iso8601() */
 
 		suite.T().Log("About to run line #85: r.EpochTime(1436428422.339).InTimezone('-07:00').Date().ToISO8601()")

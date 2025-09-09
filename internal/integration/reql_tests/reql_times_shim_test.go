@@ -68,7 +68,7 @@ func (suite *TimesShimSuite) TestCases() {
 	{
 		// times/shim.yaml line #8
 		/* ("2013-07-29T18:21:36.680-07:00") */
-		var expected_ string = "2013-07-29T18:21:36.680-07:00"
+		var expected_ = "2013-07-29T18:21:36.680-07:00"
 		/* r.expr(datetime.fromtimestamp(t, PacificTimeZone())).to_iso8601() */
 
 		suite.T().Log("About to run line #8: r.Expr(Ast.Fromtimestamp(t, PacificTimeZone())).ToISO8601()")
@@ -83,7 +83,7 @@ func (suite *TimesShimSuite) TestCases() {
 	{
 		// times/shim.yaml line #12
 		/* ("2013-07-30T01:21:36.680+00:00") */
-		var expected_ string = "2013-07-30T01:21:36.680+00:00"
+		var expected_ = "2013-07-30T01:21:36.680+00:00"
 		/* r.expr(datetime.fromtimestamp(t, UTCTimeZone())).to_iso8601() */
 
 		suite.T().Log("About to run line #12: r.Expr(Ast.Fromtimestamp(t, UTCTimeZone())).ToISO8601()")
