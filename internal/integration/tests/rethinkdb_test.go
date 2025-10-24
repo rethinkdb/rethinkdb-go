@@ -1,6 +1,7 @@
 package tests
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -10,57 +11,93 @@ import (
 	"testing"
 	"time"
 
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/wait"
 	test "gopkg.in/check.v1"
 	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
 )
 
-var session *r.Session
-var testdata = flag.Bool("rethinkdb.testdata", true, "create test data")
-var url, url1, url2, url3, db, authKey string
+var (
+	session                            *r.Session
+	testdata                           = flag.Bool("rethinkdb.testdata", true, "create test data")
+	url, url1, url2, url3, db, authKey string
+)
 
 func init() {
 	// Fixing test.testlogfile parsing error on Go 1.13+.
-	if runtime.Version() < "go1.13" {
+	if runtime.Version() < "go1.22" {
 		flag.Parse()
 	}
 
 	r.SetVerbose(true)
 	// If the test is being run by wercker look for the rethink url
-	url = os.Getenv("RETHINKDB_URL")
-	if url == "" {
-		url = "localhost:28015"
+}
+
+type connectionDetails struct {
+	URL     string
+	DB      string
+	User    string
+	Session *r.Session
+}
+
+func startRethink(t testing.TB) (container testcontainers.Container, c *connectionDetails, err error) {
+	ctx := context.Background()
+	var log testcontainers.Logging
+	if t != nil {
+		log = testcontainers.TestLogger(t)
+	}
+	req := testcontainers.ContainerRequest{
+		Image:        "rethinkdb:2.4.4-bookworm-slim",
+		ExposedPorts: []string{"8080/tcp", "28015/tcp"},
+		Env:          map[string]string{"RETHINKDB_PASSWORD": "rethink"},
+		WaitingFor: wait.ForAll(
+			wait.ForListeningPort("28015/tcp"),
+		),
+		Cmd: []string{"rethinkdb", "--bind", "all", "--directory", "/tmp", "--io-threads", "500"},
+	}
+	rtContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+		Logger:           log,
+	})
+	if err != nil {
+		panic(err.Error())
+	}
+	ip, err := rtContainer.Host(ctx)
+	if err != nil {
+		return rtContainer, nil, err
+	}
+	port, err := rtContainer.MappedPort(ctx, "28015")
+	if err != nil {
+		return rtContainer, nil, err
 	}
 
-	url1 = os.Getenv("RETHINKDB_URL_1")
-	if url1 == "" {
-		url1 = "localhost:28016"
+	c = &connectionDetails{
+		URL:  ip + ":" + port.Port(),
+		User: "admin",
+		DB:   "test",
 	}
+	session, err = r.Connect(r.ConnectOpts{
+		Address: ip + ":" + port.Port(),
+	})
+	if err != nil {
+		return rtContainer, nil, err
+	}
+	c.Session = session
 
-	url2 = os.Getenv("RETHINKDB_URL_2")
-	if url2 == "" {
-		url2 = "localhost:28017"
-	}
-
-	url3 = os.Getenv("RETHINKDB_URL_3")
-	if url3 == "" {
-		url3 = "localhost:28018"
-	}
-
-	db = os.Getenv("RETHINKDB_DB")
-	if db == "" {
-		db = "test"
-	}
+	return rtContainer, c, err
 }
 
 // Begin TestMain(), Setup, Teardown
 func testSetup(m *testing.M) {
 	var err error
-	session, err = r.Connect(r.ConnectOpts{
-		Address: url,
-	})
+	_, connection, err := startRethink(nil)
 	if err != nil {
 		panic(fmt.Errorf("Error connecting to instance: %w", err))
 	}
+
+	session = connection.Session
+	url = connection.URL
 
 	setupTestData()
 }
