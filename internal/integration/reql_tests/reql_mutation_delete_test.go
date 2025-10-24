@@ -70,7 +70,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #7
 		/* ({'deleted':0,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':100}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 100}
+		var expected_ = map[interface{}]interface{}{"deleted": 0, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 100}
 		/* tbl.insert([{'id':i} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #7: tbl.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, })\n    }\n    return res\n}()))")
@@ -92,7 +92,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #19
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.count() */
 
 		suite.T().Log("About to run line #19: tbl.Count()")
@@ -107,7 +107,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #24
 		/* ({'deleted':1,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 1, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"deleted": 1, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
 		/* tbl.get(12).delete() */
 
 		suite.T().Log("About to run line #24: tbl.Get(12).Delete()")
@@ -122,7 +122,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #31
 		/* err('ReqlQueryLogicError', 'Durability option `wrong` unrecognized (options are "hard" and "soft").', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Durability option `wrong` unrecognized (options are \"hard\" and \"soft\").")
+		var expected_ = err("ReqlQueryLogicError", "Durability option `wrong` unrecognized (options are \"hard\" and \"soft\").")
 		/* tbl.skip(50).delete(durability='wrong') */
 
 		suite.T().Log("About to run line #31: tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: 'wrong', })")
@@ -137,7 +137,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #38
 		/* ({'deleted':49,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 49, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"deleted": 49, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
 		/* tbl.skip(50).delete(durability='soft') */
 
 		suite.T().Log("About to run line #38: tbl.Skip(50).Delete().OptArgs(r.DeleteOpts{Durability: 'soft', })")
@@ -152,7 +152,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #45
 		/* ({'deleted':50,'replaced':0,'unchanged':0,'errors':0,'skipped':0,'inserted':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 50, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"deleted": 50, "replaced": 0, "unchanged": 0, "errors": 0, "skipped": 0, "inserted": 0}
 		/* tbl.delete(durability='hard') */
 
 		suite.T().Log("About to run line #45: tbl.Delete().OptArgs(r.DeleteOpts{Durability: 'hard', })")
@@ -167,7 +167,7 @@ func (suite *MutationDeleteSuite) TestCases() {
 	{
 		// mutation/delete.yaml line #49
 		/* err('ReqlQueryLogicError', 'Expected type SELECTION but found DATUM:', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type SELECTION but found DATUM:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type SELECTION but found DATUM:")
 		/* r.expr([1, 2]).delete() */
 
 		suite.T().Log("About to run line #49: r.Expr([]interface{}{1, 2}).Delete()")

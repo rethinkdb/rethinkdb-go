@@ -77,7 +77,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #8
 		/* ({'created':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('sindex', lambda row:common_prefix.append(row['value'])) */
 
 		suite.T().Log("About to run line #8: tbl.IndexCreateFunc('sindex', func(row r.Term) interface{} { return common_prefix.Append(row.AtIndex('value'))})")
@@ -92,7 +92,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #11
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.index_wait('sindex') */
 
 		suite.T().Log("About to run line #11: tbl.IndexWait('sindex')")
@@ -226,7 +226,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #83
 		/* err('ReqlQueryLogicError', 'Cannot call `changes` after a non-deterministic function.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot call `changes` after a non-deterministic function.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot call `changes` after a non-deterministic function.")
 		/* tbl.map(nondetermmap).changes(squash=False) */
 
 		suite.T().Log("About to run line #83: tbl.Map(nondetermmap).Changes().OptArgs(r.ChangesOpts{Squash: false, })")
@@ -248,7 +248,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #92
 		/* err('ReqlQueryLogicError', 'Cannot call `changes` after a non-deterministic function.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot call `changes` after a non-deterministic function.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot call `changes` after a non-deterministic function.")
 		/* tbl.filter(nondetermfilter).changes(squash=False) */
 
 		suite.T().Log("About to run line #92: tbl.Filter(nondetermfilter).Changes().OptArgs(r.ChangesOpts{Squash: false, })")
@@ -270,7 +270,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #100
 		/* ({'skipped':0,'deleted':0,'unchanged':0,'errors':0,'replaced':0,'inserted':101}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"skipped": 0, "deleted": 0, "unchanged": 0, "errors": 0, "replaced": 0, "inserted": 101}
+		var expected_ = map[interface{}]interface{}{"skipped": 0, "deleted": 0, "unchanged": 0, "errors": 0, "replaced": 0, "inserted": 101}
 		/* tbl.insert(r.range(101).map({'id':r.uuid().coerce_to('binary').slice(0,r.random(4,24)).coerce_to('string'),'value':r.row.coerce_to('string')})) */
 
 		suite.T().Log("About to run line #100: tbl.Insert(r.Range(101).Map(map[interface{}]interface{}{'id': r.UUID().CoerceTo('binary').Slice(0, r.Random(4, 24)).CoerceTo('string'), 'value': r.Row.CoerceTo('string'), }))")
@@ -285,7 +285,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #105
 		/* bag(pre) */
-		var expected_ compare.Expected = compare.UnorderedMatch(pre)
+		var expected_ = compare.UnorderedMatch(pre)
 		/* pre_changes */
 
 		suite.T().Log("About to run line #105: pre_changes")
@@ -300,7 +300,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #108
 		/* bag(mid) */
-		var expected_ compare.Expected = compare.UnorderedMatch(mid)
+		var expected_ = compare.UnorderedMatch(mid)
 		/* mid_changes */
 
 		suite.T().Log("About to run line #108: mid_changes")
@@ -315,7 +315,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #111
 		/* bag(post) */
-		var expected_ compare.Expected = compare.UnorderedMatch(post)
+		var expected_ = compare.UnorderedMatch(post)
 		/* post_changes */
 
 		suite.T().Log("About to run line #111: post_changes")
@@ -330,7 +330,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #114
 		/* bag(erroredres) */
-		var expected_ compare.Expected = compare.UnorderedMatch(erroredres)
+		var expected_ = compare.UnorderedMatch(erroredres)
 		/* premap_changes1 */
 
 		suite.T().Log("About to run line #114: premap_changes1")
@@ -345,7 +345,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #117
 		/* bag(erroredres) */
-		var expected_ compare.Expected = compare.UnorderedMatch(erroredres)
+		var expected_ = compare.UnorderedMatch(erroredres)
 		/* premap_changes2 */
 
 		suite.T().Log("About to run line #117: premap_changes2")
@@ -360,7 +360,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #120
 		/* err('ReqlNonExistenceError', "No attribute `dummy` in object:") */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `dummy` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `dummy` in object:")
 		/* postmap_changes1 */
 
 		suite.T().Log("About to run line #120: postmap_changes1")
@@ -375,7 +375,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #123
 		/* err('ReqlNonExistenceError', "Index out of bounds:" + " 1") */
-		var expected_ Err = err("ReqlNonExistenceError", "Index out of bounds:"+" 1")
+		var expected_ = err("ReqlNonExistenceError", "Index out of bounds:"+" 1")
 		/* postmap_changes2 */
 
 		suite.T().Log("About to run line #123: postmap_changes2")
@@ -390,7 +390,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #126
 		/* err('ReqlUserError', "dummy") */
-		var expected_ Err = err("ReqlUserError", "dummy")
+		var expected_ = err("ReqlUserError", "dummy")
 		/* postmap_changes3 */
 
 		suite.T().Log("About to run line #126: postmap_changes3")
@@ -405,7 +405,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #129
 		/* bag(erroredres) */
-		var expected_ compare.Expected = compare.UnorderedMatch(erroredres)
+		var expected_ = compare.UnorderedMatch(erroredres)
 		/* prefilter_changes1 */
 
 		suite.T().Log("About to run line #129: prefilter_changes1")
@@ -420,7 +420,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #132
 		/* bag(erroredres) */
-		var expected_ compare.Expected = compare.UnorderedMatch(erroredres)
+		var expected_ = compare.UnorderedMatch(erroredres)
 		/* prefilter_changes2 */
 
 		suite.T().Log("About to run line #132: prefilter_changes2")
@@ -435,7 +435,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #135
 		/* bag(erroredres) */
-		var expected_ compare.Expected = compare.UnorderedMatch(erroredres)
+		var expected_ = compare.UnorderedMatch(erroredres)
 		/* postfilter_changes1 */
 
 		suite.T().Log("About to run line #135: postfilter_changes1")
@@ -450,7 +450,7 @@ func (suite *ChangefeedsEdgeSuite) TestCases() {
 	{
 		// changefeeds/edge.yaml line #138
 		/* bag(erroredres) */
-		var expected_ compare.Expected = compare.UnorderedMatch(erroredres)
+		var expected_ = compare.UnorderedMatch(erroredres)
 		/* postfilter_changes2 */
 
 		suite.T().Log("About to run line #138: postfilter_changes2")

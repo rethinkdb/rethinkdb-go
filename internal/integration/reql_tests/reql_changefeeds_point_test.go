@@ -77,7 +77,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #14
 		/* [{'new_val':null}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"new_val": nil}}
 		/* fetch(basic, 1) */
 
 		suite.T().Log("About to run line #14: fetch(basic, 1)")
@@ -89,7 +89,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #19
 		/* partial({'errors':0, 'inserted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
 		/* tbl.insert({'id':1}) */
 
 		suite.T().Log("About to run line #19: tbl.Insert(map[interface{}]interface{}{'id': 1, })")
@@ -104,7 +104,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #22
 		/* [{'old_val':null, 'new_val':{'id':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}}
 		/* fetch(basic, 1) */
 
 		suite.T().Log("About to run line #22: fetch(basic, 1)")
@@ -116,7 +116,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #27
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* tbl.get(1).update({'update':1}) */
 
 		suite.T().Log("About to run line #27: tbl.Get(1).Update(map[interface{}]interface{}{'update': 1, })")
@@ -131,7 +131,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #30
 		/* [{'old_val':{'id':1}, 'new_val':{'id':1,'update':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "update": 1}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "update": 1}}}
 		/* fetch(basic, 1) */
 
 		suite.T().Log("About to run line #30: fetch(basic, 1)")
@@ -143,7 +143,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #35
 		/* partial({'errors':0, 'deleted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
 		/* tbl.get(1).delete() */
 
 		suite.T().Log("About to run line #35: tbl.Get(1).Delete()")
@@ -158,7 +158,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #38
 		/* [{'old_val':{'id':1,'update':1}, 'new_val':null}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "update": 1}, "new_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "update": 1}, "new_val": nil}}
 		/* fetch(basic, 1) */
 
 		suite.T().Log("About to run line #38: fetch(basic, 1)")
@@ -177,7 +177,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #53
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.insert({'id':1, 'update':1}) */
 
 		suite.T().Log("About to run line #53: tbl.Insert(map[interface{}]interface{}{'id': 1, 'update': 1, })")
@@ -192,7 +192,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #54
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get(1).update({'update':4}) */
 
 		suite.T().Log("About to run line #54: tbl.Get(1).Update(map[interface{}]interface{}{'update': 4, })")
@@ -207,7 +207,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #55
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get(1).update({'update':1}) */
 
 		suite.T().Log("About to run line #55: tbl.Get(1).Update(map[interface{}]interface{}{'update': 1, })")
@@ -222,7 +222,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #56
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get(1).update({'update':7}) */
 
 		suite.T().Log("About to run line #56: tbl.Get(1).Update(map[interface{}]interface{}{'update': 7, })")
@@ -237,7 +237,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #58
 		/* [4,7] */
-		var expected_ []interface{} = []interface{}{4, 7}
+		var expected_ = []interface{}{4, 7}
 		/* fetch(filter, 2) */
 
 		suite.T().Log("About to run line #58: fetch(filter, 2)")
@@ -256,7 +256,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #67
 		/* partial({'errors':0, 'inserted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
 		/* tbl.insert({'id':3, 'red':1, 'green':1}) */
 
 		suite.T().Log("About to run line #67: tbl.Insert(map[interface{}]interface{}{'id': 3, 'red': 1, 'green': 1, })")
@@ -271,7 +271,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #69
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* tbl.get(3).update({'blue':2, 'green':3}) */
 
 		suite.T().Log("About to run line #69: tbl.Get(3).Update(map[interface{}]interface{}{'blue': 2, 'green': 3, })")
@@ -286,7 +286,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #71
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* tbl.get(3).update({'green':4}) */
 
 		suite.T().Log("About to run line #71: tbl.Get(3).Update(map[interface{}]interface{}{'green': 4, })")
@@ -301,7 +301,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #73
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* tbl.get(3).update({'blue':4}) */
 
 		suite.T().Log("About to run line #73: tbl.Get(3).Update(map[interface{}]interface{}{'blue': 4, })")
@@ -316,7 +316,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #76
 		/* [{'red': 1}, {'blue': 2, 'red': 1}, {'blue': 2, 'red': 1}, {'blue': 4, 'red': 1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"red": 1}, map[interface{}]interface{}{"blue": 2, "red": 1}, map[interface{}]interface{}{"blue": 2, "red": 1}, map[interface{}]interface{}{"blue": 4, "red": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"red": 1}, map[interface{}]interface{}{"blue": 2, "red": 1}, map[interface{}]interface{}{"blue": 2, "red": 1}, map[interface{}]interface{}{"blue": 4, "red": 1}}
 		/* fetch(pluck, 4) */
 
 		suite.T().Log("About to run line #76: fetch(pluck, 4)")
@@ -342,7 +342,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #88
 		/* [{'new_val':null}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"new_val": nil}}
 		/* fetch(debug, 1) */
 
 		suite.T().Log("About to run line #88: fetch(debug, 1)")
@@ -354,7 +354,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #91
 		/* partial({'errors':0, 'inserted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "inserted": 1})
 		/* dtbl.insert({'id':1}) */
 
 		suite.T().Log("About to run line #91: dtbl.Insert(map[interface{}]interface{}{'id': 1, })")
@@ -369,7 +369,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #93
 		/* [{'old_val':null, 'new_val':{'id':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": nil, "new_val": map[interface{}]interface{}{"id": 1}}}
 		/* fetch(debug, 1) */
 
 		suite.T().Log("About to run line #93: fetch(debug, 1)")
@@ -381,7 +381,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #96
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* dtbl.get(1).update({'update':1}) */
 
 		suite.T().Log("About to run line #96: dtbl.Get(1).Update(map[interface{}]interface{}{'update': 1, })")
@@ -396,7 +396,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #98
 		/* [{'old_val':{'id':1}, 'new_val':{'id':1,'update':1}}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "update": 1}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1}, "new_val": map[interface{}]interface{}{"id": 1, "update": 1}}}
 		/* fetch(debug, 1) */
 
 		suite.T().Log("About to run line #98: fetch(debug, 1)")
@@ -408,7 +408,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #101
 		/* partial({'errors':0, 'deleted':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "deleted": 1})
 		/* dtbl.get(1).delete() */
 
 		suite.T().Log("About to run line #101: dtbl.Get(1).Delete()")
@@ -423,7 +423,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #103
 		/* [{'old_val':{'id':1,'update':1}, 'new_val':null}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "update": 1}, "new_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"old_val": map[interface{}]interface{}{"id": 1, "update": 1}, "new_val": nil}}
 		/* fetch(debug, 1) */
 
 		suite.T().Log("About to run line #103: fetch(debug, 1)")
@@ -435,7 +435,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #106
 		/* {'skipped':0, 'deleted':0, 'unchanged':0, 'errors':0, 'replaced':0, 'inserted':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"skipped": 0, "deleted": 0, "unchanged": 0, "errors": 0, "replaced": 0, "inserted": 1}
+		var expected_ = map[interface{}]interface{}{"skipped": 0, "deleted": 0, "unchanged": 0, "errors": 0, "replaced": 0, "inserted": 1}
 		/* dtbl.insert({'id':5, 'red':1, 'green':1}) */
 
 		suite.T().Log("About to run line #106: dtbl.Insert(map[interface{}]interface{}{'id': 5, 'red': 1, 'green': 1, })")
@@ -457,7 +457,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #113
 		/* [{'red':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"red": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"red": 1}}
 		/* fetch(dtblPluck, 1) */
 
 		suite.T().Log("About to run line #113: fetch(dtblPluck, 1)")
@@ -469,7 +469,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #116
 		/* partial({'errors':0, 'replaced':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"errors": 0, "replaced": 1})
 		/* dtbl.get(5).update({'blue':2, 'green':3}) */
 
 		suite.T().Log("About to run line #116: dtbl.Get(5).Update(map[interface{}]interface{}{'blue': 2, 'green': 3, })")
@@ -484,7 +484,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #119
 		/* [{'blue':2, 'red':1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"blue": 2, "red": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"blue": 2, "red": 1}}
 		/* fetch(dtblPluck, 1) */
 
 		suite.T().Log("About to run line #119: fetch(dtblPluck, 1)")
@@ -510,7 +510,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #137
 		/* partial([{'new_val':partial({'db':'test'})}]) */
-		var expected_ compare.Expected = compare.PartialMatch([]interface{}{map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"db": "test"})}})
+		var expected_ = compare.PartialMatch([]interface{}{map[interface{}]interface{}{"new_val": compare.PartialMatch(map[interface{}]interface{}{"db": "test"})}})
 		/* fetch(rtblPluck, 1) */
 
 		suite.T().Log("About to run line #137: fetch(rtblPluck, 1)")
@@ -522,7 +522,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #140
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.reconfigure(shards=3, replicas=1) */
 
 		suite.T().Log("About to run line #140: tbl.Reconfigure().OptArgs(r.ReconfigureOpts{Shards: 3, Replicas: 1, })")
@@ -537,7 +537,7 @@ func (suite *ChangefeedsPointSuite) TestCases() {
 	{
 		// changefeeds/point.yaml line #143
 		/* partial([{'old_val':partial({'db':'test'}), 'new_val':partial({'db':'test'})}]) */
-		var expected_ compare.Expected = compare.PartialMatch([]interface{}{map[interface{}]interface{}{"old_val": compare.PartialMatch(map[interface{}]interface{}{"db": "test"}), "new_val": compare.PartialMatch(map[interface{}]interface{}{"db": "test"})}})
+		var expected_ = compare.PartialMatch([]interface{}{map[interface{}]interface{}{"old_val": compare.PartialMatch(map[interface{}]interface{}{"db": "test"}), "new_val": compare.PartialMatch(map[interface{}]interface{}{"db": "test"})}})
 		/* fetch(rtblPluck, 1, 2) */
 
 		suite.T().Log("About to run line #143: fetch(rtblPluck, 1)")

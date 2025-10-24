@@ -70,7 +70,7 @@ func (suite *ChangefeedsNowSuite) TestCases() {
 	{
 		// changefeeds/now.py_one.yaml line #8
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.merge({'a': r.now()}).changes() */
 
 		suite.T().Log("About to run line #8: tbl.Merge(map[interface{}]interface{}{'a': r.Now(), }).Changes()")

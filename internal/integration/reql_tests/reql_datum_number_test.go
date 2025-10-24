@@ -61,7 +61,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #6
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1) */
 
 		suite.T().Log("About to run line #6: r.Expr(1)")
@@ -76,7 +76,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #15
 		/* -1 */
-		var expected_ int = -1
+		var expected_ = -1
 		/* r.expr(-1) */
 
 		suite.T().Log("About to run line #15: r.Expr(-1)")
@@ -91,7 +91,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #24
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(0) */
 
 		suite.T().Log("About to run line #24: r.Expr(0)")
@@ -121,7 +121,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #44
 		/* 1.5 */
-		var expected_ float64 = 1.5
+		var expected_ = 1.5
 		/* r.expr(1.5) */
 
 		suite.T().Log("About to run line #44: r.Expr(1.5)")
@@ -166,7 +166,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #73
 		/* 1234567890 */
-		var expected_ int = 1234567890
+		var expected_ = 1234567890
 		/* r.expr(1234567890) */
 
 		suite.T().Log("About to run line #73: r.Expr(1234567890)")
@@ -181,7 +181,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #83
 		/* -73850380122423 */
-		var expected_ int = -73850380122423
+		var expected_ = -73850380122423
 		/* r.expr(-73850380122423) */
 
 		suite.T().Log("About to run line #83: r.Expr(-73850380122423)")
@@ -226,7 +226,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #103
 		/* 'NUMBER' */
-		var expected_ string = "NUMBER"
+		var expected_ = "NUMBER"
 		/* r.expr(1).type_of() */
 
 		suite.T().Log("About to run line #103: r.Expr(1).TypeOf()")
@@ -241,7 +241,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #107
 		/* '1' */
-		var expected_ string = "1"
+		var expected_ = "1"
 		/* r.expr(1).coerce_to('string') */
 
 		suite.T().Log("About to run line #107: r.Expr(1).CoerceTo('string')")
@@ -256,7 +256,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #110
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1).coerce_to('number') */
 
 		suite.T().Log("About to run line #110: r.Expr(1).CoerceTo('number')")
@@ -271,7 +271,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #115
 		/* int_cmp(1) */
-		var expected_ int = int_cmp(1)
+		var expected_ = int_cmp(1)
 		/* r.expr(1.0) */
 
 		suite.T().Log("About to run line #115: r.Expr(1.0)")
@@ -286,7 +286,7 @@ func (suite *DatumNumberSuite) TestCases() {
 	{
 		// datum/number.yaml line #119
 		/* int_cmp(45) */
-		var expected_ int = int_cmp(45)
+		var expected_ = int_cmp(45)
 		/* r.expr(45) */
 
 		suite.T().Log("About to run line #119: r.Expr(45)")

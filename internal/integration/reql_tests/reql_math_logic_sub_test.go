@@ -61,7 +61,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #6
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(1) - 1 */
 
 		suite.T().Log("About to run line #6: r.Expr(1).Sub(1)")
@@ -76,7 +76,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #7
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* 1 - r.expr(1) */
 
 		suite.T().Log("About to run line #7: r.Sub(1, r.Expr(1))")
@@ -91,7 +91,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #8
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* r.expr(1).sub(1) */
 
 		suite.T().Log("About to run line #8: r.Expr(1).Sub(1)")
@@ -106,7 +106,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #17
 		/* -2 */
-		var expected_ int = -2
+		var expected_ = -2
 		/* r.expr(-1) - 1 */
 
 		suite.T().Log("About to run line #17: r.Expr(-1).Sub(1)")
@@ -136,7 +136,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #26
 		/* -13 */
-		var expected_ int = -13
+		var expected_ = -13
 		/* r.expr(1).sub(2,3,4,5) */
 
 		suite.T().Log("About to run line #26: r.Expr(1).Sub(2, 3, 4, 5)")
@@ -151,7 +151,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #30
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('a').sub(0.8) */
 
 		suite.T().Log("About to run line #30: r.Expr('a').Sub(0.8)")
@@ -166,7 +166,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #33
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr(1).sub('a') */
 
 		suite.T().Log("About to run line #33: r.Expr(1).Sub('a')")
@@ -181,7 +181,7 @@ func (suite *MathLogicSubSuite) TestCases() {
 	{
 		// math_logic/sub.yaml line #36
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('b').sub('a') */
 
 		suite.T().Log("About to run line #36: r.Expr('b').Sub('a')")

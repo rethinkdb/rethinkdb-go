@@ -61,7 +61,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #5
 		/* err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 5.000 seconds.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 5.000 seconds.")
+		var expected_ = err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 5.000 seconds.")
 		/* r.js('while(true) {}') */
 
 		suite.T().Log("About to run line #5: r.JS('while(true) {}')")
@@ -76,7 +76,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #8
 		/* err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 1.300 seconds.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 1.300 seconds.")
+		var expected_ = err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 1.300 seconds.")
 		/* r.js('while(true) {}', timeout=1.3) */
 
 		suite.T().Log("About to run line #8: r.JS('while(true) {}').OptArgs(r.JSOpts{Timeout: 1.3, })")
@@ -91,7 +91,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #13
 		/* err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 8.000 seconds.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 8.000 seconds.")
+		var expected_ = err("ReqlQueryLogicError", "JavaScript query `while(true) {}` timed out after 8.000 seconds.")
 		/* r.js('while(true) {}', timeout=8) */
 
 		suite.T().Log("About to run line #13: r.JS('while(true) {}').OptArgs(r.JSOpts{Timeout: 8, })")
@@ -106,7 +106,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #18
 		/* err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 5.000 seconds.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 5.000 seconds.")
+		var expected_ = err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 5.000 seconds.")
 		/* r.expr('foo').do(r.js('(function(x) { while(true) {} })')) */
 
 		suite.T().Log("About to run line #18: r.Expr('foo').Do(r.JS('(function(x) { while(true) {} })'))")
@@ -121,7 +121,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #21
 		/* err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 1.300 seconds.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 1.300 seconds.")
+		var expected_ = err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 1.300 seconds.")
 		/* r.expr('foo').do(r.js('(function(x) { while(true) {} })', timeout=1.3)) */
 
 		suite.T().Log("About to run line #21: r.Expr('foo').Do(r.JS('(function(x) { while(true) {} })').OptArgs(r.JSOpts{Timeout: 1.3, }))")
@@ -136,7 +136,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #26
 		/* err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 8.000 seconds.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 8.000 seconds.")
+		var expected_ = err("ReqlQueryLogicError", "JavaScript query `(function(x) { while(true) {} })` timed out after 8.000 seconds.")
 		/* r.expr('foo').do(r.js('(function(x) { while(true) {} })', timeout=8)) */
 
 		suite.T().Log("About to run line #26: r.Expr('foo').Do(r.JS('(function(x) { while(true) {} })').OptArgs(r.JSOpts{Timeout: 8, }))")
@@ -151,7 +151,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #32
 		/* err("ReqlNonExistenceError", "Error in HTTP GET of `httpbin.org/delay/10`:" + " timed out after 0.800 seconds.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Error in HTTP GET of `httpbin.org/delay/10`:"+" timed out after 0.800 seconds.")
+		var expected_ = err("ReqlNonExistenceError", "Error in HTTP GET of `httpbin.org/delay/10`:"+" timed out after 0.800 seconds.")
 		/* r.http('httpbin.org/delay/10', timeout=0.8) */
 
 		suite.T().Log("About to run line #32: r.HTTP('httpbin.org/delay/10').OptArgs(r.HTTPOpts{Timeout: 0.8, })")
@@ -166,7 +166,7 @@ func (suite *TimeoutSuite) TestCases() {
 	{
 		// timeout.yaml line #36
 		/* err("ReqlNonExistenceError", "Error in HTTP PUT of `httpbin.org/delay/10`:" + " timed out after 0.000 seconds.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Error in HTTP PUT of `httpbin.org/delay/10`:"+" timed out after 0.000 seconds.")
+		var expected_ = err("ReqlNonExistenceError", "Error in HTTP PUT of `httpbin.org/delay/10`:"+" timed out after 0.000 seconds.")
 		/* r.http('httpbin.org/delay/10', method='PUT', timeout=0.0) */
 
 		suite.T().Log("About to run line #36: r.HTTP('httpbin.org/delay/10').OptArgs(r.HTTPOpts{Method: 'PUT', Timeout: 0.0, })")

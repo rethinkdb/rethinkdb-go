@@ -78,7 +78,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #7
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(1).do(lambda v: v * 2) */
 
 		suite.T().Log("About to run line #7: r.Expr(1).Do(func(v r.Term) interface{} { return r.Mul(v, 2)})")
@@ -93,7 +93,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #12
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* r.expr([0, 1, 2]).do(lambda v: v.append(3)) */
 
 		suite.T().Log("About to run line #12: r.Expr([]interface{}{0, 1, 2}).Do(func(v r.Term) interface{} { return v.Append(3)})")
@@ -108,7 +108,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #17
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* r.do(1, 2, lambda x, y: x + y) */
 
 		suite.T().Log("About to run line #17: r.Do(1, 2, func(x r.Term, y r.Term) interface{} { return r.Add(x, y)})")
@@ -123,7 +123,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #22
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.do(lambda: 1) */
 
 		suite.T().Log("About to run line #22: r.Do(func() interface{} { return 1})")
@@ -138,7 +138,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #38
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.do(1) */
 
 		suite.T().Log("About to run line #38: r.Do(1)")
@@ -153,7 +153,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #53
 		/* err("ReqlQueryLogicError", "Expected type ARRAY but found STRING.", [1, 0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type ARRAY but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type ARRAY but found STRING.")
 		/* r.expr('abc').do(lambda v: v.append(3)) */
 
 		suite.T().Log("About to run line #53: r.Expr('abc').Do(func(v r.Term) interface{} { return v.Append(3)})")
@@ -168,7 +168,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #58
 		/* err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.", [1, 1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
 		/* r.expr('abc').do(lambda v: v + 3) */
 
 		suite.T().Log("About to run line #58: r.Expr('abc').Do(func(v r.Term) interface{} { return r.Add(v, 3)})")
@@ -183,7 +183,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #63
 		/* err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.", [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
 		/* r.expr('abc').do(lambda v: v + 'def') + 3 */
 
 		suite.T().Log("About to run line #63: r.Expr('abc').Do(func(v r.Term) interface{} { return r.Add(v, 'def')}).Add(3)")
@@ -198,7 +198,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #78
 		/* 5 */
-		var expected_ int = 5
+		var expected_ = 5
 		/* r.expr(5).do(r.row) */
 
 		suite.T().Log("About to run line #78: r.Expr(5).Do(r.Row)")
@@ -213,7 +213,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #84
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch(True, 1, 2) */
 
 		suite.T().Log("About to run line #84: r.Branch(true, 1, 2)")
@@ -228,7 +228,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #86
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.branch(False, 1, 2) */
 
 		suite.T().Log("About to run line #86: r.Branch(false, 1, 2)")
@@ -243,7 +243,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #88
 		/* ("c") */
-		var expected_ string = "c"
+		var expected_ = "c"
 		/* r.branch(1, 'c', False) */
 
 		suite.T().Log("About to run line #88: r.Branch(1, 'c', false)")
@@ -258,7 +258,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #90
 		/* ([]) */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.branch(null, {}, []) */
 
 		suite.T().Log("About to run line #90: r.Branch(nil, map[interface{}]interface{}{}, []interface{}{})")
@@ -273,7 +273,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #93
 		/* err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:")
 		/* r.branch(r.db('test'), 1, 2) */
 
 		suite.T().Log("About to run line #93: r.Branch(r.DB('test'), 1, 2)")
@@ -288,7 +288,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #95
 		/* err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:")
 		/* r.branch(tbl, 1, 2) */
 
 		suite.T().Log("About to run line #95: r.Branch(tbl, 1, 2)")
@@ -303,7 +303,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #97
 		/* err("ReqlUserError", "a", []) */
-		var expected_ Err = err("ReqlUserError", "a")
+		var expected_ = err("ReqlUserError", "a")
 		/* r.branch(r.error("a"), 1, 2) */
 
 		suite.T().Log("About to run line #97: r.Branch(r.Error('a'), 1, 2)")
@@ -318,7 +318,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #100
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch([], 1, 2) */
 
 		suite.T().Log("About to run line #100: r.Branch([]interface{}{}, 1, 2)")
@@ -333,7 +333,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #102
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch({}, 1, 2) */
 
 		suite.T().Log("About to run line #102: r.Branch(map[interface{}]interface{}{}, 1, 2)")
@@ -348,7 +348,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #104
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch("a", 1, 2) */
 
 		suite.T().Log("About to run line #104: r.Branch('a', 1, 2)")
@@ -363,7 +363,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #106
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch(1.2, 1, 2) */
 
 		suite.T().Log("About to run line #106: r.Branch(1.2, 1, 2)")
@@ -378,7 +378,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #109
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch(True, 1, True, 2, 3) */
 
 		suite.T().Log("About to run line #109: r.Branch(true, 1, true, 2, 3)")
@@ -393,7 +393,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #111
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch(True, 1, False, 2, 3) */
 
 		suite.T().Log("About to run line #111: r.Branch(true, 1, false, 2, 3)")
@@ -408,7 +408,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #113
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.branch(False, 1, True, 2, 3) */
 
 		suite.T().Log("About to run line #113: r.Branch(false, 1, true, 2, 3)")
@@ -423,7 +423,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #115
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* r.branch(False, 1, False, 2, 3) */
 
 		suite.T().Log("About to run line #115: r.Branch(false, 1, false, 2, 3)")
@@ -438,7 +438,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #118
 		/* err("ReqlQueryLogicError", "Cannot call `branch` term with an even number of arguments.") */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot call `branch` term with an even number of arguments.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot call `branch` term with an even number of arguments.")
 		/* r.branch(True, 1, True, 2) */
 
 		suite.T().Log("About to run line #118: r.Branch(true, 1, true, 2)")
@@ -453,7 +453,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #122
 		/* err("ReqlUserError", "Hello World", [0]) */
-		var expected_ Err = err("ReqlUserError", "Hello World")
+		var expected_ = err("ReqlUserError", "Hello World")
 		/* r.error('Hello World') */
 
 		suite.T().Log("About to run line #122: r.Error('Hello World')")
@@ -468,7 +468,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #125
 		/* err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found NUMBER.")
 		/* r.error(5) */
 
 		suite.T().Log("About to run line #125: r.Error(5)")
@@ -483,7 +483,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #140
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.js('1 + 1') */
 
 		suite.T().Log("About to run line #140: r.JS('1 + 1')")
@@ -498,7 +498,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #143
 		/* 4 */
-		var expected_ int = 4
+		var expected_ = 4
 		/* r.js('1 + 1; 2 + 2') */
 
 		suite.T().Log("About to run line #143: r.JS('1 + 1; 2 + 2')")
@@ -513,7 +513,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #146
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* r.do(1, 2, r.js('(function(a, b) { return a + b; })')) */
 
 		suite.T().Log("About to run line #146: r.Do(1, 2, r.JS('(function(a, b) { return a + b; })'))")
@@ -528,7 +528,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #149
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(1).do(r.js('(function(x) { return x + 1; })')) */
 
 		suite.T().Log("About to run line #149: r.Expr(1).Do(r.JS('(function(x) { return x + 1; })'))")
@@ -543,7 +543,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #152
 		/* 'foobar' */
-		var expected_ string = "foobar"
+		var expected_ = "foobar"
 		/* r.expr('foo').do(r.js('(function(x) { return x + "bar"; })')) */
 
 		suite.T().Log("About to run line #152: r.Expr('foo').Do(r.JS('(function(x) { return x + \\'bar\\'; })'))")
@@ -558,7 +558,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #157
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* r.js('1 + 2', timeout=1.2) */
 
 		suite.T().Log("About to run line #157: r.JS('1 + 2').OptArgs(r.JSOpts{Timeout: 1.2, })")
@@ -573,7 +573,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #161
 		/* err("ReqlQueryLogicError", "Query result must be of type DATUM, GROUPED_DATA, or STREAM (got FUNCTION).", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Query result must be of type DATUM, GROUPED_DATA, or STREAM (got FUNCTION).")
+		var expected_ = err("ReqlQueryLogicError", "Query result must be of type DATUM, GROUPED_DATA, or STREAM (got FUNCTION).")
 		/* r.js('(function() { return 1; })') */
 
 		suite.T().Log("About to run line #161: r.JS('(function() { return 1; })')")
@@ -588,7 +588,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #164
 		/* err("ReqlQueryLogicError", "SyntaxError: Unexpected token (", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "SyntaxError: Unexpected token (")
+		var expected_ = err("ReqlQueryLogicError", "SyntaxError: Unexpected token (")
 		/* r.js('function() { return 1; }') */
 
 		suite.T().Log("About to run line #164: r.JS('function() { return 1; }')")
@@ -603,7 +603,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #168
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.do(1, 2, r.js('(function(a) { return a; })')) */
 
 		suite.T().Log("About to run line #168: r.Do(1, 2, r.JS('(function(a) { return a; })'))")
@@ -618,7 +618,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #171
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.do(1, 2, r.js('(function(a, b, c) { return a; })')) */
 
 		suite.T().Log("About to run line #171: r.Do(1, 2, r.JS('(function(a, b, c) { return a; })'))")
@@ -633,7 +633,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #174
 		/* err("ReqlQueryLogicError", "Cannot convert javascript `undefined` to ql::datum_t.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot convert javascript `undefined` to ql::datum_t.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot convert javascript `undefined` to ql::datum_t.")
 		/* r.do(1, 2, r.js('(function(a, b, c) { return c; })')) */
 
 		suite.T().Log("About to run line #174: r.Do(1, 2, r.JS('(function(a, b, c) { return c; })'))")
@@ -648,7 +648,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #177
 		/* ([2, 3]) */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* r.expr([1, 2, 3]).filter(r.js('(function(a) { return a >= 2; })')) */
 
 		suite.T().Log("About to run line #177: r.Expr([]interface{}{1, 2, 3}).Filter(r.JS('(function(a) { return a >= 2; })'))")
@@ -663,7 +663,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #180
 		/* ([2, 3, 4]) */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* r.expr([1, 2, 3]).map(r.js('(function(a) { return a + 1; })')) */
 
 		suite.T().Log("About to run line #180: r.Expr([]interface{}{1, 2, 3}).Map(r.JS('(function(a) { return a + 1; })'))")
@@ -678,7 +678,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #183
 		/* err("ReqlQueryLogicError", "Expected type FUNCTION but found DATUM:", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type FUNCTION but found DATUM:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type FUNCTION but found DATUM:")
 		/* r.expr([1, 2, 3]).map(r.js('1')) */
 
 		suite.T().Log("About to run line #183: r.Expr([]interface{}{1, 2, 3}).Map(r.JS('1'))")
@@ -693,7 +693,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #186
 		/* err("ReqlQueryLogicError", "Cannot convert javascript `undefined` to ql::datum_t.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot convert javascript `undefined` to ql::datum_t.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot convert javascript `undefined` to ql::datum_t.")
 		/* r.expr([1, 2, 3]).filter(r.js('(function(a) {})')) */
 
 		suite.T().Log("About to run line #186: r.Expr([]interface{}{1, 2, 3}).Filter(r.JS('(function(a) {})'))")
@@ -708,7 +708,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #190
 		/* err("ReqlQueryLogicError", "Expected type FUNCTION but found DATUM:", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type FUNCTION but found DATUM:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type FUNCTION but found DATUM:")
 		/* r.expr([1, 2, 3]).map(1) */
 
 		suite.T().Log("About to run line #190: r.Expr([]interface{}{1, 2, 3}).Map(1)")
@@ -723,7 +723,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #193
 		/* ([1, 2, 3]) */
-		var expected_ []interface{} = []interface{}{1, 2, 3}
+		var expected_ = []interface{}{1, 2, 3}
 		/* r.expr([1, 2, 3]).filter('foo') */
 
 		suite.T().Log("About to run line #193: r.Expr([]interface{}{1, 2, 3}).Filter('foo')")
@@ -738,7 +738,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #195
 		/* ([1, 2, 4]) */
-		var expected_ []interface{} = []interface{}{1, 2, 4}
+		var expected_ = []interface{}{1, 2, 4}
 		/* r.expr([1, 2, 4]).filter([]) */
 
 		suite.T().Log("About to run line #195: r.Expr([]interface{}{1, 2, 4}).Filter([]interface{}{})")
@@ -753,7 +753,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #197
 		/* ([]) */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr([1, 2, 3]).filter(null) */
 
 		suite.T().Log("About to run line #197: r.Expr([]interface{}{1, 2, 3}).Filter(nil)")
@@ -768,7 +768,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #200
 		/* ([]) */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr([1, 2, 4]).filter(False) */
 
 		suite.T().Log("About to run line #200: r.Expr([]interface{}{1, 2, 4}).Filter(false)")
@@ -783,7 +783,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #205
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.count() */
 
 		suite.T().Log("About to run line #205: tbl.Count()")
@@ -798,7 +798,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #210
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':3}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
 		/* r.expr([1, 2, 3]).for_each(lambda row:tbl.insert({ 'id':row })) */
 
 		suite.T().Log("About to run line #210: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl.Insert(map[interface{}]interface{}{'id': row, })})")
@@ -813,7 +813,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #214
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* tbl.count() */
 
 		suite.T().Log("About to run line #214: tbl.Count()")
@@ -828,7 +828,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #219
 		/* ({'deleted':0.0,'replaced':9,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 9, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 9, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* r.expr([1,2,3]).for_each(lambda row:tbl.update({'foo':row})) */
 
 		suite.T().Log("About to run line #219: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl.Update(map[interface{}]interface{}{'foo': row, })})")
@@ -843,7 +843,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #225
 		/* {'first_error':"Duplicate primary key `id`:\n{\n\t\"foo\":\t3,\n\t\"id\":\t1\n}\n{\n\t\"id\":\t1\n}",'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':3,'skipped':0.0,'inserted':3} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"first_error": "Duplicate primary key `id`:\n{\n\t\"foo\":\t3,\n\t\"id\":\t1\n}\n{\n\t\"id\":\t1\n}", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 3, "skipped": 0.0, "inserted": 3}
+		var expected_ = map[interface{}]interface{}{"first_error": "Duplicate primary key `id`:\n{\n\t\"foo\":\t3,\n\t\"id\":\t1\n}\n{\n\t\"id\":\t1\n}", "deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 3, "skipped": 0.0, "inserted": 3}
 		/* r.expr([1,2,3]).for_each(lambda row:[tbl.insert({ 'id':row }), tbl.insert({ 'id':row*10 })]) */
 
 		suite.T().Log("About to run line #225: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return []interface{}{tbl.Insert(map[interface{}]interface{}{'id': row, }), tbl.Insert(map[interface{}]interface{}{'id': r.Mul(row, 10), })}})")
@@ -860,7 +860,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #229
 		/* 6 */
-		var expected_ int = 6
+		var expected_ = 6
 		/* tbl.count() */
 
 		suite.T().Log("About to run line #229: tbl.Count()")
@@ -882,7 +882,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #233
 		/* ({'deleted':0.0,'replaced':0.0,'generated_keys':arrlen(3,uuid()),'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':3}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(3, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(3, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
 		/* r.expr([1, 2, 3]).for_each( tbl2.insert({}) ) */
 
 		suite.T().Log("About to run line #233: r.Expr([]interface{}{1, 2, 3}).ForEach(tbl2.Insert(map[interface{}]interface{}{}))")
@@ -897,7 +897,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #241
 		/* ({'deleted':0.0,'replaced':36,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':0.0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 36, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 36, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 0.0}
 		/* r.expr([1,2,3]).for_each(lambda row:[tbl.update({'foo':row}), tbl.update({'bar':row})]) */
 
 		suite.T().Log("About to run line #241: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return []interface{}{tbl.Update(map[interface{}]interface{}{'foo': row, }), tbl.Update(map[interface{}]interface{}{'bar': row, })}})")
@@ -914,7 +914,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #246
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':3}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 3}
 		/* r.expr([1, 2, 3]).for_each( tbl2.insert({ 'id':r.row }) ) */
 
 		suite.T().Log("About to run line #246: r.Expr([]interface{}{1, 2, 3}).ForEach(tbl2.Insert(map[interface{}]interface{}{'id': r.Row, }))")
@@ -929,7 +929,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #250
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.", [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
 		/* r.expr([1, 2, 3]).for_each(1) */
 
 		suite.T().Log("About to run line #250: r.Expr([]interface{}{1, 2, 3}).ForEach(1)")
@@ -944,7 +944,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #253
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.", [1, 1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
 		/* r.expr([1, 2, 3]).for_each(lambda x:x) */
 
 		suite.T().Log("About to run line #253: r.Expr([]interface{}{1, 2, 3}).ForEach(func(x r.Term) interface{} { return x})")
@@ -959,7 +959,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #258
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.", [1, 1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.  Expected type ARRAY but found NUMBER.")
 		/* r.expr([1, 2, 3]).for_each(r.row) */
 
 		suite.T().Log("About to run line #258: r.Expr([]interface{}{1, 2, 3}).ForEach(r.Row)")
@@ -974,7 +974,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #263
 		/* err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.", [1, 1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.")
+		var expected_ = err("ReqlQueryLogicError", "FOR_EACH expects one or more basic write queries.")
 		/* r.expr([1, 2, 3]).for_each(lambda row:tbl) */
 
 		suite.T().Log("About to run line #263: r.Expr([]interface{}{1, 2, 3}).ForEach(func(row r.Term) interface{} { return tbl})")
@@ -989,7 +989,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #272
 		/* ({'deleted':0.0,'replaced':0.0,'generated_keys':arrlen(1,uuid()),'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(1, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(1, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
 		/* r.expr(1).do(tbl.insert({'foo':r.row})) */
 
 		suite.T().Log("About to run line #272: r.Expr(1).Do(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
@@ -1004,7 +1004,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #276
 		/* ({'deleted':0.0,'replaced':0.0,'generated_keys':arrlen(1,uuid()),'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(1, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "generated_keys": arrlen(1, compare.IsUUID()), "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
 		/* r.expr([1, 2])[0].do(tbl.insert({'foo':r.row})) */
 
 		suite.T().Log("About to run line #276: r.Expr([]interface{}{1, 2}).AtIndex(0).Do(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
@@ -1019,7 +1019,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #281
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
-		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
+		var expected_ = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
 		/* r.expr([1, 2]).map(tbl.insert({'foo':r.row})) */
 
 		suite.T().Log("About to run line #281: r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }))")
@@ -1034,7 +1034,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #285
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
-		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
+		var expected_ = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
 		/* r.expr([1, 2]).map(r.db('test').table_create('table_create_failure')) */
 
 		suite.T().Log("About to run line #285: r.Expr([]interface{}{1, 2}).Map(r.DB('test').TableCreate('table_create_failure'))")
@@ -1049,7 +1049,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #288
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
-		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
+		var expected_ = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
 		/* r.expr([1, 2]).map(tbl.insert({'foo':r.row}).get_field('inserted')) */
 
 		suite.T().Log("About to run line #288: r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }).Field('inserted'))")
@@ -1064,7 +1064,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #292
 		/* err('ReqlCompileError', 'Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.', [0]) */
-		var expected_ Err = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
+		var expected_ = err("ReqlCompileError", "Cannot nest writes or meta ops in stream operations.  Use FOR_EACH instead.")
 		/* r.expr([1, 2]).map(tbl.insert({'foo':r.row}).get_field('inserted').add(5)) */
 
 		suite.T().Log("About to run line #292: r.Expr([]interface{}{1, 2}).Map(tbl.Insert(map[interface{}]interface{}{'foo': r.Row, }).Field('inserted').Add(5))")
@@ -1079,7 +1079,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #296
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* r.expr(1).do(r.db('test').table_create('table_create_success')) */
 
 		suite.T().Log("About to run line #296: r.Expr(1).Do(r.DB('test').TableCreate('table_create_success'))")
@@ -1094,7 +1094,7 @@ func (suite *ControlSuite) TestCases() {
 	{
 		// control.yaml line #300
 		/* [1, 2] */
-		var expected_ []interface{} = []interface{}{1, 2}
+		var expected_ = []interface{}{1, 2}
 		/* r.expr([1, 2]) */
 
 		suite.T().Log("About to run line #300: r.Expr([]interface{}{1, 2})")

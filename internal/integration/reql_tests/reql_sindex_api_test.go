@@ -77,7 +77,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #11
 		/* ({'deleted':0,'inserted':4,'skipped':0,'errors':0,'replaced':0,'unchanged':0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "inserted": 4, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0, "inserted": 4, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0}
 		/* tbl.insert([{'id':0, 'a':0, 'b':0, 'c':0, 'm':[1,2,3]},
 		{'id':1, 'a':0, 'b':0, 'c':0, 'm':[4,5,6]},
 		{'id':2, 'a':0, 'b':0, 'c':1, 'm':7},
@@ -95,7 +95,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #18
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('rename-foo', r.row['b']) */
 
 		suite.T().Log("About to run line #18: tbl.IndexCreateFunc('rename-foo', r.Row.AtIndex('b'))")
@@ -110,7 +110,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #23
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('rename-bar', r.row['c']) */
 
 		suite.T().Log("About to run line #23: tbl.IndexCreateFunc('rename-bar', r.Row.AtIndex('c'))")
@@ -125,7 +125,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #28
 		/* err_regex('ReqlOpFailedError','Index `rename-foo` does not exist or index `rename-bar` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]',[]) */
-		var expected_ Err = err_regex("ReqlOpFailedError", "Index `rename-foo` does not exist or index `rename-bar` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
+		var expected_ = err_regex("ReqlOpFailedError", "Index `rename-foo` does not exist or index `rename-bar` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
 		/* tbl.index_rename('rename-foo','rename-bar') */
 
 		suite.T().Log("About to run line #28: tbl.IndexRename('rename-foo', 'rename-bar')")
@@ -140,7 +140,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #31
 		/* err_regex('ReqlOpFailedError','Index `rename-fake` does not exist or index `rename-stuff` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]',[]) */
-		var expected_ Err = err_regex("ReqlOpFailedError", "Index `rename-fake` does not exist or index `rename-stuff` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
+		var expected_ = err_regex("ReqlOpFailedError", "Index `rename-fake` does not exist or index `rename-stuff` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
 		/* tbl.index_rename('rename-fake','rename-stuff') */
 
 		suite.T().Log("About to run line #31: tbl.IndexRename('rename-fake', 'rename-stuff')")
@@ -155,7 +155,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #34
 		/* err('ReqlQueryLogicError','Index name conflict:'+' `id` is the name of the primary key.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Index name conflict:"+" `id` is the name of the primary key.")
+		var expected_ = err("ReqlQueryLogicError", "Index name conflict:"+" `id` is the name of the primary key.")
 		/* tbl.index_rename('id','rename-stuff') */
 
 		suite.T().Log("About to run line #34: tbl.IndexRename('id', 'rename-stuff')")
@@ -170,7 +170,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #37
 		/* err('ReqlQueryLogicError','Index name conflict:'+' `id` is the name of the primary key.',[]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Index name conflict:"+" `id` is the name of the primary key.")
+		var expected_ = err("ReqlQueryLogicError", "Index name conflict:"+" `id` is the name of the primary key.")
 		/* tbl.index_rename('rename-stuff','id') */
 
 		suite.T().Log("About to run line #37: tbl.IndexRename('rename-stuff', 'id')")
@@ -185,7 +185,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #40
 		/* {'renamed':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 0}
+		var expected_ = map[interface{}]interface{}{"renamed": 0}
 		/* tbl.index_rename('rename-foo','rename-foo') */
 
 		suite.T().Log("About to run line #40: tbl.IndexRename('rename-foo', 'rename-foo')")
@@ -200,7 +200,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #43
 		/* {'renamed':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 0}
+		var expected_ = map[interface{}]interface{}{"renamed": 0}
 		/* tbl.index_rename('rename-foo','rename-foo',overwrite=True) */
 
 		suite.T().Log("About to run line #43: tbl.IndexRename('rename-foo', 'rename-foo').OptArgs(r.IndexRenameOpts{Overwrite: true, })")
@@ -215,7 +215,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #48
 		/* {'renamed':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1}
+		var expected_ = map[interface{}]interface{}{"renamed": 1}
 		/* tbl.index_rename('rename-foo','rename-bar',overwrite=True) */
 
 		suite.T().Log("About to run line #48: tbl.IndexRename('rename-foo', 'rename-bar').OptArgs(r.IndexRenameOpts{Overwrite: true, })")
@@ -230,7 +230,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #53
 		/* {'renamed':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1}
+		var expected_ = map[interface{}]interface{}{"renamed": 1}
 		/* tbl.index_rename('rename-bar','rename-stuff',overwrite=True) */
 
 		suite.T().Log("About to run line #53: tbl.IndexRename('rename-bar', 'rename-stuff').OptArgs(r.IndexRenameOpts{Overwrite: true, })")
@@ -245,7 +245,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #58
 		/* {'renamed':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"renamed": 1}
+		var expected_ = map[interface{}]interface{}{"renamed": 1}
 		/* tbl.index_rename('rename-stuff','rename-last') */
 
 		suite.T().Log("About to run line #58: tbl.IndexRename('rename-stuff', 'rename-last')")
@@ -260,7 +260,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #62
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('minval', lambda:r.minval) */
 
 		suite.T().Log("About to run line #62: tbl.IndexCreateFunc('minval', func() interface{} { return r.MinVal})")
@@ -275,7 +275,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #67
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('maxval', lambda:r.maxval) */
 
 		suite.T().Log("About to run line #67: tbl.IndexCreateFunc('maxval', func() interface{} { return r.MaxVal})")
@@ -292,7 +292,7 @@ func (suite *SindexApiSuite) TestCases() {
 		/* bag([{'index':'rename-last','ready':true},
 		{'index':'minval','ready':true},
 		{'index':'maxval','ready':true}]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"index": "rename-last", "ready": true}, map[interface{}]interface{}{"index": "minval", "ready": true}, map[interface{}]interface{}{"index": "maxval", "ready": true}})
+		var expected_ = compare.UnorderedMatch([]interface{}{map[interface{}]interface{}{"index": "rename-last", "ready": true}, map[interface{}]interface{}{"index": "minval", "ready": true}, map[interface{}]interface{}{"index": "maxval", "ready": true}})
 		/* tbl.index_wait('rename-last', 'minval', 'maxval').pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #71: tbl.IndexWait('rename-last', 'minval', 'maxval').Pluck('index', 'ready')")
@@ -307,7 +307,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #76
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* tbl.get_all(0, index='rename-last').count() */
 
 		suite.T().Log("About to run line #76: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: 'rename-last', }).Count()")
@@ -322,7 +322,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #82
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.get_all(r.minval, index='minval').count() */
 
 		suite.T().Log("About to run line #82: tbl.GetAll(r.MinVal).OptArgs(r.GetAllOpts{Index: 'minval', }).Count()")
@@ -337,7 +337,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #87
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.get_all(r.maxval, index='maxval').count() */
 
 		suite.T().Log("About to run line #87: tbl.GetAll(r.MaxVal).OptArgs(r.GetAllOpts{Index: 'maxval', }).Count()")
@@ -352,7 +352,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #92
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.between(r.minval, r.maxval, index='minval').count() */
 
 		suite.T().Log("About to run line #92: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'minval', }).Count()")
@@ -367,7 +367,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #97
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('rename-last-dup', tbl.index_status('rename-last').nth(0).get_field('function')) */
 
 		suite.T().Log("About to run line #97: tbl.IndexCreateFunc('rename-last-dup', tbl.IndexStatus('rename-last').Nth(0).Field('function'))")
@@ -382,7 +382,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #100
 		/* [{'index':'rename-last-dup','ready':true}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"index": "rename-last-dup", "ready": true}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"index": "rename-last-dup", "ready": true}}
 		/* tbl.index_wait('rename-last-dup').pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #100: tbl.IndexWait('rename-last-dup').Pluck('index', 'ready')")
@@ -397,7 +397,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #103
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* tbl.get_all(0, index='rename-last-dup').count() */
 
 		suite.T().Log("About to run line #103: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: 'rename-last-dup', }).Count()")
@@ -412,7 +412,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #109
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
+		var expected_ = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('rename-last-dup') */
 
 		suite.T().Log("About to run line #109: tbl.IndexDrop('rename-last-dup')")
@@ -427,7 +427,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #110
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
+		var expected_ = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('minval') */
 
 		suite.T().Log("About to run line #110: tbl.IndexDrop('minval')")
@@ -442,7 +442,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #111
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
+		var expected_ = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('maxval') */
 
 		suite.T().Log("About to run line #111: tbl.IndexDrop('maxval')")
@@ -457,7 +457,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #114
 		/* ['rename-last'] */
-		var expected_ []interface{} = []interface{}{"rename-last"}
+		var expected_ = []interface{}{"rename-last"}
 		/* tbl.index_list() */
 
 		suite.T().Log("About to run line #114: tbl.IndexList()")
@@ -472,7 +472,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #117
 		/* {'dropped':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"dropped": 1}
+		var expected_ = map[interface{}]interface{}{"dropped": 1}
 		/* tbl.index_drop('rename-last') */
 
 		suite.T().Log("About to run line #117: tbl.IndexDrop('rename-last')")
@@ -487,7 +487,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #121
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('ai', r.row['a']) */
 
 		suite.T().Log("About to run line #121: tbl.IndexCreateFunc('ai', r.Row.AtIndex('a'))")
@@ -502,7 +502,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #125
 		/* err_regex("ReqlOpFailedError", "Index `ai` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]", []) */
-		var expected_ Err = err_regex("ReqlOpFailedError", "Index `ai` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
+		var expected_ = err_regex("ReqlOpFailedError", "Index `ai` already exists on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
 		/* tbl.index_create('ai', r.row['a']) */
 
 		suite.T().Log("About to run line #125: tbl.IndexCreateFunc('ai', r.Row.AtIndex('a'))")
@@ -517,7 +517,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #129
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('bi', r.row['b']) */
 
 		suite.T().Log("About to run line #129: tbl.IndexCreateFunc('bi', r.Row.AtIndex('b'))")
@@ -532,7 +532,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #133
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('ci', r.row['c']) */
 
 		suite.T().Log("About to run line #133: tbl.IndexCreateFunc('ci', r.Row.AtIndex('c'))")
@@ -547,7 +547,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #137
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('idi', r.row['id']) */
 
 		suite.T().Log("About to run line #137: tbl.IndexCreateFunc('idi', r.Row.AtIndex('id'))")
@@ -562,7 +562,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #141
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('kdi', [r.row['id']]) */
 
 		suite.T().Log("About to run line #141: tbl.IndexCreateFunc('kdi', []interface{}{r.Row.AtIndex('id')})")
@@ -577,7 +577,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #145
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('mi', r.row['m'], multi=True) */
 
 		suite.T().Log("About to run line #145: tbl.IndexCreateFunc('mi', r.Row.AtIndex('m')).OptArgs(r.IndexCreateOpts{Multi: true, })")
@@ -592,7 +592,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #149
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('brokeni', r.row['broken']) */
 
 		suite.T().Log("About to run line #149: tbl.IndexCreateFunc('brokeni', r.Row.AtIndex('broken'))")
@@ -607,7 +607,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #153
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.index_wait().pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #153: tbl.IndexWait().Pluck('index', 'ready')")
@@ -622,7 +622,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #156
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get(True) */
 
 		suite.T().Log("About to run line #156: tbl.Get(true)")
@@ -667,7 +667,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #164
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get(1)['id'] */
 
 		suite.T().Log("About to run line #164: tbl.Get(1).AtIndex('id')")
@@ -682,7 +682,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #168
 		/* 'SELECTION<OBJECT>' */
-		var expected_ string = "SELECTION<OBJECT>"
+		var expected_ = "SELECTION<OBJECT>"
 		/* tbl.get(1).type_of() */
 
 		suite.T().Log("About to run line #168: tbl.Get(1).TypeOf()")
@@ -697,7 +697,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #172
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':1,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
 		/* tbl.get(1).update(lambda x:null) */
 
 		suite.T().Log("About to run line #172: tbl.Get(1).Update(func(x r.Term) interface{} { return nil})")
@@ -712,7 +712,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #180
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get_all(True, index='id') */
 
 		suite.T().Log("About to run line #180: tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: 'id', })")
@@ -727,7 +727,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #185
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all(-1, index='id') */
 
 		suite.T().Log("About to run line #185: tbl.GetAll(-1).OptArgs(r.GetAllOpts{Index: 'id', })")
@@ -742,7 +742,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #189
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all(-1) */
 
 		suite.T().Log("About to run line #189: tbl.GetAll(-1)")
@@ -757,7 +757,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #193
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all([-1]) */
 
 		suite.T().Log("About to run line #193: tbl.GetAll([]interface{}{-1})")
@@ -772,7 +772,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #197
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get_all(1, index='id')[0]['id'] */
 
 		suite.T().Log("About to run line #197: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).AtIndex(0).AtIndex('id')")
@@ -787,7 +787,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #201
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get_all(1)[0]['id'] */
 
 		suite.T().Log("About to run line #201: tbl.GetAll(1).AtIndex(0).AtIndex('id')")
@@ -802,7 +802,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #205
 		/* bag([1,2,3]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{1, 2, 3})
+		var expected_ = compare.UnorderedMatch([]interface{}{1, 2, 3})
 		/* tbl.get_all(1,2,3, index='id').map(lambda x:x["id"]).coerce_to("ARRAY") */
 
 		suite.T().Log("About to run line #205: tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')}).CoerceTo('ARRAY')")
@@ -817,7 +817,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #209
 		/* bag([1,2,3]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{1, 2, 3})
+		var expected_ = compare.UnorderedMatch([]interface{}{1, 2, 3})
 		/* tbl.get_all(1,2,3).map(lambda x:x["id"]).coerce_to("ARRAY") */
 
 		suite.T().Log("About to run line #209: tbl.GetAll(1, 2, 3).Map(func(x r.Term) interface{} { return x.AtIndex('id')}).CoerceTo('ARRAY')")
@@ -832,7 +832,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #213
 		/* 'SELECTION<STREAM>' */
-		var expected_ string = "SELECTION<STREAM>"
+		var expected_ = "SELECTION<STREAM>"
 		/* tbl.get_all(1, index='id').type_of() */
 
 		suite.T().Log("About to run line #213: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).TypeOf()")
@@ -847,7 +847,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #217
 		/* 'SELECTION<STREAM>' */
-		var expected_ string = "SELECTION<STREAM>"
+		var expected_ = "SELECTION<STREAM>"
 		/* tbl.get_all(1).type_of() */
 
 		suite.T().Log("About to run line #217: tbl.GetAll(1).TypeOf()")
@@ -862,7 +862,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #221
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':1,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1, index='id').update(lambda x:null) */
 
 		suite.T().Log("About to run line #221: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).Update(func(x r.Term) interface{} { return nil})")
@@ -877,7 +877,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #225
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':1,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 1, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1).update(lambda x:null) */
 
 		suite.T().Log("About to run line #225: tbl.GetAll(1).Update(func(x r.Term) interface{} { return nil})")
@@ -892,7 +892,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #229
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':3,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1,2,3, index='id').update(lambda x:null) */
 
 		suite.T().Log("About to run line #229: tbl.GetAll(1, 2, 3).OptArgs(r.GetAllOpts{Index: 'id', }).Update(func(x r.Term) interface{} { return nil})")
@@ -907,7 +907,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #233
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':3,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 3, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1,2,3).update(lambda x:null) */
 
 		suite.T().Log("About to run line #233: tbl.GetAll(1, 2, 3).Update(func(x r.Term) interface{} { return nil})")
@@ -922,7 +922,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #238
 		/* err_regex("ReqlOpFailedError", "Index `fake` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]", []) */
-		var expected_ Err = err_regex("ReqlOpFailedError", "Index `fake` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
+		var expected_ = err_regex("ReqlOpFailedError", "Index `fake` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
 		/* tbl.get_all(0, index='fake') */
 
 		suite.T().Log("About to run line #238: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: 'fake', })")
@@ -937,7 +937,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #242
 		/* err("ReqlQueryLogicError", "Cannot use a geospatial index with `get_all`. Use `get_intersecting` instead.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use a geospatial index with `get_all`. Use `get_intersecting` instead.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use a geospatial index with `get_all`. Use `get_intersecting` instead.")
 		/* tbl.get_all(r.point(0, 0)) */
 
 		suite.T().Log("About to run line #242: tbl.GetAll(r.Point(0, 0))")
@@ -952,7 +952,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #246
 		/* err("ReqlQueryLogicError", "Expected type STRING but found BOOL.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found BOOL.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found BOOL.")
 		/* tbl.get_all(0, index=False) */
 
 		suite.T().Log("About to run line #246: tbl.GetAll(0).OptArgs(r.GetAllOpts{Index: false, })")
@@ -967,7 +967,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #251
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get_all(True, index='id') */
 
 		suite.T().Log("About to run line #251: tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: 'id', })")
@@ -982,7 +982,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #256
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all([], index='id') */
 
 		suite.T().Log("About to run line #256: tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: 'id', })")
@@ -997,7 +997,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #260
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.get_all(True, index='idi') */
 
 		suite.T().Log("About to run line #260: tbl.GetAll(true).OptArgs(r.GetAllOpts{Index: 'idi', })")
@@ -1012,7 +1012,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #265
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all([], index='idi') */
 
 		suite.T().Log("About to run line #265: tbl.GetAll([]interface{}{}).OptArgs(r.GetAllOpts{Index: 'idi', })")
@@ -1027,7 +1027,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #270
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get_all(1, index='id')[0]['id'] */
 
 		suite.T().Log("About to run line #270: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'id', }).AtIndex(0).AtIndex('id')")
@@ -1042,7 +1042,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #274
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get_all(1, index='idi')[0]['id'] */
 
 		suite.T().Log("About to run line #274: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'idi', }).AtIndex(0).AtIndex('id')")
@@ -1057,7 +1057,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #278
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all(1, index='ai') */
 
 		suite.T().Log("About to run line #278: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ai', })")
@@ -1072,7 +1072,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #282
 		/* [3] */
-		var expected_ []interface{} = []interface{}{3}
+		var expected_ = []interface{}{3}
 		/* tbl.get_all(1, index='bi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #282: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'bi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1087,7 +1087,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #286
 		/* err('ReqlQueryLogicError', 'Indexed order_by can only be performed on a TABLE or TABLE_SLICE. Make sure order_by comes before any transformations (such as map) or filters.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE. Make sure order_by comes before any transformations (such as map) or filters.")
+		var expected_ = err("ReqlQueryLogicError", "Indexed order_by can only be performed on a TABLE or TABLE_SLICE. Make sure order_by comes before any transformations (such as map) or filters.")
 		/* tbl.get_all(1, index='bi').order_by(index='id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #286: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'bi', }).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1102,7 +1102,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #290
 		/* err('ReqlQueryLogicError', 'Expected type TABLE_SLICE but found SELECTION:', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type TABLE_SLICE but found SELECTION:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type TABLE_SLICE but found SELECTION:")
 		/* tbl.get_all(1, index='bi').between(1, 1, index='id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #290: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'bi', }).Between(1, 1).OptArgs(r.BetweenOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1117,7 +1117,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #294
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* tbl.get_all(1, index='ci').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #294: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ci', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1132,7 +1132,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #298
 		/* 'SELECTION<STREAM>' */
-		var expected_ string = "SELECTION<STREAM>"
+		var expected_ = "SELECTION<STREAM>"
 		/* tbl.get_all(1, index='ci').type_of() */
 
 		suite.T().Log("About to run line #298: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ci', }).TypeOf()")
@@ -1147,7 +1147,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #302
 		/* {'replaced':0,'skipped':0,'deleted':0,'unchanged':2,'errors':0,'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 2, "errors": 0, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"replaced": 0, "skipped": 0, "deleted": 0, "unchanged": 2, "errors": 0, "inserted": 0}
 		/* tbl.get_all(1, index='ci').update(lambda x:null) */
 
 		suite.T().Log("About to run line #302: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'ci', }).Update(func(x r.Term) interface{} { return nil})")
@@ -1162,7 +1162,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #306
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all(1, index='brokeni') */
 
 		suite.T().Log("About to run line #306: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'brokeni', })")
@@ -1177,7 +1177,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #311
 		/* [rows[0]] */
-		var expected_ []interface{} = []interface{}{rows[0]}
+		var expected_ = []interface{}{rows[0]}
 		/* tbl.get_all(1, index='mi') */
 
 		suite.T().Log("About to run line #311: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'mi', })")
@@ -1192,7 +1192,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #316
 		/* [rows[0]] */
-		var expected_ []interface{} = []interface{}{rows[0]}
+		var expected_ = []interface{}{rows[0]}
 		/* tbl.get_all(2, index='mi') */
 
 		suite.T().Log("About to run line #316: tbl.GetAll(2).OptArgs(r.GetAllOpts{Index: 'mi', })")
@@ -1207,7 +1207,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #321
 		/* [rows[1]] */
-		var expected_ []interface{} = []interface{}{rows[1]}
+		var expected_ = []interface{}{rows[1]}
 		/* tbl.get_all(5, index='mi') */
 
 		suite.T().Log("About to run line #321: tbl.GetAll(5).OptArgs(r.GetAllOpts{Index: 'mi', })")
@@ -1222,7 +1222,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #326
 		/* [rows[2]] */
-		var expected_ []interface{} = []interface{}{rows[2]}
+		var expected_ = []interface{}{rows[2]}
 		/* tbl.get_all(7, index='mi') */
 
 		suite.T().Log("About to run line #326: tbl.GetAll(7).OptArgs(r.GetAllOpts{Index: 'mi', })")
@@ -1237,7 +1237,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #331
 		/* err_regex("ReqlOpFailedError", "Index `fake` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]", []) */
-		var expected_ Err = err_regex("ReqlOpFailedError", "Index `fake` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
+		var expected_ = err_regex("ReqlOpFailedError", "Index `fake` was not found on table `[a-zA-Z0-9_]+.[a-zA-Z0-9_]+`[.]")
 		/* tbl.eq_join('id', tbl, index='fake') */
 
 		suite.T().Log("About to run line #331: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'fake', })")
@@ -1252,7 +1252,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #335
 		/* err("ReqlQueryLogicError", "Expected type STRING but found BOOL.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found BOOL.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found BOOL.")
 		/* tbl.eq_join('id', tbl, index=False) */
 
 		suite.T().Log("About to run line #335: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: false, })")
@@ -1267,7 +1267,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #340
 		/* [{'left':rows[1],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[1], "right": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[1], "right": rows[0]}}
 		/* tbl.filter({'id':1}).eq_join('id', tbl, index='mi') */
 
 		suite.T().Log("About to run line #340: tbl.Filter(map[interface{}]interface{}{'id': 1, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'mi', })")
@@ -1282,7 +1282,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #345
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl) */
 
 		suite.T().Log("About to run line #345: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl)")
@@ -1297,7 +1297,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #350
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join(lambda x:x['id'], tbl) */
 
 		suite.T().Log("About to run line #350: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex('id')}, tbl)")
@@ -1312,7 +1312,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #355
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='id') */
 
 		suite.T().Log("About to run line #355: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'id', })")
@@ -1327,7 +1327,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #360
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join(lambda x:x['id'], tbl, index='id') */
 
 		suite.T().Log("About to run line #360: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex('id')}, tbl).OptArgs(r.EqJoinOpts{Index: 'id', })")
@@ -1342,7 +1342,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #365
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='idi') */
 
 		suite.T().Log("About to run line #365: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'idi', })")
@@ -1357,7 +1357,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #370
 		/* [{'left':rows[0],'right':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join(lambda x:x['id'], tbl, index='idi') */
 
 		suite.T().Log("About to run line #370: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin(func(x r.Term) interface{} { return x.AtIndex('id')}, tbl).OptArgs(r.EqJoinOpts{Index: 'idi', })")
@@ -1375,7 +1375,7 @@ func (suite *SindexApiSuite) TestCases() {
 		{'right':rows[1],'left':rows[0]},
 		{'right':rows[2],'left':rows[0]},
 		{'right':rows[3],'left':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[0]}, map[interface{}]interface{}{"right": rows[3], "left": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[0]}, map[interface{}]interface{}{"right": rows[3], "left": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='ai').order_by('right') */
 
 		suite.T().Log("About to run line #375: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'ai', }).OrderBy('right')")
@@ -1392,7 +1392,7 @@ func (suite *SindexApiSuite) TestCases() {
 		/* ([{'right':rows[0],'left':rows[0]},
 		{'right':rows[1],'left':rows[0]},
 		{'right':rows[2],'left':rows[0]}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='bi').order_by('right') */
 
 		suite.T().Log("About to run line #382: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'bi', }).OrderBy('right')")
@@ -1407,7 +1407,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #388
 		/* [{'right':rows[0],'left':rows[0]}, {'right':rows[1],'left':rows[0]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='ci').order_by('right') */
 
 		suite.T().Log("About to run line #388: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'ci', }).OrderBy('right')")
@@ -1422,7 +1422,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #392
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.filter({'id':0}).eq_join('id', tbl, index='brokeni') */
 
 		suite.T().Log("About to run line #392: tbl.Filter(map[interface{}]interface{}{'id': 0, }).EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'brokeni', })")
@@ -1444,7 +1444,7 @@ func (suite *SindexApiSuite) TestCases() {
 		{'left':rows[1],'right':rows[2]},
 		{'left':rows[2],'right':rows[3]},
 		{'left':rows[3],'right':rows[3]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}, map[interface{}]interface{}{"left": rows[1], "right": rows[0]}, map[interface{}]interface{}{"left": rows[0], "right": rows[1]}, map[interface{}]interface{}{"left": rows[1], "right": rows[1]}, map[interface{}]interface{}{"left": rows[0], "right": rows[2]}, map[interface{}]interface{}{"left": rows[1], "right": rows[2]}, map[interface{}]interface{}{"left": rows[2], "right": rows[3]}, map[interface{}]interface{}{"left": rows[3], "right": rows[3]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"left": rows[0], "right": rows[0]}, map[interface{}]interface{}{"left": rows[1], "right": rows[0]}, map[interface{}]interface{}{"left": rows[0], "right": rows[1]}, map[interface{}]interface{}{"left": rows[1], "right": rows[1]}, map[interface{}]interface{}{"left": rows[0], "right": rows[2]}, map[interface{}]interface{}{"left": rows[1], "right": rows[2]}, map[interface{}]interface{}{"left": rows[2], "right": rows[3]}, map[interface{}]interface{}{"left": rows[3], "right": rows[3]}}
 		/* tbl.eq_join('c', tbl, index='bi').order_by('right', 'left') */
 
 		suite.T().Log("About to run line #397: tbl.EqJoin('c', tbl).OptArgs(r.EqJoinOpts{Index: 'bi', }).OrderBy('right', 'left')")
@@ -1459,7 +1459,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #408
 		/* err("ReqlQueryLogicError", "Index name conflict: `id` is the name of the primary key.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Index name conflict: `id` is the name of the primary key.")
+		var expected_ = err("ReqlQueryLogicError", "Index name conflict: `id` is the name of the primary key.")
 		/* tbl.index_create('id') */
 
 		suite.T().Log("About to run line #408: tbl.IndexCreate('id')")
@@ -1474,7 +1474,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #411
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('c') */
 
 		suite.T().Log("About to run line #411: tbl.IndexCreate('c')")
@@ -1489,7 +1489,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #413
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('broken') */
 
 		suite.T().Log("About to run line #413: tbl.IndexCreate('broken')")
@@ -1504,7 +1504,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #416
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.index_wait('broken') */
 
 		suite.T().Log("About to run line #416: tbl.IndexWait('broken')")
@@ -1519,7 +1519,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #419
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* tbl.get_all(1, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #419: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1534,7 +1534,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #423
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all(1, index='broken').order_by('broken').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #423: tbl.GetAll(1).OptArgs(r.GetAllOpts{Index: 'broken', }).OrderBy('broken').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1549,7 +1549,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #428
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('nil', lambda x:null) */
 
 		suite.T().Log("About to run line #428: tbl.IndexCreateFunc('nil', func(x r.Term) interface{} { return nil})")
@@ -1564,7 +1564,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #431
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.index_wait().pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #431: tbl.IndexWait().Pluck('index', 'ready')")
@@ -1579,7 +1579,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #434
 		/* err("ReqlNonExistenceError", "Keys cannot be NULL.", []) */
-		var expected_ Err = err("ReqlNonExistenceError", "Keys cannot be NULL.")
+		var expected_ = err("ReqlNonExistenceError", "Keys cannot be NULL.")
 		/* tbl.get_all(null, index='nil') */
 
 		suite.T().Log("About to run line #434: tbl.GetAll(nil).OptArgs(r.GetAllOpts{Index: 'nil', })")
@@ -1594,7 +1594,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #439
 		/* {'deleted':0,'inserted':1,'skipped':0,'errors':0,'replaced':0,'unchanged':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0, "inserted": 1, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0}
+		var expected_ = map[interface{}]interface{}{"deleted": 0, "inserted": 1, "skipped": 0, "errors": 0, "replaced": 0, "unchanged": 0}
 		/* tbl.insert({'id':4, 'a':4, 'b':4, 'c':4, 'm':[14,15,16]}) */
 
 		suite.T().Log("About to run line #439: tbl.Insert(map[interface{}]interface{}{'id': 4, 'a': 4, 'b': 4, 'c': 4, 'm': []interface{}{14, 15, 16}, })")
@@ -1613,7 +1613,7 @@ func (suite *SindexApiSuite) TestCases() {
 		{'right':rows[2],'left':rows[1]},
 		{'right':rows[3],'left':rows[1]},
 		{'right':rows[4],'left':rows[4]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[1]}, map[interface{}]interface{}{"right": rows[3], "left": rows[1]}, map[interface{}]interface{}{"right": rows[4], "left": rows[4]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[1]}, map[interface{}]interface{}{"right": rows[3], "left": rows[1]}, map[interface{}]interface{}{"right": rows[4], "left": rows[4]}}
 		/* tbl.eq_join('id', tbl, index='c').order_by('left', 'right').coerce_to("ARRAY") */
 
 		suite.T().Log("About to run line #446: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'c', }).OrderBy('left', 'right').CoerceTo('ARRAY')")
@@ -1632,7 +1632,7 @@ func (suite *SindexApiSuite) TestCases() {
 		{'right':rows[2],'left':rows[1]},
 		{'right':rows[3],'left':rows[1]},
 		{'right':rows[4],'left':rows[4]}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[1]}, map[interface{}]interface{}{"right": rows[3], "left": rows[1]}, map[interface{}]interface{}{"right": rows[4], "left": rows[4]}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"right": rows[0], "left": rows[0]}, map[interface{}]interface{}{"right": rows[1], "left": rows[0]}, map[interface{}]interface{}{"right": rows[2], "left": rows[1]}, map[interface{}]interface{}{"right": rows[3], "left": rows[1]}, map[interface{}]interface{}{"right": rows[4], "left": rows[4]}}
 		/* tbl.eq_join('id', tbl, index='ci').order_by('left', 'right') */
 
 		suite.T().Log("About to run line #455: tbl.EqJoin('id', tbl).OptArgs(r.EqJoinOpts{Index: 'ci', }).OrderBy('left', 'right')")
@@ -1647,7 +1647,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #465
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(null, 2, index='id').count() */
 
 		suite.T().Log("About to run line #465: tbl.Between(nil, 2).OptArgs(r.BetweenOpts{Index: 'id', }).Count()")
@@ -1662,7 +1662,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #466
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(2, null, index='id').count() */
 
 		suite.T().Log("About to run line #466: tbl.Between(2, nil).OptArgs(r.BetweenOpts{Index: 'id', }).Count()")
@@ -1677,7 +1677,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #467
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(null, null, index='id').count() */
 
 		suite.T().Log("About to run line #467: tbl.Between(nil, nil).OptArgs(r.BetweenOpts{Index: 'id', }).Count()")
@@ -1692,7 +1692,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #479
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #479: tbl.Between(r.MinVal, r.MaxVal).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1707,7 +1707,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #483
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval).order_by(index='id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #483: tbl.Between(r.MinVal, r.MaxVal).OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1722,7 +1722,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #487
 		/* err('ReqlQueryLogicError', 'Cannot perform multiple BETWEENs on the same table.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot perform multiple BETWEENs on the same table.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot perform multiple BETWEENs on the same table.")
 		/* tbl.between(r.minval, r.maxval).between(r.minval, r.maxval).map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #487: tbl.Between(r.MinVal, r.MaxVal).Between(r.MinVal, r.MaxVal).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1737,7 +1737,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #491
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.order_by(index='id').between(r.minval, 3).map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #491: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'id', }).Between(r.MinVal, 3).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1752,7 +1752,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #495
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #495: tbl.Between(0, r.MaxVal).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1767,7 +1767,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #499
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, 4).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #499: tbl.Between(r.MinVal, 4).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1782,7 +1782,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #503
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 4).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #503: tbl.Between(0, 4).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1797,7 +1797,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #507
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, 5).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #507: tbl.Between(-1, 5).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1812,7 +1812,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #511
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, 5).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #511: tbl.Between(5, 5).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1827,7 +1827,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #515
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #515: tbl.Between(5, r.MaxVal).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1842,7 +1842,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #519
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #519: tbl.Between(-1, -1).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1857,7 +1857,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #523
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1).order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #523: tbl.Between(r.MinVal, -1).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1872,7 +1872,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #528
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #528: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1887,7 +1887,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #532
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #532: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1902,7 +1902,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #536
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, 4, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #536: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1917,7 +1917,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #540
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, 4, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #540: tbl.Between(0, 4).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1932,7 +1932,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #544
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, 5, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #544: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1947,7 +1947,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #548
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, 5, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #548: tbl.Between(5, 5).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1962,7 +1962,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #552
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #552: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1977,7 +1977,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #556
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #556: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -1992,7 +1992,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #560
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1, right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #560: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2007,7 +2007,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #565
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #565: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2022,7 +2022,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #569
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #569: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2037,7 +2037,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #573
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, 4, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #573: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2052,7 +2052,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #577
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 4, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #577: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2067,7 +2067,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #581
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, 5, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #581: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2082,7 +2082,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #585
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, 5, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #585: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2097,7 +2097,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #589
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #589: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2112,7 +2112,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #593
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #593: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2127,7 +2127,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #597
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1, index='id').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #597: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'id', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2142,7 +2142,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #602
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #602: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2157,7 +2157,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #606
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #606: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2172,7 +2172,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #610
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, 4, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #610: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2187,7 +2187,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #614
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, 4, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #614: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2202,7 +2202,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #618
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, 5, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #618: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2217,7 +2217,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #622
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, 5, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #622: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2232,7 +2232,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #626
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #626: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2247,7 +2247,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #630
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #630: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2262,7 +2262,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #634
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1, index='id', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #634: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2277,7 +2277,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #639
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #639: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2292,7 +2292,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #643
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #643: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2307,7 +2307,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #647
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, 4, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #647: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2322,7 +2322,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #651
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 4, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #651: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2337,7 +2337,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #655
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, 5, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #655: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2352,7 +2352,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #659
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, 5, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #659: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2367,7 +2367,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #663
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #663: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2382,7 +2382,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #667
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #667: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2397,7 +2397,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #671
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1, index='idi').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #671: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'idi', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2412,7 +2412,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #676
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #676: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2427,7 +2427,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #680
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #680: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2442,7 +2442,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #684
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, 4, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #684: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2457,7 +2457,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #688
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, 4, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #688: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2472,7 +2472,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #692
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, 5, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #692: tbl.Between(-1, 5).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2487,7 +2487,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #696
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, 5, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #696: tbl.Between(5, 5).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2502,7 +2502,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #700
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #700: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2517,7 +2517,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #704
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #704: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2532,7 +2532,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #708
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1, index='idi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #708: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'idi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2547,7 +2547,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #713
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #713: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2562,7 +2562,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #717
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #717: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2577,7 +2577,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #721
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, 4, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #721: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2592,7 +2592,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #725
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 4, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #725: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2607,7 +2607,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #729
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, 5, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #729: tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2622,7 +2622,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #734
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #734: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2637,7 +2637,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #738
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #738: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2652,7 +2652,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #742
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, 4, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #742: tbl.Between(r.MinVal, 4).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2667,7 +2667,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #746
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, 4, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #746: tbl.Between(0, 4).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2682,7 +2682,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #750
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, 5, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #750: tbl.Between(0, 5).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2697,7 +2697,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #755
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 3, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #755: tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2712,7 +2712,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #759
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 1, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #759: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2727,7 +2727,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #763
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(0, 0, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #763: tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2742,7 +2742,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #767
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(-1, 2, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #767: tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2757,7 +2757,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #772
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 3, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #772: tbl.Between(0, 3).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2772,7 +2772,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #776
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 1, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #776: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2787,7 +2787,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #780
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 0, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #780: tbl.Between(0, 0).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2802,7 +2802,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #784
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(-1, 2, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #784: tbl.Between(-1, 2).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2817,7 +2817,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #789
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(1, 1, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #789: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2832,7 +2832,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #793
 		/* [4] */
-		var expected_ []interface{} = []interface{}{4}
+		var expected_ = []interface{}{4}
 		/* tbl.between(1, r.maxval, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #793: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2847,7 +2847,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #797
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #797: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2862,7 +2862,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #801
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, 0, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #801: tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2877,7 +2877,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #805
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #805: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2892,7 +2892,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #809
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1, index='ai').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #809: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'ai', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2907,7 +2907,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #814
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(1, 1, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #814: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2922,7 +2922,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #818
 		/* [4] */
-		var expected_ []interface{} = []interface{}{4}
+		var expected_ = []interface{}{4}
 		/* tbl.between(1, r.maxval, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #818: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2937,7 +2937,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #822
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(5, r.maxval, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #822: tbl.Between(5, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2952,7 +2952,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #826
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, 0, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #826: tbl.Between(r.MinVal, 0).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2967,7 +2967,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #830
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(-1, -1, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #830: tbl.Between(-1, -1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2982,7 +2982,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #834
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, -1, index='ai', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #834: tbl.Between(r.MinVal, -1).OptArgs(r.BetweenOpts{Index: 'ai', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -2997,7 +2997,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #839
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(0, 1, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #839: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3012,7 +3012,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #843
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(-1, 1, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #843: tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3027,7 +3027,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #847
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(r.minval, 1, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #847: tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3042,7 +3042,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #851
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #851: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3057,7 +3057,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #855
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, r.maxval, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #855: tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3072,7 +3072,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #859
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #859: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3087,7 +3087,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #863
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between(1, r.maxval, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #863: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3102,7 +3102,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #867
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(1, 1, index='c').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #867: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'c', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3117,7 +3117,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #872
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(0, 1, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #872: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3132,7 +3132,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #876
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(-1, 1, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #876: tbl.Between(-1, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3147,7 +3147,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #880
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, 1, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #880: tbl.Between(r.MinVal, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3162,7 +3162,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #884
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(0, r.maxval, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #884: tbl.Between(0, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3177,7 +3177,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #888
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(-1, r.maxval, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #888: tbl.Between(-1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3192,7 +3192,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #892
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #892: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3207,7 +3207,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #896
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between(1, r.maxval, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #896: tbl.Between(1, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3222,7 +3222,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #900
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* tbl.between(1, 1, index='c', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #900: tbl.Between(1, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3237,7 +3237,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #905
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('bc', lambda row:[row['b'], row['c']]) */
 
 		suite.T().Log("About to run line #905: tbl.IndexCreateFunc('bc', func(row r.Term) interface{} { return []interface{}{row.AtIndex('b'), row.AtIndex('c')}})")
@@ -3252,7 +3252,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #909
 		/* {'created':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create('cb', lambda row:[row['c'], row['b']]) */
 
 		suite.T().Log("About to run line #909: tbl.IndexCreateFunc('cb', func(row r.Term) interface{} { return []interface{}{row.AtIndex('c'), row.AtIndex('b')}})")
@@ -3267,7 +3267,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #912
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.index_wait().pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #912: tbl.IndexWait().Pluck('index', 'ready')")
@@ -3282,7 +3282,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #915
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, [0, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #915: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3297,7 +3297,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #919
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between(r.minval, [0, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #919: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3312,7 +3312,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #923
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(r.minval, [0, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #923: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3327,7 +3327,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #927
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(r.minval, [0, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #927: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3342,7 +3342,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #931
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between(r.minval, [1, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #931: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3357,7 +3357,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #935
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(r.minval, [1, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #935: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3372,7 +3372,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #939
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between(r.minval, [1, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #939: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3387,7 +3387,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #943
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between(r.minval, [1, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #943: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3402,7 +3402,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #947
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #947: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3417,7 +3417,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #951
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #951: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3432,7 +3432,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #956
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(r.minval, [0, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #956: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3447,7 +3447,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #960
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(r.minval, [0, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #960: tbl.Between(r.MinVal, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3462,7 +3462,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #964
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between(r.minval, [0, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #964: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3477,7 +3477,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #968
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between(r.minval, [0, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #968: tbl.Between(r.MinVal, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3492,7 +3492,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #972
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between(r.minval, [1, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #972: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3507,7 +3507,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #976
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between(r.minval, [1, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #976: tbl.Between(r.MinVal, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3522,7 +3522,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #980
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, [1, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #980: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3537,7 +3537,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #984
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between(r.minval, [1, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #984: tbl.Between(r.MinVal, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3552,7 +3552,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #988
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #988: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3567,7 +3567,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #992
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between(r.minval, r.maxval, index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #992: tbl.Between(r.MinVal, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3582,7 +3582,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #997
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 0], [0, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #997: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3597,7 +3597,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1001
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 0], [0, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1001: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3612,7 +3612,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1005
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between([0, 0], [0, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1005: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3627,7 +3627,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1009
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between([0, 0], [0, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1009: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3642,7 +3642,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1013
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between([0, 0], [1, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1013: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3657,7 +3657,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1017
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between([0, 0], [1, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1017: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3672,7 +3672,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1021
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between([0, 0], [1, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1021: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3687,7 +3687,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1025
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between([0, 0], [1, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1025: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3702,7 +3702,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1029
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between([0, 0], r.maxval, index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1029: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3717,7 +3717,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1033
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between([0, 0], r.maxval, index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1033: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3732,7 +3732,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1038
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between([0, 0], [0, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1038: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3747,7 +3747,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1042
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between([0, 0], [0, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1042: tbl.Between([]interface{}{0, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3762,7 +3762,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1046
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between([0, 0], [0, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1046: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3777,7 +3777,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1050
 		/* [0, 1] */
-		var expected_ []interface{} = []interface{}{0, 1}
+		var expected_ = []interface{}{0, 1}
 		/* tbl.between([0, 0], [0, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1050: tbl.Between([]interface{}{0, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3792,7 +3792,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1054
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between([0, 0], [1, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1054: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3807,7 +3807,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1058
 		/* [0, 1, 2] */
-		var expected_ []interface{} = []interface{}{0, 1, 2}
+		var expected_ = []interface{}{0, 1, 2}
 		/* tbl.between([0, 0], [1, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1058: tbl.Between([]interface{}{0, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3822,7 +3822,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1062
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between([0, 0], [1, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1062: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3837,7 +3837,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1066
 		/* [0, 1, 2, 3] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3}
+		var expected_ = []interface{}{0, 1, 2, 3}
 		/* tbl.between([0, 0], [1, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1066: tbl.Between([]interface{}{0, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3852,7 +3852,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1070
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between([0, 0], r.maxval, index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1070: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3867,7 +3867,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1074
 		/* [0, 1, 2, 3, 4] */
-		var expected_ []interface{} = []interface{}{0, 1, 2, 3, 4}
+		var expected_ = []interface{}{0, 1, 2, 3, 4}
 		/* tbl.between([0, 0], r.maxval, index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1074: tbl.Between([]interface{}{0, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3882,7 +3882,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1079
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [0, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1079: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3897,7 +3897,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1083
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [0, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1083: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3912,7 +3912,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1087
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [0, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1087: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3927,7 +3927,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1091
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [0, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1091: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3942,7 +3942,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1095
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([0, 1], [1, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1095: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3957,7 +3957,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1099
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [1, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1099: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3972,7 +3972,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1103
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([0, 1], [1, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1103: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -3987,7 +3987,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1107
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([0, 1], [1, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1107: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4002,7 +4002,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1111
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between([0, 1], r.maxval, index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1111: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4017,7 +4017,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1115
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between([0, 1], r.maxval, index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1115: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4032,7 +4032,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1120
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [0, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1120: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4047,7 +4047,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1124
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [0, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1124: tbl.Between([]interface{}{0, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4062,7 +4062,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1128
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([0, 1], [0, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1128: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4077,7 +4077,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1132
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([0, 1], [0, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1132: tbl.Between([]interface{}{0, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4092,7 +4092,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1136
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([0, 1], [1, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1136: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4107,7 +4107,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1140
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([0, 1], [1, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1140: tbl.Between([]interface{}{0, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4122,7 +4122,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1144
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* tbl.between([0, 1], [1, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1144: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4137,7 +4137,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1148
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* tbl.between([0, 1], [1, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1148: tbl.Between([]interface{}{0, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4152,7 +4152,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1152
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between([0, 1], r.maxval, index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1152: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4167,7 +4167,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1156
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between([0, 1], r.maxval, index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1156: tbl.Between([]interface{}{0, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4182,7 +4182,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1161
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1161: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4197,7 +4197,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1165
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1165: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4212,7 +4212,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1169
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1169: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4227,7 +4227,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1173
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1173: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4242,7 +4242,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1177
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [1, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1177: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4257,7 +4257,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1181
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [1, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1181: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4272,7 +4272,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1185
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [1, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1185: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4287,7 +4287,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1189
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([1, 0], [1, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1189: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4302,7 +4302,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1193
 		/* [3, 4] */
-		var expected_ []interface{} = []interface{}{3, 4}
+		var expected_ = []interface{}{3, 4}
 		/* tbl.between([1, 0], r.maxval, index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1193: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4317,7 +4317,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1197
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between([1, 0], r.maxval, index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1197: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4332,7 +4332,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1202
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1202: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4347,7 +4347,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1206
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1206: tbl.Between([]interface{}{1, 0}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4362,7 +4362,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1210
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1210: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4377,7 +4377,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1214
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [0, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1214: tbl.Between([]interface{}{1, 0}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4392,7 +4392,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1218
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 0], [1, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1218: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4407,7 +4407,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1222
 		/* [2] */
-		var expected_ []interface{} = []interface{}{2}
+		var expected_ = []interface{}{2}
 		/* tbl.between([1, 0], [1, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1222: tbl.Between([]interface{}{1, 0}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4422,7 +4422,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1226
 		/* [3] */
-		var expected_ []interface{} = []interface{}{3}
+		var expected_ = []interface{}{3}
 		/* tbl.between([1, 0], [1, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1226: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4437,7 +4437,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1230
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* tbl.between([1, 0], [1, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1230: tbl.Between([]interface{}{1, 0}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4452,7 +4452,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1234
 		/* [3, 4] */
-		var expected_ []interface{} = []interface{}{3, 4}
+		var expected_ = []interface{}{3, 4}
 		/* tbl.between([1, 0], r.maxval, index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1234: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4467,7 +4467,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1238
 		/* [2, 3, 4] */
-		var expected_ []interface{} = []interface{}{2, 3, 4}
+		var expected_ = []interface{}{2, 3, 4}
 		/* tbl.between([1, 0], r.maxval, index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1238: tbl.Between([]interface{}{1, 0}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4482,7 +4482,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1243
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1243: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4497,7 +4497,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1247
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1247: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4512,7 +4512,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1251
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1251: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4527,7 +4527,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1255
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1255: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4542,7 +4542,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1259
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [1, 0], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1259: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4557,7 +4557,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1263
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [1, 0], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1263: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4572,7 +4572,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1267
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [1, 1], index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1267: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4587,7 +4587,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1271
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [1, 1], index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1271: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4602,7 +4602,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1275
 		/* [3, 4] */
-		var expected_ []interface{} = []interface{}{3, 4}
+		var expected_ = []interface{}{3, 4}
 		/* tbl.between([1, 1], r.maxval, index='bc').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1275: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4617,7 +4617,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1279
 		/* [3, 4] */
-		var expected_ []interface{} = []interface{}{3, 4}
+		var expected_ = []interface{}{3, 4}
 		/* tbl.between([1, 1], r.maxval, index='cb').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1279: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4632,7 +4632,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1284
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1284: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4647,7 +4647,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1288
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1288: tbl.Between([]interface{}{1, 1}, []interface{}{0, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4662,7 +4662,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1292
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1292: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4677,7 +4677,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1296
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [0, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1296: tbl.Between([]interface{}{1, 1}, []interface{}{0, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4692,7 +4692,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1300
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [1, 0], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1300: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4707,7 +4707,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1304
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.between([1, 1], [1, 0], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1304: tbl.Between([]interface{}{1, 1}, []interface{}{1, 0}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4722,7 +4722,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1308
 		/* [3] */
-		var expected_ []interface{} = []interface{}{3}
+		var expected_ = []interface{}{3}
 		/* tbl.between([1, 1], [1, 1], index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1308: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4737,7 +4737,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1312
 		/* [3] */
-		var expected_ []interface{} = []interface{}{3}
+		var expected_ = []interface{}{3}
 		/* tbl.between([1, 1], [1, 1], index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1312: tbl.Between([]interface{}{1, 1}, []interface{}{1, 1}).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4752,7 +4752,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1316
 		/* [3, 4] */
-		var expected_ []interface{} = []interface{}{3, 4}
+		var expected_ = []interface{}{3, 4}
 		/* tbl.between([1, 1], r.maxval, index='bc', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1316: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'bc', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4767,7 +4767,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1320
 		/* [3, 4] */
-		var expected_ []interface{} = []interface{}{3, 4}
+		var expected_ = []interface{}{3, 4}
 		/* tbl.between([1, 1], r.maxval, index='cb', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1320: tbl.Between([]interface{}{1, 1}, r.MaxVal).OptArgs(r.BetweenOpts{Index: 'cb', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4782,7 +4782,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1325
 		/* [0,0,0] */
-		var expected_ []interface{} = []interface{}{0, 0, 0}
+		var expected_ = []interface{}{0, 0, 0}
 		/* tbl.between(1, 3, index='mi', right_bound='closed').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1325: tbl.Between(1, 3).OptArgs(r.BetweenOpts{Index: 'mi', RightBound: 'closed', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4797,7 +4797,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1330
 		/* [0,0,0,1,1,1,2,3,3,3,4,4,4] */
-		var expected_ []interface{} = []interface{}{0, 0, 0, 1, 1, 1, 2, 3, 3, 3, 4, 4, 4}
+		var expected_ = []interface{}{0, 0, 0, 1, 1, 1, 2, 3, 3, 3, 4, 4, 4}
 		/* tbl.between(1, 16, index='mi', right_bound='closed').order_by('id').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1330: tbl.Between(1, 16).OptArgs(r.BetweenOpts{Index: 'mi', RightBound: 'closed', }).OrderBy('id').Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4812,7 +4812,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1335
 		/* [0,0,0,1,1,1,2,3,3,3,4,4,4] */
-		var expected_ []interface{} = []interface{}{0, 0, 0, 1, 1, 1, 2, 3, 3, 3, 4, 4, 4}
+		var expected_ = []interface{}{0, 0, 0, 1, 1, 1, 2, 3, 3, 3, 4, 4, 4}
 		/* tbl.order_by(index='mi').map(lambda x:x['id']) */
 
 		suite.T().Log("About to run line #1335: tbl.OrderBy().OptArgs(r.OrderByOpts{Index: 'mi', }).Map(func(x r.Term) interface{} { return x.AtIndex('id')})")
@@ -4827,7 +4827,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1341
 		/* [2, 3] */
-		var expected_ []interface{} = []interface{}{2, 3}
+		var expected_ = []interface{}{2, 3}
 		/* tbl.between(0, 1, index='c', right_bound='closed', left_bound='open').order_by('id')['id'] */
 
 		suite.T().Log("About to run line #1341: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'c', RightBound: 'closed', LeftBound: 'open', }).OrderBy('id').AtIndex('id')")
@@ -4842,7 +4842,7 @@ func (suite *SindexApiSuite) TestCases() {
 	{
 		// sindex/api.yaml line #1345
 		/* [1] */
-		var expected_ []interface{} = []interface{}{1}
+		var expected_ = []interface{}{1}
 		/* tbl.between(0, 1, index='id', right_bound='closed', left_bound='open').order_by('id')['id'] */
 
 		suite.T().Log("About to run line #1345: tbl.Between(0, 1).OptArgs(r.BetweenOpts{Index: 'id', RightBound: 'closed', LeftBound: 'open', }).OrderBy('id').AtIndex('id')")

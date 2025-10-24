@@ -61,7 +61,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #4
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[0, 0], 'type':'Point'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point"}
+		var expected_ = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point"}
 		/* r.geojson({'coordinates':[0, 0], 'type':'Point'}) */
 
 		suite.T().Log("About to run line #4: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{0, 0}, 'type': 'Point', })")
@@ -76,7 +76,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #6
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[0,0], [0,1]], 'type':'LineString'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}}, "type": "LineString"}
+		var expected_ = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}}, "type": "LineString"}
 		/* r.geojson({'coordinates':[[0,0], [0,1]], 'type':'LineString'}) */
 
 		suite.T().Log("About to run line #6: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{[]interface{}{0, 0}, []interface{}{0, 1}}, 'type': 'LineString', })")
@@ -91,7 +91,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #8
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[[[0,0], [0,1], [1,0], [0,0]]], 'type':'Polygon'}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}}}, "type": "Polygon"}
+		var expected_ = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}}}, "type": "Polygon"}
 		/* r.geojson({'coordinates':[[[0,0], [0,1], [1,0], [0,0]]], 'type':'Polygon'}) */
 
 		suite.T().Log("About to run line #8: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{[]interface{}{[]interface{}{0, 0}, []interface{}{0, 1}, []interface{}{1, 0}, []interface{}{0, 0}}}, 'type': 'Polygon', })")
@@ -106,7 +106,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #12
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found ARRAY.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found ARRAY.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found ARRAY.")
 		/* r.geojson({'coordinates':[[], 0], 'type':'Point'}) */
 
 		suite.T().Log("About to run line #12: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{[]interface{}{}, 0}, 'type': 'Point', })")
@@ -121,7 +121,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #14
 		/* err('ReqlQueryLogicError', 'Expected type ARRAY but found BOOL.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type ARRAY but found BOOL.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type ARRAY but found BOOL.")
 		/* r.geojson({'coordinates':true, 'type':'Point'}) */
 
 		suite.T().Log("About to run line #14: r.GeoJSON(map[interface{}]interface{}{'coordinates': true, 'type': 'Point', })")
@@ -136,7 +136,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #16
 		/* err('ReqlNonExistenceError', 'No attribute `coordinates` in object:', [0]) */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `coordinates` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `coordinates` in object:")
 		/* r.geojson({'type':'Point'}) */
 
 		suite.T().Log("About to run line #16: r.GeoJSON(map[interface{}]interface{}{'type': 'Point', })")
@@ -151,7 +151,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #18
 		/* err('ReqlNonExistenceError', 'No attribute `type` in object:', [0]) */
-		var expected_ Err = err("ReqlNonExistenceError", "No attribute `type` in object:")
+		var expected_ = err("ReqlNonExistenceError", "No attribute `type` in object:")
 		/* r.geojson({'coordinates':[0, 0]}) */
 
 		suite.T().Log("About to run line #18: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{0, 0}, })")
@@ -166,7 +166,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #20
 		/* err('ReqlQueryLogicError', 'Unrecognized GeoJSON type `foo`.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Unrecognized GeoJSON type `foo`.")
+		var expected_ = err("ReqlQueryLogicError", "Unrecognized GeoJSON type `foo`.")
 		/* r.geojson({'coordinates':[0, 0], 'type':'foo'}) */
 
 		suite.T().Log("About to run line #20: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{0, 0}, 'type': 'foo', })")
@@ -181,7 +181,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #22
 		/* err('ReqlQueryLogicError', 'Unrecognized field `foo` found in geometry object.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Unrecognized field `foo` found in geometry object.")
+		var expected_ = err("ReqlQueryLogicError", "Unrecognized field `foo` found in geometry object.")
 		/* r.geojson({'coordinates':[0, 0], 'type':'Point', 'foo':'wrong'}) */
 
 		suite.T().Log("About to run line #22: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{0, 0}, 'type': 'Point', 'foo': 'wrong', })")
@@ -196,7 +196,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #26
 		/* ({'$reql_type$':'GEOMETRY', 'coordinates':[0, 0], 'type':'Point', 'crs':null}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point", "crs": nil}
+		var expected_ = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point", "crs": nil}
 		/* r.geojson({'coordinates':[0, 0], 'type':'Point', 'crs':null}) */
 
 		suite.T().Log("About to run line #26: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{0, 0}, 'type': 'Point', 'crs': nil, })")
@@ -211,7 +211,7 @@ func (suite *GeoGeojsonSuite) TestCases() {
 	{
 		// geo/geojson.yaml line #30
 		/* err('ReqlQueryLogicError', 'GeoJSON type `MultiPoint` is not supported.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "GeoJSON type `MultiPoint` is not supported.")
+		var expected_ = err("ReqlQueryLogicError", "GeoJSON type `MultiPoint` is not supported.")
 		/* r.geojson({'coordinates':[0, 0], 'type':'MultiPoint'}) */
 
 		suite.T().Log("About to run line #30: r.GeoJSON(map[interface{}]interface{}{'coordinates': []interface{}{0, 0}, 'type': 'MultiPoint', })")

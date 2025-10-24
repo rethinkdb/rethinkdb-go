@@ -70,7 +70,7 @@ func (suite *TransformTableSuite) TestCases() {
 	{
 		// transform/table.yaml line #5
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* tbl.insert([{"a":["k1","v1"]},{"a":["k2","v2"]}]) */
 
 		suite.T().Log("About to run line #5: tbl.Insert([]interface{}{map[interface{}]interface{}{'a': []interface{}{'k1', 'v1'}, }, map[interface{}]interface{}{'a': []interface{}{'k2', 'v2'}, }})")
@@ -85,7 +85,7 @@ func (suite *TransformTableSuite) TestCases() {
 	{
 		// transform/table.yaml line #10
 		/* {"k1":"v1","k2":"v2"} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"k1": "v1", "k2": "v2"}
+		var expected_ = map[interface{}]interface{}{"k1": "v1", "k2": "v2"}
 		/* tbl.map(r.row["a"]).coerce_to("object") */
 
 		suite.T().Log("About to run line #10: tbl.Map(r.Row.AtIndex('a')).CoerceTo('object')")
@@ -100,7 +100,7 @@ func (suite *TransformTableSuite) TestCases() {
 	{
 		// transform/table.yaml line #14
 		/* "SELECTION<STREAM>" */
-		var expected_ string = "SELECTION<STREAM>"
+		var expected_ = "SELECTION<STREAM>"
 		/* tbl.limit(1).type_of() */
 
 		suite.T().Log("About to run line #14: tbl.Limit(1).TypeOf()")
@@ -115,7 +115,7 @@ func (suite *TransformTableSuite) TestCases() {
 	{
 		// transform/table.yaml line #17
 		/* "ARRAY" */
-		var expected_ string = "ARRAY"
+		var expected_ = "ARRAY"
 		/* tbl.limit(1).coerce_to('array').type_of() */
 
 		suite.T().Log("About to run line #17: tbl.Limit(1).CoerceTo('array').TypeOf()")

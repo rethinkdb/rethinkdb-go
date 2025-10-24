@@ -61,7 +61,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #3
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(True) */
 
 		suite.T().Log("About to run line #3: r.Expr(true)")
@@ -76,7 +76,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #10
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(False) */
 
 		suite.T().Log("About to run line #10: r.Expr(false)")
@@ -91,7 +91,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #17
 		/* 'BOOL' */
-		var expected_ string = "BOOL"
+		var expected_ = "BOOL"
 		/* r.expr(False).type_of() */
 
 		suite.T().Log("About to run line #17: r.Expr(false).TypeOf()")
@@ -106,7 +106,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #21
 		/* 'true' */
-		var expected_ string = "true"
+		var expected_ = "true"
 		/* r.expr(True).coerce_to('string') */
 
 		suite.T().Log("About to run line #21: r.Expr(true).CoerceTo('string')")
@@ -121,7 +121,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #24
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(True).coerce_to('bool') */
 
 		suite.T().Log("About to run line #24: r.Expr(true).CoerceTo('bool')")
@@ -136,7 +136,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #27
 		/* False */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(False).coerce_to('bool') */
 
 		suite.T().Log("About to run line #27: r.Expr(false).CoerceTo('bool')")
@@ -151,7 +151,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #30
 		/* False */
-		var expected_ bool = false
+		var expected_ = false
 		/* r.expr(null).coerce_to('bool') */
 
 		suite.T().Log("About to run line #30: r.Expr(nil).CoerceTo('bool')")
@@ -166,7 +166,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #33
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(0).coerce_to('bool') */
 
 		suite.T().Log("About to run line #33: r.Expr(0).CoerceTo('bool')")
@@ -181,7 +181,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #36
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('false').coerce_to('bool') */
 
 		suite.T().Log("About to run line #36: r.Expr('false').CoerceTo('bool')")
@@ -196,7 +196,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #39
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr('foo').coerce_to('bool') */
 
 		suite.T().Log("About to run line #39: r.Expr('foo').CoerceTo('bool')")
@@ -211,7 +211,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #42
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr([]).coerce_to('bool') */
 
 		suite.T().Log("About to run line #42: r.Expr([]interface{}{}).CoerceTo('bool')")
@@ -226,7 +226,7 @@ func (suite *DatumBoolSuite) TestCases() {
 	{
 		// datum/bool.yaml line #45
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr({}).coerce_to('bool') */
 
 		suite.T().Log("About to run line #45: r.Expr(map[interface{}]interface{}{}).CoerceTo('bool')")

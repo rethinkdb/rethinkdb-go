@@ -70,7 +70,7 @@ func (suite *ChangefeedsSquashSuite) TestCases() {
 	{
 		// changefeeds/squash.yaml line #7
 		/* ("STREAM") */
-		var expected_ string = "STREAM"
+		var expected_ = "STREAM"
 		/* tbl.changes(squash=true).type_of() */
 
 		suite.T().Log("About to run line #7: tbl.Changes().OptArgs(r.ChangesOpts{Squash: true, }).TypeOf()")
@@ -113,7 +113,7 @@ func (suite *ChangefeedsSquashSuite) TestCases() {
 	{
 		// changefeeds/squash.yaml line #28
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.insert({'id':100})['inserted'] */
 
 		suite.T().Log("About to run line #28: tbl.Insert(map[interface{}]interface{}{'id': 100, }).AtIndex('inserted')")
@@ -128,7 +128,7 @@ func (suite *ChangefeedsSquashSuite) TestCases() {
 	{
 		// changefeeds/squash.yaml line #32
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tbl.get(100).update({'a':1})['replaced'] */
 
 		suite.T().Log("About to run line #32: tbl.Get(100).Update(map[interface{}]interface{}{'a': 1, }).AtIndex('replaced')")
@@ -144,7 +144,7 @@ func (suite *ChangefeedsSquashSuite) TestCases() {
 		// changefeeds/squash.yaml line #36
 		/* ([{'new_val':{'id':100}, 'old_val':null},
 		{'new_val':{'a':1, 'id':100}, 'old_val':{'id':100}}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 100}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 100}, "old_val": map[interface{}]interface{}{"id": 100}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 100}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 100}, "old_val": map[interface{}]interface{}{"id": 100}}}
 		/* normal_changes */
 
 		suite.T().Log("About to run line #36: normal_changes")
@@ -160,7 +160,7 @@ func (suite *ChangefeedsSquashSuite) TestCases() {
 		// changefeeds/squash.yaml line #40
 		/* ([{'new_val':{'id':100}, 'old_val':null},
 		{'new_val':{'a':1, 'id':100}, 'old_val':{'id':100}}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 100}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 100}, "old_val": map[interface{}]interface{}{"id": 100}}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"id": 100}, "old_val": nil}, map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 100}, "old_val": map[interface{}]interface{}{"id": 100}}}
 		/* false_squash_changes */
 
 		suite.T().Log("About to run line #40: false_squash_changes")
@@ -175,7 +175,7 @@ func (suite *ChangefeedsSquashSuite) TestCases() {
 	{
 		// changefeeds/squash.yaml line #44
 		/* ([{'new_val':{'a':1, 'id':100}, 'old_val':null}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 100}, "old_val": nil}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"new_val": map[interface{}]interface{}{"a": 1, "id": 100}, "old_val": nil}}
 		/* long_squash_changes */
 
 		suite.T().Log("About to run line #44: long_squash_changes")
@@ -190,7 +190,7 @@ func (suite *ChangefeedsSquashSuite) TestCases() {
 	{
 		// changefeeds/squash.yaml line #59
 		/* err('ReqlQueryLogicError', 'Expected BOOL or a positive NUMBER but found a negative NUMBER.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected BOOL or a positive NUMBER but found a negative NUMBER.")
+		var expected_ = err("ReqlQueryLogicError", "Expected BOOL or a positive NUMBER but found a negative NUMBER.")
 		/* tbl.changes(squash=-10) */
 
 		suite.T().Log("About to run line #59: tbl.Changes().OptArgs(r.ChangesOpts{Squash: -10, })")

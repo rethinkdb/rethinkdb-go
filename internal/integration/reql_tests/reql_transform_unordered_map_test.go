@@ -86,7 +86,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #6
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* odd.insert([{"id":1, "num":1}, {"id":3, "num":3}, {"id":5, "num":5}]) */
 
 		suite.T().Log("About to run line #6: odd.Insert([]interface{}{map[interface{}]interface{}{'id': 1, 'num': 1, }, map[interface{}]interface{}{'id': 3, 'num': 3, }, map[interface{}]interface{}{'id': 5, 'num': 5, }})")
@@ -101,7 +101,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #7
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* even.insert([{"id":2, "num":2}, {"id":4, "num":4}, {"id":6, "num":6}]) */
 
 		suite.T().Log("About to run line #7: even.Insert([]interface{}{map[interface{}]interface{}{'id': 2, 'num': 2, }, map[interface{}]interface{}{'id': 4, 'num': 4, }, map[interface{}]interface{}{'id': 6, 'num': 6, }})")
@@ -116,7 +116,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #8
 		/* AnythingIsFine */
-		var expected_ string = compare.AnythingIsFine
+		var expected_ = compare.AnythingIsFine
 		/* odd2.insert([{"id":7, "num":1}, {"id":8, "num":3}, {"id":9, "num":2}]) */
 
 		suite.T().Log("About to run line #8: odd2.Insert([]interface{}{map[interface{}]interface{}{'id': 7, 'num': 1, }, map[interface{}]interface{}{'id': 8, 'num': 3, }, map[interface{}]interface{}{'id': 9, 'num': 2, }})")
@@ -131,7 +131,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #11
 		/* [{"id":1, "num":1}, {"id":3, "num":3}, {"id":5, "num":5}, {"id":2, "num":2}, {"id":4, "num":4}, {"id":6, "num":6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num").union(even.order_by("num"), interleave = false) */
 
 		suite.T().Log("About to run line #11: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: false, })")
@@ -146,7 +146,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #16
 		/* [{"id":2, "num":2}, {"id":4, "num":4}, {"id":6, "num":6}, {"id":1, "num":1}, {"id":3, "num":3}, {"id":5, "num":5}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}, map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 5, "num": 5}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}, map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 5, "num": 5}}
 		/* even.order_by("num").union(odd.order_by("num"), interleave = false) */
 
 		suite.T().Log("About to run line #16: even.OrderBy('num').Union(odd.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: false, })")
@@ -161,7 +161,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #22
 		/* [{"id":1, "num":1}, {"id":2, "num":2}, {"id":3, "num":3}, {"id":4, "num":4}, {"id":5, "num":5}, {"id":6, "num":6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num").union(even.order_by("num"), interleave="num") */
 
 		suite.T().Log("About to run line #22: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: 'num', })")
@@ -176,7 +176,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #28
 		/* err("ReqlQueryLogicError","The streams given as arguments are not ordered by given ordering.") */
-		var expected_ Err = err("ReqlQueryLogicError", "The streams given as arguments are not ordered by given ordering.")
+		var expected_ = err("ReqlQueryLogicError", "The streams given as arguments are not ordered by given ordering.")
 		/* odd.order_by("num").union(even.order_by("num"), interleave=r.desc("num")) */
 
 		suite.T().Log("About to run line #28: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: r.Desc('num'), })")
@@ -191,7 +191,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #34
 		/* [{"id":1, "num":1}, {"id":2, "num":2}, {"id":3, "num":3}, {"id":4, "num":4}, {"id":5, "num":5}, {"id":6, "num":6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num").union(even.order_by("num"), interleave=lambda x: x["num"]) */
 
 		suite.T().Log("About to run line #34: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return x.AtIndex('num')}, })")
@@ -206,7 +206,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #40
 		/* [{"id": 7, "num": 1}, {"id": 2, "num": 2}, {"id": 9, "num": 2}, {"id": 8, "num": 3}, {"id": 4, "num": 4}, {"id": 6, "num": 6}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 7, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 9, "num": 2}, map[interface{}]interface{}{"id": 8, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 7, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 9, "num": 2}, map[interface{}]interface{}{"id": 8, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd2.order_by("num", r.desc("id")).union(even.order_by("num", r.desc("id")), interleave=[lambda x: x["num"], lambda x: x["id"]]) */
 
 		suite.T().Log("About to run line #40: odd2.OrderBy('num', r.Desc('id')).Union(even.OrderBy('num', r.Desc('id'))).OptArgs(r.UnionOpts{Interleave: []interface{}{func(x r.Term) interface{} { return x.AtIndex('num')}, func(x r.Term) interface{} { return x.AtIndex('id')}}, })")
@@ -221,7 +221,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #46
 		/* err("ReqlServerCompileError", "DESC may only be used as an argument to ORDER_BY or UNION.") */
-		var expected_ Err = err("ReqlCompileError", "DESC may only be used as an argument to ORDER_BY or UNION.")
+		var expected_ = err("ReqlCompileError", "DESC may only be used as an argument to ORDER_BY or UNION.")
 		/* odd.order_by("num").union(even.order_by("num"), interleave=lambda x: r.desc(x["num"])) */
 
 		suite.T().Log("About to run line #46: odd.OrderBy('num').Union(even.OrderBy('num')).OptArgs(r.UnionOpts{Interleave: func(x r.Term) interface{} { return r.Desc(x.AtIndex('num'))}, })")
@@ -236,7 +236,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #50
 		/* [{"id":6, "num":6}, {"id":5, "num":5}, {"id":4, "num":4}, {"id":3, "num":3}, {"id":2, "num":2}, {"id":1, "num":1}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 6, "num": 6}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 1, "num": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 6, "num": 6}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 1, "num": 1}}
 		/* odd.order_by(r.desc("num")).union(even.order_by(r.desc("num")), interleave= [r.desc(lambda x: x["num"])]) */
 
 		suite.T().Log("About to run line #50: odd.OrderBy(r.Desc('num')).Union(even.OrderBy(r.Desc('num'))).OptArgs(r.UnionOpts{Interleave: []interface{}{r.Desc(func(x r.Term) interface{} { return x.AtIndex('num')})}, })")
@@ -251,7 +251,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #54
 		/* [{"id":1, "num":1}, {"id":7, "num":1}, {"id":2, "num":2}, {"id":9, "num":2}, {"id":3, "num":3}, {"id":8, "num":3}, {"id":4, "num":4}, {"id":5, "num":5}, {"id":6, "num":6}, ] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 7, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 9, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 8, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 1, "num": 1}, map[interface{}]interface{}{"id": 7, "num": 1}, map[interface{}]interface{}{"id": 2, "num": 2}, map[interface{}]interface{}{"id": 9, "num": 2}, map[interface{}]interface{}{"id": 3, "num": 3}, map[interface{}]interface{}{"id": 8, "num": 3}, map[interface{}]interface{}{"id": 4, "num": 4}, map[interface{}]interface{}{"id": 5, "num": 5}, map[interface{}]interface{}{"id": 6, "num": 6}}
 		/* odd.order_by("num", "id").union(even.order_by("num", "id"), odd2.order_by("num", "id"), interleave= ["num", "id"]) */
 
 		suite.T().Log("About to run line #54: odd.OrderBy('num', 'id').Union(even.OrderBy('num', 'id'), odd2.OrderBy('num', 'id')).OptArgs(r.UnionOpts{Interleave: []interface{}{'num', 'id'}, })")
@@ -266,7 +266,7 @@ func (suite *TransformUnorderedMapSuite) TestCases() {
 	{
 		// transform/unordered_map.yaml line #58
 		/* err("ReqlQueryLogicError","The streams given as arguments are not ordered by given ordering.") */
-		var expected_ Err = err("ReqlQueryLogicError", "The streams given as arguments are not ordered by given ordering.")
+		var expected_ = err("ReqlQueryLogicError", "The streams given as arguments are not ordered by given ordering.")
 		/* odd.order_by("num", "id").union(even.order_by("num", "id"), odd2.order_by(r.desc("num"), "id"), interleave= ["num", "id"]) */
 
 		suite.T().Log("About to run line #58: odd.OrderBy('num', 'id').Union(even.OrderBy('num', 'id'), odd2.OrderBy(r.Desc('num'), 'id')).OptArgs(r.UnionOpts{Interleave: []interface{}{'num', 'id'}, })")

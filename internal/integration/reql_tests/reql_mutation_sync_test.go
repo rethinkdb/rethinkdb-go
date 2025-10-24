@@ -61,7 +61,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #5
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* r.db('test').table_create('test1') */
 
 		suite.T().Log("About to run line #5: r.DB('test').TableCreate('test1')")
@@ -76,7 +76,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #7
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* r.db('test').table_create('test1soft') */
 
 		suite.T().Log("About to run line #7: r.DB('test').TableCreate('test1soft')")
@@ -91,7 +91,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #9
 		/* {'skipped':0, 'deleted':0, 'unchanged':0, 'errors':0, 'replaced':1, 'inserted':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"skipped": 0, "deleted": 0, "unchanged": 0, "errors": 0, "replaced": 1, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"skipped": 0, "deleted": 0, "unchanged": 0, "errors": 0, "replaced": 1, "inserted": 0}
 		/* r.db('test').table('test1soft').config().update({'durability':'soft'}) */
 
 		suite.T().Log("About to run line #9: r.DB('test').Table('test1soft').Config().Update(map[interface{}]interface{}{'durability': 'soft', })")
@@ -120,7 +120,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #13
 		/* partial({'created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"created": 1})
 		/* tbl.index_create('x') */
 
 		suite.T().Log("About to run line #13: tbl.IndexCreate('x')")
@@ -135,7 +135,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #15
 		/* [{'ready':True, 'index':'x'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"ready": true, "index": "x"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"ready": true, "index": "x"}}
 		/* tbl.index_wait('x').pluck('index', 'ready') */
 
 		suite.T().Log("About to run line #15: tbl.IndexWait('x').Pluck('index', 'ready')")
@@ -150,7 +150,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #19
 		/* {'synced':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"synced": 1}
+		var expected_ = map[interface{}]interface{}{"synced": 1}
 		/* tbl.sync() */
 
 		suite.T().Log("About to run line #19: tbl.Sync()")
@@ -165,7 +165,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #21
 		/* {'synced':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"synced": 1}
+		var expected_ = map[interface{}]interface{}{"synced": 1}
 		/* tbl_soft.sync() */
 
 		suite.T().Log("About to run line #21: tbl_soft.Sync()")
@@ -180,7 +180,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #23
 		/* {'synced':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"synced": 1}
+		var expected_ = map[interface{}]interface{}{"synced": 1}
 		/* tbl.sync() */
 
 		suite.T().Log("About to run line #23: tbl.Sync()")
@@ -196,7 +196,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #27
 		/* {'synced':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"synced": 1}
+		var expected_ = map[interface{}]interface{}{"synced": 1}
 		/* tbl.sync() */
 
 		suite.T().Log("About to run line #27: tbl.Sync()")
@@ -212,7 +212,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #48
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* r.db('test').table_drop('test1') */
 
 		suite.T().Log("About to run line #48: r.DB('test').TableDrop('test1')")
@@ -227,7 +227,7 @@ func (suite *MutationSyncSuite) TestCases() {
 	{
 		// mutation/sync.yaml line #50
 		/* partial({'tables_dropped':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_dropped": 1})
 		/* r.db('test').table_drop('test1soft') */
 
 		suite.T().Log("About to run line #50: r.DB('test').TableDrop('test1soft')")

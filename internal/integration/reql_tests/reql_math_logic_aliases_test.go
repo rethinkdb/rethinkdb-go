@@ -61,7 +61,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #5
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(0).add(1) */
 
 		suite.T().Log("About to run line #5: r.Expr(0).Add(1)")
@@ -76,7 +76,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #6
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.add(0, 1) */
 
 		suite.T().Log("About to run line #6: r.Add(0, 1)")
@@ -91,7 +91,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #7
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(2).sub(1) */
 
 		suite.T().Log("About to run line #7: r.Expr(2).Sub(1)")
@@ -106,7 +106,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #8
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.sub(2, 1) */
 
 		suite.T().Log("About to run line #8: r.Sub(2, 1)")
@@ -121,7 +121,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #9
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(2).div(2) */
 
 		suite.T().Log("About to run line #9: r.Expr(2).Div(2)")
@@ -136,7 +136,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #10
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.div(2, 2) */
 
 		suite.T().Log("About to run line #10: r.Div(2, 2)")
@@ -151,7 +151,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #11
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1).mul(1) */
 
 		suite.T().Log("About to run line #11: r.Expr(1).Mul(1)")
@@ -166,7 +166,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #12
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.mul(1, 1) */
 
 		suite.T().Log("About to run line #12: r.Mul(1, 1)")
@@ -181,7 +181,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #13
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(1).mod(2) */
 
 		suite.T().Log("About to run line #13: r.Expr(1).Mod(2)")
@@ -196,7 +196,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #14
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.mod(1, 2) */
 
 		suite.T().Log("About to run line #14: r.Mod(1, 2)")
@@ -211,7 +211,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #25
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(True).and_(True) */
 
 		suite.T().Log("About to run line #25: r.Expr(true).And(true)")
@@ -226,7 +226,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #26
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(True).or_(True) */
 
 		suite.T().Log("About to run line #26: r.Expr(true).Or(true)")
@@ -241,7 +241,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #27
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.and_(True, True) */
 
 		suite.T().Log("About to run line #27: r.And(true, true)")
@@ -256,7 +256,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #28
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.or_(True, True) */
 
 		suite.T().Log("About to run line #28: r.Or(true, true)")
@@ -271,7 +271,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #29
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(False).not_() */
 
 		suite.T().Log("About to run line #29: r.Expr(false).Not()")
@@ -286,7 +286,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #30
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.not_(False) */
 
 		suite.T().Log("About to run line #30: r.Not(false)")
@@ -301,7 +301,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #34
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).eq(1) */
 
 		suite.T().Log("About to run line #34: r.Expr(1).Eq(1)")
@@ -316,7 +316,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #35
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).ne(2) */
 
 		suite.T().Log("About to run line #35: r.Expr(1).Ne(2)")
@@ -331,7 +331,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #36
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).lt(2) */
 
 		suite.T().Log("About to run line #36: r.Expr(1).Lt(2)")
@@ -346,7 +346,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #37
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).gt(0) */
 
 		suite.T().Log("About to run line #37: r.Expr(1).Gt(0)")
@@ -361,7 +361,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #38
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).le(1) */
 
 		suite.T().Log("About to run line #38: r.Expr(1).Le(1)")
@@ -376,7 +376,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #39
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.expr(1).ge(1) */
 
 		suite.T().Log("About to run line #39: r.Expr(1).Ge(1)")
@@ -391,7 +391,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #40
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.eq(1, 1) */
 
 		suite.T().Log("About to run line #40: r.Eq(1, 1)")
@@ -406,7 +406,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #41
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.ne(1, 2) */
 
 		suite.T().Log("About to run line #41: r.Ne(1, 2)")
@@ -421,7 +421,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #42
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.lt(1, 2) */
 
 		suite.T().Log("About to run line #42: r.Lt(1, 2)")
@@ -436,7 +436,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #43
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.gt(1, 0) */
 
 		suite.T().Log("About to run line #43: r.Gt(1, 0)")
@@ -451,7 +451,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #44
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.le(1, 1) */
 
 		suite.T().Log("About to run line #44: r.Le(1, 1)")
@@ -466,7 +466,7 @@ func (suite *MathLogicAliasesSuite) TestCases() {
 	{
 		// math_logic/aliases.yaml line #45
 		/* True */
-		var expected_ bool = true
+		var expected_ = true
 		/* r.ge(1, 1) */
 
 		suite.T().Log("About to run line #45: r.Ge(1, 1)")

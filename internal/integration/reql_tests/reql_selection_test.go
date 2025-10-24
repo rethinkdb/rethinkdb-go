@@ -86,7 +86,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #6
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
 		/* tbl.insert([{'id':i, 'a':i%4} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #6: tbl.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'a': r.Mod(i, 4), })\n    }\n    return res\n}()))")
@@ -108,7 +108,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #18
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':100}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 100}
 		/* tbl2.insert([{'id':i, 'b':i%4} for i in xrange(100)]) */
 
 		suite.T().Log("About to run line #18: tbl2.Insert((func() []interface{} {\n    res := []interface{}{}\n    for iterator_ := 0; iterator_ < 100; iterator_++ {\n        i := iterator_\n        res = append(res, map[interface{}]interface{}{'id': i, 'b': r.Mod(i, 4), })\n    }\n    return res\n}()))")
@@ -130,7 +130,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #31
 		/* 'TABLE' */
-		var expected_ string = "TABLE"
+		var expected_ = "TABLE"
 		/* tbl.type_of() */
 
 		suite.T().Log("About to run line #31: tbl.TypeOf()")
@@ -145,7 +145,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #35
 		/* err("ReqlOpFailedError", 'Database `missing` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Database `missing` does not exist.")
+		var expected_ = err("ReqlOpFailedError", "Database `missing` does not exist.")
 		/* r.db('missing').table('bar') */
 
 		suite.T().Log("About to run line #35: r.DB('missing').Table('bar')")
@@ -160,7 +160,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #39
 		/* err("ReqlOpFailedError", 'Table `test.missing` does not exist.', [0]) */
-		var expected_ Err = err("ReqlOpFailedError", "Table `test.missing` does not exist.")
+		var expected_ = err("ReqlOpFailedError", "Table `test.missing` does not exist.")
 		/* r.db('test').table('missing') */
 
 		suite.T().Log("About to run line #39: r.DB('test').Table('missing')")
@@ -175,7 +175,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #43
 		/* ({"errors":1,"inserted":0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"errors": 1, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"errors": 1, "inserted": 0}
 		/* tbl.insert({"id":"\x00"}).pluck("errors","inserted") */
 
 		suite.T().Log("About to run line #43: tbl.Insert(map[interface{}]interface{}{'id': '\\u0000', }).Pluck('errors', 'inserted')")
@@ -190,7 +190,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #46
 		/* ({"errors":1,"inserted":0}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"errors": 1, "inserted": 0}
+		var expected_ = map[interface{}]interface{}{"errors": 1, "inserted": 0}
 		/* tbl.insert({"id":["embedded",["null\x00"]]}).pluck("errors","inserted") */
 
 		suite.T().Log("About to run line #46: tbl.Insert(map[interface{}]interface{}{'id': []interface{}{'embedded', []interface{}{'null\\u0000'}}, }).Pluck('errors', 'inserted')")
@@ -205,7 +205,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #51
 		/* ({'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
 		/* tbl3.insert({'id':u'Здравствуй','value':u'Земля!'}) */
 
 		suite.T().Log("About to run line #51: tbl3.Insert(map[interface{}]interface{}{'id': 'Здравствуй', 'value': 'Земля!', })")
@@ -220,7 +220,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #60
 		/* {u'id':u'Здравствуй',u'value':u'Земля!'} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}
+		var expected_ = map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}
 		/* tbl3.get('Здравствуй') */
 
 		suite.T().Log("About to run line #60: tbl3.Get('Здравствуй')")
@@ -235,7 +235,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #73
 		/* [{u'id':u'Здравствуй',u'value':u'Земля!'}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": "Здравствуй", "value": "Земля!"}}
 		/* tbl3.filter({'value':'Земля!'}) */
 
 		suite.T().Log("About to run line #73: tbl3.Filter(map[interface{}]interface{}{'value': 'Земля!', })")
@@ -250,7 +250,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #86
 		/* err("ReqlQueryLogicError", 'Database name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Database name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
+		var expected_ = err("ReqlQueryLogicError", "Database name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
 		/* r.db('%') */
 
 		suite.T().Log("About to run line #86: r.DB('%')")
@@ -265,7 +265,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #89
 		/* err("ReqlQueryLogicError", 'Table name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Table name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
+		var expected_ = err("ReqlQueryLogicError", "Table name `%` invalid (Use A-Z, a-z, 0-9, _ and - only).")
 		/* r.db('test').table('%') */
 
 		suite.T().Log("About to run line #89: r.DB('test').Table('%')")
@@ -280,7 +280,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #93
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.count() */
 
 		suite.T().Log("About to run line #93: tbl.Count()")
@@ -309,7 +309,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #101
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* r.db(tbl2DbName).table(tbl2Name, read_mode='outdated').count() */
 
 		suite.T().Log("About to run line #101: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'outdated', }).Count()")
@@ -324,7 +324,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #102
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* r.db(tbl2DbName).table(tbl2Name, read_mode='single').count() */
 
 		suite.T().Log("About to run line #102: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'single', }).Count()")
@@ -339,7 +339,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #103
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* r.db(tbl2DbName).table(tbl2Name, read_mode='majority').count() */
 
 		suite.T().Log("About to run line #103: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'majority', }).Count()")
@@ -354,7 +354,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #120
 		/* err("ReqlQueryLogicError", 'Expected type STRING but found BOOL.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type STRING but found BOOL.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type STRING but found BOOL.")
 		/* r.db(tbl2DbName).table(tbl2Name, read_mode=true).count() */
 
 		suite.T().Log("About to run line #120: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: true, }).Count()")
@@ -369,7 +369,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #125
 		/* err("ReqlQueryLogicError", 'Read mode `fake` unrecognized (options are "majority", "single", and "outdated").') */
-		var expected_ Err = err("ReqlQueryLogicError", "Read mode `fake` unrecognized (options are \"majority\", \"single\", and \"outdated\").")
+		var expected_ = err("ReqlQueryLogicError", "Read mode `fake` unrecognized (options are \"majority\", \"single\", and \"outdated\").")
 		/* r.db(tbl2DbName).table(tbl2Name, read_mode='fake').count() */
 
 		suite.T().Log("About to run line #125: r.DB(tbl2DbName).Table(tbl2Name).OptArgs(r.TableOpts{ReadMode: 'fake', }).Count()")
@@ -384,7 +384,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #130
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* tbl.get(20).count() */
 
 		suite.T().Log("About to run line #130: tbl.Get(20).Count()")
@@ -399,7 +399,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #134
 		/* {'id':20,'a':0} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"id": 20, "a": 0}
+		var expected_ = map[interface{}]interface{}{"id": 20, "a": 0}
 		/* tbl.get(20) */
 
 		suite.T().Log("About to run line #134: tbl.Get(20)")
@@ -436,7 +436,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #149
 		/* partial({'tables_created':1}) */
-		var expected_ compare.Expected = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
+		var expected_ = compare.PartialMatch(map[interface{}]interface{}{"tables_created": 1})
 		/* r.db('test').table_create('testpkey', primary_key='foo') */
 
 		suite.T().Log("About to run line #149: r.DB('test').TableCreate('testpkey').OptArgs(r.TableCreateOpts{PrimaryKey: 'foo', })")
@@ -451,7 +451,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #155
 		/* {'deleted':0.0,'replaced':0.0,'unchanged':0.0,'errors':0.0,'skipped':0.0,'inserted':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
+		var expected_ = map[interface{}]interface{}{"deleted": 0.0, "replaced": 0.0, "unchanged": 0.0, "errors": 0.0, "skipped": 0.0, "inserted": 1}
 		/* tblpkey.insert({'foo':10,'a':10}) */
 
 		suite.T().Log("About to run line #155: tblpkey.Insert(map[interface{}]interface{}{'foo': 10, 'a': 10, })")
@@ -466,7 +466,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #159
 		/* {'foo':10,'a':10} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"foo": 10, "a": 10}
+		var expected_ = map[interface{}]interface{}{"foo": 10, "a": 10}
 		/* tblpkey.get(10) */
 
 		suite.T().Log("About to run line #159: tblpkey.Get(10)")
@@ -481,7 +481,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #163
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* tbl.get_all() */
 
 		suite.T().Log("About to run line #163: tbl.GetAll()")
@@ -496,7 +496,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #165
 		/* [{"id":20,"a":0}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 20, "a": 0}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 20, "a": 0}}
 		/* tbl.get_all(20) */
 
 		suite.T().Log("About to run line #165: tbl.GetAll(20)")
@@ -511,7 +511,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #167
 		/* "SELECTION<STREAM>" */
-		var expected_ string = "SELECTION<STREAM>"
+		var expected_ = "SELECTION<STREAM>"
 		/* tbl.get_all().type_of() */
 
 		suite.T().Log("About to run line #167: tbl.GetAll().TypeOf()")
@@ -526,7 +526,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #169
 		/* "SELECTION<STREAM>" */
-		var expected_ string = "SELECTION<STREAM>"
+		var expected_ = "SELECTION<STREAM>"
 		/* tbl.get_all(20).type_of() */
 
 		suite.T().Log("About to run line #169: tbl.GetAll(20).TypeOf()")
@@ -541,7 +541,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #173
 		/* 'TABLE_SLICE' */
-		var expected_ string = "TABLE_SLICE"
+		var expected_ = "TABLE_SLICE"
 		/* tbl.between(2, 1).type_of() */
 
 		suite.T().Log("About to run line #173: tbl.Between(2, 1).TypeOf()")
@@ -556,7 +556,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #175
 		/* 'TABLE_SLICE' */
-		var expected_ string = "TABLE_SLICE"
+		var expected_ = "TABLE_SLICE"
 		/* tbl.between(1, 2).type_of() */
 
 		suite.T().Log("About to run line #175: tbl.Between(1, 2).TypeOf()")
@@ -571,7 +571,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #177
 		/* 'TABLE_SLICE' */
-		var expected_ string = "TABLE_SLICE"
+		var expected_ = "TABLE_SLICE"
 		/* tbl.between(1, 2, index='id').type_of() */
 
 		suite.T().Log("About to run line #177: tbl.Between(1, 2).OptArgs(r.BetweenOpts{Index: 'id', }).TypeOf()")
@@ -586,7 +586,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #181
 		/* 'TABLE_SLICE' */
-		var expected_ string = "TABLE_SLICE"
+		var expected_ = "TABLE_SLICE"
 		/* tbl.between(1, 1, right_bound='closed').type_of() */
 
 		suite.T().Log("About to run line #181: tbl.Between(1, 1).OptArgs(r.BetweenOpts{RightBound: 'closed', }).TypeOf()")
@@ -601,7 +601,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #185
 		/* 'TABLE_SLICE' */
-		var expected_ string = "TABLE_SLICE"
+		var expected_ = "TABLE_SLICE"
 		/* tbl.between(2, 1).type_of() */
 
 		suite.T().Log("About to run line #185: tbl.Between(2, 1).TypeOf()")
@@ -616,7 +616,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #187
 		/* 'TABLE_SLICE' */
-		var expected_ string = "TABLE_SLICE"
+		var expected_ = "TABLE_SLICE"
 		/* tbl.between(2, 1, index='id').type_of() */
 
 		suite.T().Log("About to run line #187: tbl.Between(2, 1).OptArgs(r.BetweenOpts{Index: 'id', }).TypeOf()")
@@ -631,7 +631,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #192
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tbl.between(21, 20).count() */
 
 		suite.T().Log("About to run line #192: tbl.Between(21, 20).Count()")
@@ -646,7 +646,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #194
 		/* 9 */
-		var expected_ int = 9
+		var expected_ = 9
 		/* tbl.between(20, 29).count() */
 
 		suite.T().Log("About to run line #194: tbl.Between(20, 29).Count()")
@@ -661,7 +661,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #196
 		/* 9 */
-		var expected_ int = 9
+		var expected_ = 9
 		/* tbl.between(-10, 9).count() */
 
 		suite.T().Log("About to run line #196: tbl.Between(-10, 9).Count()")
@@ -676,7 +676,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #198
 		/* 20 */
-		var expected_ int = 20
+		var expected_ = 20
 		/* tbl.between(80, 2000).count() */
 
 		suite.T().Log("About to run line #198: tbl.Between(80, 2000).Count()")
@@ -691,7 +691,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #200
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.between(-2000, 2000).count() */
 
 		suite.T().Log("About to run line #200: tbl.Between(-2000, 2000).Count()")
@@ -706,7 +706,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #205
 		/* 10 */
-		var expected_ int = 10
+		var expected_ = 10
 		/* tbl.between(20, 29, right_bound='closed').count() */
 
 		suite.T().Log("About to run line #205: tbl.Between(20, 29).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
@@ -721,7 +721,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #209
 		/* 10 */
-		var expected_ int = 10
+		var expected_ = 10
 		/* tbl.between(-10, 9, right_bound='closed').count() */
 
 		suite.T().Log("About to run line #209: tbl.Between(-10, 9).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
@@ -736,7 +736,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #213
 		/* 20 */
-		var expected_ int = 20
+		var expected_ = 20
 		/* tbl.between(80, 2000, right_bound='closed').count() */
 
 		suite.T().Log("About to run line #213: tbl.Between(80, 2000).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
@@ -751,7 +751,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #217
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.between(-2000, 2000, right_bound='closed').count() */
 
 		suite.T().Log("About to run line #217: tbl.Between(-2000, 2000).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
@@ -766,7 +766,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #223
 		/* 8 */
-		var expected_ int = 8
+		var expected_ = 8
 		/* tbl.between(20, 29, left_bound='open').count() */
 
 		suite.T().Log("About to run line #223: tbl.Between(20, 29).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
@@ -781,7 +781,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #227
 		/* 9 */
-		var expected_ int = 9
+		var expected_ = 9
 		/* tbl.between(-10, 9, left_bound='open').count() */
 
 		suite.T().Log("About to run line #227: tbl.Between(-10, 9).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
@@ -796,7 +796,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #231
 		/* 19 */
-		var expected_ int = 19
+		var expected_ = 19
 		/* tbl.between(80, 2000, left_bound='open').count() */
 
 		suite.T().Log("About to run line #231: tbl.Between(80, 2000).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
@@ -811,7 +811,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #235
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.between(-2000, 2000, left_bound='open').count() */
 
 		suite.T().Log("About to run line #235: tbl.Between(-2000, 2000).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
@@ -826,7 +826,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #240
 		/* err('ReqlQueryLogicError', 'Expected type TABLE_SLICE but found DATUM:', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type TABLE_SLICE but found DATUM:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type TABLE_SLICE but found DATUM:")
 		/* r.expr([1, 2, 3]).between(-1, 2) */
 
 		suite.T().Log("About to run line #240: r.Expr([]interface{}{1, 2, 3}).Between(-1, 2)")
@@ -841,7 +841,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #244
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* tbl.between(r.minval, 2).count() */
 
 		suite.T().Log("About to run line #244: tbl.Between(r.MinVal, 2).Count()")
@@ -856,7 +856,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #247
 		/* 3 */
-		var expected_ int = 3
+		var expected_ = 3
 		/* tbl.between(r.minval, 2, right_bound='closed').count() */
 
 		suite.T().Log("About to run line #247: tbl.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{RightBound: 'closed', }).Count()")
@@ -871,7 +871,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #251
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* tbl.between(r.minval, 2, left_bound='open').count() */
 
 		suite.T().Log("About to run line #251: tbl.Between(r.MinVal, 2).OptArgs(r.BetweenOpts{LeftBound: 'open', }).Count()")
@@ -886,7 +886,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #255
 		/* 98 */
-		var expected_ int = 98
+		var expected_ = 98
 		/* tbl.between(2, r.maxval).count() */
 
 		suite.T().Log("About to run line #255: tbl.Between(2, r.MaxVal).Count()")
@@ -901,7 +901,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #265
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(null, 2).count() */
 
 		suite.T().Log("About to run line #265: tbl.Between(nil, 2).Count()")
@@ -916,7 +916,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #266
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(2, null).count() */
 
 		suite.T().Log("About to run line #266: tbl.Between(2, nil).Count()")
@@ -931,7 +931,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #267
 		/* err('ReqlQueryLogicError', 'Cannot use `nu' + 'll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot use `nu"+"ll` in BETWEEN, use `r.minval` or `r.maxval` to denote unboundedness.")
 		/* tbl.between(null, null).count() */
 
 		suite.T().Log("About to run line #267: tbl.Between(nil, nil).Count()")
@@ -946,7 +946,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #271
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* tblpkey.between(9, 11).count() */
 
 		suite.T().Log("About to run line #271: tblpkey.Between(9, 11).Count()")
@@ -961,7 +961,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #274
 		/* 0 */
-		var expected_ int = 0
+		var expected_ = 0
 		/* tblpkey.between(11, 12).count() */
 
 		suite.T().Log("About to run line #274: tblpkey.Between(11, 12).Count()")
@@ -976,7 +976,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #278
 		/* 25 */
-		var expected_ int = 25
+		var expected_ = 25
 		/* tbl.filter(lambda row:row['a'] > 2).count() */
 
 		suite.T().Log("About to run line #278: tbl.Filter(func(row r.Term) interface{} { return row.AtIndex('a').Gt(2)}).Count()")
@@ -991,7 +991,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #284
 		/* 100 */
-		var expected_ int = 100
+		var expected_ = 100
 		/* tbl.filter(lambda row: 1).count() */
 
 		suite.T().Log("About to run line #284: tbl.Filter(func(row r.Term) interface{} { return 1}).Count()")
@@ -1006,7 +1006,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #290
 		/* [4, 5] */
-		var expected_ []interface{} = []interface{}{4, 5}
+		var expected_ = []interface{}{4, 5}
 		/* r.expr([1, 2, 3, 4, 5]).filter(r.row > 2).filter(r.row > 3) */
 
 		suite.T().Log("About to run line #290: r.Expr([]interface{}{1, 2, 3, 4, 5}).Filter(r.Row.Gt(2)).Filter(r.Row.Gt(3))")
@@ -1028,7 +1028,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #298
 		/* [[3, 4], [5, 6]] */
-		var expected_ []interface{} = []interface{}{[]interface{}{3, 4}, []interface{}{5, 6}}
+		var expected_ = []interface{}{[]interface{}{3, 4}, []interface{}{5, 6}}
 		/* nested.filter(lambda x: x.filter(lambda y: y >= 4).count() > 0) */
 
 		suite.T().Log("About to run line #298: nested.Filter(func(x r.Term) interface{} { return x.Filter(func(y r.Term) interface{} { return r.Ge(y, 4)}).Count().Gt(0)})")
@@ -1045,7 +1045,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #303
 		/* ([[3, 4], [5, 6]]) */
-		var expected_ []interface{} = []interface{}{[]interface{}{3, 4}, []interface{}{5, 6}}
+		var expected_ = []interface{}{[]interface{}{3, 4}, []interface{}{5, 6}}
 		/* nested.filter(r.row.filter(lambda y: y >= 4).count() > 0) */
 
 		suite.T().Log("About to run line #303: nested.Filter(r.Row.Filter(func(y r.Term) interface{} { return r.Ge(y, 4)}).Count().Gt(0))")
@@ -1060,7 +1060,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #307
 		/* err("ReqlCompileError", 'Cannot use r.row in nested queries.  Use functions instead.', [0]) */
-		var expected_ Err = err("ReqlCompileError", "Cannot use r.row in nested queries.  Use functions instead.")
+		var expected_ = err("ReqlCompileError", "Cannot use r.row in nested queries.  Use functions instead.")
 		/* nested.filter(lambda x: x.filter(r.row >= 4).count() > 0) */
 
 		suite.T().Log("About to run line #307: nested.Filter(func(x r.Term) interface{} { return x.Filter(r.Row.Ge(4)).Count().Gt(0)})")
@@ -1075,7 +1075,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #311
 		/* err("ReqlCompileError", 'Cannot use r.row in nested queries.  Use functions instead.', [0]) */
-		var expected_ Err = err("ReqlCompileError", "Cannot use r.row in nested queries.  Use functions instead.")
+		var expected_ = err("ReqlCompileError", "Cannot use r.row in nested queries.  Use functions instead.")
 		/* r.expr([[1, 2], [3, 4], [5, 6]]).filter(r.row.filter(r.row >= 4).count() > 0) */
 
 		suite.T().Log("About to run line #311: r.Expr([]interface{}{[]interface{}{1, 2}, []interface{}{3, 4}, []interface{}{5, 6}}).Filter(r.Row.Filter(r.Row.Ge(4)).Count().Gt(0))")
@@ -1090,7 +1090,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #316
 		/* [{'a':1,'b':2,'c':3}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, "b": 2, "c": 3}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1, "b": 2, "c": 3}}
 		/* r.expr([{'a':1,'b':1,'c':3},{'a':1,'b':2,'c':3}]).filter({'a':1,'b':2}) */
 
 		suite.T().Log("About to run line #316: r.Expr([]interface{}{map[interface{}]interface{}{'a': 1, 'b': 1, 'c': 3, }, map[interface{}]interface{}{'a': 1, 'b': 2, 'c': 3, }}).Filter(map[interface{}]interface{}{'a': 1, 'b': 2, })")
@@ -1105,7 +1105,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #319
 		/* [{'a':1,'b':1,'c':3},{'a':1,'b':2,'c':3}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, "b": 1, "c": 3}, map[interface{}]interface{}{"a": 1, "b": 2, "c": 3}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1, "b": 1, "c": 3}, map[interface{}]interface{}{"a": 1, "b": 2, "c": 3}}
 		/* r.expr([{'a':1,'b':1,'c':3},{'a':1,'b':2,'c':3}]).filter({'a':1}) */
 
 		suite.T().Log("About to run line #319: r.Expr([]interface{}{map[interface{}]interface{}{'a': 1, 'b': 1, 'c': 3, }, map[interface{}]interface{}{'a': 1, 'b': 2, 'c': 3, }}).Filter(map[interface{}]interface{}{'a': 1, })")
@@ -1120,7 +1120,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #323
 		/* [{'a':1,'b':1,'c':3}] */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": 1, "b": 1, "c": 3}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": 1, "b": 1, "c": 3}}
 		/* r.expr([{'a':1,'b':1,'c':3},{'a':1,'b':2,'c':3}]).filter({'a':r.row['b']}) */
 
 		suite.T().Log("About to run line #323: r.Expr([]interface{}{map[interface{}]interface{}{'a': 1, 'b': 1, 'c': 3, }, map[interface{}]interface{}{'a': 1, 'b': 2, 'c': 3, }}).Filter(map[interface{}]interface{}{'a': r.Row.AtIndex('b'), })")
@@ -1135,7 +1135,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #329
 		/* [] */
-		var expected_ []interface{} = []interface{}{}
+		var expected_ = []interface{}{}
 		/* r.expr([{'a':1}]).filter({'b':1}) */
 
 		suite.T().Log("About to run line #329: r.Expr([]interface{}{map[interface{}]interface{}{'a': 1, }}).Filter(map[interface{}]interface{}{'b': 1, })")
@@ -1150,7 +1150,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #335
 		/* 25 */
-		var expected_ int = 25
+		var expected_ = 25
 		/* tbl.count(lambda row: {'a':1}) */
 
 		suite.T().Log("About to run line #335: tbl.Count(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': 1, }})")
@@ -1165,7 +1165,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #341
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr([1,2,3,1]).count(1) */
 
 		suite.T().Log("About to run line #341: r.Expr([]interface{}{1, 2, 3, 1}).Count(1)")
@@ -1180,7 +1180,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #344
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr([null, 4, null, 'foo']).count(null) */
 
 		suite.T().Log("About to run line #344: r.Expr([]interface{}{nil, 4, nil, 'foo'}).Count(nil)")
@@ -1195,7 +1195,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #348
 		/* err('ReqlQueryLogicError', 'Expected type DATUM but found TABLE:', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type DATUM but found TABLE:")
 		/* r.expr(5) + tbl */
 
 		suite.T().Log("About to run line #348: r.Expr(5).Add(tbl)")
@@ -1210,7 +1210,7 @@ func (suite *SelectionSuite) TestCases() {
 	{
 		// selection.yaml line #353
 		/* "SELECTION<STREAM>" */
-		var expected_ string = "SELECTION<STREAM>"
+		var expected_ = "SELECTION<STREAM>"
 		/* tbl.has_fields('field').type_of() */
 
 		suite.T().Log("About to run line #353: tbl.HasFields('field').TypeOf()")

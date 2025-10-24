@@ -61,7 +61,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #4
 		/* [1,2,3] */
-		var expected_ []interface{} = []interface{}{1, 2, 3}
+		var expected_ = []interface{}{1, 2, 3}
 		/* r.json("[1,2,3]") */
 
 		suite.T().Log("About to run line #4: r.JSON('[1,2,3]')")
@@ -76,7 +76,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #7
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.json("1") */
 
 		suite.T().Log("About to run line #7: r.JSON('1')")
@@ -91,7 +91,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #10
 		/* {} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{}
+		var expected_ = map[interface{}]interface{}{}
 		/* r.json("{}") */
 
 		suite.T().Log("About to run line #10: r.JSON('{}')")
@@ -106,7 +106,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #13
 		/* "foo" */
-		var expected_ string = "foo"
+		var expected_ = "foo"
 		/* r.json('"foo"') */
 
 		suite.T().Log("About to run line #13: r.JSON('\\'foo\\'')")
@@ -121,7 +121,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #16
 		/* err("ReqlQueryLogicError", 'Failed to parse "[1,2" as JSON:' + ' Missing a comma or \']\' after an array element.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Failed to parse \"[1,2\" as JSON:"+" Missing a comma or ']' after an array element.")
+		var expected_ = err("ReqlQueryLogicError", "Failed to parse \"[1,2\" as JSON:"+" Missing a comma or ']' after an array element.")
 		/* r.json("[1,2") */
 
 		suite.T().Log("About to run line #16: r.JSON('[1,2')")
@@ -136,7 +136,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #19
 		/* '[1,2,3]' */
-		var expected_ string = "[1,2,3]"
+		var expected_ = "[1,2,3]"
 		/* r.json("[1,2,3]").to_json_string() */
 
 		suite.T().Log("About to run line #19: r.JSON('[1,2,3]').ToJSON()")
@@ -151,7 +151,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #23
 		/* '[1,2,3]' */
-		var expected_ string = "[1,2,3]"
+		var expected_ = "[1,2,3]"
 		/* r.json("[1,2,3]").to_json() */
 
 		suite.T().Log("About to run line #23: r.JSON('[1,2,3]').ToJSON()")
@@ -166,7 +166,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #26
 		/* '{"foo":4}' */
-		var expected_ string = "{\"foo\":4}"
+		var expected_ = "{\"foo\":4}"
 		/* r.json("{\"foo\":4}").to_json_string() */
 
 		suite.T().Log("About to run line #26: r.JSON('{\\'foo\\':4}').ToJSON()")
@@ -181,7 +181,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #30
 		/* '{"foo":4}' */
-		var expected_ string = "{\"foo\":4}"
+		var expected_ = "{\"foo\":4}"
 		/* r.json("{\"foo\":4}").to_json() */
 
 		suite.T().Log("About to run line #30: r.JSON('{\\'foo\\':4}').ToJSON()")
@@ -210,7 +210,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #37
 		/* sorted */
-		var expected_ string = sorted
+		var expected_ = sorted
 		/* r.json(text).to_json_string() */
 
 		suite.T().Log("About to run line #37: r.JSON(text).ToJSON()")
@@ -225,7 +225,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #40
 		/* err('ReqlQueryLogicError', 'Cannot convert `r.minval` to JSON.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot convert `r.minval` to JSON.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot convert `r.minval` to JSON.")
 		/* r.expr(r.minval).to_json_string() */
 
 		suite.T().Log("About to run line #40: r.Expr(r.MinVal).ToJSON()")
@@ -240,7 +240,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #43
 		/* err('ReqlQueryLogicError', 'Cannot convert `r.maxval` to JSON.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot convert `r.maxval` to JSON.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot convert `r.maxval` to JSON.")
 		/* r.expr(r.maxval).to_json_string() */
 
 		suite.T().Log("About to run line #43: r.Expr(r.MaxVal).ToJSON()")
@@ -255,7 +255,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #46
 		/* err('ReqlQueryLogicError', 'Cannot convert `r.minval` to JSON.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot convert `r.minval` to JSON.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot convert `r.minval` to JSON.")
 		/* r.expr(r.minval).coerce_to('string') */
 
 		suite.T().Log("About to run line #46: r.Expr(r.MinVal).CoerceTo('string')")
@@ -270,7 +270,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #49
 		/* err('ReqlQueryLogicError', 'Cannot convert `r.maxval` to JSON.') */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot convert `r.maxval` to JSON.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot convert `r.maxval` to JSON.")
 		/* r.expr(r.maxval).coerce_to('string') */
 
 		suite.T().Log("About to run line #49: r.Expr(r.MaxVal).CoerceTo('string')")
@@ -285,7 +285,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #52
 		/* {'timezone':'+00:00','$reql_type$':'TIME','epoch_time':1410393600} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"timezone": "+00:00", "$reql_type$": "TIME", "epoch_time": 1410393600}
+		var expected_ = map[interface{}]interface{}{"timezone": "+00:00", "$reql_type$": "TIME", "epoch_time": 1410393600}
 		/* r.time(2014,9,11, 'Z') */
 
 		suite.T().Log("About to run line #52: r.Time(2014, 9, 11, 'Z')")
@@ -301,7 +301,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #57
 		/* '{"$reql_type$":"TIME","epoch_time":1410393600,"timezone":"+00:00"}' */
-		var expected_ string = "{\"$reql_type$\":\"TIME\",\"epoch_time\":1410393600,\"timezone\":\"+00:00\"}"
+		var expected_ = "{\"$reql_type$\":\"TIME\",\"epoch_time\":1410393600,\"timezone\":\"+00:00\"}"
 		/* r.time(2014,9,11, 'Z').to_json_string() */
 
 		suite.T().Log("About to run line #57: r.Time(2014, 9, 11, 'Z').ToJSON()")
@@ -316,7 +316,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #60
 		/* {'$reql_type$':'GEOMETRY','coordinates':[0,0],'type':'Point'} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point"}
+		var expected_ = map[interface{}]interface{}{"$reql_type$": "GEOMETRY", "coordinates": []interface{}{0, 0}, "type": "Point"}
 		/* r.point(0,0) */
 
 		suite.T().Log("About to run line #60: r.Point(0, 0)")
@@ -331,7 +331,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #63
 		/* '{"$reql_type$":"GEOMETRY","coordinates":[0,0],"type":"Point"}' */
-		var expected_ string = "{\"$reql_type$\":\"GEOMETRY\",\"coordinates\":[0,0],\"type\":\"Point\"}"
+		var expected_ = "{\"$reql_type$\":\"GEOMETRY\",\"coordinates\":[0,0],\"type\":\"Point\"}"
 		/* r.point(0,0).to_json_string() */
 
 		suite.T().Log("About to run line #63: r.Point(0, 0).ToJSON()")
@@ -353,7 +353,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #70
 		/* s */
-		var expected_ []byte = s
+		var expected_ = s
 		/* r.binary(s) */
 
 		suite.T().Log("About to run line #70: r.Binary(s)")
@@ -368,7 +368,7 @@ func (suite *JsonSuite) TestCases() {
 	{
 		// json.yaml line #73
 		/* '{"$reql_type$":"BINARY","data":"Zm9v"}' */
-		var expected_ string = "{\"$reql_type$\":\"BINARY\",\"data\":\"Zm9v\"}"
+		var expected_ = "{\"$reql_type$\":\"BINARY\",\"data\":\"Zm9v\"}"
 		/* r.expr("foo").coerce_to("binary").to_json_string() */
 
 		suite.T().Log("About to run line #73: r.Expr('foo').CoerceTo('binary').ToJSON()")

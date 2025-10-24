@@ -68,7 +68,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #9
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* obj['a'] */
 
 		suite.T().Log("About to run line #9: obj.AtIndex('a')")
@@ -83,7 +83,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #14
 		/* 'str' */
-		var expected_ string = "str"
+		var expected_ = "str"
 		/* obj['c'] */
 
 		suite.T().Log("About to run line #14: obj.AtIndex('c')")
@@ -98,7 +98,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #22
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* obj.has_fields('b') */
 
 		suite.T().Log("About to run line #22: obj.HasFields('b')")
@@ -113,7 +113,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #24
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* obj.keys().contains('d') */
 
 		suite.T().Log("About to run line #24: obj.Keys().Contains('d')")
@@ -128,7 +128,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #26
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* obj.has_fields('d') */
 
 		suite.T().Log("About to run line #26: obj.HasFields('d')")
@@ -143,7 +143,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #28
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* obj.has_fields({'e':'f'}) */
 
 		suite.T().Log("About to run line #28: obj.HasFields(map[interface{}]interface{}{'e': 'f', })")
@@ -158,7 +158,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #30
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* obj.has_fields({'e':'g'}) */
 
 		suite.T().Log("About to run line #30: obj.HasFields(map[interface{}]interface{}{'e': 'g', })")
@@ -173,7 +173,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #32
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* obj.has_fields('f') */
 
 		suite.T().Log("About to run line #32: obj.HasFields('f')")
@@ -188,7 +188,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #36
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* obj.has_fields('a', 'b') */
 
 		suite.T().Log("About to run line #36: obj.HasFields('a', 'b')")
@@ -203,7 +203,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #38
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* obj.has_fields('a', 'd') */
 
 		suite.T().Log("About to run line #38: obj.HasFields('a', 'd')")
@@ -218,7 +218,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #40
 		/* false */
-		var expected_ bool = false
+		var expected_ = false
 		/* obj.has_fields('a', 'f') */
 
 		suite.T().Log("About to run line #40: obj.HasFields('a', 'f')")
@@ -233,7 +233,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #42
 		/* true */
-		var expected_ bool = true
+		var expected_ = true
 		/* obj.has_fields('a', {'e':'f'}) */
 
 		suite.T().Log("About to run line #42: obj.HasFields('a', map[interface{}]interface{}{'e': 'f', })")
@@ -248,7 +248,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #46
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr([obj, obj.pluck('a', 'b')]).has_fields('a', 'b').count() */
 
 		suite.T().Log("About to run line #46: r.Expr([]interface{}{obj, obj.Pluck('a', 'b')}).HasFields('a', 'b').Count()")
@@ -263,7 +263,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #48
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr([obj, obj.pluck('a', 'b')]).has_fields('a', 'c').count() */
 
 		suite.T().Log("About to run line #48: r.Expr([]interface{}{obj, obj.Pluck('a', 'b')}).HasFields('a', 'c').Count()")
@@ -278,7 +278,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #50
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr([obj, obj.pluck('a', 'e')]).has_fields('a', {'e':'f'}).count() */
 
 		suite.T().Log("About to run line #50: r.Expr([]interface{}{obj, obj.Pluck('a', 'e')}).HasFields('a', map[interface{}]interface{}{'e': 'f', }).Count()")
@@ -293,7 +293,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #55
 		/* {'a':1} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1}
+		var expected_ = map[interface{}]interface{}{"a": 1}
 		/* obj.pluck('a') */
 
 		suite.T().Log("About to run line #55: obj.Pluck('a')")
@@ -308,7 +308,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #57
 		/* {'a':1, 'b':2} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2}
 		/* obj.pluck('a', 'b') */
 
 		suite.T().Log("About to run line #57: obj.Pluck('a', 'b')")
@@ -323,7 +323,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #62
 		/* {'b':2, 'c':'str', 'd':null, 'e':{'f':'buzz'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
+		var expected_ = map[interface{}]interface{}{"b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
 		/* obj.without('a') */
 
 		suite.T().Log("About to run line #62: obj.Without('a')")
@@ -338,7 +338,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #64
 		/* {'c':'str', 'd':null,'e':{'f':'buzz'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
+		var expected_ = map[interface{}]interface{}{"c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
 		/* obj.without('a', 'b') */
 
 		suite.T().Log("About to run line #64: obj.Without('a', 'b')")
@@ -353,7 +353,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #66
 		/* {'e':{'f':'buzz'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"e": map[interface{}]interface{}{"f": "buzz"}}
+		var expected_ = map[interface{}]interface{}{"e": map[interface{}]interface{}{"f": "buzz"}}
 		/* obj.without('a', 'b', 'c', 'd') */
 
 		suite.T().Log("About to run line #66: obj.Without('a', 'b', 'c', 'd')")
@@ -368,7 +368,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #68
 		/* {'a':1, 'b':2, 'c':'str', 'd':null, 'e':{}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{}}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{}}
 		/* obj.without({'e':'f'}) */
 
 		suite.T().Log("About to run line #68: obj.Without(map[interface{}]interface{}{'e': 'f', })")
@@ -383,7 +383,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #70
 		/* {'a':1, 'b':2, 'c':'str', 'd':null, 'e':{'f':'buzz'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
 		/* obj.without({'e':'buzz'}) */
 
 		suite.T().Log("About to run line #70: obj.Without(map[interface{}]interface{}{'e': 'buzz', })")
@@ -398,7 +398,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #77
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* obj.merge(1) */
 
 		suite.T().Log("About to run line #77: obj.Merge(1)")
@@ -413,7 +413,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #81
 		/* {'a':1, 'b':2, 'c':'str', 'd':null, 'e':-2} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": -2}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": -2}
 		/* obj.merge({'e':-2}) */
 
 		suite.T().Log("About to run line #81: obj.Merge(map[interface{}]interface{}{'e': -2, })")
@@ -428,7 +428,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #85
 		/* {'a':1, 'b':2, 'c':'str', 'd':null} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil}
 		/* obj.merge({'e':r.literal()}) */
 
 		suite.T().Log("About to run line #85: obj.Merge(map[interface{}]interface{}{'e': r.Literal(), })")
@@ -443,7 +443,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #89
 		/* {'a':1, 'b':2, 'c':'str', 'd':null, 'e':{'f':'quux'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "quux"}}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "quux"}}
 		/* obj.merge({'e':{'f':'quux'}}) */
 
 		suite.T().Log("About to run line #89: obj.Merge(map[interface{}]interface{}{'e': map[interface{}]interface{}{'f': 'quux', }, })")
@@ -458,7 +458,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #92
 		/* {'a':1, 'b':2, 'c':'str', 'd':null, 'e':{'f':'buzz', 'g':'quux'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz", "g": "quux"}}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz", "g": "quux"}}
 		/* obj.merge({'e':{'g':'quux'}}) */
 
 		suite.T().Log("About to run line #92: obj.Merge(map[interface{}]interface{}{'e': map[interface{}]interface{}{'g': 'quux', }, })")
@@ -473,7 +473,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #95
 		/* {'a':1, 'b':2, 'c':'str', 'd':null, 'e':{'g':'quux'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"g": "quux"}}
+		var expected_ = map[interface{}]interface{}{"a": 1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"g": "quux"}}
 		/* obj.merge({'e':r.literal({'g':'quux'})}) */
 
 		suite.T().Log("About to run line #95: obj.Merge(map[interface{}]interface{}{'e': r.Literal(map[interface{}]interface{}{'g': 'quux', }), })")
@@ -488,7 +488,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #99
 		/* {'a':-1, 'b':2, 'c':'str', 'd':null, 'e':{'f':'buzz'}} */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": -1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
+		var expected_ = map[interface{}]interface{}{"a": -1, "b": 2, "c": "str", "d": nil, "e": map[interface{}]interface{}{"f": "buzz"}}
 		/* obj.merge({'a':-1}) */
 
 		suite.T().Log("About to run line #99: obj.Merge(map[interface{}]interface{}{'a': -1, })")
@@ -510,7 +510,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #105
 		/* err("ReqlQueryLogicError", errmsg, []) */
-		var expected_ Err = err("ReqlQueryLogicError", errmsg)
+		var expected_ = err("ReqlQueryLogicError", errmsg)
 		/* r.literal('foo') */
 
 		suite.T().Log("About to run line #105: r.Literal('foo')")
@@ -525,7 +525,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #108
 		/* err("ReqlQueryLogicError", errmsg, []) */
-		var expected_ Err = err("ReqlQueryLogicError", errmsg)
+		var expected_ = err("ReqlQueryLogicError", errmsg)
 		/* obj.merge(r.literal('foo')) */
 
 		suite.T().Log("About to run line #108: obj.Merge(r.Literal('foo'))")
@@ -540,7 +540,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #111
 		/* err("ReqlQueryLogicError", errmsg, []) */
-		var expected_ Err = err("ReqlQueryLogicError", errmsg)
+		var expected_ = err("ReqlQueryLogicError", errmsg)
 		/* obj.merge({'foo':r.literal(r.literal('foo'))}) */
 
 		suite.T().Log("About to run line #111: obj.Merge(map[interface{}]interface{}{'foo': r.Literal(r.Literal('foo')), })")
@@ -562,7 +562,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #116
 		/* ({'a':{'b':1, 'c':2}, 'd':3, 'e':4, 'f':5}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 3, "e": 4, "f": 5}
+		var expected_ = map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 3, "e": 4, "f": 5}
 		/* o.merge({'e':4}, {'f':5}) */
 
 		suite.T().Log("About to run line #116: o.Merge(map[interface{}]interface{}{'e': 4, }, map[interface{}]interface{}{'f': 5, })")
@@ -577,7 +577,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #120
 		/* ([{'a':{'b':1, 'c':2}, 'd':3, 'e':3}, {'a':{'b':1, 'c':2}, 'd':4, 'e':4}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 3, "e": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 4, "e": 4}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 3, "e": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 4, "e": 4}}
 		/* r.expr([o, o.merge({'d':4})]).merge(lambda row:{'e':row['d']}) */
 
 		suite.T().Log("About to run line #120: r.Expr([]interface{}{o, o.Merge(map[interface{}]interface{}{'d': 4, })}).Merge(func(row r.Term) interface{} { return map[interface{}]interface{}{'e': row.AtIndex('d'), }})")
@@ -592,7 +592,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #124
 		/* ([{'a':{'b':1, 'c':2}, 'd':3, 'e':3}, {'a':{'b':1, 'c':2}, 'd':4, 'e':4}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 3, "e": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 4, "e": 4}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 3, "e": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 1, "c": 2}, "d": 4, "e": 4}}
 		/* r.expr([o, o.merge({'d':4})]).merge({'e':r.row['d']}) */
 
 		suite.T().Log("About to run line #124: r.Expr([]interface{}{o, o.Merge(map[interface{}]interface{}{'d': 4, })}).Merge(map[interface{}]interface{}{'e': r.Row.AtIndex('d'), })")
@@ -607,7 +607,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #129
 		/* ([{'a':{'b':2, 'c':2}, 'd':3}, {'a':{'b':2, 'c':2}, 'd':4}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2, "c": 2}, "d": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2, "c": 2}, "d": 4}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2, "c": 2}, "d": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2, "c": 2}, "d": 4}}
 		/* r.expr([o, o.merge({'d':4})]).merge(lambda row:{'a':{'b':2}}) */
 
 		suite.T().Log("About to run line #129: r.Expr([]interface{}{o, o.Merge(map[interface{}]interface{}{'d': 4, })}).Merge(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': map[interface{}]interface{}{'b': 2, }, }})")
@@ -624,7 +624,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #134
 		/* ([{'a':{'b':2}, 'd':3}, {'a':{'b':2}, 'd':4}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2}, "d": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2}, "d": 4}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2}, "d": 3}, map[interface{}]interface{}{"a": map[interface{}]interface{}{"b": 2}, "d": 4}}
 		/* r.expr([o, o.merge({'d':4})]).merge(lambda row:{'a':r.literal({'b':2})}) */
 
 		suite.T().Log("About to run line #134: r.Expr([]interface{}{o, o.Merge(map[interface{}]interface{}{'d': 4, })}).Merge(func(row r.Term) interface{} { return map[interface{}]interface{}{'a': r.Literal(map[interface{}]interface{}{'b': 2, }), }})")
@@ -641,7 +641,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #139
 		/* (['a', 'b', 'c', 'd', 'e']) */
-		var expected_ []interface{} = []interface{}{"a", "b", "c", "d", "e"}
+		var expected_ = []interface{}{"a", "b", "c", "d", "e"}
 		/* obj.keys() */
 
 		suite.T().Log("About to run line #139: obj.Keys()")
@@ -656,7 +656,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #142
 		/* ([1, 2, 'str', null, {'f':'buzz'}]) */
-		var expected_ []interface{} = []interface{}{1, 2, "str", nil, map[interface{}]interface{}{"f": "buzz"}}
+		var expected_ = []interface{}{1, 2, "str", nil, map[interface{}]interface{}{"f": "buzz"}}
 		/* obj.values() */
 
 		suite.T().Log("About to run line #142: obj.Values()")
@@ -671,7 +671,7 @@ func (suite *TransformObjectSuite) TestCases() {
 	{
 		// transform/object.yaml line #146
 		/* 5 */
-		var expected_ int = 5
+		var expected_ = 5
 		/* obj.count() */
 
 		suite.T().Log("About to run line #146: obj.Count()")

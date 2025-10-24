@@ -70,7 +70,7 @@ func (suite *SindexNullsinstringsSuite) TestCases() {
 	{
 		// sindex/nullsinstrings.yaml line #4
 		/* ({"created":1}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"created": 1}
+		var expected_ = map[interface{}]interface{}{"created": 1}
 		/* tbl.index_create("key") */
 
 		suite.T().Log("About to run line #4: tbl.IndexCreate('key')")
@@ -85,7 +85,7 @@ func (suite *SindexNullsinstringsSuite) TestCases() {
 	{
 		// sindex/nullsinstrings.yaml line #6
 		/* ([{"ready":true}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"ready": true}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"ready": true}}
 		/* tbl.index_wait().pluck("ready") */
 
 		suite.T().Log("About to run line #6: tbl.IndexWait().Pluck('ready')")
@@ -100,7 +100,7 @@ func (suite *SindexNullsinstringsSuite) TestCases() {
 	{
 		// sindex/nullsinstrings.yaml line #10
 		/* ({"inserted":2}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"inserted": 2}
+		var expected_ = map[interface{}]interface{}{"inserted": 2}
 		/* tbl.insert([{"id":1,"key":["a","b"]},{"id":2,"key":["a\u0000Sb"]}]).pluck("inserted") */
 
 		suite.T().Log("About to run line #10: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 1, 'key': []interface{}{'a', 'b'}, }, map[interface{}]interface{}{'id': 2, 'key': []interface{}{'a\\u0000Sb'}, }}).Pluck('inserted')")
@@ -115,7 +115,7 @@ func (suite *SindexNullsinstringsSuite) TestCases() {
 	{
 		// sindex/nullsinstrings.yaml line #13
 		/* ([{"id":2}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 2}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 2}}
 		/* tbl.get_all(["a\u0000Sb"], index="key").pluck("id") */
 
 		suite.T().Log("About to run line #13: tbl.GetAll([]interface{}{'a\\u0000Sb'}).OptArgs(r.GetAllOpts{Index: 'key', }).Pluck('id')")
@@ -130,7 +130,7 @@ func (suite *SindexNullsinstringsSuite) TestCases() {
 	{
 		// sindex/nullsinstrings.yaml line #18
 		/* ([{"id":1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"id": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"id": 1}}
 		/* tbl.get_all(["a","b"], index="key").pluck("id") */
 
 		suite.T().Log("About to run line #18: tbl.GetAll([]interface{}{'a', 'b'}).OptArgs(r.GetAllOpts{Index: 'key', }).Pluck('id')")

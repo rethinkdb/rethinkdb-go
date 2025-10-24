@@ -61,7 +61,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #6
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(1) * 2 */
 
 		suite.T().Log("About to run line #6: r.Expr(1).Mul(2)")
@@ -76,7 +76,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #7
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* 1 * r.expr(2) */
 
 		suite.T().Log("About to run line #7: r.Mul(1, r.Expr(2))")
@@ -91,7 +91,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #8
 		/* 2 */
-		var expected_ int = 2
+		var expected_ = 2
 		/* r.expr(1).mul(2) */
 
 		suite.T().Log("About to run line #8: r.Expr(1).Mul(2)")
@@ -106,7 +106,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #15
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(-1) * -1 */
 
 		suite.T().Log("About to run line #15: r.Expr(-1).Mul(-1)")
@@ -136,7 +136,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #25
 		/* [1,2,3,1,2,3,1,2,3] */
-		var expected_ []interface{} = []interface{}{1, 2, 3, 1, 2, 3, 1, 2, 3}
+		var expected_ = []interface{}{1, 2, 3, 1, 2, 3, 1, 2, 3}
 		/* r.expr([1,2,3]) * 3 */
 
 		suite.T().Log("About to run line #25: r.Expr([]interface{}{1, 2, 3}).Mul(3)")
@@ -151,7 +151,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #30
 		/* 120 */
-		var expected_ int = 120
+		var expected_ = 120
 		/* r.expr(1).mul(2,3,4,5) */
 
 		suite.T().Log("About to run line #30: r.Expr(1).Mul(2, 3, 4, 5)")
@@ -166,7 +166,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #46
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('a') * 0.8 */
 
 		suite.T().Log("About to run line #46: r.Expr('a').Mul(0.8)")
@@ -181,7 +181,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #50
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [1]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr(1) * 'a' */
 
 		suite.T().Log("About to run line #50: r.Expr(1).Mul('a')")
@@ -196,7 +196,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #54
 		/* err('ReqlQueryLogicError', 'Expected type NUMBER but found STRING.', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
+		var expected_ = err("ReqlQueryLogicError", "Expected type NUMBER but found STRING.")
 		/* r.expr('b') * 'a' */
 
 		suite.T().Log("About to run line #54: r.Expr('b').Mul('a')")
@@ -211,7 +211,7 @@ func (suite *MathLogicMulSuite) TestCases() {
 	{
 		// math_logic/mul.yaml line #58
 		/* err('ReqlQueryLogicError', 'Number not an integer: 1.5', [0]) */
-		var expected_ Err = err("ReqlQueryLogicError", "Number not an integer: 1.5")
+		var expected_ = err("ReqlQueryLogicError", "Number not an integer: 1.5")
 		/* r.expr([]) * 1.5 */
 
 		suite.T().Log("About to run line #58: r.Expr([]interface{}{}).Mul(1.5)")

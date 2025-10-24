@@ -91,7 +91,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #43
 		/* err("ReqlQueryLogicError", "Empty ERROR term outside a default block.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Empty ERROR term outside a default block.")
+		var expected_ = err("ReqlQueryLogicError", "Empty ERROR term outside a default block.")
 		/* r.error() */
 
 		suite.T().Log("About to run line #43: r.Error()")
@@ -106,7 +106,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #96
 		/* err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:")
+		var expected_ = err("ReqlQueryLogicError", "Expected type DATUM but found DATABASE:")
 		/* db.table_drop() */
 
 		suite.T().Log("About to run line #96: db.TableDrop()")
@@ -121,7 +121,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #209
 		/* err("ReqlQueryLogicError", "Cannot call `branch` term with an even number of arguments.", []) */
-		var expected_ Err = err("ReqlQueryLogicError", "Cannot call `branch` term with an even number of arguments.")
+		var expected_ = err("ReqlQueryLogicError", "Cannot call `branch` term with an even number of arguments.")
 		/* r.branch(1,2,3,4) */
 
 		suite.T().Log("About to run line #209: r.Branch(1, 2, 3, 4)")
@@ -136,7 +136,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #220
 		/* 10 */
-		var expected_ int = 10
+		var expected_ = 10
 		/* tbl.insert([{'id':0},{'id':1},{'id':2},{'id':3},{'id':4},{'id':5},{'id':6},{'id':7},{'id':8},{'id':9}]).get_field('inserted') */
 
 		suite.T().Log("About to run line #220: tbl.Insert([]interface{}{map[interface{}]interface{}{'id': 0, }, map[interface{}]interface{}{'id': 1, }, map[interface{}]interface{}{'id': 2, }, map[interface{}]interface{}{'id': 3, }, map[interface{}]interface{}{'id': 4, }, map[interface{}]interface{}{'id': 5, }, map[interface{}]interface{}{'id': 6, }, map[interface{}]interface{}{'id': 7, }, map[interface{}]interface{}{'id': 8, }, map[interface{}]interface{}{'id': 9, }}).Field('inserted')")
@@ -151,7 +151,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #223
 		/* bag([0, 1, 2]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{0, 1, 2})
+		var expected_ = compare.UnorderedMatch([]interface{}{0, 1, 2})
 		/* tbl.get_all(0, 1, 2).get_field('id') */
 
 		suite.T().Log("About to run line #223: tbl.GetAll(0, 1, 2).Field('id')")
@@ -166,7 +166,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #226
 		/* bag([0, 1, 2]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{0, 1, 2})
+		var expected_ = compare.UnorderedMatch([]interface{}{0, 1, 2})
 		/* tbl.get_all(r.args([]), 0, 1, 2).get_field('id') */
 
 		suite.T().Log("About to run line #226: tbl.GetAll(r.Args([]interface{}{}), 0, 1, 2).Field('id')")
@@ -181,7 +181,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #229
 		/* bag([0, 1, 2]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{0, 1, 2})
+		var expected_ = compare.UnorderedMatch([]interface{}{0, 1, 2})
 		/* tbl.get_all(r.args([0]), 1, 2).get_field('id') */
 
 		suite.T().Log("About to run line #229: tbl.GetAll(r.Args([]interface{}{0}), 1, 2).Field('id')")
@@ -196,7 +196,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #232
 		/* bag([0, 1, 2]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{0, 1, 2})
+		var expected_ = compare.UnorderedMatch([]interface{}{0, 1, 2})
 		/* tbl.get_all(r.args([0, 1]), 2).get_field('id') */
 
 		suite.T().Log("About to run line #232: tbl.GetAll(r.Args([]interface{}{0, 1}), 2).Field('id')")
@@ -211,7 +211,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #235
 		/* bag([0, 1, 2]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{0, 1, 2})
+		var expected_ = compare.UnorderedMatch([]interface{}{0, 1, 2})
 		/* tbl.get_all(r.args([0, 1, 2])).get_field('id') */
 
 		suite.T().Log("About to run line #235: tbl.GetAll(r.Args([]interface{}{0, 1, 2})).Field('id')")
@@ -226,7 +226,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #238
 		/* bag([0, 1, 2]) */
-		var expected_ compare.Expected = compare.UnorderedMatch([]interface{}{0, 1, 2})
+		var expected_ = compare.UnorderedMatch([]interface{}{0, 1, 2})
 		/* tbl.get_all(r.args([0]), 1, r.args([2])).get_field('id') */
 
 		suite.T().Log("About to run line #238: tbl.GetAll(r.Args([]interface{}{0}), 1, r.Args([]interface{}{2})).Field('id')")
@@ -241,7 +241,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #243
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch(true, 1, r.error("a")) */
 
 		suite.T().Log("About to run line #243: r.Branch(true, 1, r.Error('a'))")
@@ -256,7 +256,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #246
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.branch(r.args([true, 1]), r.error("a")) */
 
 		suite.T().Log("About to run line #246: r.Branch(r.Args([]interface{}{true, 1}), r.Error('a'))")
@@ -271,7 +271,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #249
 		/* 1 */
-		var expected_ int = 1
+		var expected_ = 1
 		/* r.expr(true).branch(1, 2) */
 
 		suite.T().Log("About to run line #249: r.Expr(true).Branch(1, 2)")
@@ -286,7 +286,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #252
 		/* err("ReqlUserError", "a", []) */
-		var expected_ Err = err("ReqlUserError", "a")
+		var expected_ = err("ReqlUserError", "a")
 		/* r.branch(r.args([true, 1, r.error("a")])) */
 
 		suite.T().Log("About to run line #252: r.Branch(r.Args([]interface{}{true, 1, r.Error('a')}))")
@@ -301,7 +301,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #258
 		/* ([{'group':0, 'reduction':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"group": 0, "reduction": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"group": 0, "reduction": 1}}
 		/* tbl.group(lambda row:row['id'].mod(2)).count({'id':0}).ungroup() */
 
 		suite.T().Log("About to run line #258: tbl.Group(func(row r.Term) interface{} { return row.AtIndex('id').Mod(2)}).Count(map[interface{}]interface{}{'id': 0, }).Ungroup()")
@@ -316,7 +316,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #263
 		/* ([{'group':0, 'reduction':1}]) */
-		var expected_ []interface{} = []interface{}{map[interface{}]interface{}{"group": 0, "reduction": 1}}
+		var expected_ = []interface{}{map[interface{}]interface{}{"group": 0, "reduction": 1}}
 		/* tbl.group(r.row['id'].mod(2)).count(r.args([{'id':0}])).ungroup() */
 
 		suite.T().Log("About to run line #263: tbl.Group(r.Row.AtIndex('id').Mod(2)).Count(r.Args([]interface{}{map[interface{}]interface{}{'id': 0, }})).Ungroup()")
@@ -331,7 +331,7 @@ func (suite *AritySuite) TestCases() {
 	{
 		// arity.yaml line #269
 		/* ({'a':{'c':1}}) */
-		var expected_ map[interface{}]interface{} = map[interface{}]interface{}{"a": map[interface{}]interface{}{"c": 1}}
+		var expected_ = map[interface{}]interface{}{"a": map[interface{}]interface{}{"c": 1}}
 		/* r.expr({'a':{'b':1}}).merge(r.args([{'a':r.literal({'c':1})}])) */
 
 		suite.T().Log("About to run line #269: r.Expr(map[interface{}]interface{}{'a': map[interface{}]interface{}{'b': 1, }, }).Merge(r.Args([]interface{}{map[interface{}]interface{}{'a': r.Literal(map[interface{}]interface{}{'c': 1, }), }}))")
