@@ -12,3 +12,6 @@ benchpool:
 generate:
 	go generate ./internal/...
 
+PHONY: proto
+proto:
+	make -C ql2 protoc
