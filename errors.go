@@ -190,3 +190,13 @@ func IsTypeErr(err error) bool {
 
 	return strings.HasPrefix(err.Error(), "Expected type")
 }
+
+// IsPKTooLongErr returns true if the error is non-nil and the
+// query failed due to PK too long error.
+func IsPKTooLongErr(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	return strings.HasPrefix(err.Error(), "Primary key too long (max 127 characters)")
+}
